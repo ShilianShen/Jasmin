@@ -11,12 +11,16 @@ file(GLOB SCR_FILES
         "${PROJECT_SOURCE_DIR}/src/*.h"
         "${PROJECT_SOURCE_DIR}/src/*.c"
 )
-add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES})
+add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
+        src/menu.h)
 
 
 # 查找库
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
-
-# 链接库
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+        SDL2::SDL2
+        SDL2_image::SDL2_image
+        SDL2_ttf::SDL2_ttf
+)

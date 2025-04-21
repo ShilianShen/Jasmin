@@ -1,5 +1,9 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <SDL_image.h>
 #include <stdio.h>
+#include <SDL_ttf.h>
+#include "menu.h"
+
 
 int main(int argc, char* argv[]) {
     // 初始化 SDL
@@ -21,9 +25,22 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return 1;
     }
+    if (TTF_Init() == -1) {
+        SDL_Log("TTF_Init Error: %s", TTF_GetError());
+        return 1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(
+        window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    );
 
     // 主循环
+    Elem elemTest = {40, {100, 100, 100, 100}, {}};
+    loadElemTexture(renderer, &elemTest, "f-../images/test.png");
     SDL_Event event;
+    bck_rect.w = 640;
+    bck_rect.h = 480;
     int running = 1;
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -31,7 +48,10 @@ int main(int argc, char* argv[]) {
                 running = 0;
             }
         }
-        // 这里可以添加渲染代码
+        renewElem(&elemTest);
+        drawElem(renderer, &elemTest);
+
+        SDL_RenderPresent(renderer);
     }
 
     // 清理资源
