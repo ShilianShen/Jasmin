@@ -2,11 +2,6 @@
 #define MENU_H
 
 
-#include <SDL_rect.h>
-#include <SDL_render.h>
-#include <stdint.h>
-
-
 // 基本函数
 SDL_Texture* getTextureFromImage(SDL_Renderer* renderer, const char* path) {
     // 检查参数
@@ -59,6 +54,29 @@ SDL_Texture* getTextureFromText(SDL_Renderer* renderer, TTF_Font* font, const ch
 
 
 SDL_Rect bck_rect;
+
+
+// menuTheme
+struct {
+    TTF_Font* font;
+    SDL_Color color;
+} menuTheme;
+void loadMenuTheme() {
+    // font
+    menuTheme.font = TTF_OpenFont("../fonts/Courier New.ttf", 20);
+    if (menuTheme.font == NULL) {printf("Fail to load font.");}
+
+    // color
+    menuTheme.color.r = 255;
+    menuTheme.color.g = 255;
+    menuTheme.color.b = 255;
+    menuTheme.color.a = 255;
+}
+void killMenuTheme() {
+    if (menuTheme.font != NULL) {TTF_CloseFont(menuTheme.font);}
+}
+
+
 // Elem
 typedef uint8_t Anchor;
 typedef uint8_t ElemPara;
@@ -84,18 +102,13 @@ typedef struct {
 } Elem;
 
 void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString) {
-    // 常量
-    static const SDL_Color color = { 255, 255, 255, 255 };
-    TTF_Font* font = TTF_OpenFont("../fonts/Times New Roman.ttf", 20);
-    printf("%d\n", font != NULL);
-
     // 检查参数
     if (renderer == NULL || elem == NULL || elemString == NULL) {return;}
     if (elemString[0] == 0 || elemString[1] == 0 || elemString[2] == 0) {return;}
 
     // 创建 texture
     switch (elemString[0]) {
-        case 't': elem->texture = getTextureFromText(renderer, font, elemString+2, color); break;
+        case 't': elem->texture = getTextureFromText(renderer, menuTheme.font, elemString+2, menuTheme.color); break;
         case 'f': elem->texture = getTextureFromImage(renderer, elemString+2); break;
         default: break;
     }
@@ -164,9 +177,9 @@ void renewElem(Elem* elem) {
     renewElemDstRect(elem);
     renewElemState(elem);
 }
-void drawElem(SDL_Renderer* renderer, Elem* elem) {
+void drawElem(SDL_Renderer* renderer, const Elem* elem) {
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &elem->dst_rect);
+    SDL_RenderDrawRect(renderer, &elem->dst_rect);
     SDL_RenderCopy(renderer, elem->texture, &elem->src_rects[elem->state], &elem->dst_rect);
 };
 
