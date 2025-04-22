@@ -61,9 +61,10 @@ struct {
     TTF_Font* font;
     SDL_Color color;
 } menuTheme;
+
 void loadMenuTheme() {
     // font
-    menuTheme.font = TTF_OpenFont("../fonts/Courier New.ttf", 20);
+    menuTheme.font = TTF_OpenFont("../fonts/Courier New.ttf", 40);
     if (menuTheme.font == NULL) {printf("Fail to load font.");}
 
     // color
@@ -168,10 +169,7 @@ void renewElemState(Elem* elem) {
     // 检查参数
     if (elem == NULL) return;
 
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-    int x = elem->dst_rect.x, y = elem->dst_rect.y, w = elem->dst_rect.w, h = elem->dst_rect.h;
-    elem->state = (x < mx && mx < x + w && y < my && my < y + h) ? INSIDE : OUTSIDE;
+    elem->state = mouseInRect(&elem->dst_rect) ? INSIDE : OUTSIDE;
 }
 void renewElem(Elem* elem) {
     renewElemDstRect(elem);

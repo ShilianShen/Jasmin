@@ -1,17 +1,18 @@
 #include <SDL.h>
 #include <SDL_image.h>
-#include <stdio.h>
 #include <SDL_ttf.h>
-#include <SDL_rect.h>
-#include <SDL_render.h>
+#include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+
+#include "device.h"
 
 #include "menu.h"
 
 
 SDL_Window* window;
 SDL_Renderer* renderer;
-const char WINDOW_TITLE[] = "SDL2 测试";
+const char WINDOW_TITLE[] = "Menu Editor";
 
 
 int main(int argc, char* argv[]) {
@@ -36,12 +37,8 @@ int main(int argc, char* argv[]) {
     // 创建 renderer
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    int logical_w, logical_h, physical_w, physical_h;
-    SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GL_GetDrawableSize(window, &physical_w, &physical_h);
-    float scale_x = (float)physical_w / (float)logical_w;
-    float scale_y = (float)physical_h / (float)logical_h;
-    printf("scale_x: %f, scale_y: %f\n", scale_x, scale_y);
+    renewScreenScale(window);
+
 
     // 载入
     loadMenuTheme();
@@ -62,6 +59,7 @@ int main(int argc, char* argv[]) {
         }
 
         // renew
+        renewMouse();
         renewElem(&elemTest);
 
         // draw
