@@ -3,7 +3,7 @@ project(Lo_Tri C)
 
 
 # 设置C标准
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 90)
 
 
 # 添加可执行文件

@@ -2,6 +2,8 @@
 #define MENU_H
 
 
+
+
 // 基本函数
 SDL_Texture* getTextureFromImage(SDL_Renderer* renderer, const char* path) {
     // 检查参数
@@ -53,7 +55,11 @@ SDL_Texture* getTextureFromText(SDL_Renderer* renderer, TTF_Font* font, const ch
 }
 
 
+
+
 SDL_Rect bck_rect;
+
+
 
 
 // menuTheme
@@ -61,6 +67,7 @@ struct {
     TTF_Font* font;
     SDL_Color color;
 } menuTheme;
+
 
 void loadMenuTheme() {
     // font
@@ -78,10 +85,12 @@ void killMenuTheme() {
 }
 
 
+
+
 // Elem
 typedef uint8_t Anchor;
 typedef uint8_t ElemPara;
-typedef enum {OUTSIDE, INSIDE, PRESS, RELEASE, NUM_ELEM_STATES} ElemState;
+typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 typedef enum {PASS, FORWARD, BACKWARD, NUM_ELEM_FUNCS} ElemFunc;
 const uint8_t ELEM_PATH_LENGTH = 32;
 
@@ -98,10 +107,11 @@ typedef struct {
 
     // 功能相关
     ElemState state;
-    ElemFunc funcs[NUM_ELEM_STATES];
-    ElemPara paras[NUM_ELEM_STATES];
+    ElemFunc func;
+    ElemPara para;
 } Elem;
 
+// load
 void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString) {
     // 检查参数
     if (renderer == NULL || elem == NULL || elemString == NULL) {return;}
@@ -129,6 +139,7 @@ void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString)
     }
 }
 
+// renew
 void renewElemDstRect(Elem* elem) {
     // 检查参数
     if (elem == NULL) return;
@@ -175,9 +186,10 @@ void renewElem(Elem* elem) {
     renewElemDstRect(elem);
     renewElemState(elem);
 }
+
+// draw
 void drawElem(SDL_Renderer* renderer, const Elem* elem) {
-    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-    SDL_RenderDrawRect(renderer, &elem->dst_rect);
+    DEBUG_DrawRect(renderer, &elem->dst_rect);
     SDL_RenderCopy(renderer, elem->texture, &elem->src_rects[elem->state], &elem->dst_rect);
 };
 
@@ -185,28 +197,26 @@ void drawElem(SDL_Renderer* renderer, const Elem* elem) {
 
 
 // Page
+struct Page {};
+
+
 typedef uint8_t PageId;
 const uint8_t ElemVol = 255;
+
+
+void drawPage(SDL_Window* window);
+
+
+
 
 // Menu
 const uint8_t MENU_DEPTH = 64;
 PageId menu[MENU_DEPTH] = {1, 0};
 
 
-// 定义大型类型
-
-
-
-struct Page {};
-
-
-
-
-// 输出函数
-
-
-void drawPage(SDL_Window* window);
 void drawMenu(SDL_Window* window);
+
+
 
 
 #endif //MENU_H

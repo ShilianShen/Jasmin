@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
 
     // 载入
     loadMenuTheme();
+    loadDebug();
     Elem elemTest = {40, {100, 100, 100, 100}, {}};
     loadElemTexture(renderer, &elemTest, "t-../images/test.png");
     SDL_Event event;
@@ -57,13 +58,21 @@ int main(int argc, char* argv[]) {
                 running = 0;
             }
         }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, NULL);
 
         // renew
         renewMouse();
         renewElem(&elemTest);
 
         // draw
+        SDL_GetWindowSize(window, &bck_rect.w, &bck_rect.h);
+        bck_rect.w *= scale_x;
+        bck_rect.h *= scale_y;
+
+        DEBUG_DrawRect(renderer, &bck_rect);
         drawElem(renderer, &elemTest);
+        drawMouse(renderer);
         SDL_RenderPresent(renderer);
     }
 
