@@ -1,12 +1,13 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+// #include <SDL_gfx.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "debug.h"
 #include "device.h"
-
 #include "menu.h"
 
 
@@ -27,7 +28,7 @@ int main(int argc, char* argv[]) {
     }
 
     // 创建 window
-    window = SDL_CreateWindow(WINDOW_TITLE, 0, 0, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    window = SDL_CreateWindow(WINDOW_TITLE, 0, 0, 800, 600, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         printf("Fail SDL_CreateWindow: %s\n", SDL_GetError());
         SDL_Quit();
@@ -43,8 +44,8 @@ int main(int argc, char* argv[]) {
     // 载入
     loadMenuTheme();
     loadDebug();
-    Elem elemTest = {40, {100, 100, 100, 100}, {}};
-    loadElemTexture(renderer, &elemTest, "t-../images/test.png");
+    Elem elemRoot = {20, {100, 100, 100, 100}, {}};
+    loadElemTexture(renderer, &elemRoot, "t-Root");
     SDL_Event event;
     bck_rect.w = 640;
     bck_rect.h = 480;
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) {
 
         // renew
         renewMouse();
-        renewElem(&elemTest);
+        renewElem(&elemRoot);
 
         // draw
         SDL_GetWindowSize(window, &bck_rect.w, &bck_rect.h);
@@ -71,7 +72,7 @@ int main(int argc, char* argv[]) {
         bck_rect.h *= scale_y;
 
         DEBUG_DrawRect(renderer, &bck_rect);
-        drawElem(renderer, &elemTest);
+        drawElem(renderer, &elemRoot);
         drawMouse(renderer);
         SDL_RenderPresent(renderer);
     }

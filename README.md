@@ -1,5 +1,7 @@
 # README
 
+> # 过早的优化是万恶之源
+
 ## CODING STYLE
 
 标识符:

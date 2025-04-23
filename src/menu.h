@@ -94,7 +94,6 @@ typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 typedef enum {PASS, FORWARD, BACKWARD, NUM_ELEM_FUNCS} ElemFunc;
 const uint8_t ELEM_PATH_LENGTH = 32;
 
-
 typedef struct {
     // 渲染位置相关
     Anchor anchor;
@@ -103,7 +102,7 @@ typedef struct {
 
     // 渲染纹理相关
     SDL_Texture* texture;
-    SDL_Rect src_rects[NUM_ELEM_STATES];
+    SDL_Rect src_rect;
 
     // 功能相关
     ElemState state;
@@ -111,7 +110,6 @@ typedef struct {
     ElemPara para;
 } Elem;
 
-// load
 void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString) {
     // 检查参数
     if (renderer == NULL || elem == NULL || elemString == NULL) {return;}
@@ -128,18 +126,20 @@ void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString)
     // 载入 guide, src_rects
     int w, h;
     SDL_QueryTexture(elem->texture, NULL, NULL, &w, &h);
-    w /= NUM_ELEM_STATES;
     elem->guide.w = w;
     elem->guide.h = h;
-    for (uint8_t i = 0; i < NUM_ELEM_STATES; i++) {
-        elem->src_rects[i].x = w * i;
-        elem->src_rects[i].y = 0;
-        elem->src_rects[i].w = w;
-        elem->src_rects[i].h = h;
-    }
+    elem->src_rect.x = 0;
+    elem->src_rect.y = 0;
+    elem->src_rect.w = w;
+    elem->src_rect.h = h;
+}
+void loadElemOthers(Elem* elem, const Anchor anchor, const SDL_Rect guide, const ElemFunc func, const ElemPara para) {
+    elem->anchor = anchor;
+    elem->guide = guide;
+    elem->func = func;
+    elem->para = para;
 }
 
-// renew
 void renewElemDstRect(Elem* elem) {
     // 检查参数
     if (elem == NULL) return;
@@ -187,17 +187,19 @@ void renewElem(Elem* elem) {
     renewElemState(elem);
 }
 
-// draw
 void drawElem(SDL_Renderer* renderer, const Elem* elem) {
     DEBUG_DrawRect(renderer, &elem->dst_rect);
-    SDL_RenderCopy(renderer, elem->texture, &elem->src_rects[elem->state], &elem->dst_rect);
+    SDL_RenderCopy(renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 };
 
 
 
 
 // Page
-struct Page {};
+typedef struct {
+    Elem elems[256];
+    Uint8 id;
+} Page;
 
 
 typedef uint8_t PageId;

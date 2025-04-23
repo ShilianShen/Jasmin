@@ -13,15 +13,18 @@ file(GLOB SCR_FILES
 )
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/menu.h
-        src/device.h)
+        src/device.h
+        src/debug.h)
 
 
 # 查找库
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
+# find_package(SDL2_gfx REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL2::SDL2
         SDL2_image::SDL2_image
         SDL2_ttf::SDL2_ttf
+        # SDL2_gfx::SDL2_gfx
 )
