@@ -11,7 +11,7 @@ float scale_x = 1, scale_y = 1;
 
 void renewScreenScale(SDL_Window* window) {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GL_GetDrawableSize(window, &physical_w, &physical_h);
+    SDL_GetWindowSizeInPixels(window, &physical_w, &physical_h);
     scale_x = (float)physical_w / (float)logical_w;
     scale_y = (float)physical_h / (float)logical_h;
 }
@@ -19,36 +19,38 @@ void renewScreenScale(SDL_Window* window) {
 
 // mouse
 struct {
-    int x, y;
+    float x, y;
 
     // left
     bool left_pressed;
-    int left_x, left_y;
+    float left_x, left_y;
 
     // right
     bool right_pressed;
-    int right_x, right_y;
+    float right_x, right_y;
 } mouse;
 void renewMouse() {
-    const Uint32 buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
+    const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
     mouse.x *= scale_x;
     mouse.y *= scale_y;
-
-    if (!mouse.left_pressed && buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+    if (!mouse.left_pressed && buttons & SDL_BUTTON_LMASK) {
         mouse.left_x = mouse.x;
         mouse.left_y = mouse.y;
-    } else if (mouse.left_pressed && !buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-        mouse.left_x = 0;
-        mouse.left_y = 0;
+    } else if (mouse.left_pressed && !(buttons & SDL_BUTTON_LMASK)) {
+        mouse.left_x = -255;
+        mouse.left_y = -255;
+    } else if (!mouse.left_pressed) {
+        mouse.left_x = -255;
+        mouse.left_y = -255;
     }
-    mouse.left_pressed = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-    mouse.right_pressed = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+    mouse.left_pressed = buttons & SDL_BUTTON_LMASK;
+    mouse.right_pressed = buttons & SDL_BUTTON_RMASK;
 }
 void drawMouse(SDL_Renderer* renderer) {
     DEBUG_DrawPoint(renderer, mouse.x, mouse.y);
     DEBUG_DrawPoint(renderer, mouse.left_x, mouse.left_y);
 }
-bool mouseInRect(const SDL_Rect* rect) {
+bool mouseInRect(const SDL_FRect* rect) {
     return (
         rect->x <= mouse.x && mouse.x < rect->x + rect->w &&
         rect->y <= mouse.y && mouse.y < rect->y + rect->h

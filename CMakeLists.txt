@@ -11,20 +11,19 @@ file(GLOB SCR_FILES
         "${PROJECT_SOURCE_DIR}/src/*.h"
         "${PROJECT_SOURCE_DIR}/src/*.c"
 )
+
+# 查找库
+find_package(SDL3 REQUIRED)
+find_package(SDL3_ttf REQUIRED)
+find_package(SDL3_image REQUIRED)
+
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/menu.h
         src/device.h
         src/debug.h)
 
-
-# 查找库
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(SDL2_ttf REQUIRED)
-# find_package(SDL2_gfx REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
-        # SDL2_gfx::SDL2_gfx
+        SDL3::SDL3
+        SDL3_ttf::SDL3_ttf
+        SDL3_image::SDL3_image
 )

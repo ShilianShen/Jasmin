@@ -5,39 +5,15 @@
 
 
 // 基本函数
-SDL_Texture* getTextureFromImage(SDL_Renderer* renderer, const char* path) {
-    // 检查参数
-    if (renderer == NULL || path == NULL) {
-        printf("Error(getTextureFromImage): Invalid parameters.");
-        return NULL;
-    }
-
-    // 创建 surface
-    SDL_Surface* surface = IMG_Load(path);
-    if (surface == NULL) {
-        printf("Fail to create surface from %s.", path);
-        return NULL;
-    }
-
-    // 创建 texture
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    if (texture == NULL) {
-        printf("Fail to create texture from %s.", path);
-        return NULL;
-    }
-
-    return texture;
-}
-SDL_Texture* getTextureFromText(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
+SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
     // 检查参数
     if (renderer == NULL || font == NULL || text == NULL) {
-        printf("Error(getTextureFromText): Invalid parameters.");
+        printf("Error(TXT_LoadTexture): Invalid parameters.");
         return NULL;
     }
 
     // 创建 surface
-    SDL_Surface* surface = TTF_RenderUTF8_Blended(font, text, color);
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text, 0, color);
     if (surface == NULL) {
         printf("Fail to create surface from %s.", text);
         return NULL;
@@ -45,7 +21,7 @@ SDL_Texture* getTextureFromText(SDL_Renderer* renderer, TTF_Font* font, const ch
 
     // 创建 texture
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
+    SDL_DestroySurface(surface);
     if (texture == NULL) {
         printf("Fail to create texture from %s.", text);
         return NULL;
@@ -53,6 +29,7 @@ SDL_Texture* getTextureFromText(SDL_Renderer* renderer, TTF_Font* font, const ch
 
     return texture;
 }
+
 
 
 
@@ -97,12 +74,12 @@ const uint8_t ELEM_PATH_LENGTH = 32;
 typedef struct {
     // 渲染位置相关
     Anchor anchor;
-    SDL_Rect guide;
-    SDL_Rect dst_rect;
+    SDL_FRect guide;
+    SDL_FRect dst_rect;
 
     // 渲染纹理相关
     SDL_Texture* texture;
-    SDL_Rect src_rect;
+    SDL_FRect src_rect;
 
     // 功能相关
     ElemState state;
@@ -117,15 +94,15 @@ void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString)
 
     // 创建 texture
     switch (elemString[0]) {
-        case 't': elem->texture = getTextureFromText(renderer, menuTheme.font, elemString+2, menuTheme.color); break;
-        case 'f': elem->texture = getTextureFromImage(renderer, elemString+2); break;
+        case 't': elem->texture = TXT_LoadTexture(renderer, menuTheme.font, elemString+2, menuTheme.color); break;
+        case 'f': elem->texture = IMG_LoadTexture(renderer, elemString+2); break;
         default: break;
     }
     if (elem->texture == NULL) {return;}
 
     // 载入 guide, src_rects
-    int w, h;
-    SDL_QueryTexture(elem->texture, NULL, NULL, &w, &h);
+    float w, h;
+    SDL_GetTextureSize(elem->texture, &w, &h);
     elem->guide.w = w;
     elem->guide.h = h;
     elem->src_rect.x = 0;
@@ -133,7 +110,7 @@ void loadElemTexture(SDL_Renderer* renderer, Elem* elem, const char* elemString)
     elem->src_rect.w = w;
     elem->src_rect.h = h;
 }
-void loadElemOthers(Elem* elem, const Anchor anchor, const SDL_Rect guide, const ElemFunc func, const ElemPara para) {
+void loadElemOthers(Elem* elem, const Anchor anchor, const SDL_FRect guide, const ElemFunc func, const ElemPara para) {
     elem->anchor = anchor;
     elem->guide = guide;
     elem->func = func;
@@ -189,7 +166,7 @@ void renewElem(Elem* elem) {
 
 void drawElem(SDL_Renderer* renderer, const Elem* elem) {
     DEBUG_DrawRect(renderer, &elem->dst_rect);
-    SDL_RenderCopy(renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+    SDL_RenderTexture(renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 };
 
 

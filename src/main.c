@@ -1,84 +1,63 @@
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-// #include <SDL_gfx.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "debug.h"
 #include "device.h"
 #include "menu.h"
 
 
-SDL_Window* window;
-SDL_Renderer* renderer;
-const char WINDOW_TITLE[] = "Menu Editor";
+int main(int argc, char *argv[]) {
+    const char WINDOW_TITLE[] = "Test";
+    const int WINDOW_WIDTH = 800;
+    const int WINDOW_HEIGHT = 600;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    bool running = true;
+    const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+    SDL_Event event;
 
-
-int main(int argc, char* argv[]) {
-    // 初始化依赖库
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        printf("SDL_Init 失败: %s\n", SDL_GetError());
-        return 1;
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
     }
-    if (TTF_Init() == -1) {
-        SDL_Log("TTF_Init Error: %s", TTF_GetError());
-        return 1;
+    if (!TTF_Init()) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
     }
-
-    // 创建 window
-    window = SDL_CreateWindow(WINDOW_TITLE, 0, 0, 800, 600, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    if (!window) {
-        printf("Fail SDL_CreateWindow: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
+    if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
 
-    // 创建 renderer
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
+    loadDebug();
+    loadMenuTheme();
     renewScreenScale(window);
 
+    Elem elemRoot;
+    SDL_FRect guide = {0, 0, 0, 0};
+    loadElemOthers(&elemRoot, 40, guide, 0, 0);
+    loadElemTexture(renderer, &elemRoot, "t-FUCK WORLD!");
 
-    // 载入
-    loadMenuTheme();
-    loadDebug();
-    Elem elemRoot = {20, {100, 100, 100, 100}, {}};
-    loadElemTexture(renderer, &elemRoot, "t-Root");
-    SDL_Event event;
-    bck_rect.w = 640;
-    bck_rect.h = 480;
-
-    // 主循环
-    int running = 1;
     while (running) {
-        // event
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = 0;
-            }
+            if (event.type == SDL_EVENT_QUIT) {running = false;}
         }
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(renderer, NULL);
 
-        // renew
         renewMouse();
+        bck_rect.w = WINDOW_WIDTH * scale_x;
+        bck_rect.h = WINDOW_HEIGHT * scale_y;
         renewElem(&elemRoot);
 
-        // draw
-        SDL_GetWindowSize(window, &bck_rect.w, &bck_rect.h);
-        bck_rect.w *= scale_x;
-        bck_rect.h *= scale_y;
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
-        DEBUG_DrawRect(renderer, &bck_rect);
         drawElem(renderer, &elemRoot);
+
         drawMouse(renderer);
+
         SDL_RenderPresent(renderer);
     }
 
-    // 释放
     SDL_DestroyWindow(window);
     SDL_Quit();
-    return 0;
+
 }

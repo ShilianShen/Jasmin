@@ -23,16 +23,16 @@ void loadDebug() {
 void DEBUG_DrawPoint(SDL_Renderer* renderer, const Sint16 x, const Sint16 y) {
     if (!debug.on || renderer == NULL) {return;}
 
-    const Sint16 w = 4;
-    const SDL_Rect rect = {x - w, y - w, 2 * w, 2 * w};
+    const float w = 4;
+    const SDL_FRect rect = {x - w, y - w, 2 * w, 2 * w};
     SDL_SetRenderDrawColor(renderer, debug.colorPoint.r, debug.colorPoint.g, debug.colorPoint.b, debug.colorPoint.a);
     SDL_RenderFillRect(renderer, &rect);
 }
-void DEBUG_DrawRect(SDL_Renderer* renderer, const SDL_Rect* rect) {
+void DEBUG_DrawRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
     if (!debug.on || renderer == NULL || rect == NULL) {return;}
 
     SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
-    SDL_RenderDrawRect(renderer, rect);
+    SDL_RenderRect(renderer, rect);
 }
 
 
