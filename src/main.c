@@ -1,22 +1,29 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#include <stdlib.h>
+#include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <string.h>
 
+
+#include "basic.h"
 #include "debug.h"
 #include "device.h"
 #include "menu.h"
 
 
 int main(int argc, char *argv[]) {
+
+    // window & renderer
     const char WINDOW_TITLE[] = "Test";
-    const int WINDOW_WIDTH = 800;
-    const int WINDOW_HEIGHT = 600;
+    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
     SDL_Window *window;
     SDL_Renderer *renderer;
     bool running = true;
     const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
     SDL_Event event;
+    const SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
@@ -28,35 +35,42 @@ int main(int argc, char *argv[]) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
 
-    loadDebug();
-    loadMenuTheme();
-    renewScreenScale(window);
+    // create & load
+    loadDebugTheme();
 
-    Elem elemRoot;
-    SDL_FRect guide = {0, 0, 0, 0};
-    loadElemOthers(&elemRoot, 40, guide, 0, 0);
-    loadElemTexture(renderer, &elemRoot, "t-FUCK WORLD!");
+    loadMenu(renderer);
 
+
+    // running
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {running = false;}
         }
 
+        // physical renew
+        renewScreenParas(window);
         renewMouse();
-        bck_rect.w = WINDOW_WIDTH * scale_x;
-        bck_rect.h = WINDOW_HEIGHT * scale_y;
-        renewElem(&elemRoot);
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        // logical renew
+        menu.bck_rect.w = (float)windowWidth, menu.bck_rect.h = (float)windowHeight;
+        renewMenu();
+
+        // clear
+        SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
         SDL_RenderClear(renderer);
 
-        drawElem(renderer, &elemRoot);
+        // logical draw
+        drawMenu();
 
+        // physical draw
         drawMouse(renderer);
+        DEBUG_Intro(renderer);
 
+        // show
         SDL_RenderPresent(renderer);
     }
 
+    // kill & destroy
     SDL_DestroyWindow(window);
     SDL_Quit();
 

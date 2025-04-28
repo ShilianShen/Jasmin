@@ -20,7 +20,9 @@ find_package(SDL3_image REQUIRED)
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/menu.h
         src/device.h
-        src/debug.h)
+        src/debug.h
+        src/basic.h
+)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3

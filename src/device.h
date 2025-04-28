@@ -2,21 +2,6 @@
 #define DEVICE_H
 
 
-
-
-// display parameters
-int logical_w, logical_h;
-int physical_w, physical_h;
-float scale_x = 1, scale_y = 1;
-
-void renewScreenScale(SDL_Window* window) {
-    SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GetWindowSizeInPixels(window, &physical_w, &physical_h);
-    scale_x = (float)physical_w / (float)logical_w;
-    scale_y = (float)physical_h / (float)logical_h;
-}
-
-
 // mouse
 struct {
     float x, y;
@@ -58,8 +43,6 @@ bool mouseInRect(const SDL_FRect* rect) {
 }
 
 
-
-
 // keyboard
 struct {} keyboard;
 void renewKeyboard() {
@@ -69,8 +52,6 @@ bool keyInKeyBoard(SDL_Scancode key) {
     //
     return false;
 }
-
-
 
 
 #endif //DEVICE_H
