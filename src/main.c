@@ -14,7 +14,6 @@
 
 
 int main(int argc, char *argv[]) {
-
     // window & renderer
     const char WINDOW_TITLE[] = "Test";
     const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;

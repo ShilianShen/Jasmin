@@ -74,7 +74,13 @@ void DEBUG_Intro(SDL_Renderer *renderer) {
     }
 }
 void DEBUG_DrawPoint(SDL_Renderer* renderer, const Sint16 x, const Sint16 y) {
-    if (!debug.on || renderer == NULL) {return;}
+    if (!debug.on) {
+        return;
+    }
+    if (renderer == NULL) {
+        printf("DEBUG_DrawPoint: Renderer is NULL.\n");
+        return;
+    }
 
     const float w = 4;
     const SDL_FRect rect = {x - w, y - w, 2 * w, 2 * w};
@@ -82,10 +88,36 @@ void DEBUG_DrawPoint(SDL_Renderer* renderer, const Sint16 x, const Sint16 y) {
     SDL_RenderFillRect(renderer, &rect);
 }
 void DEBUG_DrawRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
-    if (!debug.on || renderer == NULL || rect == NULL) {return;}
+    if (!debug.on) {
+        return;
+    }
+    if (renderer == NULL) {
+        printf("DEBUG_DrawRect: Renderer is NULL.\n");
+        return;
+    }
+    if (rect == NULL) {
+        printf("DEBUG_DrawRect: Rect is NULL.\n");
+        return;
+    }
 
     SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
     SDL_RenderRect(renderer, rect);
+}
+void DEBUG_FillRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
+    if (!debug.on) {
+        return;
+    }
+    if (renderer == NULL) {
+        printf("DEBUG_DrawRect: Renderer is NULL.\n");
+        return;
+    }
+    if (rect == NULL) {
+        printf("DEBUG_DrawRect: Rect is NULL.\n");
+        return;
+    }
+
+    SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
+    SDL_RenderFillRect(renderer, rect);
 }
 
 

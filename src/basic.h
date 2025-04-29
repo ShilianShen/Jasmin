@@ -3,6 +3,7 @@
 
 
 // display parameters
+typedef float Pixel;
 int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;

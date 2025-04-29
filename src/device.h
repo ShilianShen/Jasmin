@@ -2,7 +2,9 @@
 #define DEVICE_H
 
 
-// mouse
+#pragma region MOUSE ===================================================================================================
+
+
 struct {
     float x, y;
 
@@ -14,6 +16,8 @@ struct {
     bool right_pressed;
     float right_x, right_y;
 } mouse;
+
+
 void renewMouse() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
     mouse.x *= scale_x;
@@ -43,15 +47,25 @@ bool mouseInRect(const SDL_FRect* rect) {
 }
 
 
-// keyboard
+#pragma endregion MOUSE ================================================================================================
+#pragma region KEYBOARD ================================================================================================
+
+
 struct {} keyboard;
+
+
 void renewKeyboard() {
     //
 }
+
+
 bool keyInKeyBoard(SDL_Scancode key) {
     //
     return false;
 }
+
+
+#pragma endregion KEYBOARD =============================================================================================
 
 
 #endif //DEVICE_H

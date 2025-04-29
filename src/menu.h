@@ -3,6 +3,7 @@
 
 
 #pragma region ELEM ====================================================================================================
+#include "debug.h"
 
 
 // first data type
@@ -32,25 +33,35 @@ typedef struct {
 #pragma endregion ELEM =================================================================================================
 #pragma region PAGE ====================================================================================================
 
+
 typedef uint8_t PageId;
-const uint8_t PAGE_VOLUME = 255;
+typedef char PageName;
+typedef int PageVolume;
+const PageVolume PAGE_MAX_VOLUME = 32;
+
 
 typedef struct {
-    char* name;
-    Elem elems[PAGE_VOLUME];
-    Uint8 id;
+    PageName* name; PageId id;
+    Elem elems[PAGE_MAX_VOLUME];
 } Page;
+
 
 #pragma endregion PAGE =================================================================================================
 #pragma region MENU ====================================================================================================
-const uint8_t MENU_DEPTH = 16, PATH_DEPTH = 16;
+
+
+const uint8_t MENU_VOLUME = 16, PATH_DEPTH = 16;
+
+
 struct {
     PageId path[PATH_DEPTH];
-    Page *pageRoot, *pageEdge, *pageNow, pages[MENU_DEPTH];
+    Page *pageRoot, *pageEdge, *pageNow, *pages[MENU_VOLUME];
     SDL_FRect bck_rect;
     struct {TTF_Font* font; SDL_Color color;} theme;
     SDL_Renderer* renderer;
 } menu;
+
+
 #pragma endregion MENU =================================================================================================
 #pragma region ELEM_FUNC ===============================================================================================
 
@@ -105,7 +116,7 @@ void loadElemTexture(Elem* elem) {
 
     elem->texture = getTextureFromElemString(elem->string);
     if (elem->texture == NULL) {
-        printf("loadElemTexture: failed from elem[%p].\n", elem);
+        printf("loadElemTexture: elem[%p].texture is NULL.\n", elem);
         return;
     }
 
@@ -144,7 +155,7 @@ void renewElemDstRect(Elem* elem) {
     const Anchor y = elem->anchor / 9;
     elem->dst_rect.w = elem->guide.w;
     elem->dst_rect.h = elem->guide.h;
-    float cx = 0, cy = 0, dx = 0, dy = 0;
+    Pixel cx = 0, cy = 0, dx = 0, dy = 0;
     switch (x / 3) {
         case 0: cx = menu.bck_rect.x                  ; break;
         case 1: cx = menu.bck_rect.x + menu.bck_rect.w / 2; break;
@@ -173,9 +184,7 @@ void renewElemDstRect(Elem* elem) {
     elem->dst_rect.y = cy + dy;
 }
 void renewElemState(Elem* elem) {
-    // 检查参数
     if (elem == NULL) return;
-
     elem->state = mouseInRect(&elem->dst_rect) ? INSIDE : OUTSIDE;
 }
 void renewElem(Elem* elem) {
@@ -185,32 +194,45 @@ void renewElem(Elem* elem) {
 
 
 void drawElem(const Elem* elem) {
-    DEBUG_DrawRect(menu.renderer, &elem->dst_rect);
+    if (elem == NULL) {return;}
+    if (elem->texture == NULL) {return;}
+    if (menu.renderer == NULL) {
+        printf("drawElem: menu.renderer is NULL.\n");
+        return;
+    }
+
+    if (elem->state == OUTSIDE) {DEBUG_DrawRect(menu.renderer, &elem->dst_rect);}
+    else {DEBUG_FillRect(menu.renderer, &elem->dst_rect);}
     SDL_RenderTexture(menu.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
-};
+}
 
 
 #pragma endregion ELEM_FUNC ============================================================================================
 #pragma region PAGE_FUNC ===============================================================================================
 
-void preparePage(Page* page) {
-    for (int i = 0; i < PAGE_VOLUME; i++) {
-        loadElemTexture(&page->elems[i]);
+
+void loadPage(Page* page) {
+    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
+        //
     }
 }
+
+
 void renewPage(Page* page) {
     if (page == NULL) {return;}
-    for (int i = 0; i < PAGE_VOLUME; i++) {
+    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
         renewElem(&page->elems[i]);
     }
 }
 
+
 void drawPage(const Page* page) {
     if (page == NULL) {return;}
-    for (int i = 0; i < PAGE_VOLUME; i++) {
+    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
         drawElem(&page->elems[i]);
     }
 }
+
 
 #pragma endregion PAGE_FUNC ============================================================================================
 #pragma region MENU_FUNC ===============================================================================================
@@ -219,8 +241,11 @@ void drawPage(const Page* page) {
 // menu.theme
 void loadMenuTheme() {
     // font
-    menu.theme.font = TTF_OpenFont("../fonts/Courier New.ttf", 40);
-    if (menu.theme.font == NULL) {printf("Fail to load font.");}
+    const char fontPath[] = "../fonts/Courier New.ttf";
+    menu.theme.font = TTF_OpenFont(fontPath, 40);
+    if (menu.theme.font == NULL) {
+        printf("loadMenuTheme: Failed in %s.\n", fontPath);
+    }
 
     // color
     menu.theme.color.r = 255;
@@ -229,7 +254,9 @@ void loadMenuTheme() {
     menu.theme.color.a = 255;
 }
 void killMenuTheme() {
-    if (menu.theme.font != NULL) {TTF_CloseFont(menu.theme.font);}
+    if (menu.theme.font != NULL) {
+        TTF_CloseFont(menu.theme.font);
+    }
 }
 
 
@@ -252,17 +279,17 @@ void loadMenu(SDL_Renderer* renderer) {
 void renewMenu() {
     if (menu.path[0] == 0) {menu.pageNow = menu.pageRoot;}
     else {
-        for (int i = 0; i + 1 < MENU_DEPTH; i++) {
+        for (int i = 0; i + 1 < MENU_VOLUME; i++) {
             if (menu.path[i] != 0 && menu.path[i + 1] == 0) {
-                menu.pageNow = &menu.pages[menu.path[i]];
-                for (int j = i + 1; j < PAGE_VOLUME; j++) {
+                menu.pageNow = menu.pages[menu.path[i]];
+                for (int j = i + 1; j < PAGE_MAX_VOLUME; j++) {
                     menu.path[i] = 0;
                 }
                 break;
             }
         }
     }
-    if (menu.path[MENU_DEPTH - 1] != 0) {menu.pageNow = menu.pageEdge;}
+    if (menu.path[MENU_VOLUME - 1] != 0) {menu.pageNow = menu.pageEdge;}
     menu.pageNow = menu.pageRoot;
     // printf("%s\n", menu.pageNow->name);
     renewPage(menu.pageNow);
@@ -276,4 +303,6 @@ void drawMenu() {
 
 
 #pragma endregion MENU_FUNC ============================================================================================
+
+
 #endif //MENU_H
