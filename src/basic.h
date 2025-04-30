@@ -55,12 +55,17 @@ void SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
 }
 
 
-// EASE
+#pragma region EASE ====================================================================================================
+
+
 float EASE_bySin(const float x) {
     if (x >= 1) {return 1;}
     if (x <= 0) {return 0;}
     return SDL_pow(SDL_sinf(3.14 / 2 * x), 2);
 }
+
+
+#pragma endregion EASE =================================================================================================
 
 
 #endif //BASIC_H

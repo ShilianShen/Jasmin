@@ -6,6 +6,8 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string.h>
 
+#include "../toml/toml.h"
+
 
 #include "basic.h"
 #include "debug.h"

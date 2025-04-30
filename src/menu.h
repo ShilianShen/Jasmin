@@ -269,12 +269,23 @@ void loadMenuPageRoot() {
 }
 
 
+void loadPageFromToml() {
+    FILE* file = fopen("../menu.toml", "r");
+    if (file == NULL) {}
+    toml_table_t* tomlMenu = toml_parse_file(file, NULL, 0);
+    toml_table_t* tomlPageRoot = toml_table_in(tomlMenu, "pageRoot");
+    if (tomlPageRoot == NULL) {}
+    else {printf("YES\n");}
+    fclose(file);
+}
+
 // menu.pageEdge
 void loadMenuEdge() {}
 void loadMenu(SDL_Renderer* renderer) {
     menu.renderer = renderer;
     loadMenuTheme();
     loadMenuPageRoot();
+    loadPageFromToml();
 }
 void renewMenu() {
     if (menu.path[0] == 0) {menu.pageNow = menu.pageRoot;}

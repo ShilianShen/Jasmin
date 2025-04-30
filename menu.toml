@@ -1,4 +1,4 @@
-[PageRoot]
+[PageTest]
 elems = [
-    {anchor=40, guide=[0, 0], text="s The Title", func="Forward", para="PageTitle"},
+    {anchor=40, guide=[0, 0], text="s The Title", func="pass", para="The deads can be cured."},
 ]

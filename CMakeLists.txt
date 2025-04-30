@@ -3,7 +3,7 @@ project(Lo_Tri C)
 
 
 # 设置C标准
-set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD 99)
 
 
 # 添加可执行文件
@@ -22,6 +22,9 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/device.h
         src/debug.h
         src/basic.h
+
+        # toml/toml.h
+        toml/toml.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
