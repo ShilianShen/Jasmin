@@ -55,6 +55,7 @@ void SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
 }
 
 
+
 #pragma region EASE ====================================================================================================
 
 

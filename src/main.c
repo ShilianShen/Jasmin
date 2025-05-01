@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
 
     // running
     while (running) {
+        // printf("                                        \n");
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {running = false;}
         }

@@ -1,4 +1,7 @@
-[PageTest]
+[Root]
 elems = [
-    {anchor=40, guide=[0, 0], text="s The Title", func="pass", para="The deads can be cured."},
+    {anchor=40, guide=[0, 0], string="t ../images/test.png", func='forward', para='aa'},
+    {anchor=20, guide=[0, 0], string="f ../images/test.png", func='forward', para='aa'},
 ]
+[Edge]
+elems = []
