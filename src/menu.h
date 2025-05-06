@@ -58,11 +58,11 @@ const uint8_t MENU_MEX_VOLUME = 16, PATH_DEPTH = 16;
 
 struct {
     PageId path[PATH_DEPTH];
+    char pathString[128];
     Page *pageRoot, *pageEdge, *pageNow, *pages[MENU_MEX_VOLUME];
     SDL_FRect bck_rect;
     struct {TTF_Font* font; SDL_Color color;} theme;
     SDL_Renderer* renderer;
-    SDL_Texture* pathTexture;
 } menu;
 
 
@@ -87,47 +87,15 @@ SDL_Texture* getTextureFromElemString(const ElemString* elemString) {
             texture = IMG_LoadTexture(menu.renderer, elemString+2);
             break;
         }
+        case 'p': {
+            texture = TXT_LoadTexture(menu.renderer, menu.theme.font, menu.pathString, menu.theme.color);
+            break;
+        }
         default: {texture = NULL; break;}
     }
     if (texture == NULL) {printf("%s: failed from \"%s\".\n", __func__, elemString);}
 
     return texture;
-}
-bool drawElemTexture(SDL_Texture* texture, const Anchor anchor, const SDL_FRect guide) {
-    float w, h;
-    SDL_GetTextureSize(texture, &w, &h);
-    SDL_FRect dst_rect = {guide.x, guide.y, guide.w * w , guide.h * h};
-
-    const Anchor x = anchor % 9, y = anchor / 9;
-    float dx1, dy1, dx2, dy2;
-    switch (x / 3) {
-        case 0: {dx1 = menu.bck_rect.x                      ; break;}
-        case 1: {dx1 = menu.bck_rect.x + menu.bck_rect.w / 2; break;}
-        case 2: {dx1 = menu.bck_rect.x + menu.bck_rect.w    ; break;}
-        default: {dx1 = 0                                   ; break;}
-    }
-    switch (y / 3) {
-        case 0: {dy1 = menu.bck_rect.y                      ; break;}
-        case 1: {dy1 = menu.bck_rect.y + menu.bck_rect.h / 2; break;}
-        case 2: {dy1 = menu.bck_rect.y + menu.bck_rect.h    ; break;}
-        default: {dy1 = 0                                   ; break;}
-    }
-    switch (x % 3) {
-        case 0: {dx2 = -dst_rect.w    ; break;}
-        case 1: {dx2 = -dst_rect.w / 2; break;}
-        case 2: {dx2 = 0              ; break;}
-        default: {dx2 = 0             ; break;}
-    }
-    switch (y % 3) {
-        case 0: {dy2 = -dst_rect.h    ; break;}
-        case 1: {dy2 = -dst_rect.h / 2; break;}
-        case 2: {dy2 = 0              ; break;}
-        default: {dy2 = 0             ; break;}
-    }
-    dst_rect.x += dx1 + dx2;
-    dst_rect.y += dy1 + dy2;
-
-    return SDL_RenderTexture(menu.renderer, texture, NULL, &dst_rect);
 }
 
 
@@ -429,20 +397,16 @@ void printMenuPath() {
     }
 }
 
-void renewMenuPathTexture() {
-    static char string[128] = {};
-    if (menu.pathTexture != NULL) {SDL_DestroyTexture(menu.pathTexture);}
-
-    strcpy(string, menu.pageRoot->name);
+void renewMenuPathString() {
+    strcpy(menu.pathString, menu.pageRoot->name);
     for (int i = 0; i < PATH_DEPTH && menu.path[i] != 0; i++) {
-        strcat(string, "/");
-        strcat(string, menu.pages[menu.path[i]]->name);
+        strcat(menu.pathString, "/");
+        strcat(menu.pathString, menu.pages[menu.path[i]]->name);
     }
     if (menu.path[PATH_DEPTH - 1] != 0) {
-        strcat(string, "/");
-        strcat(string, menu.pageEdge->name);
+        strcat(menu.pathString, "/");
+        strcat(menu.pathString, menu.pageEdge->name);
     }
-    menu.pathTexture = TXT_LoadTexture(menu.renderer, debug.fontSmall, string, debug.colorText);
 }
 void renewMenu() {
     loadMenuFromToml("../menu.toml");
@@ -461,12 +425,11 @@ void renewMenu() {
     if (menu.path[MENU_MEX_VOLUME - 1] != 0) {menu.pageNow = menu.pageEdge;}
     menu.pageNow = menu.pageRoot;
     renewPage(menu.pageNow);
-    renewMenuPathTexture();
+    renewMenuPathString();
 }
 
 
 void drawMenu() {
-    drawElemTexture(menu.pathTexture, 56, (SDL_FRect){0, 0, 1, 1});
     drawPage(menu.pageNow);
 }
 

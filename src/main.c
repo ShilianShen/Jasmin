@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     // window & renderer
     const char WINDOW_TITLE[] = "Test";
-    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
+    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 200;
     SDL_Window *window;
     SDL_Renderer *renderer;
     bool running = true;
