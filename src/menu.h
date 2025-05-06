@@ -114,8 +114,12 @@ void loadElemFromToml(Elem* elem, const toml_table_t* tomlElem) {
     if (tomlGuide != NULL) {
         const toml_datum_t tomlGuideX = toml_double_at(tomlGuide, 0);
         const toml_datum_t tomlGuideY = toml_double_at(tomlGuide, 1);
+        const toml_datum_t tomlGuideW = toml_double_at(tomlGuide, 2);
+        const toml_datum_t tomlGuideH = toml_double_at(tomlGuide, 3);
         elem->guide.x = (float)(tomlGuideX.ok ? tomlGuideX.u.d : 0);
         elem->guide.y = (float)(tomlGuideY.ok ? tomlGuideY.u.d : 0);
+        elem->guide.w = (float)(tomlGuideW.ok ? tomlGuideW.u.d : 1);
+        elem->guide.h = (float)(tomlGuideH.ok ? tomlGuideH.u.d : 1);
     }
     else {elem->guide.x = elem->guide.y = 0;}
 
@@ -166,10 +170,12 @@ void renewElemTexture(Elem* elem) {
     if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
     elem->texture = getTextureFromElemString(elem->string);
     if (elem->texture == NULL) {printf("%s: failed from elem[%p].texture.\n", __func__, elem); return;}
+    SDL_SetTextureScaleMode(elem->texture, SDL_SCALEMODE_NEAREST);
 
     //
-    SDL_GetTextureSize(elem->texture, &elem->guide.w, &elem->guide.h);
-    elem->src_rect = (SDL_FRect){0, 0, elem->guide.w, elem->guide.h};
+    float w, h;
+    SDL_GetTextureSize(elem->texture, &w, &h);
+    elem->src_rect = (SDL_FRect){0, 0, w, h};
 }
 void renewElemDstRect(Elem* elem) {
     // P-Condition
@@ -179,8 +185,9 @@ void renewElemDstRect(Elem* elem) {
     //
     const Anchor x = elem->anchor % 9;
     const Anchor y = elem->anchor / 9;
-    elem->dst_rect.w = elem->guide.w;
-    elem->dst_rect.h = elem->guide.h;
+    SDL_GetTextureSize(elem->texture, &elem->dst_rect.w, &elem->dst_rect.h);
+    elem->dst_rect.w *= elem->guide.w;
+    elem->dst_rect.h *= elem->guide.h;
     Pixel cx = 0, cy = 0, dx = 0, dy = 0;
     switch (x / 3) {
         case 0: cx = menu.bck_rect.x                  ; break;
