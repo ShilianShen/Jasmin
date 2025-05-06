@@ -15,8 +15,8 @@ struct {
     SDL_Color colorLight;
 } debug;
 void loadDebugTheme() {
-    debug.fontSmall = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 128);
-    debug.fontBig = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 256);
+    debug.fontSmall = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 64);
+    debug.fontBig = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 128);
     if (debug.fontSmall == NULL) {printf("Fail to load font.\n");}
     debug.on = true;
     debug.colorPoint = (SDL_Color){246, 202, 124, 255};

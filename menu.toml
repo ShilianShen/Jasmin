@@ -1,7 +1,7 @@
 [Root]
 elems = [
-    {anchor=40, guide=[0, 0], string="t ../images/test.png", func='forward', para='aa'},
-    {anchor=20, guide=[0, 0], string="f ../images/test.png", func='forward', para='aa'},
+    {anchor=40, guide=[0, 0], string="f ../images/test.png", func='forward', para='aa'},
+    {anchor=20, guide=[0, 0], string="t ../images/test.png", func='forward', para='aa'},
 ]
 [Edge]
 elems = []

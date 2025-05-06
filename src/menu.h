@@ -62,6 +62,7 @@ struct {
     SDL_FRect bck_rect;
     struct {TTF_Font* font; SDL_Color color;} theme;
     SDL_Renderer* renderer;
+    SDL_Texture* pathTexture;
 } menu;
 
 
@@ -70,10 +71,6 @@ struct {
 
 
 // get
-/**
- * @brief 从elemString加载texture, 返回指针.
- * @details 会检查elemString风格是否正确
- */
 SDL_Texture* getTextureFromElemString(const ElemString* elemString) {
     // N-Condition
     if (elemString == NULL) {printf("%s: elemString not exist.\n", __func__); return NULL;}
@@ -96,13 +93,45 @@ SDL_Texture* getTextureFromElemString(const ElemString* elemString) {
 
     return texture;
 }
+bool drawElemTexture(SDL_Texture* texture, const Anchor anchor, const SDL_FRect guide) {
+    float w, h;
+    SDL_GetTextureSize(texture, &w, &h);
+    SDL_FRect dst_rect = {guide.x, guide.y, guide.w * w , guide.h * h};
+
+    const Anchor x = anchor % 9, y = anchor / 9;
+    float dx1, dy1, dx2, dy2;
+    switch (x / 3) {
+        case 0: {dx1 = menu.bck_rect.x                      ; break;}
+        case 1: {dx1 = menu.bck_rect.x + menu.bck_rect.w / 2; break;}
+        case 2: {dx1 = menu.bck_rect.x + menu.bck_rect.w    ; break;}
+        default: {dx1 = 0                                   ; break;}
+    }
+    switch (y / 3) {
+        case 0: {dy1 = menu.bck_rect.y                      ; break;}
+        case 1: {dy1 = menu.bck_rect.y + menu.bck_rect.h / 2; break;}
+        case 2: {dy1 = menu.bck_rect.y + menu.bck_rect.h    ; break;}
+        default: {dy1 = 0                                   ; break;}
+    }
+    switch (x % 3) {
+        case 0: {dx2 = -dst_rect.w    ; break;}
+        case 1: {dx2 = -dst_rect.w / 2; break;}
+        case 2: {dx2 = 0              ; break;}
+        default: {dx2 = 0             ; break;}
+    }
+    switch (y % 3) {
+        case 0: {dy2 = -dst_rect.h    ; break;}
+        case 1: {dy2 = -dst_rect.h / 2; break;}
+        case 2: {dy2 = 0              ; break;}
+        default: {dy2 = 0             ; break;}
+    }
+    dst_rect.x += dx1 + dx2;
+    dst_rect.y += dy1 + dy2;
+
+    return SDL_RenderTexture(menu.renderer, texture, NULL, &dst_rect);
+}
 
 
 // load
-/**
- * @brief 从tomlElem加载属性到elem
- * @details 检查参数, 如果tomlElem有属性缺失, 会用使用默认值, 而不会视为错误
- */
 void loadElemFromToml(Elem* elem, const toml_table_t* tomlElem) {
     // N-Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
@@ -136,9 +165,6 @@ void loadElemFromToml(Elem* elem, const toml_table_t* tomlElem) {
     // turn on
     elem->on = true;
 }
-/**
- * @brief 从C语言内部加载属性到elem
- */
 void loadElemFromC(Elem* elem, const Anchor anchor, const SDL_FRect guide, const ElemFunc func, const ElemPara para, const ElemString* string) {
     // N-Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
@@ -160,9 +186,6 @@ void loadElemFromC(Elem* elem, const Anchor anchor, const SDL_FRect guide, const
 
 
 // renew
-/**
- * @bried 根据string, 刷新texture
- */
 void renewElemTexture(Elem* elem) {
     // P-Condition
     if (elem == NULL) {return;}
@@ -180,9 +203,6 @@ void renewElemTexture(Elem* elem) {
     SDL_GetTextureSize(elem->texture, &elem->guide.w, &elem->guide.h);
     elem->src_rect = (SDL_FRect){0, 0, elem->guide.w, elem->guide.h};
 }
-/**
- * @brief 自动更新绘制矩形的参数
- */
 void renewElemDstRect(Elem* elem) {
     // P-Condition
     if (elem == NULL) {return;}
@@ -221,10 +241,6 @@ void renewElemDstRect(Elem* elem) {
     elem->dst_rect.x = cx + dx + elem->guide.x;
     elem->dst_rect.y = cy + dy + elem->guide.y;
 }
-/**
- *
- * @brief 根据鼠标位置和矩形判断elemState
- */
 void renewElemState(Elem* elem) {
     // P-Condition
     if (elem == NULL) return;
@@ -233,9 +249,6 @@ void renewElemState(Elem* elem) {
     //
     elem->state = mouseInRect(&elem->dst_rect) ? INSIDE : OUTSIDE;
 }
-/**
- * @brief renewFunc的集成
- */
 void renewElem(Elem* elem) {
     // P-Condition
     if (elem == NULL) {return;}
@@ -249,9 +262,6 @@ void renewElem(Elem* elem) {
 
 
 // draw
-/**
- * @brief 绘制
- */
 void drawElem(const Elem* elem) {
     // P-Condition
     if (elem == NULL) {return;}
@@ -419,7 +429,21 @@ void printMenuPath() {
     }
 }
 
+void renewMenuPathTexture() {
+    static char string[128] = {};
+    if (menu.pathTexture != NULL) {SDL_DestroyTexture(menu.pathTexture);}
 
+    strcpy(string, menu.pageRoot->name);
+    for (int i = 0; i < PATH_DEPTH && menu.path[i] != 0; i++) {
+        strcat(string, "/");
+        strcat(string, menu.pages[menu.path[i]]->name);
+    }
+    if (menu.path[PATH_DEPTH - 1] != 0) {
+        strcat(string, "/");
+        strcat(string, menu.pageEdge->name);
+    }
+    menu.pathTexture = TXT_LoadTexture(menu.renderer, debug.fontSmall, string, debug.colorText);
+}
 void renewMenu() {
     loadMenuFromToml("../menu.toml");
     if (menu.path[0] == 0) {menu.pageNow = menu.pageRoot;}
@@ -436,14 +460,13 @@ void renewMenu() {
     }
     if (menu.path[MENU_MEX_VOLUME - 1] != 0) {menu.pageNow = menu.pageEdge;}
     menu.pageNow = menu.pageRoot;
-    // printf("%s\n", menu.pageNow->name);
     renewPage(menu.pageNow);
-    // printMenuPath();
+    renewMenuPathTexture();
 }
 
 
 void drawMenu() {
-    menu.pageNow = menu.pageRoot;
+    drawElemTexture(menu.pathTexture, 56, (SDL_FRect){0, 0, 1, 1});
     drawPage(menu.pageNow);
 }
 
