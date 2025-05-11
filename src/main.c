@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     // window & renderer
     const char WINDOW_TITLE[] = "Test";
-    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 200;
+    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
     SDL_Window *window;
     SDL_Renderer *renderer;
     bool running = true;
@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     // create & load
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     loadDebugTheme();
 
     loadMenu(renderer);

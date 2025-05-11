@@ -20,7 +20,7 @@
 
 传入参数检查:
 
-条件检查分为「先决条件」「必要条件」「非必要条件」
+条件检查分为「先决条件P-Condition」「必要条件N-Condition」「非必要条件U-Condition」「自动修正条件C-Condition」
 
 先决条件: 调用函数的条件, 但是被写到了函数内部, 「不满足先决条件」不被视作「错误」
 
@@ -38,7 +38,14 @@
 
 #### ElemState 元素状态
 
-#### ElemFunc 元素诱发函数
+#### TrigFunc 元素诱发函数
+
+
+| func     | datatype |
+| -------- | -------- |
+| pass     | void     |
+| forward  | string   |
+| backward | string   |
 
 ### PAGE
 

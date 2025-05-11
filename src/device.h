@@ -45,6 +45,12 @@ bool mouseInRect(const SDL_FRect* rect) {
         rect->y <= mouse.y && mouse.y < rect->y + rect->h
         );
 }
+bool mouseLeftInRect(const SDL_FRect* rect) {
+    return (
+        rect->x <= mouse.left_x && mouse.left_x < rect->x + rect->w &&
+        rect->y <= mouse.left_y && mouse.left_y < rect->y + rect->h
+        );
+}
 
 
 #pragma endregion MOUSE ================================================================================================

@@ -82,7 +82,7 @@ void DEBUG_DrawPoint(SDL_Renderer* renderer, const Sint16 x, const Sint16 y) {
         return;
     }
 
-    const float w = 4;
+    const float w = 8;
     const SDL_FRect rect = {x - w, y - w, 2 * w, 2 * w};
     SDL_SetRenderDrawColor(renderer, debug.colorPoint.r, debug.colorPoint.g, debug.colorPoint.b, debug.colorPoint.a);
     SDL_RenderFillRect(renderer, &rect);
@@ -118,6 +118,10 @@ void DEBUG_FillRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
 
     SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
     SDL_RenderFillRect(renderer, rect);
+}
+void DEBUG_Cover(SDL_Renderer* renderer, const Uint8 alpha) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, alpha);
+    SDL_RenderFillRect(renderer, NULL);
 }
 
 
