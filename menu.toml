@@ -1,17 +1,27 @@
+# support *.png
 [Root]
 elems = [
     {anchor=56, guide=[0, 0, 1, 1], string="path"},
-    {anchor=31, guide=[0, 0, 6, 6], string="f ../images/491.png"},
-    {anchor=49, guide=[0, 0, 1, 1], string="t The dead can be cured."},
-    {anchor=49, guide=[0, 50, 1, 1], string="t Go Test.", func='forward', para='Test'},
+    {anchor=31, guide=[0, 0, 2, 2], string="f ../images/491.png"},
+    {anchor=49, guide=[0, 0, 1, 1], string="t The dead can be cured!"},
+    {anchor=20, guide=[0, 0, 1, 1], string="t Title", func='forward', para='Title'},
 ]
-[Test]
+[Title]
 elems = [
     {anchor=56, guide=[0, 0, 1, 1], string="path"},
+    {anchor=20, guide=[0, 0, 1, 1], string="t <<< Root.", func='clear'},
+    {anchor=31, guide=[0, 0, 1, 1], string="t THE MAZE"},
+    {anchor=49, guide=[0, 0, 1, 1], string="t Setting", func='forward', para='Setting'},
+]
+[Setting]
+elems = [
+    {anchor=56, guide=[0, 0, 1, 1], string="path"},
+    {anchor=20, guide=[0, 0, 1, 1], string="t <<<", func='backward'},
+    {anchor=49, guide=[0, 50, 1, 1], string="t Go Test?.", func='forward', para='Setting'},
 ]
 [Edge]
 elems = [
     {anchor=56, string="path"},
     {anchor=31, string="TC The edge of menu system, it shouldn't appear. \nIf you are watching it, there is a bug need to be fixed."},
-    {anchor=49, string="t [R2R: Return to Root]", func='backward', para='Root'}
+    {anchor=49, string="t [R2R: Return to Root]", func='clear'}
 ]
