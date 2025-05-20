@@ -16,12 +16,13 @@ typedef struct {const TrigName name; const TrigFunc func;} Trig;
 
 
 typedef uint8_t Anchor;
+typedef uint8_t ElemId;
 typedef char ElemStr;
 typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 
 
 typedef struct {
-    int id;
+    ElemId id;
     bool on;
 
     // file
@@ -401,22 +402,26 @@ void drawElem(const Elem* elem) {
 #pragma region PAGE_FUNC ===============================================================================================
 
 
-// load
-void loadPageFromToml(Page* page, const char* name, const toml_table_t* tomlPage) {
-    // N-Condition
+// load & kill
+void loadPageName(Page* page, const char* name) {
+    // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return;}
-    if (tomlPage == NULL) {printf("%s: tomlPage not exists.\n", __func__); return;}
 
-    // loadPageNameFromToml
+    //
     page->name = strdup(name);
 
-    // loadPageElemsFromToml
-    const toml_array_t* tomlElems = toml_array_in(tomlPage, "elems");
-    if (tomlElems == NULL) {printf("%s: tomlPage[%s].tomlElems not exists.\n", __func__, name); return;}
+    // Req Condition
+    if (page->name == NULL) {printf("%s: failed.\n", __func__);}
+}
+void loadPageElems(Page* page, const toml_array_t* tomlElems) {
+    // Req Condition
+    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+    if (tomlElems == NULL) {printf("%s: tomlElems not exists.\n", __func__); return;}
+
     //
     const int tomlElemsVolume = toml_array_nelem(tomlElems);
-    if (tomlElemsVolume >= PAGE_MAX_VOLUME) {printf("%s: tomlPage[%s].tomlElems overflows.\n", __func__, name); return;}
+    if (tomlElemsVolume >= PAGE_MAX_VOLUME) {printf("%s: tomlPage[%s].tomlElems overflows.\n", __func__, page->name); return;}
     //
     for (PageVolume i = 0; i < tomlElemsVolume; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
@@ -426,8 +431,19 @@ void loadPageFromToml(Page* page, const char* name, const toml_table_t* tomlPage
     }
 }
 
+void loadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
+    // Req Condition
+    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+    if (name == NULL) {printf("%s: name not exists.\n", __func__); return;}
+    if (tomlPage == NULL) {printf("%s: tomlPage not exists.\n", __func__); return;}
 
-// renew
+    //
+    loadPageName(page, name);
+    loadPageElems(page, toml_array_in(tomlPage, "elems"));
+}
+
+
+// renew & draw
 void renewPage(Page* page) {
     // N-Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -438,8 +454,6 @@ void renewPage(Page* page) {
     }
 }
 
-
-// draw
 void drawPage(const Page* page) {
     // N-Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -530,13 +544,13 @@ void loadMenuPagesFromToml(const char* tomlPath) {
 
         // loadMenuPageFromToml
         if (tomlPage == NULL) {printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);}
-        else if (strcmp(pageName, pageRootName) == 0) {loadPageFromToml(menu.pageRoot, pageName, tomlPage);}
-        else if (strcmp(pageName, pageEdgeName) == 0) {loadPageFromToml(menu.pageEdge, pageName, tomlPage);}
+        else if (strcmp(pageName, pageRootName) == 0) {loadPage(menu.pageRoot, pageName, tomlPage);}
+        else if (strcmp(pageName, pageEdgeName) == 0) {loadPage(menu.pageEdge, pageName, tomlPage);}
         else {
             if (menu.pages[pageId] == NULL) {
                 menu.pages[pageId] = malloc(sizeof(Page));
             }
-            loadPageFromToml(menu.pages[pageId], pageName, tomlPage);
+            loadPage(menu.pages[pageId], pageName, tomlPage);
             pageId++;
         }
     }
