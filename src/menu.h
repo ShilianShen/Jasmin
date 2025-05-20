@@ -21,15 +21,18 @@ typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 
 
 typedef struct {
+    int id;
     bool on;
 
     // file
-    Anchor anchor; SDL_FRect guide;
-    TrigFunc func; TrigPara para;
-    ElemStr* string;
+    Anchor anchor;
+    SDL_FRect guide;
+    TrigFunc func;
+    TrigPara para; // malloc
+    ElemStr* string; // malloc
 
     // graphic
-    SDL_Texture* texture;
+    SDL_Texture* texture; // malloc
 
     // renewable
     SDL_FRect src_rect, dst_rect;
@@ -82,6 +85,8 @@ struct {
 
 void trigFuncPass(const TrigPara para) {}
 void trigFuncForward(const TrigPara pageName) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
+
     // getPageId
     PageId pageId = 0;
     for (PageId i = 0; i < MENU_PAGE_VOLUME; i++) {
@@ -99,6 +104,8 @@ void trigFuncForward(const TrigPara pageName) {
     }
 }
 void trigFuncBackward(const TrigPara para) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
+
     for (PathId i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -107,6 +114,7 @@ void trigFuncBackward(const TrigPara para) {
     }
 }
 void trigFuncClear(const TrigPara para) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
     for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 const Trig triggers[] = {
@@ -146,9 +154,9 @@ TrigName getTrigNameFromFunc(const TrigFunc func) {
 #pragma region ELEM_FUNC ===============================================================================================
 
 
-// get
+// other
 SDL_Texture* getTextureFromElemString(const ElemStr* elemStr) {
-    // N-Condition
+    // Req Condition
     if (elemStr == NULL) {printf("%s: elemStr not exist.\n", __func__); return NULL;}
     if (elemStr[0] == '\0') {printf("%s: elemStr[%p] isn't legal.\n", __func__, elemStr); return NULL;}
     if (strlen(elemStr) <= 2) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
@@ -185,37 +193,41 @@ SDL_Texture* getTextureFromElemString(const ElemStr* elemStr) {
 
     return texture;
 }
-
-
-// other
 void turnElemOn(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
     //
     elem->on = true;
 }
 void turnElemOff(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
     //
     elem->on = false;
 }
 
 
-// load
-void loadElemFromToml(Elem* elem, const toml_table_t* tomlElem) {
-    // N-Condition
+// load & kill
+void killElem(Elem* elem) {
+    // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
 
-    // loadElemAnchorFromToml
-    const toml_datum_t tomlAnchor = toml_int_in(tomlElem, "anchor");
-    elem->anchor = (Anchor)(tomlAnchor.ok ? tomlAnchor.u.i : 0);
+    //
+    if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
+    if (elem->para != NULL) {free(elem->para); elem->para = NULL;}
+    if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
 
-    // loadElemGuideFromToml
-    const toml_array_t* tomlGuide = toml_array_in(tomlElem, "guide");
+    // ?
+    turnElemOff(elem);
+}
+
+void loadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+
+    // Opt Condition
     if (tomlGuide != NULL) {
         const toml_datum_t tomlGuideX = toml_double_at(tomlGuide, 0);
         const toml_datum_t tomlGuideY = toml_double_at(tomlGuide, 1);
@@ -226,58 +238,40 @@ void loadElemFromToml(Elem* elem, const toml_table_t* tomlElem) {
         elem->guide.w = (float)(tomlGuideW.ok ? tomlGuideW.u.d : 1);
         elem->guide.h = (float)(tomlGuideH.ok ? tomlGuideH.u.d : 1);
     }
-    else {elem->guide.x = elem->guide.y = 0, elem->guide.w = elem->guide.h = 1;}
-
-    // loadElemStringFromToml
-    const toml_datum_t tomlString = toml_string_in(tomlElem, "string");
-    if (elem->string != NULL) {free(elem->string); elem->string = NULL;}  // C-Condition
-    elem->string = strdup(tomlString.ok ? tomlString.u.s : "");
-
-    // loadElemFuncFromToml
-    const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
-    elem->func = tomlFuncName.ok ? getTrigFuncFromName(tomlFuncName.u.s) : NULL;
-
-    // loadElemParaFromToml
-    const toml_datum_t tomlFuncPara = toml_string_in(tomlElem, "para");
-    if (elem->para != NULL) {free(elem->para); elem->para = NULL;}  // C-Condition
-    elem->para = tomlFuncPara.ok ? strdup(tomlFuncPara.u.s) : NULL;
-
-    // turn on
-    elem->on = true;
+    else {
+        elem->guide.x = 0;
+        elem->guide.y = 0;
+        elem->guide.w = 1;
+        elem->guide.h = 1;
+    }
 }
-void loadElemFromC(Elem* elem, const Anchor anchor, const SDL_FRect guide, const TrigFunc func, const TrigPara para, const ElemStr* string) {
-    // N-Condition
+void loadElemString(Elem* elem, const toml_datum_t tomlString) {
+    // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-
-    // loadElemOtherFromC
-    elem->anchor = anchor;
-    elem->guide = guide;
-    elem->func = func;
-    elem->para = para;
-
-    // loadElemStringFromC
-    if (string != NULL) {elem->string = strdup(string);}
-    else {printf("%s: string not exists.\n", __func__); return;}
-    if (elem->string == NULL) {printf("%s: failed \"%s\" into elem[%p].string.\n", __func__, string, elem);}
-
-    // turn on
-    elem->on = true;
-}
-
-
-// renew
-void renewElemTexture(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
-    if (elem->on == false) {return;}
-
-    // N-Condition
-    if (elem->string == NULL) {printf("%s: elem[%p].string not exists.\n", __func__, elem); return;}
+    if (!tomlString.ok) {printf("%s: tomlString not exists.\n", __func__); return;}
+    if (elem->string != NULL) {printf("%s: elem[%d].string not free.\n", __func__, elem->id); return;}
 
     //
-    if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
+    elem->string = strdup(tomlString.u.s);
+
+    // Req Condition
+    if (elem->string == NULL) {printf("%s: failed to malloc from \"%s\".\n", __func__, tomlString.u.s);}
+}
+void loadElemPara(Elem* elem, const toml_datum_t tomlPara) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->para != NULL) {printf("%s: elem.para not freed.\n", __func__); return;}
+
+    // Opt Condition
+    elem->para = tomlPara.ok ? strdup(tomlPara.u.s) : NULL;
+}
+void loadElemTexture(Elem* elem) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->texture != NULL) {printf("%s: elem.texture not free.\n", __func__); return;}
+
+    //
     elem->texture = getTextureFromElemString(elem->string);
-    if (elem->texture == NULL) {printf("%s: failed from elem[%p].texture.\n", __func__, elem); return;}
     SDL_SetTextureScaleMode(elem->texture, SDL_SCALEMODE_NEAREST);
 
     //
@@ -285,10 +279,44 @@ void renewElemTexture(Elem* elem) {
     SDL_GetTextureSize(elem->texture, &w, &h);
     elem->src_rect = (SDL_FRect){0, 0, w, h};
 }
+void loadElemOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
+
+    // loadElemAnchorFromToml
+    const toml_datum_t tomlAnchor = toml_int_in(tomlElem, "anchor");
+    elem->anchor = (Anchor)(tomlAnchor.ok ? tomlAnchor.u.i : 0);
+
+    // loadElemFuncFromToml
+    const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
+    elem->func = tomlFuncName.ok ? getTrigFuncFromName(tomlFuncName.u.s) : NULL;
+
+    // loadElemIdFromToml
+    elem->id = tomlElemId;
+}
+
+void loadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
+
+    //
+    killElem(elem);
+    loadElemOther(elem, tomlElem, tomlElemId);
+    loadElemGuide(elem, toml_array_in(tomlElem, "guide"));
+    loadElemPara(elem, toml_string_in(tomlElem, "para"));
+    loadElemString(elem, toml_string_in(tomlElem, "string"));
+    loadElemTexture(elem);
+    turnElemOn(elem);
+}
+
+
+// renew & draw
 void renewElemDstRect(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
-    if (elem->on == false) {return;}
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
 
     //
     const Anchor x = elem->anchor % 9;
@@ -325,58 +353,46 @@ void renewElemDstRect(Elem* elem) {
     elem->dst_rect.y = cy + dy + elem->guide.y;
 }
 void renewElemState(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) return;
-    if (elem->on == false) {return;}
-
-    const bool mouseIn = mouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
-    if (elem->state == PRESSED && mouseIn == true && mouseLeftIn == false) {
-        elem->state = RELEASE;
-    }
-    else {
-        if (mouseIn == true) {
-            elem->state = mouseLeftIn ? PRESSED : INSIDE;
-        }
-        else {elem->state = OUTSIDE;}
-    }
-}
-void renewElem(Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
-    if (elem->on == false) {return;}
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
 
     //
-    renewElemTexture(elem);
-    renewElemDstRect(elem);
-    renewElemState(elem);
-    if (elem->state == RELEASE) {
-        if (elem->func != NULL) {elem->func(elem->para);}
+    const bool mouseIn = mouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
+    if (elem->state == PRESSED && mouseIn == true && mouseLeftIn == false) {elem->state = RELEASE;}
+    else {
+        if (mouseIn == true) {elem->state = mouseLeftIn ? PRESSED : INSIDE;}
+        else {elem->state = OUTSIDE;}
     }
+    if (elem->state == RELEASE && elem->func != NULL) {elem->func(elem->para);}
 }
 
+void renewElem(Elem* elem) {
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
 
-// draw
+    //
+    renewElemDstRect(elem);
+    renewElemState(elem);
+}
+
 void drawElem(const Elem* elem) {
-    // P-Condition
-    if (elem == NULL) {return;}
-    if (elem->on == false) {return;}
-
-    // N-Condition
-    if (elem->texture == NULL) {printf("%s: elem[%p].texture not exists.\n", __func__, elem); return;}
+    // Req Condition
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
+    if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", __func__, elem->id); return;}
     if (menu.renderer == NULL) {printf("%s: menu.renderer is NULL.\n", __func__); return;}
 
     //
     switch (elem->state) {
         case INSIDE: {DEBUG_DrawRect(menu.renderer, &elem->dst_rect); break;}
-
         case PRESSED:
         case RELEASE: {DEBUG_FillRect(menu.renderer, &elem->dst_rect); break;}
-
         case OUTSIDE:
         default: {break;}
     }
-
     SDL_RenderTexture(menu.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 }
 
@@ -404,7 +420,8 @@ void loadPageFromToml(Page* page, const char* name, const toml_table_t* tomlPage
     //
     for (PageVolume i = 0; i < tomlElemsVolume; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
-        if (tomlElem != NULL) {loadElemFromToml(&page->elems[i], tomlElem);}
+        // Opt Condition
+        if (tomlElem != NULL) {loadElem(&page->elems[i], tomlElem, i);}
         else {turnElemOff(&page->elems[i]);}
     }
 }
@@ -416,7 +433,9 @@ void renewPage(Page* page) {
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
     // renewPageElems
-    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {renewElem(&page->elems[i]);}
+    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
+        if (page->elems[i].on) {renewElem(&page->elems[i]);}
+    }
 }
 
 
@@ -426,7 +445,9 @@ void drawPage(const Page* page) {
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
     // drawPageElems
-    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {drawElem(&page->elems[i]);}
+    for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
+        if (page->elems[i].on) {drawElem(&page->elems[i]);}
+    }
 }
 
 
@@ -486,7 +507,7 @@ void killMenuTheme() {
 
 
 // load
-void loadMenuFromToml(const char* tomlPath) {
+void loadMenuPagesFromToml(const char* tomlPath) {
     // N-Condition
     FILE* tomlFile = fopen(tomlPath, "r");
     if (tomlFile == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return;}
@@ -530,7 +551,7 @@ void loadMenu(SDL_Renderer* renderer) {
     if (menu.pageRoot == NULL) {printf("%s: failed to malloc menu.page.Root.\n", __func__);}
     if (menu.pageEdge == NULL) {printf("%s: failed to malloc menu.page.Edge.\n", __func__);}
     loadMenuThemeFromToml("../menu_theme.toml");
-    loadMenuFromToml("../menu.toml");
+    loadMenuPagesFromToml("../menu_pages.toml");
 }
 
 
@@ -595,7 +616,7 @@ void renewMenuPageNow() {
 void renewMenu() {
     static bool need_load = true;
     if (need_load || debug.on) {
-        loadMenuFromToml("../menu.toml");
+        loadMenuPagesFromToml("../menu_pages.toml");
         need_load = false;
     }
     renewMenuPath();

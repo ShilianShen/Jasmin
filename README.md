@@ -11,16 +11,24 @@
 
 函数签名:
 
-* createSomthing: 根据参数创建sth, sth通常是声明了数量不为一的结构体. (原则上只调用一次)
-* destroySomthing: 和create对应的函数, 释放sth及其属性, sth通常是声明了数量不为一的结构体. (调用条件弱, 可调用多次)
-* loadSomething: 根据参数修改sth的东西, 通常比renew开销大, sth通常是声明了数量为一的结构体实例. (调用条件强, 可调用多次)
-* killSomething: 和load对应的函数, 释放sth的属性, sth通常是声明了数量为一的结构体实例. (调用条件弱, 可调用多次)
-* renewSomething: 在循环中反复调用
-* drawSomethinh: 在renew后显示的函数, 在循环中反复调用
+* void loadSth(Sth*, ...)
+* void killSth(Sth*)
+
+
+loadStruct分两种情况:
+
+1. loadStruct开头的函数有且仅有loadStruct()
+2. loadStruct开头的函数有loadStructAttributes(), loadStructOthers(), loadStruct(),其中:
+   * loadStructAttributes: 载入指定属性
+   * loadStructOthers: 可选, 载入其他属性
+   * loadStruct: 为以上函数的集合, 不可在其中擅自load.
+
+简单来说就是要么「一个函数完成」要么就是「分多个函数完成」.
+
 
 传入参数检查:
 
-条件检查分为「先决条件P-Condition」「必要条件N-Condition」「非必要条件U-Condition」「自动修正条件C-Condition」
+条件检查分为「先决条件PreCondition」「必要条件ReqCondition」「非必要条件OptCondition」「自动修正条件AtoCondition」
 
 先决条件: 调用函数的条件, 但是被写到了函数内部, 「不满足先决条件」不被视作「错误」
 

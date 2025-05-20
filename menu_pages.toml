@@ -2,8 +2,8 @@
 [Root]
 elems = [
     {anchor=56, guide=[0, 0, 1, 1], string="path"},
-    {anchor=31, guide=[0, 0, 2, 2], string="f ../images/491.png"},
-    {anchor=49, guide=[0, 0, 1, 1], string="t The dead can be cured!"},
+    {anchor=31, guide=[0, 0, 3, 3], string="f ../images/491.gif"},
+    {anchor=49, guide=[0, 0, 1, 1], string="t The dead can be cured."},
     {anchor=20, guide=[0, 0, 1, 1], string="t Title", func='forward', para='Title'},
 ]
 [Title]
@@ -23,5 +23,5 @@ elems = [
 elems = [
     {anchor=56, string="path"},
     {anchor=31, string="TC The edge of menu system, it shouldn't appear. \nIf you are watching it, there is a bug need to be fixed."},
-    {anchor=49, string="t [R2R: Return to Root]", func='clear'}
+    {anchor=49, string="t [R2R]", func='clear'}
 ]

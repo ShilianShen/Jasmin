@@ -1,14 +1,17 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
-#include <stdlib.h>
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <string.h>
+
+#define MINIAUDIO_IMPLEMENTATION
+#include "../miniaudio/miniaudio.h"
+ma_engine maEngine;
+
 
 #include "../toml/toml.h"
 
-
+// Jasmine
 #include "basic.h"
 #include "debug.h"
 #include "device.h"
@@ -32,9 +35,15 @@ int main(int argc, char *argv[]) {
     if (!TTF_Init()) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
     }
+
     if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
+
+    if (ma_engine_init(NULL, &maEngine) != MA_SUCCESS) {
+        return -1;
+    }
+    ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
 
     // create & load
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
