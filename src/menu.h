@@ -16,29 +16,24 @@ typedef struct {const TrigName name; const TrigFunc func;} Trig;
 
 
 typedef uint8_t Anchor;
-typedef uint8_t ElemId;
+typedef int ElemId;
 typedef char ElemStr;
 typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 
 
 typedef struct {
-    ElemId id;
-    bool on;
-
     // file
+    ElemId id;  // id意味着page的第几个元素, 从0开始, id<0意味着未初始化
     Anchor anchor;
     SDL_FRect guide;
     TrigFunc func;
     TrigPara para; // malloc
     ElemStr* string; // malloc
-
-    // graphic
     SDL_Texture* texture; // malloc
-
     // renewable
     SDL_FRect src_rect, dst_rect;
     ElemState state;
-
+    bool on;
 } Elem;
 
 
@@ -530,6 +525,8 @@ Page* getMenuPageFromPageId(const PageId pageId) {
 void initMenu() {
     if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
     if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
+    initPage(menu.pageRoot);
+    initPage(menu.pageEdge);
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] == NULL) {
             menu.pages[i] = malloc(sizeof(Page));
@@ -702,7 +699,6 @@ void trigFuncForward(const TrigPara pageName) {
     PageId pageId = 0;
     for (PageId i = 0; i < MENU_PAGE_VOLUME; i++) {
         if (!testPage(menu.pages[i], NULL)) {continue;}
-        printf("%s\n", menu.pages[i]->name);
         if (strcmp(menu.pages[i]->name, pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
