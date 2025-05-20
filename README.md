@@ -11,9 +11,20 @@
 
 函数签名:
 
-* void loadSth(Sth*, ...)
-* void killSth(Sth*)
+* bool testSth: 检查是否正常经过了load
+* void initSth: 最优先调用, 建议只调用一次, 理论上可以在kill之后再调用, 但是应该不会有任何改变.
+* void loadSth: 可以调用多次, 在kill后调用
+* void killSth: 可以调用多次
+* void renewSth: 可以调用多次, 但是在一次循环中应该只调用一次
+* void drawSth: 可以调用多次, 但是在一次循环中应该只调用一次
 
+函数流:
+
+0. init
+1. load
+2. renew
+3. draw如果不退出, 回到renew; 如果频繁更新kill后回到load; 否则到下一步
+4. kill
 
 loadStruct分两种情况:
 
@@ -24,7 +35,6 @@ loadStruct分两种情况:
    * loadStruct: 为以上函数的集合, 不可在其中擅自load.
 
 简单来说就是要么「一个函数完成」要么就是「分多个函数完成」.
-
 
 传入参数检查:
 

@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
 
         // logical renew
         menu.bck_rect.w = (float)windowWidth, menu.bck_rect.h = (float)windowHeight;
+        killMenu();
+        loadMenu();
         renewMenu();
 
         // clear

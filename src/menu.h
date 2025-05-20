@@ -52,6 +52,7 @@ const PageVolume PAGE_MAX_VOLUME = 32;
 
 
 typedef struct {
+    int id;
     PageName* name;  // malloc
     Elem elems[PAGE_MAX_VOLUME];
 } Page;
@@ -88,43 +89,13 @@ struct {
 
 
 #pragma endregion MENU =================================================================================================
-#pragma region TRIG_FUNC ===============================================================================================
+#pragma region TRIG_SIGN ===============================================================================================
 
 
-void trigFuncPass(const TrigPara para) {}
-void trigFuncForward(const TrigPara pageName) {
-    ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
-
-    // getPageId
-    PageId pageId = 0;
-    for (PageId i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] == NULL) {continue;}
-        if (strcmp(menu.pages[i]->name, pageName) == 0) {pageId = i;}
-    }
-    if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
-
-    // forward
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
-        if (menu.path[i] == 0) {
-            menu.path[i] = pageId;
-            break;
-        }
-    }
-}
-void trigFuncBackward(const TrigPara para) {
-    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
-
-    for (PathId i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
-        if (menu.path[i] != 0) {
-            menu.path[i] = 0;
-            break;
-        }
-    }
-}
-void trigFuncClear(const TrigPara para) {
-    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
-}
+void trigFuncPass(const TrigPara);
+void trigFuncForward(const TrigPara);
+void trigFuncBackward(const TrigPara);
+void trigFuncClear(const TrigPara);
 const Trig triggers[] = {
     {"pass", trigFuncPass},
     {"forward", trigFuncForward},
@@ -158,7 +129,7 @@ TrigName getTrigNameFromFunc(const TrigFunc func) {
 }
 
 
-#pragma endregion TRIG_FUNC ============================================================================================
+#pragma endregion TRIG_SIGN ============================================================================================
 #pragma region ELEM_FUNC ===============================================================================================
 
 
@@ -217,29 +188,29 @@ void turnElemOff(Elem* elem) {
 }
 
 
-// init & load & kill
-void initElem(Elem* elem) {
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    elem->on = false;
-    elem->id = -1;
-    elem->string = NULL;
-    elem->texture = NULL;
-    elem->para = NULL;
+// test
+bool testElem(const Elem* elem, const char* string) {
+    if (elem == NULL) {printf("%s: elem not exists.\n", string); return false;}
+    if (elem->on == false) {printf("%s: elem not on.\n", string); return false;}
+    if (elem->id < 0) {printf("%s: elem id is negative.\n", string); return false;}
+    if (elem->string == NULL) {printf("%s: elem[%d].string not exists.\n", string, elem->id); return false;}
+    if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", string, elem->id); return false;}
+    return true;
 }
 
-void killElem(Elem* elem) {
+
+// init
+void initElem(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
     //
-    if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
-    if (elem->para != NULL) {free(elem->para); elem->para = NULL;}
-    if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
-
-    // ?
-    turnElemOff(elem);
+    *elem = (Elem){0};
+    elem->id = -1;
 }
 
+
+// load
 void loadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
@@ -319,7 +290,6 @@ void loadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
 
     //
-    killElem(elem);
     loadElemOther(elem, tomlElem, tomlElemId);
     loadElemGuide(elem, toml_array_in(tomlElem, "guide"));
     loadElemPara(elem, toml_string_in(tomlElem, "para"));
@@ -329,11 +299,23 @@ void loadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
 }
 
 
-// renew & draw
-void renewElemDstRect(Elem* elem) {
+// kill
+void killElem(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
+
+    //
+    if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
+    if (elem->para != NULL) {free(elem->para); elem->para = NULL;}
+    if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
+    turnElemOff(elem);
+}
+
+
+// renew
+void renewElemDstRect(Elem* elem) {
+    // Req Condition
+    if (!testElem(elem, __func__)) {return;}
 
     //
     const Anchor x = elem->anchor % 9;
@@ -371,8 +353,7 @@ void renewElemDstRect(Elem* elem) {
 }
 void renewElemState(Elem* elem) {
     // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
+    if (!testElem(elem, __func__)) {return;}
 
     //
     const bool mouseIn = mouseInRect(&elem->dst_rect);
@@ -387,19 +368,18 @@ void renewElemState(Elem* elem) {
 
 void renewElem(Elem* elem) {
     // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
+    if (!testElem(elem, __func__)) {return;}
 
     //
     renewElemDstRect(elem);
     renewElemState(elem);
 }
 
+
+// draw
 void drawElem(const Elem* elem) {
     // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->on == false) {printf("%s: elem[%d] isn't on.\n", __func__, elem->id); return;}
-    if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", __func__, elem->id); return;}
+    if (!testElem(elem, __func__)) {return;}
     if (menu.renderer == NULL) {printf("%s: menu.renderer is NULL.\n", __func__); return;}
 
     //
@@ -418,24 +398,26 @@ void drawElem(const Elem* elem) {
 #pragma region PAGE_FUNC ===============================================================================================
 
 
-// load & kill
-void initPage(Page* page) {
-    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
-    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {
-        initElem(&page->elems[i]);
-    }
-    page->name == NULL;
+// test
+bool testPage(const Page* page, const char* string) {
+    if (page == NULL) {if (string != NULL) {printf("%s: page not exists.\n", string);} return false;}
+    if (page->name == NULL) {if (string != NULL) {printf("%s: name not exists.\n", string);} return false;}
+    return true;
 }
 
-void killPage(Page* page) {
+
+// init
+void initPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
     //
-    if (page->name != NULL) {free(page->name); page->name = NULL;}
-    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {killElem(&page->elems[i]);}
+    *page = (Page){0};
+    page->id = -1;
 }
 
+
+// load
 void loadPageName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -477,13 +459,23 @@ void loadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
     if (tomlPage == NULL) {printf("%s: tomlPage not exists.\n", __func__); return;}
 
     //
-    killPage(page);
     loadPageName(page, name);
     loadPageElems(page, toml_array_in(tomlPage, "elems"));
 }
 
 
-// renew & draw
+// kill
+void killPage(Page* page) {
+    // Req Condition
+    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+
+    //
+    if (page->name != NULL) {free(page->name); page->name = NULL;}
+    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {killElem(&page->elems[i]);}
+}
+
+
+// renew
 void renewPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -494,6 +486,8 @@ void renewPage(Page* page) {
     }
 }
 
+
+// draw
 void drawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -524,16 +518,28 @@ toml_table_t* getToml(const char* tomlPath) {
 
     return toml;
 }
+Page* getMenuPageFromPathId(const PathId pathId) {
+    return menu.pages[menu.path[pathId]];
+}
+Page* getMenuPageFromPageId(const PageId pageId) {
+    return menu.pages[pageId];
+}
 
 
-// load & kill : menu theme
-void killMenuTheme() {
-    if (menu.theme.font != NULL) {
-        TTF_CloseFont(menu.theme.font);
-        menu.theme.font = NULL;
+// init
+void initMenu() {
+    if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
+    if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
+    for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
+        if (menu.pages[i] == NULL) {
+            menu.pages[i] = malloc(sizeof(Page));
+            initPage(menu.pages[i]);
+        }
     }
 }
 
+
+// load
 void loadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
     if (menu.theme.font != NULL) {printf("%s: theme.font not free.\n", __func__); return;}
@@ -559,14 +565,12 @@ void loadMenuThemeColor(const toml_array_t* tomlColor) {
     menu.theme.color.b = color[2];
     menu.theme.color.a = color[3];
 }
-
 void loadMenuTheme(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenuTheme = getToml(tomlPath);
     if (tomlMenuTheme == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
 
     //
-    killMenuTheme();
     loadMenuThemeFont(
         toml_string_in(tomlMenuTheme, "font_path"),
         toml_int_in(tomlMenuTheme, "font_size"));
@@ -575,32 +579,6 @@ void loadMenuTheme(const char* tomlPath) {
     //
     toml_free(tomlMenuTheme);
 }
-
-
-// load & kill
-void initMenu() {
-    if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
-    if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
-    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] == NULL) {
-            menu.pages[i] = malloc(sizeof(Page));
-            initPage(menu.pages[i]);
-        }
-    }
-}
-
-void killMenuPages() {
-    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] != NULL) {
-            killPage(menu.pages[i]);
-        }
-    }
-}
-void killMenu() {
-    killMenuPages();
-}
-
-
 void loadMenuPages(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
@@ -632,23 +610,31 @@ void loadMenu() {
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
-    initMenu();
-    killMenu();
     loadMenuTheme(MENU_THEME_PATH);
     loadMenuPages(MENU_PAGES_PATH);
 }
 
 
-// get
-Page* getMenuPageFromPathId(const PathId pathId) {
-    return menu.pages[menu.path[pathId]];
+// kill
+void killMenuTheme() {
+    if (menu.theme.font != NULL) {
+        TTF_CloseFont(menu.theme.font);
+        menu.theme.font = NULL;
+    }
 }
-Page* getMenuPageFromPageId(const PageId pageId) {
-    return menu.pages[pageId];
+void killMenu() {
+    killPage(menu.pageRoot);
+    killPage(menu.pageEdge);
+    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
+        if (menu.pages[i] != NULL) {
+            killPage(menu.pages[i]);
+        }
+    }
+    killMenuTheme();
 }
 
 
-// renew & draw
+// renew
 void renewMenuPathString() {
     strcpy(menu.pathString, menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME && menu.path[i] != 0; i++) {
@@ -673,7 +659,6 @@ void renewMenuPageNow() {
         menu.pageNow = menu.pageRoot;
         return;
     }
-
     // else if pageOther
     for (PathId i = 0; i + 1 < MENU_PATH_VOLUME; i++) {
         if (getMenuPageFromPathId(i) != NULL && getMenuPageFromPathId(i+1) == NULL) {
@@ -681,7 +666,6 @@ void renewMenuPageNow() {
             return;
         }
     }
-
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
@@ -689,7 +673,6 @@ void renewMenuPageNow() {
 void renewMenu() {
     static bool need_load = true;
     if (need_load || debug.on) {
-        loadMenu();
         need_load = false;
     }
     renewMenuPath();
@@ -700,12 +683,55 @@ void renewMenu() {
     renewMenuPathString();
 }
 
+
+// draw
 void drawMenu() {
     drawPage(menu.pageNow);
 }
 
 
 #pragma endregion MENU_FUNC ============================================================================================
+#pragma region TRIG_FUNC ===============================================================================================
+
+
+void trigFuncPass(const TrigPara para) {}
+void trigFuncForward(const TrigPara pageName) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
+
+    // getPageId
+    PageId pageId = 0;
+    for (PageId i = 0; i < MENU_PAGE_VOLUME; i++) {
+        if (!testPage(menu.pages[i], NULL)) {continue;}
+        printf("%s\n", menu.pages[i]->name);
+        if (strcmp(menu.pages[i]->name, pageName) == 0) {pageId = i;}
+    }
+    if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
+
+    // forward
+    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
+        if (menu.path[i] == 0) {
+            menu.path[i] = pageId;
+            break;
+        }
+    }
+}
+void trigFuncBackward(const TrigPara para) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
+
+    for (PathId i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
+        if (menu.path[i] != 0) {
+            menu.path[i] = 0;
+            break;
+        }
+    }
+}
+void trigFuncClear(const TrigPara para) {
+    ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
+    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
+}
+
+
+#pragma endregion TRIG_FUNC ============================================================================================
 
 
 #endif //MENU_H
