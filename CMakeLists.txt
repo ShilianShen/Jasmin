@@ -24,7 +24,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/basic.h
 
         # toml/toml.h
-        toml/toml.c
+        third_party/toml/toml.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

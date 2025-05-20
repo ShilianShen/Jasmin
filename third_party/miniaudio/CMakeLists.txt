@@ -453,11 +453,11 @@ endif()
 
 # Static Libraries
 add_library(miniaudio STATIC
-    miniaudio.c
-    miniaudio.h
+        miniaudio.c
+        miniaudio.h
 )
 
-target_include_directories(miniaudio PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(miniaudio PUBLIC .)
 target_compile_options    (miniaudio PRIVATE ${COMPILE_OPTIONS})
 target_compile_definitions(miniaudio PRIVATE ${COMPILE_DEFINES})
 
@@ -473,8 +473,8 @@ endif()
 
 if(HAS_LIBVORBIS)
     add_library(miniaudio_libvorbis STATIC
-        extras/decoders/libvorbis/miniaudio_libvorbis.c
-        extras/decoders/libvorbis/miniaudio_libvorbis.h
+            extras/decoders/libvorbis/miniaudio_libvorbis.c
+            extras/decoders/libvorbis/miniaudio_libvorbis.h
     )
 
     target_compile_options    (miniaudio_libvorbis PRIVATE ${COMPILE_OPTIONS})
@@ -495,8 +495,8 @@ endif()
 
 if(HAS_LIBOPUS)
     add_library(miniaudio_libopus STATIC
-        extras/decoders/libopus/miniaudio_libopus.c
-        extras/decoders/libopus/miniaudio_libopus.h
+            extras/decoders/libopus/miniaudio_libopus.c
+            extras/decoders/libopus/miniaudio_libopus.h
     )
 
     target_compile_options    (miniaudio_libopus PRIVATE ${COMPILE_OPTIONS})
@@ -543,7 +543,7 @@ target_link_libraries (miniaudio_common_options INTERFACE ${COMMON_LINK_LIBRARIE
 if(MINIAUDIO_BUILD_TESTS)
     enable_testing()
 
-    set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    set(TESTS_DIR tests)
 
     function(add_miniaudio_test name source)
         add_executable(${name} ${TESTS_DIR}/${source})
@@ -563,7 +563,7 @@ if(MINIAUDIO_BUILD_TESTS)
     add_test(NAME miniaudio_conversion COMMAND miniaudio_conversion)
 
     add_miniaudio_test(miniaudio_filtering filtering/filtering.c)
-    add_test(NAME miniaudio_filtering COMMAND miniaudio_filtering ${CMAKE_CURRENT_SOURCE_DIR}/data/16-44100-stereo.flac)
+    add_test(NAME miniaudio_filtering COMMAND miniaudio_filtering data/16-44100-stereo.flac)
     
     add_miniaudio_test(miniaudio_generation generation/generation.c)
     add_test(NAME miniaudio_generation COMMAND miniaudio_generation)
@@ -573,7 +573,7 @@ endif()
 #
 # Like tests, all examples are compiled as a single translation unit. There is no need to add miniaudio as a link library.
 if (MINIAUDIO_BUILD_EXAMPLES)
-    set(EXAMPLES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/examples)
+    set(EXAMPLES_DIR examples)
 
     function(add_miniaudio_example name source)
         add_executable(${name} ${EXAMPLES_DIR}/${source})

@@ -5,11 +5,10 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio/miniaudio.h"
+#include "../third_party/miniaudio/miniaudio.h"
+#include "../third_party/toml/toml.h"
 ma_engine maEngine;
 
-
-#include "../toml/toml.h"
 
 // Jasmine
 #include "basic.h"
@@ -43,7 +42,7 @@ int main(int argc, char *argv[]) {
     if (ma_engine_init(NULL, &maEngine) != MA_SUCCESS) {
         return -1;
     }
-    ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
+    // ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
 
     // create & load
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -54,7 +53,6 @@ int main(int argc, char *argv[]) {
 
     // running
     while (running) {
-        // printf("                                        \n");
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {running = false;}
         }

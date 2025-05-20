@@ -52,7 +52,7 @@ const PageVolume PAGE_MAX_VOLUME = 32;
 
 
 typedef struct {
-    PageName* name;
+    PageName* name;  // malloc
     Elem elems[PAGE_MAX_VOLUME];
 } Page;
 
@@ -65,18 +65,22 @@ typedef int PageId;
 typedef int PathId;
 const PageId MENU_PAGE_VOLUME = 16;
 const PathId MENU_PATH_VOLUME = 6;
-
+const char* MENU_THEME_PATH = "../menu/menu_theme.toml";
+const char* MENU_PAGES_PATH = "../menu/menu_pages.toml";
 
 struct {
-    SDL_Renderer* renderer;
+    SDL_Renderer* renderer;  // malloc???
     SDL_FRect bck_rect;
 
     PageId path[MENU_PATH_VOLUME];
     char pathString[128];
 
-    Page *pageRoot, *pageEdge, *pageNow, *pages[MENU_PAGE_VOLUME];
+    Page *pageRoot, *pageEdge, *pageNow, *pages[MENU_PAGE_VOLUME];  // malloc
 
-    struct {TTF_Font* font; SDL_Color color;} theme;
+    struct {
+        TTF_Font* font;  // malloc
+        SDL_Color color;
+    } theme;
 } menu;
 
 
@@ -403,6 +407,15 @@ void drawElem(const Elem* elem) {
 
 
 // load & kill
+void killPage(Page* page) {
+    // Req Condition
+    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+
+    //
+    if (page->name != NULL) {free(page->name); page->name = NULL;}
+    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {killElem(&page->elems[i]);}
+}
+
 void loadPageName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -419,14 +432,20 @@ void loadPageElems(Page* page, const toml_array_t* tomlElems) {
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (tomlElems == NULL) {printf("%s: tomlElems not exists.\n", __func__); return;}
 
-    //
+    // Req Condition
     const int tomlElemsVolume = toml_array_nelem(tomlElems);
-    if (tomlElemsVolume >= PAGE_MAX_VOLUME) {printf("%s: tomlPage[%s].tomlElems overflows.\n", __func__, page->name); return;}
+    if (tomlElemsVolume >= PAGE_MAX_VOLUME) {
+        printf("%s: tomlPage[%s].tomlElems overflows.\n", __func__, page->name);
+        return;
+    }
+
     //
     for (PageVolume i = 0; i < tomlElemsVolume; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         // Opt Condition
-        if (tomlElem != NULL) {loadElem(&page->elems[i], tomlElem, i);}
+        if (tomlElem != NULL) {
+            loadElem(&page->elems[i], tomlElem, i);
+        }
         else {turnElemOff(&page->elems[i]);}
     }
 }
@@ -438,6 +457,7 @@ void loadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
     if (tomlPage == NULL) {printf("%s: tomlPage not exists.\n", __func__); return;}
 
     //
+    killPage(page);
     loadPageName(page, name);
     loadPageElems(page, toml_array_in(tomlPage, "elems"));
 }
@@ -445,20 +465,20 @@ void loadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
 
 // renew & draw
 void renewPage(Page* page) {
-    // N-Condition
+    // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
-    // renewPageElems
+    //
     for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
         if (page->elems[i].on) {renewElem(&page->elems[i]);}
     }
 }
 
 void drawPage(const Page* page) {
-    // N-Condition
+    // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
-    // drawPageElems
+    //
     for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
         if (page->elems[i].on) {drawElem(&page->elems[i]);}
     }
@@ -469,16 +489,37 @@ void drawPage(const Page* page) {
 #pragma region MENU_FUNC ===============================================================================================
 
 
-// menu.theme
-void loadMenuThemeFromToml(const char* tomlPath) {
-    // N-Condition
-    FILE* tomlFile = fopen(tomlPath, "r");
-    if (tomlFile == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return;}
+// other
+toml_table_t* getToml(const char* tomlPath) {
+    // Req Condition
+    FILE* file = fopen(tomlPath, "r"); // malloc
+    if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
 
-    // getMenuThemeFromToml
-    toml_table_t* tomlMenuTheme = toml_parse_file(tomlFile, NULL, 0);  //  malloc
-    fclose(tomlFile);
-    if (tomlMenuTheme == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath);}
+    //
+    toml_table_t* toml = toml_parse_file(file, NULL, 0); // malloc
+    fclose(file); // end malloc
+
+    // Req Condition
+    if (toml == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return NULL;}
+
+    return toml;
+}
+
+// load & kill
+void initMenu() {
+
+}
+void killMenuTheme() {
+    if (menu.theme.font != NULL) {
+        TTF_CloseFont(menu.theme.font);
+    }
+}
+
+void loadMenuTheme(const char* tomlPath) {
+    killMenuTheme();
+    // Req Condition
+    toml_table_t* tomlMenuTheme = getToml(tomlPath);
+    if (tomlMenuTheme == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
 
     {
         // getMenuThemeFontPathFromToml
@@ -513,37 +554,20 @@ void loadMenuThemeFromToml(const char* tomlPath) {
     // freeTomlMenu
     toml_free(tomlMenuTheme);  // free
 }
-void killMenuTheme() {
-    if (menu.theme.font != NULL) {
-        TTF_CloseFont(menu.theme.font);
-    }
-}
-
-
-// load
-void loadMenuPagesFromToml(const char* tomlPath) {
-    // N-Condition
-    FILE* tomlFile = fopen(tomlPath, "r");
-    if (tomlFile == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return;}
-
-    // getMenuFromToml
-    toml_table_t* tomlMenu = toml_parse_file(tomlFile, NULL, 0);
-    fclose(tomlFile);
-    if (tomlMenu == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return;}
+void loadMenuPages(const char* tomlPath) {
+    // Req Condition
+    toml_table_t* tomlMenu = getToml(tomlPath);
+    if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
 
     // getPageName
-    const char pageRootName[] = "Root";
-    const char pageEdgeName[] = "Edge";
+    const char pageRootName[] = "Root", pageEdgeName[] = "Edge";
     PageId pageId = 1;
-    for (int i = 0; ; i++) {
+    for (int i = 0; toml_key_in(tomlMenu, i) != NULL; i++) {
         const char* pageName = toml_key_in(tomlMenu, i);
-        if (pageName == NULL) {break;}
-
-        // getPageFromToml
         const toml_table_t* tomlPage = toml_table_in(tomlMenu, pageName);
-
-        // loadMenuPageFromToml
-        if (tomlPage == NULL) {printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);}
+        if (tomlPage == NULL) {
+            printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
+        }
         else if (strcmp(pageName, pageRootName) == 0) {loadPage(menu.pageRoot, pageName, tomlPage);}
         else if (strcmp(pageName, pageEdgeName) == 0) {loadPage(menu.pageEdge, pageName, tomlPage);}
         else {
@@ -555,18 +579,23 @@ void loadMenuPagesFromToml(const char* tomlPath) {
         }
     }
 
-    // freeTomlMenu
-    toml_free(tomlMenu);
+    //
+    toml_free(tomlMenu); // end malloc
 }
+
 void loadMenu(SDL_Renderer* renderer) {
+    // Req Condition
+    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
+
     menu.renderer = renderer;
     if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
     if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
     if (menu.pageRoot == NULL) {printf("%s: failed to malloc menu.page.Root.\n", __func__);}
     if (menu.pageEdge == NULL) {printf("%s: failed to malloc menu.page.Edge.\n", __func__);}
-    loadMenuThemeFromToml("../menu_theme.toml");
-    loadMenuPagesFromToml("../menu_pages.toml");
+    loadMenuTheme(MENU_THEME_PATH);
+    loadMenuPages(MENU_PAGES_PATH);
 }
+
 
 
 // get
@@ -590,7 +619,7 @@ void printMenuPath() {
 }
 
 
-// renew
+// renew & draw
 void renewMenuPathString() {
     strcpy(menu.pathString, menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME && menu.path[i] != 0; i++) {
@@ -627,10 +656,11 @@ void renewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
+
 void renewMenu() {
     static bool need_load = true;
     if (need_load || debug.on) {
-        loadMenuPagesFromToml("../menu_pages.toml");
+        loadMenuPages(MENU_PAGES_PATH);
         need_load = false;
     }
     renewMenuPath();
@@ -640,7 +670,6 @@ void renewMenu() {
     // printMenuPath();
     renewMenuPathString();
 }
-
 
 void drawMenu() {
     drawPage(menu.pageNow);
