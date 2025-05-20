@@ -65,8 +65,11 @@ typedef int PageId;
 typedef int PathId;
 const PageId MENU_PAGE_VOLUME = 16;
 const PathId MENU_PATH_VOLUME = 6;
-const char* MENU_THEME_PATH = "../menu/menu_theme.toml";
-const char* MENU_PAGES_PATH = "../menu/menu_pages.toml";
+const char MENU_THEME_PATH[] = "../menu/theme.toml";
+const char MENU_PAGES_PATH[] = "../menu/pages.toml";
+const char MENU_ROOT_NAME[] = "Root";
+const char MENU_EDGE_NAME[] = "Edge";
+
 
 struct {
     SDL_Renderer* renderer;  // malloc???
@@ -214,7 +217,16 @@ void turnElemOff(Elem* elem) {
 }
 
 
-// load & kill
+// init & load & kill
+void initElem(Elem* elem) {
+    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+    elem->on = false;
+    elem->id = -1;
+    elem->string = NULL;
+    elem->texture = NULL;
+    elem->para = NULL;
+}
+
 void killElem(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
@@ -407,6 +419,14 @@ void drawElem(const Elem* elem) {
 
 
 // load & kill
+void initPage(Page* page) {
+    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {
+        initElem(&page->elems[i]);
+    }
+    page->name == NULL;
+}
+
 void killPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
@@ -505,62 +525,88 @@ toml_table_t* getToml(const char* tomlPath) {
     return toml;
 }
 
-// load & kill
-void initMenu() {
 
-}
+// load & kill : menu theme
 void killMenuTheme() {
     if (menu.theme.font != NULL) {
         TTF_CloseFont(menu.theme.font);
+        menu.theme.font = NULL;
     }
 }
 
+void loadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
+    // Req Condition
+    if (menu.theme.font != NULL) {printf("%s: theme.font not free.\n", __func__); return;}
+    if (!tomlFontPath.ok) {printf("%s: tomlFontPath not exists.\n", __func__); return;}
+    if (!tomlFontSize.ok) {printf("%s: tomlFontSize not exists.\n", __func__); return;}
+
+    //
+    menu.theme.font = TTF_OpenFont(tomlFontPath.u.s, tomlFontSize.u.i);
+    if (menu.theme.font == NULL) {printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);}
+}
+void loadMenuThemeColor(const toml_array_t* tomlColor) {
+    // Req Condition
+    if (tomlColor == NULL) {printf("%s: tomlColor not exists.\n", __func__); return;}
+
+    //
+    int color[4] = {};
+    for (int i = 0; i < 4; i++) {
+        const toml_datum_t c = toml_int_at(tomlColor, i);
+        color[i] = c.ok ? c.u.i : 255;
+    }
+    menu.theme.color.r = color[0];
+    menu.theme.color.g = color[1];
+    menu.theme.color.b = color[2];
+    menu.theme.color.a = color[3];
+}
+
 void loadMenuTheme(const char* tomlPath) {
-    killMenuTheme();
     // Req Condition
     toml_table_t* tomlMenuTheme = getToml(tomlPath);
     if (tomlMenuTheme == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
 
-    {
-        // getMenuThemeFontPathFromToml
-        const char* tomlFontPathKey = "font_path";
-        const toml_datum_t tomlFontPath = toml_string_in(tomlMenuTheme, tomlFontPathKey);
-        if (!tomlFontPath.ok) {printf("%s: no key \"%s\" in \"%s\".\n", __func__, tomlFontPathKey, tomlPath);}
+    //
+    killMenuTheme();
+    loadMenuThemeFont(
+        toml_string_in(tomlMenuTheme, "font_path"),
+        toml_int_in(tomlMenuTheme, "font_size"));
+    loadMenuThemeColor(toml_array_in(tomlMenuTheme, "font_color"));
 
-        // getMenuThemeFontSizeFromToml
-        const char* tomlFontSizeKey = "font_size";
-        const toml_datum_t tomlFontSize = toml_int_in(tomlMenuTheme, tomlFontSizeKey);
-        if (!tomlFontSize.ok) {printf("%s: no key \"%s\" in \"%s\".\n", __func__, tomlFontSizeKey, tomlPath);}
-
-        // loadMenuThemeFont
-        menu.theme.font = TTF_OpenFont(tomlFontPath.u.s, tomlFontSize.u.i);
-        if (menu.theme.font == NULL) {printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);}
-
-        // loadMenuThemeColor
-        const char* tomlFontColorKey = "font_color";
-        const toml_array_t* tomlFontColor = toml_array_in(tomlMenuTheme, tomlFontColorKey);
-        if (tomlFontColor == NULL) {printf("%s: no key \"%s\" in \"%s\".\n", __func__, tomlFontSizeKey, tomlPath);}
-        int color[4] = {};
-        for (int i = 0; i < 4; i++) {
-            const toml_datum_t c = toml_int_at(tomlFontColor, i);
-            color[i] = c.ok ? c.u.i : 255;
-        }
-        menu.theme.color.r = color[0];
-        menu.theme.color.g = color[1];
-        menu.theme.color.b = color[2];
-        menu.theme.color.a = color[3];
-    }
-
-    // freeTomlMenu
-    toml_free(tomlMenuTheme);  // free
+    //
+    toml_free(tomlMenuTheme);
 }
+
+
+// load & kill
+void initMenu() {
+    if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
+    if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
+    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
+        if (menu.pages[i] == NULL) {
+            menu.pages[i] = malloc(sizeof(Page));
+            initPage(menu.pages[i]);
+        }
+    }
+}
+
+void killMenuPages() {
+    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
+        if (menu.pages[i] != NULL) {
+            killPage(menu.pages[i]);
+        }
+    }
+}
+void killMenu() {
+    killMenuPages();
+}
+
+
 void loadMenuPages(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
 
     // getPageName
-    const char pageRootName[] = "Root", pageEdgeName[] = "Edge";
     PageId pageId = 1;
     for (int i = 0; toml_key_in(tomlMenu, i) != NULL; i++) {
         const char* pageName = toml_key_in(tomlMenu, i);
@@ -568,8 +614,8 @@ void loadMenuPages(const char* tomlPath) {
         if (tomlPage == NULL) {
             printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
         }
-        else if (strcmp(pageName, pageRootName) == 0) {loadPage(menu.pageRoot, pageName, tomlPage);}
-        else if (strcmp(pageName, pageEdgeName) == 0) {loadPage(menu.pageEdge, pageName, tomlPage);}
+        else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {loadPage(menu.pageRoot, pageName, tomlPage);}
+        else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {loadPage(menu.pageEdge, pageName, tomlPage);}
         else {
             if (menu.pages[pageId] == NULL) {
                 menu.pages[pageId] = malloc(sizeof(Page));
@@ -582,20 +628,15 @@ void loadMenuPages(const char* tomlPath) {
     //
     toml_free(tomlMenu); // end malloc
 }
-
-void loadMenu(SDL_Renderer* renderer) {
+void loadMenu() {
     // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
+    if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
-    menu.renderer = renderer;
-    if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
-    if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
-    if (menu.pageRoot == NULL) {printf("%s: failed to malloc menu.page.Root.\n", __func__);}
-    if (menu.pageEdge == NULL) {printf("%s: failed to malloc menu.page.Edge.\n", __func__);}
+    initMenu();
+    killMenu();
     loadMenuTheme(MENU_THEME_PATH);
     loadMenuPages(MENU_PAGES_PATH);
 }
-
 
 
 // get
@@ -604,18 +645,6 @@ Page* getMenuPageFromPathId(const PathId pathId) {
 }
 Page* getMenuPageFromPageId(const PageId pageId) {
     return menu.pages[pageId];
-}
-
-
-// print
-void printMenuPath() {
-    printf("%s", menu.pageRoot->name);
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
-        const Page* page = getMenuPageFromPathId(i);
-        if (page == NULL) {continue;}
-        printf("/%s", page->name);
-    }
-    printf("\n");
 }
 
 
@@ -660,7 +689,7 @@ void renewMenuPageNow() {
 void renewMenu() {
     static bool need_load = true;
     if (need_load || debug.on) {
-        loadMenuPages(MENU_PAGES_PATH);
+        loadMenu();
         need_load = false;
     }
     renewMenuPath();

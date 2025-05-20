@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     loadDebugTheme();
 
-    loadMenu(renderer);
+    menu.renderer = renderer;
+    initMenu();
 
 
     // running
