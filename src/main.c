@@ -46,11 +46,12 @@ int main(int argc, char *argv[]) {
 
     // create & load
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    loadDebugTheme();
 
     menu.renderer = renderer;
+    initDebug();
     initMenu();
-
+    debug.renderer = renderer;
+    loadDebugTheme();
 
     // running
     while (running) {
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
 
         // physical draw
         drawMouse(renderer);
-        DEBUG_Intro(renderer);
+        DEBUG_Intro();
 
         // show
         SDL_RenderPresent(renderer);

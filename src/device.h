@@ -36,8 +36,15 @@ void renewMouse() {
     mouse.right_pressed = buttons & SDL_BUTTON_RMASK;
 }
 void drawMouse(SDL_Renderer* renderer) {
-    DEBUG_DrawPoint(renderer, mouse.x, mouse.y);
-    DEBUG_DrawPoint(renderer, mouse.left_x, mouse.left_y);
+    static char text[32];
+
+    snprintf(text, 32, "(%.f, %.f)", mouse.x, mouse.y);
+    DEBUG_DrawPoint(mouse.x, mouse.y);
+    DEBUG_DrawText(mouse.x, mouse.y, text);
+
+    snprintf(text, 32, "(%.f, %.f)", mouse.left_x, mouse.left_y);
+    DEBUG_DrawPoint(mouse.left_x, mouse.left_y);
+    DEBUG_DrawText(mouse.left_x, mouse.left_y, text);
 }
 bool mouseInRect(const SDL_FRect* rect) {
     return (

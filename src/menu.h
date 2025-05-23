@@ -3,37 +3,94 @@
 
 
 #pragma region TRIG ====================================================================================================
+/*
+ * Trig是Menu中调用函数的手段, 涉及的数据类型有Trig, TrigName, TrigFunc, TrigPara和变量trig_set.
+ * TrigFunc函数和TrigPara外来参数两者一起描述调用函数的具体细节, 即实际发生trigFunc(trigPara).
+ * TrigName应该是TrigFunc的文本解释.
+ * TrigName和TrigFunc共同构成Trig.
+ * 所有的Trig构成有限的trig_set.
+ * trig_set是检索范围, TrigName和TrigFunc是检索关键字.
+ * TrigName和TrigFunc被定义双射, 即可以用TrigName在trig_set内查找到TrigFunc或相反, 同样是Trig内的唯一检索手段.
+ *
+ * 流: toml -> (TrigName, TrigPara) -(trig_set)-> (TrigFunc, TrigPara) -> TrigFunc(TrigPara)
+ *
+ * Q: 为什么用TrigFunc和TrigPara两个对象来描述而不是只用一个对象?
+ * A: 如果用一个对象来描述, 那么在能forward到n个page时, 需要储存的空间是n*sizeof(forward), 但是分成两个参数就不需要了.
+ */
 
 
+// datatype
 typedef char* TrigPara;
 typedef char* TrigName;
 typedef void (*TrigFunc)(TrigPara);
 typedef struct {const TrigName name; const TrigFunc func;} Trig;
 
 
+void trigFuncPass(TrigPara);
+void trigFuncForward(TrigPara);
+void trigFuncBackward(TrigPara);
+void trigFuncClear(TrigPara);
+
+
+const Trig trig_set[] = {
+    {"pass", trigFuncPass},
+    {"forward", trigFuncForward},
+    {"backward", trigFuncBackward},
+    {"clear", trigFuncClear},
+    {NULL, NULL}
+};
+
+
+TrigFunc findTrigFuncFromName(const TrigName name) {
+    // Req Condition
+    if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
+
+    //
+    for (int i = 0; trig_set[i].name != NULL; i++) {
+        if (strcmp(trig_set[i].name, name) == 0) {
+            return trig_set[i].func;
+        }
+    }
+    return NULL;
+}
+TrigName findTrigNameFromFunc(const TrigFunc func) {
+    // Req Condition
+    if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
+
+    //
+    for (int i = 0; trig_set[i].func != NULL; i++) {
+        if (trig_set[i].func == func) {
+            return trig_set[i].name;
+        }
+    }
+    return NULL;
+}
+
+
 #pragma endregion TRIG  ================================================================================================
 #pragma region ELEM ====================================================================================================
-
+/*
+ * Elem是图形显示的单位, 同时和一个TrigFunc(可以是NULL)绑定, 以实现复杂的功能.
+ */
 
 typedef uint8_t Anchor;
-typedef int ElemId;
-typedef char ElemStr;
+typedef int ElemId; // uint?
+typedef char* ElemStr;
 typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
 
 
 typedef struct {
     // file
-    ElemId id;  // id意味着page的第几个元素, 从0开始, id<0意味着未初始化
+    ElemId id;  // id意味着page的第几个元素, 从1开始, id=0意味着未初始化
     Anchor anchor;
     SDL_FRect guide;
     TrigFunc func;
     TrigPara para; // malloc
-    ElemStr* string; // malloc
+    ElemStr string; // malloc
     SDL_Texture* texture; // malloc
     // renewable
     SDL_FRect src_rect, dst_rect;
     ElemState state;
-    bool on;
 } Elem;
 
 
@@ -42,12 +99,13 @@ typedef struct {
 
 
 typedef char PageName;
+typedef int PageId;
 typedef int PageVolume;
 const PageVolume PAGE_MAX_VOLUME = 32;
 
 
 typedef struct {
-    int id;
+    PageId id;
     PageName* name;  // malloc
     Elem elems[PAGE_MAX_VOLUME];
 } Page;
@@ -57,7 +115,6 @@ typedef struct {
 #pragma region MENU ====================================================================================================
 
 
-typedef int PageId;
 typedef int PathId;
 const PageId MENU_PAGE_VOLUME = 16;
 const PathId MENU_PATH_VOLUME = 6;
@@ -84,52 +141,11 @@ struct {
 
 
 #pragma endregion MENU =================================================================================================
-#pragma region TRIG_SIGN ===============================================================================================
-
-
-void trigFuncPass(const TrigPara);
-void trigFuncForward(const TrigPara);
-void trigFuncBackward(const TrigPara);
-void trigFuncClear(const TrigPara);
-const Trig triggers[] = {
-    {"pass", trigFuncPass},
-    {"forward", trigFuncForward},
-    {"backward", trigFuncBackward},
-    {"clear", trigFuncClear},
-    {NULL, NULL}
-};
-TrigFunc getTrigFuncFromName(const TrigName name) {
-    // N-Condition
-    if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
-
-    //
-    for (int i = 0; triggers[i].name != NULL; i++) {
-        if (strcmp(triggers[i].name, name) == 0) {
-            return triggers[i].func;
-        }
-    }
-    return NULL;
-}
-TrigName getTrigNameFromFunc(const TrigFunc func) {
-    // N-Condition
-    if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
-
-    //
-    for (int i = 0; triggers[i].func != NULL; i++) {
-        if (triggers[i].func == func) {
-            return triggers[i].name;
-        }
-    }
-    return NULL;
-}
-
-
-#pragma endregion TRIG_SIGN ============================================================================================
 #pragma region ELEM_FUNC ===============================================================================================
 
 
 // other
-SDL_Texture* getTextureFromElemString(const ElemStr* elemStr) {
+SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
     // Req Condition
     if (elemStr == NULL) {printf("%s: elemStr not exist.\n", __func__); return NULL;}
     if (elemStr[0] == '\0') {printf("%s: elemStr[%p] isn't legal.\n", __func__, elemStr); return NULL;}
@@ -167,26 +183,11 @@ SDL_Texture* getTextureFromElemString(const ElemStr* elemStr) {
 
     return texture;
 }
-void turnElemOn(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-
-    //
-    elem->on = true;
-}
-void turnElemOff(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-
-    //
-    elem->on = false;
-}
 
 
 // test
 bool testElem(const Elem* elem, const char* string) {
     if (elem == NULL) {printf("%s: elem not exists.\n", string); return false;}
-    if (elem->on == false) {printf("%s: elem not on.\n", string); return false;}
     if (elem->id < 0) {printf("%s: elem id is negative.\n", string); return false;}
     if (elem->string == NULL) {printf("%s: elem[%d].string not exists.\n", string, elem->id); return false;}
     if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", string, elem->id); return false;}
@@ -201,7 +202,6 @@ void initElem(Elem* elem) {
 
     //
     *elem = (Elem){0};
-    elem->id = -1;
 }
 
 
@@ -273,7 +273,7 @@ void loadElemOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemI
 
     // loadElemFuncFromToml
     const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
-    elem->func = tomlFuncName.ok ? getTrigFuncFromName(tomlFuncName.u.s) : NULL;
+    elem->func = tomlFuncName.ok ? findTrigFuncFromName(tomlFuncName.u.s) : NULL;
 
     // loadElemIdFromToml
     elem->id = tomlElemId;
@@ -290,7 +290,6 @@ void loadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     loadElemPara(elem, toml_string_in(tomlElem, "para"));
     loadElemString(elem, toml_string_in(tomlElem, "string"));
     loadElemTexture(elem);
-    turnElemOn(elem);
 }
 
 
@@ -303,7 +302,6 @@ void killElem(Elem* elem) {
     if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
     if (elem->para != NULL) {free(elem->para); elem->para = NULL;}
     if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
-    turnElemOff(elem);
 }
 
 
@@ -379,9 +377,9 @@ void drawElem(const Elem* elem) {
 
     //
     switch (elem->state) {
-        case INSIDE: {DEBUG_DrawRect(menu.renderer, &elem->dst_rect); break;}
         case PRESSED:
-        case RELEASE: {DEBUG_FillRect(menu.renderer, &elem->dst_rect); break;}
+        case RELEASE: {DEBUG_FillRect(&elem->dst_rect);}
+        case INSIDE: {DEBUG_DrawRect(&elem->dst_rect); break;}
         case OUTSIDE:
         default: {break;}
     }
@@ -441,9 +439,8 @@ void loadPageElems(Page* page, const toml_array_t* tomlElems) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         // Opt Condition
         if (tomlElem != NULL) {
-            loadElem(&page->elems[i], tomlElem, i);
+            loadElem(&page->elems[i], tomlElem, i+1);
         }
-        else {turnElemOff(&page->elems[i]);}
     }
 }
 
@@ -477,7 +474,7 @@ void renewPage(Page* page) {
 
     //
     for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
-        if (page->elems[i].on) {renewElem(&page->elems[i]);}
+        if (page->elems[i].id != 0) {renewElem(&page->elems[i]);}
     }
 }
 
@@ -489,7 +486,7 @@ void drawPage(const Page* page) {
 
     //
     for (PageVolume i = 0; i < PAGE_MAX_VOLUME; i++) {
-        if (page->elems[i].on) {drawElem(&page->elems[i]);}
+        if (page->elems[i].id != 0) {drawElem(&page->elems[i]);}
     }
 }
 

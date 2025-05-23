@@ -2,34 +2,43 @@
 #define DEBUG_H
 
 
-// debug parameters
-struct {
-    TTF_Font* fontSmall;
-    TTF_Font* fontBig;
+// datatype
+struct Debug {
     bool on;
-    SDL_Color colorPoint;
-    SDL_Color colorLine;
-    SDL_Color colorFace;
-    SDL_Color colorText;
-    SDL_Color colorDark;
-    SDL_Color colorLight;
-} debug;
+    SDL_Renderer* renderer;
+    struct {
+        TTF_Font *fontSmall, *fontBig;
+        SDL_Color point, line, face, text, dark, light;
+    } theme;
+};
+typedef struct Debug Debug;
+Debug debug;
+
+
+// init
+void initDebug() {
+    debug = (Debug){0};
+}
+
+
+// load
 void loadDebugTheme() {
-    debug.fontSmall = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 64);
-    debug.fontBig = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 128);
-    if (debug.fontSmall == NULL) {printf("Fail to load font.\n");}
+    debug.theme.fontSmall = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 16);
+    debug.theme.fontBig = TTF_OpenFont("../fonts/JetBrainsMono-ExtraBold.ttf", 32);
+    if (debug.theme.fontSmall == NULL) {printf("Fail to load font.\n");}
     debug.on = true;
-    debug.colorPoint = (SDL_Color){246, 202, 124, 255};
-    debug.colorLine = (SDL_Color){158, 189, 127, 255};
-    debug.colorFace = (SDL_Color){241, 155, 153, 255};
-    debug.colorText = (SDL_Color){116, 173, 220, 255};
-    debug.colorDark = (SDL_Color){0, 0, 0, 255};
-    debug.colorLight = (SDL_Color){255, 255, 255, 255};
+    debug.theme.point = (SDL_Color){246, 202, 124, 255};
+    debug.theme.line = (SDL_Color){158, 189, 127, 255};
+    // debug.theme.face = (SDL_Color){241, 155, 153, 255};
+    debug.theme.face = (SDL_Color){158, 189, 127, 127};
+    debug.theme.text = (SDL_Color){116, 173, 220, 255};
+    debug.theme.dark = (SDL_Color){0, 0, 0, 255};
+    debug.theme.light = (SDL_Color){255, 255, 255, 255};
 };
 
 
 // debug functions
-void DEBUG_Intro(SDL_Renderer *renderer) {
+void DEBUG_Intro() {
     if (!debug.on) {return;}
 
     const Uint64 T1 = 1000, T2 = 2000, T3 = 2500, T4 = 3000;
@@ -39,11 +48,11 @@ void DEBUG_Intro(SDL_Renderer *renderer) {
     const Uint64 nowTime = SDL_GetTicks();
     if (nowTime < T4) {
         if (textureDark == NULL) {
-            textureDark = TXT_LoadTexture(renderer, debug.fontSmall, "[DEBUG:]", debug.colorDark);
+            textureDark = TXT_LoadTexture(debug.renderer, debug.theme.fontSmall, "[DEBUG:]", debug.theme.dark);
             SDL_GetTextureSize(textureDark, &darkWidth, &darkHeight);
         }
         if (textureLight == NULL) {
-            textureLight = TXT_LoadTexture(renderer, debug.fontBig, "ON", debug.colorLight);
+            textureLight = TXT_LoadTexture(debug.renderer, debug.theme.fontBig, "ON", debug.theme.light);
             SDL_GetTextureSize(textureLight, &lightWidth, &lightHeight);
         }
     }
@@ -54,74 +63,71 @@ void DEBUG_Intro(SDL_Renderer *renderer) {
         textureDark = NULL;
     }
     if (T1 <= nowTime && nowTime < T4) {
-        const SDL_Color colors[] = {debug.colorPoint, debug.colorLine, debug.colorFace, debug.colorText};
+        const SDL_Color colors[] = {debug.theme.point, debug.theme.line, debug.theme.face, debug.theme.text};
         const int num_colors = sizeof(colors) / sizeof(SDL_Color);
         SDL_FRect rect = {(windowWidth - darkWidth) / 2, (windowHeight - darkHeight) / 2, 0, darkHeight};
         for (int i = 0; i < num_colors; i++) {
             rect.w = darkWidth * (4 - i) / num_colors * EASE_bySin((float)(nowTime - T1) / (T2 - T1));
-            SDL_SetRenderSDLColor(renderer, colors[3 - i]);
-            SDL_RenderFillRect(renderer, &rect);
+            SDL_SetRenderSDLColor(debug.renderer, colors[3 - i]);
+            SDL_RenderFillRect(debug.renderer, &rect);
         }
         rect.w = darkWidth;
-        SDL_RenderTexture(renderer, textureDark, NULL, &rect);
+        SDL_RenderTexture(debug.renderer, textureDark, NULL, &rect);
     }
     if (T1 <= nowTime && nowTime < T4) {
         SDL_FRect src_rect = {0, 0, lightWidth, 0};
         SDL_FRect dst_rect = {(windowWidth - lightWidth) / 2, (windowHeight - lightHeight) / 2, lightWidth, 0};
         src_rect.h = dst_rect.h = lightHeight * EASE_bySin((float)(nowTime - T1) / (T3 - T1));
         dst_rect.y += lightHeight - dst_rect.h;
-        SDL_RenderTexture(renderer, textureLight, &src_rect, &dst_rect);
+        SDL_RenderTexture(debug.renderer, textureLight, &src_rect, &dst_rect);
     }
 }
-void DEBUG_DrawPoint(SDL_Renderer* renderer, const Sint16 x, const Sint16 y) {
-    if (!debug.on) {
-        return;
-    }
-    if (renderer == NULL) {
-        printf("DEBUG_DrawPoint: Renderer is NULL.\n");
-        return;
-    }
+void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
+    // Pre Condition
+    if (!debug.on) {return;}
 
+    //
     const float w = 8;
     const SDL_FRect rect = {x - w, y - w, 2 * w, 2 * w};
-    SDL_SetRenderDrawColor(renderer, debug.colorPoint.r, debug.colorPoint.g, debug.colorPoint.b, debug.colorPoint.a);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
+    SDL_RenderFillRect(debug.renderer, &rect);
 }
-void DEBUG_DrawRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
-    if (!debug.on) {
-        return;
-    }
-    if (renderer == NULL) {
-        printf("DEBUG_DrawRect: Renderer is NULL.\n");
-        return;
-    }
-    if (rect == NULL) {
-        printf("DEBUG_DrawRect: Rect is NULL.\n");
-        return;
-    }
+void DEBUG_DrawRect(const SDL_FRect* rect) {
+    // Pre Condition
+    if (!debug.on) {return;}
 
-    SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
-    SDL_RenderRect(renderer, rect);
-}
-void DEBUG_FillRect(SDL_Renderer* renderer, const SDL_FRect* rect) {
-    if (!debug.on) {
-        return;
-    }
-    if (renderer == NULL) {
-        printf("DEBUG_DrawRect: Renderer is NULL.\n");
-        return;
-    }
-    if (rect == NULL) {
-        printf("DEBUG_DrawRect: Rect is NULL.\n");
-        return;
-    }
+    // Req Condition
+    if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
-    SDL_SetRenderDrawColor(renderer, debug.colorFace.r, debug.colorFace.g, debug.colorFace.b, debug.colorFace.a);
-    SDL_RenderFillRect(renderer, rect);
+    //
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.line);
+    SDL_RenderRect(debug.renderer, rect);
 }
-void DEBUG_Cover(SDL_Renderer* renderer, const Uint8 alpha) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, alpha);
-    SDL_RenderFillRect(renderer, NULL);
+void DEBUG_FillRect(const SDL_FRect* rect) {
+    // Pre Condition
+    if (!debug.on) {return;}
+
+    // Req Condition
+    if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
+
+    //
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
+    SDL_RenderFillRect(debug.renderer, rect);
+}
+void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
+    // Pre Condition
+    if (!debug.on) {return;}
+
+    // Req Condition
+    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
+
+    //
+    SDL_Texture* textTexture = TXT_LoadTexture(debug.renderer, debug.theme.fontSmall, text, debug.theme.text);
+    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
+    SDL_FRect dst_rect = {x, y};
+    SDL_GetTextureSize(textTexture, &dst_rect.w, &dst_rect.h);
+    SDL_RenderTexture(debug.renderer, textTexture, NULL, &dst_rect);
+    SDL_DestroyTexture(textTexture);
 }
 
 

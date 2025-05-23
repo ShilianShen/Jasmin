@@ -111,8 +111,8 @@ SDL_Texture* TXT_LoadTextureWithLines(SDL_Renderer* renderer, TTF_Font* font, co
 
     return texture;
 }
-void SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
+    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
 
