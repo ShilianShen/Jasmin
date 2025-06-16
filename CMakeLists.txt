@@ -18,13 +18,25 @@ find_package(SDL3_ttf REQUIRED)
 find_package(SDL3_image REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        src/menu.h
-        src/device.h
-        src/debug.h
-        src/basic.h
+        src/jasmin/menu/struct/menu.h
+        src/jasmin/device.h
+        src/jasmin/debug.h
+        src/jasmin/basic.h
 
         # toml/toml.h
         third_party/toml/toml.c
+        src/jasmin/menu/struct/trig.h
+        src/jasmin/menu/struct/elem.h
+        src/jasmin/menu/struct/page.h
+        src/jasmin/menu/menu.h
+        src/jasmin/menu/func/init.h
+        src/jasmin/menu/func/load.h
+        src/jasmin/menu/func/renew.h
+        src/jasmin/menu/func/draw.h
+        src/jasmin/menu/func/kill.h
+        src/jasmin/menu/func/test.h
+        src/jasmin/menu/func/trig.h
+        src/jasmin/jasmin.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

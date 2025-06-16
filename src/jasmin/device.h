@@ -38,13 +38,16 @@ void renewMouse() {
 void drawMouse(SDL_Renderer* renderer) {
     static char text[32];
 
-    snprintf(text, 32, "(%.f, %.f)", mouse.x, mouse.y);
-    DEBUG_DrawPoint(mouse.x, mouse.y);
-    DEBUG_DrawText(mouse.x, mouse.y, text);
+    snprintf(text, 32, "%.f, %.f", mouse.x, mouse.y);
+    if (debug.message != NULL && strlen(debug.message) > 0) {
+        DEBUG_DrawText(mouse.x, mouse.y, debug.message);
+    }
+    else {
+        DEBUG_DrawText(mouse.x, mouse.y, text);
+    }
 
-    snprintf(text, 32, "(%.f, %.f)", mouse.left_x, mouse.left_y);
     DEBUG_DrawPoint(mouse.left_x, mouse.left_y);
-    DEBUG_DrawText(mouse.left_x, mouse.left_y, text);
+    DEBUG_DrawPoint(mouse.x, mouse.y);
 }
 bool mouseInRect(const SDL_FRect* rect) {
     return (

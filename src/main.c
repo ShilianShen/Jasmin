@@ -1,26 +1,22 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <stdio.h>
+#include <stdarg.h>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
-
 #define MINIAUDIO_IMPLEMENTATION
 #include "../third_party/miniaudio/miniaudio.h"
 #include "../third_party/toml/toml.h"
 ma_engine maEngine;
+#include "jasmin/jasmin.h"
 
-
-// Jasmine
-#include "basic.h"
-#include "debug.h"
-#include "device.h"
-#include "menu.h"
 
 
 int main(int argc, char *argv[]) {
     // window & renderer
     const char WINDOW_TITLE[] = "Test";
     const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
+    bool oftenReload = true;
     SDL_Window *window;
     SDL_Renderer *renderer;
     bool running = true;
@@ -43,48 +39,56 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     // ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
-
-    // create & load
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_HideCursor();
 
-    menu.renderer = renderer;
-    initDebug();
-    initMenu();
-    debug.renderer = renderer;
-    loadDebugTheme();
+    // init
+    DEBUG_Init(renderer);
+    MENU_InitMenu(renderer);
+
+    // load
+    DEBUG_Load();
+    MENU_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
 
     // running
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {running = false;}
         }
-
+        // renew
         // physical renew
         renewScreenParas(window);
         renewMouse();
+        DEBUG_Renew();
 
         // logical renew
-        menu.bck_rect.w = (float)windowWidth, menu.bck_rect.h = (float)windowHeight;
-        killMenu();
-        loadMenu();
-        renewMenu();
+        menu.bck_rect.w = (float)windowWidth;
+        menu.bck_rect.h = (float)windowHeight;
+        MENU_RenewMenu();
 
-        // clear
+        // draw
         SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
         SDL_RenderClear(renderer);
 
         // logical draw
-        drawMenu();
+        MENU_DrawMenu();
 
         // physical draw
         drawMouse(renderer);
         DEBUG_Intro();
 
-        // show
+        //
         SDL_RenderPresent(renderer);
+
+        //
+        if (oftenReload) {
+            MENU_KillMenu();
+            MENU_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
+        }
     }
 
     // kill & destroy
+    MENU_KillMenu();
     SDL_DestroyWindow(window);
     SDL_Quit();
 

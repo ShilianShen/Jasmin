@@ -17,7 +17,7 @@ void renewScreenParas(SDL_Window* window) {
 }
 
 
-// 基本函数
+// basic function
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
     // N-Condition
     if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}
@@ -113,6 +113,9 @@ SDL_Texture* TXT_LoadTextureWithLines(SDL_Renderer* renderer, TTF_Font* font, co
 }
 bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+}
+bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
+    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
 }
 
 

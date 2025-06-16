@@ -1,0 +1,69 @@
+#ifndef TRIG_H
+#define TRIG_H
+
+
+/*
+ * Trig是Menu中调用函数的手段, 涉及的数据类型有Trig, TrigName, TrigFunc, TrigPara和变量trig_set.
+ * TrigFunc函数和TrigPara外来参数两者一起描述调用函数的具体细节, 即实际发生trigFunc(trigPara).
+ * TrigName应该是TrigFunc的文本解释.
+ * TrigName和TrigFunc共同构成Trig.
+ * 所有的Trig构成有限的trig_set.
+ * trig_set是检索范围, TrigName和TrigFunc是检索关键字.
+ * TrigName和TrigFunc被定义双射, 即可以用TrigName在trig_set内查找到TrigFunc或相反, 同样是Trig内的唯一检索手段.
+ *
+ * 流: toml -> (TrigName, TrigPara) -(trig_set)-> (TrigFunc, TrigPara) -> TrigFunc(TrigPara)
+ *
+ * Q: 为什么用TrigFunc和TrigPara两个对象来描述而不是只用一个对象?
+ * A: 如果用一个对象来描述, 那么在能forward到n个page时, 需要储存的空间是n*sizeof(forward), 但是分成两个参数就不需要了.
+ */
+
+
+// datatype
+typedef char* TrigPara;
+typedef char* TrigName;
+typedef void (*TrigFunc)(TrigPara);
+typedef struct {const TrigName name; const TrigFunc func;} Trig;
+
+
+void trigFuncPass(TrigPara);
+void trigFuncForward(TrigPara);
+void trigFuncBackward(TrigPara);
+void trigFuncClear(TrigPara);
+
+
+const Trig trig_set[] = {
+    {"pass", trigFuncPass},
+    {"forward", trigFuncForward},
+    {"backward", trigFuncBackward},
+    {"clear", trigFuncClear},
+    {NULL, NULL}
+};
+
+
+TrigFunc findTrigFuncFromName(const TrigName name) {
+    // Req Condition
+    if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
+
+    //
+    for (int i = 0; trig_set[i].name != NULL; i++) {
+        if (strcmp(trig_set[i].name, name) == 0) {
+            return trig_set[i].func;
+        }
+    }
+    return NULL;
+}
+TrigName findTrigNameFromFunc(const TrigFunc func) {
+    // Req Condition
+    if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
+
+    //
+    for (int i = 0; trig_set[i].func != NULL; i++) {
+        if (trig_set[i].func == func) {
+            return trig_set[i].name;
+        }
+    }
+    return NULL;
+}
+
+
+#endif //TRIG_H
