@@ -3,7 +3,7 @@
 
 
 #include "../basic/basic.h"
-#include "struct/menu.h"
+#include "struct/struct.h"
 #include "func/func.h"
 
 

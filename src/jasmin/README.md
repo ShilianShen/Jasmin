@@ -14,33 +14,43 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ```mermaid
 graph
-    subgraph basic.h
+    subgraph BASIC
         SDL3 --> setting
-        toml --> setting --> ease --> debug --> device --> basic
+        toml --> setting --> ease --> debug --> device --> basic.h
     end
 
-    subgraph menu.h
-        subgraph menu_struct.h
-            basic --> trig.h --> elem --> page --> menu' --> trig.c --> menu_struct
+    subgraph MENU
+        basic.h --> menu_interface.h --> menu_struct_interface.h
+        
+        subgraph MENU_STRUCT
+            menu_struct_interface.h --> trig.h --> elem
+            elem --> page --> menu' --> trig.c --> menu_struct.h
         end
 
-        subgraph menu_func.h
-            menu_struct --> draw --> menu_func
-            menu_struct --> init --> menu_func
-            menu_struct --> kill --> menu_func
-            menu_struct --> load --> menu_func
-            menu_struct --> renew --> menu_func
+        menu_struct.h --> menu_func_interface.h
+        
+        subgraph MENU_FUNC
+            menu_func_interface.h --> draw --> menu_func.h
+            menu_func_interface.h --> init --> menu_func.h
+            menu_func_interface.h --> kill --> menu_func.h
+            menu_func_interface.h --> load --> menu_func.h
+            menu_func_interface.h --> renew --> menu_func.h
         end
-        menu_func --> menu
+        menu_func.h --> menu.h
     end
   
-    style basic.h fill: black
-    style menu.h fill: black
-    style basic fill: peru
-    style menu_struct fill: peru
-    style menu_func fill: peru
-    style menu fill: peru
+    style BASIC fill: black
+    style MENU fill: black
 
-    basic --> menu --> jasmin
-    basic --> lo_tri --> jasmin
+    style menu_struct_interface.h fill: darkslategray
+    style menu_func_interface.h fill: darkslategray
+    style menu_interface.h fill: darkslategray
+    
+    style basic.h fill: peru
+    style menu_struct.h fill: peru
+    style menu_func.h fill: peru
+    style menu.h fill: peru
+
+    basic.h --> menu.h --> jasmin
+    basic.h --> lo_tri --> jasmin
 ```
