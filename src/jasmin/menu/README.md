@@ -17,22 +17,15 @@
 
 ## 结构
 
-$$
-\text{basic}\to
-[
-\text{trig.h}
-\to\text{elem}
-\to\text{page}
-\to\text{menu}
-]_{\text{struct}}
+```mermaid
+graph LR;
+basic --> menu_struct --> menu_func --> menu
+```
 
-\to
-\left[\begin{matrix}
-\text{draw}\\
-\text{init}\\
-\text{kill}\\
-\text{load}\\
-\text{renew}\\
-\end{matrix}\right]_{\text{func}}
-\to\text{trig.c}, \text{menu}
-$$
+```mermaid
+graph LR
+subgraph menu_struct
+interface.h --> trig.h --> elem --> page --> menu --> trig.c --> menu_struct.h
+end
+basic --> interface.h
+```

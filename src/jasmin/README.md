@@ -12,39 +12,25 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ## 依赖 Dependency
 
-### 串联依赖 Series-Dependency
-
 ```mermaid
-erDiagram
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--|{ LINE-ITEM : contains
+graph LR
+    subgraph basic.h
+        SDL3 --> setting
+        toml --> setting --> ease --> debug --> device --> basic
+    end
+    subgraph menu.h
+        subgraph menu_struct.h
+            basic --> trig.h --> elem --> page --> menu' --> trig.c --> menu_struct
+        end
+        subgraph menu_func.h
+            menu_struct --> draw --> menu_func
+            menu_struct --> init --> menu_func
+            menu_struct --> kill --> menu_func
+            menu_struct --> load --> menu_func
+            menu_struct --> renew --> menu_func
+        end
+        menu_func --> menu
+    end
+    basic --> menu --> jasmin
+    basic --> lo_tri --> jasmin
 ```
-
-$$
-\left[\begin{matrix}\text{SDL3}\\ \text{toml}\end{matrix}\right]
-\to 
-\text{setting}
-\to 
-\text{ease}
-\to
-\text{debug} 
-\to 
-\text{device} 
-\to 
-\text{basic}
-$$
-
-### 并联依赖 Parallel-Dependency
-
-$$
-\text{basic} 
-\to
-\left[\begin{matrix}
-  \text{menu} \\
-  \text{lo\_tri}
-\end{matrix}\right]
-\to 
-\text{jasmin}
-$$
-
-你好
