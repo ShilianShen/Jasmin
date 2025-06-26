@@ -1,13 +1,6 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <stdio.h>
 #include <stdarg.h>
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3_ttf/SDL_ttf.h>
-#define MINIAUDIO_IMPLEMENTATION
-#include "../third_party/miniaudio/miniaudio.h"
-#include "../third_party/toml/toml.h"
-ma_engine maEngine;
 #include "jasmin/jasmin.h"
 
 
@@ -35,20 +28,20 @@ int main(int argc, char *argv[]) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
 
-    if (ma_engine_init(NULL, &maEngine) != MA_SUCCESS) {
+    /*if (ma_engine_init(NULL, &maEngine) != MA_SUCCESS) {
         return -1;
-    }
+    }*/
     // ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_HideCursor();
 
     // init
     DEBUG_Init(renderer);
-    MENU_InitMenu(renderer);
+    MENU_Init(renderer);
 
     // load
     DEBUG_Load();
-    MENU_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
+    MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
 
     // running
     while (running) {
@@ -64,14 +57,14 @@ int main(int argc, char *argv[]) {
         // logical renew
         menu.bck_rect.w = (float)windowWidth;
         menu.bck_rect.h = (float)windowHeight;
-        MENU_RenewMenu();
+        MENU_Renew();
 
         // draw
         SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
         SDL_RenderClear(renderer);
 
         // logical draw
-        MENU_DrawMenu();
+        MENU_Draw();
 
         // physical draw
         drawMouse(renderer);
@@ -82,13 +75,13 @@ int main(int argc, char *argv[]) {
 
         //
         if (oftenReload) {
-            MENU_KillMenu();
-            MENU_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
+            MENU_Kill();
+            MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
         }
     }
 
     // kill & destroy
-    MENU_KillMenu();
+    MENU_Kill();
     SDL_DestroyWindow(window);
     SDL_Quit();
 

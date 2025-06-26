@@ -2,9 +2,7 @@
 #define JASMIN_H
 
 
-#include "basic.h"
-#include "debug.h"
-#include "device.h"
+#include "basic/basic.h"
 #include "menu/menu.h"
 
 

@@ -1,5 +1,4 @@
-#ifndef TEST_H
-#define TEST_H
+#include "elem.h"
 
 
 bool testElem(const Elem* elem, const char* string) {
@@ -9,11 +8,3 @@ bool testElem(const Elem* elem, const char* string) {
     if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", string, elem->id); return false;}
     return true;
 }
-bool testPage(const Page* page, const char* string) {
-    if (page == NULL) {if (string != NULL) {printf("%s: page not exists.\n", string);} return false;}
-    if (page->name == NULL) {if (string != NULL) {printf("%s: name not exists.\n", string);} return false;}
-    return true;
-}
-
-
-#endif //TEST_H

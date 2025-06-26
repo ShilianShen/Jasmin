@@ -1,5 +1,5 @@
-#ifndef LOAD_H
-#define LOAD_H
+#ifndef JASMIN_MENU_FUNC_LOAD_H
+#define JASMIN_MENU_FUNC_LOAD_H
 
 
 // load
@@ -144,12 +144,6 @@ toml_table_t* getToml(const char* tomlPath) {
 
     return toml;
 }
-Page* getMenuPageFromPathId(const PathId pathId) {
-    return menu.pages[menu.path[pathId]];
-}
-Page* getMenuPageFromPageId(const PageId pageId) {
-    return menu.pages[pageId];
-}
 
 
 void MENU_LoadPageName(Page* page, const char* name) {
@@ -274,6 +268,9 @@ void MENU_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
     MENU_LoadMenuPages(menuPagesPath);
 }
 
+void MENU_Load(const char* menuPagesPath, const char* menuThemePath) {
+    MENU_LoadMenu(menuPagesPath, menuThemePath);
+}
 
 
-#endif //LOAD_H
+#endif //JASMIN_MENU_FUNC_LOAD_H

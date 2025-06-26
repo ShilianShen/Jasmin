@@ -1,9 +1,6 @@
-#ifndef BASIC_H
-#define BASIC_H
+#include "setting.h"
 
 
-// display parameters
-typedef float Pixel;
 int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;
@@ -15,9 +12,6 @@ void renewScreenParas(SDL_Window* window) {
     scale_x = (float)windowWidth / (float)logical_w;
     scale_y = (float)windowHeight / (float)logical_h;
 }
-
-
-// basic function
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
     // N-Condition
     if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}
@@ -72,13 +66,13 @@ SDL_Texture* TXT_LoadTextureWithLines(SDL_Renderer* renderer, TTF_Font* font, co
     }
 
     // getMainTextureSize
-    const float line_height = TTF_GetFontHeight(font);
+    const float line_height = (float)TTF_GetFontHeight(font);
     const int main_texture_height = num_lines * TTF_GetFontHeight(font);
     float line_widths[num_lines];
     int main_texture_width = 0;
     for (int i = 0; i < num_lines; i++) {
         SDL_GetTextureSize(sub_textures[i], &line_widths[i], NULL);
-        if (main_texture_width < line_widths[i]) {main_texture_width = (int)line_widths[i];}
+        if ((float)main_texture_width < line_widths[i]) {main_texture_width = (int)line_widths[i];}
     }
 
     // getTexture N-Condition
@@ -96,10 +90,10 @@ SDL_Texture* TXT_LoadTextureWithLines(SDL_Renderer* renderer, TTF_Font* font, co
 
     // updateTexture
     for (int i = 0; i < num_lines; i++) {
-        SDL_FRect dst_rect = {0, line_height * i, line_widths[i], line_height};
+        SDL_FRect dst_rect = {0, line_height * (float)i, line_widths[i], line_height};
         switch (aligned) {
-            case 'r': case 'R': {dst_rect.x = main_texture_width - dst_rect.w; break;}
-            case 'c': case 'C': {dst_rect.x = (main_texture_width - dst_rect.w) / 2; break;}
+            case 'r': case 'R': {dst_rect.x = (float)main_texture_width - dst_rect.w; break;}
+            case 'c': case 'C': {dst_rect.x = ((float)main_texture_width - dst_rect.w) / 2; break;}
             case 'l': case 'L': default: {break;}
         }
         SDL_RenderTexture(renderer, sub_textures[i], NULL, &dst_rect);
@@ -117,21 +111,3 @@ bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
 bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
 }
-
-
-
-
-#pragma region EASE ====================================================================================================
-
-
-float EASE_bySin(const float x) {
-    if (x >= 1) {return 1;}
-    if (x <= 0) {return 0;}
-    return SDL_pow(SDL_sinf(3.14 / 2 * x), 2);
-}
-
-
-#pragma endregion EASE =================================================================================================
-
-
-#endif //BASIC_H

@@ -1,18 +1,16 @@
-#ifndef ELEM_H
-#define ELEM_H
+#ifndef JASMIN_MENU_STRUCT_ELEM_H
+#define JASMIN_MENU_STRUCT_ELEM_H
 
 
-/*
- * Elem是图形显示的单位, 同时和一个TrigFunc(可以是NULL)绑定, 以实现复杂的功能.
- */
+#include "../../../basic/basic.h"
+#include "../trig.h"
+
 
 typedef uint8_t Anchor;
-typedef int ElemId; // uint?
+typedef int ElemId;
 typedef char* ElemStr;
-typedef enum {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
-
-
-typedef struct {
+typedef enum ElemState {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
+typedef struct Elem {
     // file
     ElemId id;  // id意味着page的第几个元素, 从1开始, id=0意味着未初始化
     Anchor anchor;
@@ -27,4 +25,7 @@ typedef struct {
 } Elem;
 
 
-#endif //ELEM_H
+bool testElem(const Elem* elem, const char* string);
+
+
+#endif //JASMIN_MENU_STRUCT_ELEM_H

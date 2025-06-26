@@ -19,24 +19,34 @@ find_package(SDL3_image REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/menu/struct/menu.h
-        src/jasmin/device.h
-        src/jasmin/debug.h
-        src/jasmin/basic.h
+        src/jasmin/basic/device/device.h
+        src/jasmin/basic/debug/debug.h
+        src/jasmin/basic/setting/setting.h
 
         # toml/toml.h
         third_party/toml/toml.c
         src/jasmin/menu/struct/trig.h
-        src/jasmin/menu/struct/elem.h
+        src/jasmin/menu/struct/elem/elem.h
         src/jasmin/menu/struct/page.h
         src/jasmin/menu/menu.h
-        src/jasmin/menu/func/init.h
-        src/jasmin/menu/func/load.h
-        src/jasmin/menu/func/renew.h
-        src/jasmin/menu/func/draw.h
-        src/jasmin/menu/func/kill.h
-        src/jasmin/menu/func/test.h
+        src/jasmin/menu/func/init/init.h
+        src/jasmin/menu/func/load/load.h
+        src/jasmin/menu/func/renew/renew.h
+        src/jasmin/menu/func/draw/draw.h
+        src/jasmin/menu/func/kill/kill.h
         src/jasmin/menu/func/trig.h
         src/jasmin/jasmin.h
+        src/jasmin/basic/basic.h
+        src/jasmin/tessst.c
+        src/jasmin/basic/setting/setting.c
+        src/jasmin/basic/debug/debug.c
+        src/jasmin/basic/device/device.c
+        src/jasmin/basic/ease/ease.c
+        src/jasmin/basic/ease/ease.h
+        src/jasmin/menu/func/draw/draw.c
+        src/jasmin/menu/struct/struct.h
+        src/jasmin/menu/func/func.h
+        src/jasmin/menu/struct/elem/elem.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

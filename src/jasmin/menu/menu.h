@@ -1,24 +1,17 @@
-#ifndef MPET_H
-#define MPET_H
+#ifndef JASMIN_MENU_H
+#define JASMIN_MENU_H
 
 
-#include "struct/trig.h"
-#include "struct/elem.h"
-#include "struct/page.h"
+#include "../basic/basic.h"
 #include "struct/menu.h"
+#include "func/func.h"
 
 
-#include "func/test.h"
-#include "func/load.h"
-#include "func/renew.h"
-#include "func/kill.h"
-#include "func/trig.h"
-#include "func/draw.h"
-#include "func/init.h"
-
-void func() {
-    MENU_DrawElem(NULL);
-}
+void MENU_Draw();
+void MENU_Init(SDL_Renderer*);
+void MENU_Kill();
+void MENU_Load(const char*, const char*);
+void MENU_Renew();
 
 
-#endif //MPET_H
+#endif //JASMIN_MENU_H

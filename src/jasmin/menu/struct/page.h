@@ -1,5 +1,8 @@
-#ifndef PAGE_H
-#define PAGE_H
+#ifndef JASMIN_MENU_STRUCT_PAGE_H
+#define JASMIN_MENU_STRUCT_PAGE_H
+
+
+#include "elem/elem.h"
 
 
 typedef char PageName;
@@ -15,4 +18,11 @@ typedef struct {
 } Page;
 
 
-#endif //PAGE_H
+bool testPage(const Page* page, const char* string) {
+    if (page == NULL) {if (string != NULL) {printf("%s: page not exists.\n", string);} return false;}
+    if (page->name == NULL) {if (string != NULL) {printf("%s: name not exists.\n", string);} return false;}
+    return true;
+}
+
+
+#endif //JASMIN_MENU_STRUCT_PAGE_H

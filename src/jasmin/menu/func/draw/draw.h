@@ -1,8 +1,8 @@
-#ifndef DRAW_H
-#define DRAW_H
+#ifndef JASMIN_MENU_FUNC_DRAW_H
+#define JASMIN_MENU_FUNC_DRAW_H
 
 
-void MENU_DrawElem(const Elem* elem) {
+static void MENU_DrawElem(const Elem* elem) {
     // Req Condition
     if (!testElem(elem, __func__)) {return;}
     if (menu.renderer == NULL) {printf("%s: menu.renderer is NULL.\n", __func__); return;}
@@ -17,7 +17,7 @@ void MENU_DrawElem(const Elem* elem) {
     }
     SDL_RenderTexture(menu.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 }
-void MENU_DrawPage(const Page* page) {
+static void MENU_DrawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
@@ -26,10 +26,14 @@ void MENU_DrawPage(const Page* page) {
         if (page->elems[i].id != 0) {MENU_DrawElem(&page->elems[i]);}
     }
 }
-void MENU_DrawMenu() {
+static void MENU_DrawMenu() {
     MENU_DrawPage(menu.pageNow);
 }
 
 
+void MENU_Draw() {
+    MENU_DrawMenu();
+}
 
-#endif //DRAW_H
+
+#endif //JASMIN_MENU_FUNC_DRAW_H

@@ -1,5 +1,5 @@
-#ifndef KILL_H
-#define KILL_H
+#ifndef JASMIN_MENU_FUNC_KILL_H
+#define JASMIN_MENU_FUNC_KILL_H
 
 
 void MENU_KillElem(Elem* elem) {
@@ -37,4 +37,10 @@ void MENU_KillMenu() {
 }
 
 
-#endif //KILL_H
+
+void MENU_Kill() {
+    MENU_KillMenu();
+}
+
+
+#endif //JASMIN_MENU_FUNC_KILL_H

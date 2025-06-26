@@ -1,5 +1,5 @@
-#ifndef TRIG_H
-#define TRIG_H
+#ifndef JASMIN_MENU_STRUCT_TRIG_H
+#define JASMIN_MENU_STRUCT_TRIG_H
 
 
 /*
@@ -22,7 +22,7 @@
 typedef char* TrigPara;
 typedef char* TrigName;
 typedef void (*TrigFunc)(TrigPara);
-typedef struct {const TrigName name; const TrigFunc func;} Trig;
+typedef struct Trig {const TrigName name; const TrigFunc func;} Trig;
 
 
 void trigFuncPass(TrigPara);
@@ -31,39 +31,11 @@ void trigFuncBackward(TrigPara);
 void trigFuncClear(TrigPara);
 
 
-const Trig trig_set[] = {
-    {"pass", trigFuncPass},
-    {"forward", trigFuncForward},
-    {"backward", trigFuncBackward},
-    {"clear", trigFuncClear},
-    {NULL, NULL}
-};
+extern Trig trig_set[];
 
 
-TrigFunc findTrigFuncFromName(const TrigName name) {
-    // Req Condition
-    if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
-
-    //
-    for (int i = 0; trig_set[i].name != NULL; i++) {
-        if (strcmp(trig_set[i].name, name) == 0) {
-            return trig_set[i].func;
-        }
-    }
-    return NULL;
-}
-TrigName findTrigNameFromFunc(const TrigFunc func) {
-    // Req Condition
-    if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
-
-    //
-    for (int i = 0; trig_set[i].func != NULL; i++) {
-        if (trig_set[i].func == func) {
-            return trig_set[i].name;
-        }
-    }
-    return NULL;
-}
+TrigFunc findTrigFuncFromName(const TrigName name);
+TrigName findTrigNameFromFunc(const TrigFunc func);
 
 
-#endif //TRIG_H
+#endif //JASMIN_MENU_STRUCT_TRIG_H

@@ -1,5 +1,5 @@
-#ifndef INIT_H
-#define INIT_H
+#ifndef JASMIN_MENU_FUNC_INIT_H
+#define JASMIN_MENU_FUNC_INIT_H
 
 
 void MENU_InitElem(Elem* elem) {
@@ -37,4 +37,9 @@ void MENU_InitMenu(SDL_Renderer* renderer) {
 }
 
 
-#endif //INIT_H
+void MENU_Init(SDL_Renderer* renderer) {
+    MENU_InitMenu(renderer);
+}
+
+
+#endif //JASMIN_MENU_FUNC_INIT_H

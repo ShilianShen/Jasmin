@@ -1,23 +1,19 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#include "debug.h"
 
 
-// datatype
+typedef struct Debug Debug;
 struct Debug {
     bool on;
     SDL_Renderer* renderer;
-    struct {
+    struct DebugTheme {
         TTF_Font *font32, *font64, *font128, *font256;
         SDL_Color colorPoint, colorRect, colorFace, colorText, colorDark, colorLight;
         int alphaLight, alphaDark;
     } theme;
     char message[50];
-};
-typedef struct Debug Debug;
-Debug debug;
+} debug;
 
 
-// init
 void DEBUG_Init(SDL_Renderer* renderer) {
     // Req Condition
     if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
@@ -26,9 +22,6 @@ void DEBUG_Init(SDL_Renderer* renderer) {
     debug = (Debug){0};
     debug.renderer = renderer;
 }
-
-
-// load
 static void DEBUG_LoadTheme() {
     debug.theme.font32 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 32);
     debug.theme.font64 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 64);
@@ -52,9 +45,6 @@ static void DEBUG_LoadTheme() {
 void DEBUG_Load() {
     DEBUG_LoadTheme();
 }
-
-
-// renew
 void DEBUG_Renew() {
     // Pre Condition
     if (!debug.on) {return;}
@@ -64,7 +54,6 @@ void DEBUG_Renew() {
 }
 
 
-// debug functions
 void DEBUG_Intro() {
     // Pre Condition
     if (!debug.on) {return;}
@@ -93,9 +82,9 @@ void DEBUG_Intro() {
     if (T1 <= nowTime && nowTime < T4) {
         const SDL_Color colors[] = {debug.theme.colorPoint, debug.theme.colorRect, debug.theme.colorFace, debug.theme.colorText};
         const int num_colors = sizeof(colors) / sizeof(SDL_Color);
-        SDL_FRect rect = {(windowWidth - darkWidth) / 2, (windowHeight - darkHeight) / 2, 0, darkHeight};
+        SDL_FRect rect = {((float)windowWidth - darkWidth) / 2, ((float)windowHeight - darkHeight) / 2, 0, darkHeight};
         for (int i = 0; i < num_colors; i++) {
-            rect.w = darkWidth * (4 - i) / num_colors * EASE_bySin((float)(nowTime - T1) / (T2 - T1));
+            rect.w = darkWidth * (float)(4 - i) / (float)num_colors * EASE_Sin2((float)(nowTime - T1) / (float)(T2 - T1));
             SDL_SetRenderSDLColor(debug.renderer, colors[3 - i]);
             SDL_RenderFillRect(debug.renderer, &rect);
         }
@@ -104,23 +93,33 @@ void DEBUG_Intro() {
     }
     if (T1 <= nowTime && nowTime < T4) {
         SDL_FRect src_rect = {0, 0, lightWidth, 0};
-        SDL_FRect dst_rect = {(windowWidth - lightWidth) / 2, (windowHeight - lightHeight) / 2, lightWidth, 0};
-        src_rect.h = dst_rect.h = lightHeight * EASE_bySin((float)(nowTime - T1) / (T3 - T1));
+        SDL_FRect dst_rect = {((float)windowWidth - lightWidth) / 2, ((float)windowHeight - lightHeight) / 2, lightWidth, 0};
+        src_rect.h = dst_rect.h = lightHeight * EASE_Sin2((float)(nowTime - T1) / (float)(T3 - T1));
         dst_rect.y += lightHeight - dst_rect.h;
         SDL_RenderTexture(debug.renderer, textureLight, &src_rect, &dst_rect);
     }
 }
+
+
 void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
     // Pre Condition
     if (!debug.on) {return;}
 
     // point
     const float w = 8;
-    const SDL_FRect rect = {x - w, y - w, 2 * w, 2 * w};
+    const SDL_FRect rect = {(float)x - w, (float)y - w, 2 * w, 2 * w};
 
     // draw
     SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorPoint, debug.theme.alphaLight);
     SDL_RenderFillRect(debug.renderer, &rect);
+}
+void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
+    // Pre Condition
+    if (!debug.on) {return;}
+
+    // line
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorPoint, debug.theme.alphaDark);
+    SDL_RenderLine(debug.renderer, x1, y1, x2, y2);
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
     // Pre Condition
@@ -177,6 +176,8 @@ void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     SDL_RenderTexture(debug.renderer, textTexture, NULL, &dst_rect);
     SDL_DestroyTexture(textTexture);
 }
+
+
 void DEBUG_SendMessage(const char* format, ...) {
     // Pre Condition
     if (!debug.on) {return;}
@@ -187,6 +188,15 @@ void DEBUG_SendMessage(const char* format, ...) {
     vsnprintf(debug.message, 50, format, args);
     va_end(args);
 }
+bool DEBUG_HaveMessage() {
+    if (!debug.on) {return false;}
 
+    if (debug.message == NULL || strlen(debug.message) == 0) {return false;}
 
-#endif //DEBUG_H
+    return true;
+}
+void DEBUG_DrawMessage(const Sint16 x, const Sint16 y) {
+    if (!debug.on) {return;}
+
+    DEBUG_DrawText(x, y, debug.message);
+}

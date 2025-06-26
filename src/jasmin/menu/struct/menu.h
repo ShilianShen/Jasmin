@@ -1,5 +1,8 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef JASMIN_MENU_STRUCT_MENU_H
+#define JASMIN_MENU_STRUCT_MENU_H
+
+
+#include "page.h"
 
 
 typedef int PathId;
@@ -25,4 +28,12 @@ struct {
 } menu;
 
 
-#endif //MENU_H
+Page* getMenuPageFromPathId(const PathId pathId) {
+    return menu.pages[menu.path[pathId]];
+}
+Page* getMenuPageFromPageId(const PageId pageId) {
+    return menu.pages[pageId];
+}
+
+
+#endif //JASMIN_MENU_STRUCT_MENU_H

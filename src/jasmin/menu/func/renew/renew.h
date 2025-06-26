@@ -1,5 +1,5 @@
-#ifndef RENEW_H
-#define RENEW_H
+#ifndef JASMIN_MENU_FUNC_RENEW_H
+#define JASMIN_MENU_FUNC_RENEW_H
 
 
 // renew
@@ -120,9 +120,6 @@ void MENU_RenewMenuPageNow() {
 
 void MENU_RenewMenu() {
     static bool need_load = true;
-    if (need_load || debug.on) {
-        need_load = false;
-    }
     MENU_RenewMenuPath();
     MENU_RenewMenuPageNow();
     MENU_RenewPage(menu.pageNow);
@@ -131,5 +128,9 @@ void MENU_RenewMenu() {
     MENU_RenewMenuPathString();
 }
 
+void MENU_Renew() {
+    MENU_RenewMenu();
+}
 
-#endif //RENEW_H
+
+#endif //JASMIN_MENU_FUNC_RENEW_H
