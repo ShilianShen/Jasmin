@@ -14,6 +14,12 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ### 串联依赖 Series-Dependency
 
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+```
+
 $$
 \left[\begin{matrix}\text{SDL3}\\ \text{toml}\end{matrix}\right]
 \to 
