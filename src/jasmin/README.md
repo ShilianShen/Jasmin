@@ -12,18 +12,23 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ## 依赖 Dependency
 
+style menu_struct.h fill: darkslategray
+
+style basic fill: peru
+
 ```mermaid
-graph LR
+graph TB
     subgraph basic.h
         SDL3 --> setting
         toml --> setting --> ease --> debug --> device --> basic
     end
-    style basic.h fill: darkred
+    style basic.h fill: black
+    style basic fill: peru
+
     subgraph menu.h
         subgraph menu_struct.h
             basic --> trig.h --> elem --> page --> menu' --> trig.c --> menu_struct
         end
-        style menu_struct.h fill: darkgray
         subgraph menu_func.h
             menu_struct --> draw --> menu_func
             menu_struct --> init --> menu_func
@@ -34,6 +39,8 @@ graph LR
         menu_func --> menu
     end
     style menu.h fill: black
+    style menu fill: peru
+
     basic --> menu --> jasmin
     basic --> lo_tri --> jasmin
 ```
