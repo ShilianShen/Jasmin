@@ -14,21 +14,23 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ```mermaid
 graph
+    SDL3 --> basic_interface.h
+    toml --> basic_interface.h
+
     subgraph BASIC
-        SDL3 --> setting
-        toml --> setting --> ease --> debug --> device --> basic.h
+        basic_interface.h --> setting --> ease --> debug --> device --> basic.h
     end
 
     subgraph MENU
         basic.h --> menu_interface.h --> menu_struct_interface.h
-        
+  
         subgraph MENU_STRUCT
             menu_struct_interface.h --> trig.h --> elem
             elem --> page --> menu' --> trig.c --> menu_struct.h
         end
 
         menu_struct.h --> menu_func_interface.h
-        
+  
         subgraph MENU_FUNC
             menu_func_interface.h --> draw --> menu_func.h
             menu_func_interface.h --> init --> menu_func.h
@@ -42,10 +44,11 @@ graph
     style BASIC fill: black
     style MENU fill: black
 
+    style basic_interface.h fill: darkslategray
     style menu_struct_interface.h fill: darkslategray
     style menu_func_interface.h fill: darkslategray
     style menu_interface.h fill: darkslategray
-    
+  
     style basic.h fill: peru
     style menu_struct.h fill: peru
     style menu_func.h fill: peru

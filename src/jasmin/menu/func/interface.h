@@ -1,0 +1,8 @@
+#ifndef JASMIN_MENU_FUNC_INTERFACE_H
+#define JASMIN_MENU_FUNC_INTERFACE_H
+
+
+#include ""
+
+
+#endif //JASMIN_MENU_FUNC_INTERFACE_H

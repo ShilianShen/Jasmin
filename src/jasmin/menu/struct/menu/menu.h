@@ -2,7 +2,7 @@
 #define JASMIN_MENU_STRUCT_MENU_H
 
 
-#include "page.h"
+#include "../page/page.h"
 
 
 typedef int PathId;

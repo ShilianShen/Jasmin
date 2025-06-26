@@ -2,8 +2,7 @@
 #define JASMIN_MENU_STRUCT_ELEM_H
 
 
-#include "../../../basic/basic.h"
-#include "../trig.h"
+#include "../trig/trig.h"
 
 
 typedef uint8_t Anchor;

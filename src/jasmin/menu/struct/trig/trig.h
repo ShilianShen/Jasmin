@@ -2,6 +2,9 @@
 #define JASMIN_MENU_STRUCT_TRIG_H
 
 
+#include "../interface.h"
+
+
 /*
  * Trig是Menu中调用函数的手段, 涉及的数据类型有Trig, TrigName, TrigFunc, TrigPara和变量trig_set.
  * TrigFunc函数和TrigPara外来参数两者一起描述调用函数的具体细节, 即实际发生trigFunc(trigPara).
