@@ -1,7 +1,7 @@
 # Jasmin
 
 ```mermaid
-graph LR
+graph
     SDL3.h --> BASIC --> MENU --> jasmin.h
     toml.h --> BASIC --> LO_TRI--> jasmin.h
 ```
@@ -17,4 +17,3 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 * 3d模型的渲染
 
 ## 依赖 Dependency
-

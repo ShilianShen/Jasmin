@@ -1,6 +1,6 @@
 # Struct
 ```mermaid
-graph LR
+graph
     interface.h --> trig.h --> elem.h --> page.h --> menu.h --> struct.h
     trig.h --trig.c--> struct.h
     elem.h --elem.c--> elem.h
