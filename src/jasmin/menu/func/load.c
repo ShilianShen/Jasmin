@@ -1,9 +1,7 @@
-#ifndef JASMIN_MENU_FUNC_LOAD_H
-#define JASMIN_MENU_FUNC_LOAD_H
+#include "func.h"
 
 
-// load
-SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
+static SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
     // Req Condition
     if (elemStr == NULL) {printf("%s: elemStr not exist.\n", __func__); return NULL;}
     if (elemStr[0] == '\0') {printf("%s: elemStr[%p] isn't legal.\n", __func__, elemStr); return NULL;}
@@ -41,7 +39,9 @@ SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
 
     return texture;
 }
-void MENU_LoadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
+
+
+static void MENU_LoadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
@@ -63,7 +63,7 @@ void MENU_LoadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
         elem->guide.h = 1;
     }
 }
-void MENU_LoadElemString(Elem* elem, const toml_datum_t tomlString) {
+static void MENU_LoadElemString(Elem* elem, const toml_datum_t tomlString) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (!tomlString.ok) {printf("%s: tomlString not exists.\n", __func__); return;}
@@ -75,15 +75,15 @@ void MENU_LoadElemString(Elem* elem, const toml_datum_t tomlString) {
     // Req Condition
     if (elem->string == NULL) {printf("%s: failed to malloc from \"%s\".\n", __func__, tomlString.u.s);}
 }
-void MENU_LoadElemPara(Elem* elem, const toml_datum_t tomlPara) {
+static void MENU_LoadElemPara(Elem* elem, const toml_datum_t tomlPara) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->para != NULL) {printf("%s: elem.para not freed.\n", __func__); return;}
+    if (elem->trig_para != NULL) {printf("%s: elem.para not freed.\n", __func__); return;}
 
     // Opt Condition
-    elem->para = tomlPara.ok ? strdup(tomlPara.u.s) : NULL;
+    elem->trig_para = tomlPara.ok ? strdup(tomlPara.u.s) : NULL;
 }
-void MENU_LoadElemTexture(Elem* elem) {
+static void MENU_LoadElemTexture(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (elem->texture != NULL) {printf("%s: elem.texture not free.\n", __func__); return;}
@@ -97,7 +97,7 @@ void MENU_LoadElemTexture(Elem* elem) {
     SDL_GetTextureSize(elem->texture, &w, &h);
     elem->src_rect = (SDL_FRect){0, 0, w, h};
 }
-void MENU_LoadElemOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+static void MENU_LoadElemOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
@@ -108,13 +108,12 @@ void MENU_LoadElemOther(Elem* elem, const toml_table_t* tomlElem, const int toml
 
     // loadElemFuncFromToml
     const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
-    elem->func = tomlFuncName.ok ? findTrigFuncFromName(tomlFuncName.u.s) : NULL;
+    elem->trig_func = tomlFuncName.ok ? TRIG_FindFuncFromName(tomlFuncName.u.s) : NULL;
 
     // loadElemIdFromToml
     elem->id = tomlElemId;
 }
-
-void MENU_LoadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+static void MENU_LoadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
@@ -128,9 +127,7 @@ void MENU_LoadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemI
 }
 
 
-// load
-
-toml_table_t* getToml(const char* tomlPath) {
+static toml_table_t* getToml(const char* tomlPath) {
     // Req Condition
     FILE* file = fopen(tomlPath, "r"); // malloc
     if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
@@ -144,9 +141,7 @@ toml_table_t* getToml(const char* tomlPath) {
 
     return toml;
 }
-
-
-void MENU_LoadPageName(Page* page, const char* name) {
+static void MENU_LoadPageName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return;}
@@ -157,7 +152,7 @@ void MENU_LoadPageName(Page* page, const char* name) {
     // Req Condition
     if (page->name == NULL) {printf("%s: failed.\n", __func__);}
 }
-void MENU_LoadPageElems(Page* page, const toml_array_t* tomlElems) {
+static void MENU_LoadPageElems(Page* page, const toml_array_t* tomlElems) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (tomlElems == NULL) {printf("%s: tomlElems not exists.\n", __func__); return;}
@@ -178,8 +173,7 @@ void MENU_LoadPageElems(Page* page, const toml_array_t* tomlElems) {
         }
     }
 }
-
-void MENU_LoadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
+static void MENU_LoadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return;}
@@ -191,8 +185,7 @@ void MENU_LoadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
 }
 
 
-// loadMenu
-void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
+static void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
     if (menu.theme.font != NULL) {printf("%s: theme.font not free.\n", __func__); return;}
     if (!tomlFontPath.ok) {printf("%s: tomlFontPath not exists.\n", __func__); return;}
@@ -202,7 +195,7 @@ void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t 
     menu.theme.font = TTF_OpenFont(tomlFontPath.u.s, tomlFontSize.u.i);
     if (menu.theme.font == NULL) {printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);}
 }
-void MENU_LoadMenuThemeColor(const toml_array_t* tomlColor) {
+static void MENU_LoadMenuThemeColor(const toml_array_t* tomlColor) {
     // Req Condition
     if (tomlColor == NULL) {printf("%s: tomlColor not exists.\n", __func__); return;}
 
@@ -217,7 +210,7 @@ void MENU_LoadMenuThemeColor(const toml_array_t* tomlColor) {
     menu.theme.color.b = color[2];
     menu.theme.color.a = color[3];
 }
-void MENU_LoadMenuTheme(const char* tomlPath) {
+static void MENU_LoadMenuTheme(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenuTheme = getToml(tomlPath);
     if (tomlMenuTheme == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
@@ -231,7 +224,7 @@ void MENU_LoadMenuTheme(const char* tomlPath) {
     //
     toml_free(tomlMenuTheme);
 }
-void MENU_LoadMenuPages(const char* tomlPath) {
+static void MENU_LoadMenuPages(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
@@ -258,8 +251,7 @@ void MENU_LoadMenuPages(const char* tomlPath) {
     //
     toml_free(tomlMenu); // end malloc
 }
-
-void MENU_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
+static void MENU_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
@@ -268,9 +260,7 @@ void MENU_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
     MENU_LoadMenuPages(menuPagesPath);
 }
 
+
 void MENU_Load(const char* menuPagesPath, const char* menuThemePath) {
     MENU_LoadMenu(menuPagesPath, menuThemePath);
 }
-
-
-#endif //JASMIN_MENU_FUNC_LOAD_H

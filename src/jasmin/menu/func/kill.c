@@ -1,17 +1,16 @@
-#ifndef JASMIN_MENU_FUNC_KILL_H
-#define JASMIN_MENU_FUNC_KILL_H
+#include "func.h"
 
 
-void MENU_KillElem(Elem* elem) {
+static void MENU_KillElem(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
     //
     if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
-    if (elem->para != NULL) {free(elem->para); elem->para = NULL;}
+    if (elem->trig_para != NULL) {free(elem->trig_para); elem->trig_para = NULL;}
     if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
 }
-void MENU_KillPage(Page* page) {
+static void MENU_KillPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
@@ -19,13 +18,13 @@ void MENU_KillPage(Page* page) {
     if (page->name != NULL) {free(page->name); page->name = NULL;}
     for (int i = 0; i < PAGE_MAX_VOLUME; i++) {MENU_KillElem(&page->elems[i]);}
 }
-void MENU_KillMenuTheme() {
+static void MENU_KillMenuTheme() {
     if (menu.theme.font != NULL) {
         TTF_CloseFont(menu.theme.font);
         menu.theme.font = NULL;
     }
 }
-void MENU_KillMenu() {
+static void MENU_KillMenu() {
     MENU_KillPage(menu.pageRoot);
     MENU_KillPage(menu.pageEdge);
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
@@ -37,10 +36,6 @@ void MENU_KillMenu() {
 }
 
 
-
 void MENU_Kill() {
     MENU_KillMenu();
 }
-
-
-#endif //JASMIN_MENU_FUNC_KILL_H

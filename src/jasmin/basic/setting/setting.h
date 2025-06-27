@@ -2,12 +2,12 @@
 #define JASMIN_BASIC_SETTING_H
 
 
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3_ttf/SDL_ttf.h>
+/*
+ * Setting是一些基本函数存放的地方.
+ */
 
-#include <stdlib.h>
-#include "../../../../third_party/toml/toml.h"
+
+#include "../interface.h"
 
 
 typedef float Pixel;

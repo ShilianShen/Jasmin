@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     // init
     DEBUG_Init(renderer);
     MENU_Init(renderer);
-
+    TEST_Init();
     // load
     DEBUG_Load();
     MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(renderer);
 
         // logical draw
+        SDL_RenderGeometry(renderer, NULL, vert, 3, NULL, 0);
         MENU_Draw();
 
         // physical draw

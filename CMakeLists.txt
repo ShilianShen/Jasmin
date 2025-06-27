@@ -29,27 +29,31 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/menu/struct/elem/elem.h
         src/jasmin/menu/struct/page/page.h
         src/jasmin/menu/menu.h
-        src/jasmin/menu/func/init/init.h
-        src/jasmin/menu/func/load/load.h
-        src/jasmin/menu/func/renew/renew.h
-        src/jasmin/menu/func/draw/draw.h
-        src/jasmin/menu/func/kill/kill.h
-        src/jasmin/menu/func/trig.h
         src/jasmin/jasmin.h
         src/jasmin/basic/basic.h
-        src/jasmin/tessst.c
         src/jasmin/basic/setting/setting.c
         src/jasmin/basic/debug/debug.c
         src/jasmin/basic/device/device.c
         src/jasmin/basic/ease/ease.c
         src/jasmin/basic/ease/ease.h
-        src/jasmin/menu/func/draw/draw.c
+        src/jasmin/menu/func/draw.c
         src/jasmin/menu/struct/struct.h
         src/jasmin/menu/func/func.h
         src/jasmin/menu/struct/elem/elem.c
         src/jasmin/menu/menu_interface.h
         src/jasmin/menu/struct/interface.h
         src/jasmin/menu/func/interface.h
+        src/jasmin/menu/struct/menu/menu.c
+        src/jasmin/menu/struct/page/page.c
+        src/jasmin/menu/struct/trig/trig.c
+        src/jasmin/menu/func/init.c
+        src/jasmin/menu/func/kill.c
+        src/jasmin/menu/func/load.c
+        src/jasmin/menu/func/renew.c
+        src/jasmin/basic/interface.h
+        src/jasmin/lo_tri/lo_tri.h
+        src/jasmin/lo_tri/interface.h
+        src/jasmin/lo_tri/test.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

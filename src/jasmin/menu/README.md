@@ -1,5 +1,10 @@
 # Menu
 
+```mermaid
+graph LR
+    interface.h --> STRUCT --> FUNC --> menu.h
+```
+
 ## Intro
 
 为Jasmin的子模块

@@ -28,17 +28,17 @@ typedef void (*TrigFunc)(TrigPara);
 typedef struct Trig {const TrigName name; const TrigFunc func;} Trig;
 
 
-void trigFuncPass(TrigPara);
-void trigFuncForward(TrigPara);
-void trigFuncBackward(TrigPara);
-void trigFuncClear(TrigPara);
+void TRIG_FUNC_Pass(TrigPara);
+void TRIG_FUNC_Forward(TrigPara);
+void TRIG_FUNC_Backward(TrigPara);
+void TRIG_FUNC_Clear(TrigPara);
 
 
 extern Trig trig_set[];
 
 
-TrigFunc findTrigFuncFromName(const TrigName name);
-TrigName findTrigNameFromFunc(const TrigFunc func);
+TrigFunc TRIG_FindFuncFromName(TrigName);
+TrigName TRIG_FindNameFromFunc(TrigFunc);
 
 
 #endif //JASMIN_MENU_STRUCT_TRIG_H

@@ -1,9 +1,7 @@
-#ifndef JASMIN_MENU_FUNC_RENEW_H
-#define JASMIN_MENU_FUNC_RENEW_H
+#include "func.h"
 
 
-// renew
-void MENU_RenewElemDstRect(Elem* elem) {
+static void MENU_RenewElemDstRect(Elem* elem) {
     // Req Condition
     if (!testElem(elem, __func__)) {return;}
 
@@ -41,7 +39,7 @@ void MENU_RenewElemDstRect(Elem* elem) {
     elem->dst_rect.x = cx + dx + elem->guide.x;
     elem->dst_rect.y = cy + dy + elem->guide.y;
 }
-void MENU_RenewElemState(Elem* elem) {
+static void MENU_RenewElemState(Elem* elem) {
     // Req Condition
     if (!testElem(elem, __func__)) {return;}
 
@@ -49,17 +47,18 @@ void MENU_RenewElemState(Elem* elem) {
     const bool mouseIn = mouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
     if (elem->state == PRESSED) {
-        DEBUG_SendMessage("Elem: %d", elem->id);
+        DEBUG_SendMessage("Elem: %d\n", elem->id);
+        DEBUG_SendMessage("State: %d\n", elem->state);
+        DEBUG_SendMessage("Trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
     }
     if (elem->state == PRESSED && mouseIn == true && mouseLeftIn == false) {elem->state = RELEASE;}
     else {
         if (mouseIn == true) {elem->state = mouseLeftIn ? PRESSED : INSIDE;}
         else {elem->state = OUTSIDE;}
     }
-    if (elem->state == RELEASE && elem->func != NULL) {elem->func(elem->para);}
+    if (elem->state == RELEASE && elem->trig_func != NULL) {elem->trig_func(elem->trig_para);}
 }
-
-void MENU_RenewElem(Elem* elem) {
+static void MENU_RenewElem(Elem* elem) {
     // Req Condition
     if (!testElem(elem, __func__)) {return;}
 
@@ -69,8 +68,7 @@ void MENU_RenewElem(Elem* elem) {
 }
 
 
-// renew
-void MENU_RenewPage(Page* page) {
+static void MENU_RenewPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
@@ -81,9 +79,7 @@ void MENU_RenewPage(Page* page) {
 }
 
 
-
-// renew
-void MENU_RenewMenuPathString() {
+static void MENU_RenewMenuPathString() {
     strcpy(menu.pathString, menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME && menu.path[i] != 0; i++) {
         strcat(menu.pathString, "/");
@@ -94,14 +90,14 @@ void MENU_RenewMenuPathString() {
         strcat(menu.pathString, menu.pageEdge->name);
     }
 }
-void MENU_RenewMenuPath() {
+static void MENU_RenewMenuPath() {
     bool need_clear = false;
     for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear) {menu.path[i] = 0;}
         else if (getMenuPageFromPathId(i) == NULL) {need_clear = true;}
     }
 }
-void MENU_RenewMenuPageNow() {
+static void MENU_RenewMenuPageNow() {
     // if pageRoot
     if (getMenuPageFromPathId(0) == NULL) {
         menu.pageNow = menu.pageRoot;
@@ -117,8 +113,7 @@ void MENU_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-
-void MENU_RenewMenu() {
+static void MENU_RenewMenu() {
     static bool need_load = true;
     MENU_RenewMenuPath();
     MENU_RenewMenuPageNow();
@@ -128,9 +123,7 @@ void MENU_RenewMenu() {
     MENU_RenewMenuPathString();
 }
 
+
 void MENU_Renew() {
     MENU_RenewMenu();
 }
-
-
-#endif //JASMIN_MENU_FUNC_RENEW_H

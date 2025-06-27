@@ -14,8 +14,8 @@ typedef struct Elem {
     ElemId id;  // id意味着page的第几个元素, 从1开始, id=0意味着未初始化
     Anchor anchor;
     SDL_FRect guide;
-    TrigFunc func;
-    TrigPara para; // malloc
+    TrigFunc trig_func;
+    TrigPara trig_para; // malloc
     ElemStr string; // malloc
     SDL_Texture* texture; // malloc
     // renewable

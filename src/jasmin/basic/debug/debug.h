@@ -2,6 +2,12 @@
 #define JASMIN_BASIC_DEBUG_H
 
 
+/*
+ * Debug是同来简化Debug的, 尤其是显示的部分.
+ * 所以Debug函数在Debug.on=false时都不会做任何事情.
+ */
+
+
 #include "../ease/ease.h"
 
 

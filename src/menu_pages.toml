@@ -2,7 +2,7 @@
 [Root]
 elems = [
     {anchor=56, guide=[0, 0, 1, 1], string="path"},
-    {anchor=31, guide=[0, 0, 4, 4], string="f ../images/491.gif"},
+    {anchor=31, guide=[0, 0, 2, 2], string="f ../images/491.gif"},
     {anchor=49, guide=[0, 0, 1, 1], string="t The dead can be cured."},
     {anchor=20, guide=[0, 0, 1, 1], string="t Title", func='forward', para='Title'},
     # {anchor=31, guide=[0, 0, 1, 1], string="t THE MAZE"},

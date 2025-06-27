@@ -1,15 +1,14 @@
-#ifndef JASMIN_MENU_FUNC_INIT_H
-#define JASMIN_MENU_FUNC_INIT_H
+#include "func.h"
 
 
-void MENU_InitElem(Elem* elem) {
+static void MENU_InitElem(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
     //
     *elem = (Elem){0};
 }
-void MENU_InitPage(Page* page) {
+static void MENU_InitPage(Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
@@ -17,8 +16,7 @@ void MENU_InitPage(Page* page) {
     *page = (Page){0};
     page->id = -1;
 }
-
-void MENU_InitMenu(SDL_Renderer* renderer) {
+static void MENU_InitMenu(SDL_Renderer* renderer) {
     // Req Condition
     if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
@@ -40,6 +38,3 @@ void MENU_InitMenu(SDL_Renderer* renderer) {
 void MENU_Init(SDL_Renderer* renderer) {
     MENU_InitMenu(renderer);
 }
-
-
-#endif //JASMIN_MENU_FUNC_INIT_H

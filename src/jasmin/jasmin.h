@@ -2,8 +2,8 @@
 #define JASMIN_H
 
 
-#include "basic/basic.h"
 #include "menu/menu.h"
+#include "lo_tri/lo_tri.h"
 
 
 #endif //JASMIN_H

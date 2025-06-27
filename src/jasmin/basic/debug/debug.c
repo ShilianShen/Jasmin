@@ -10,7 +10,7 @@ struct Debug {
         SDL_Color colorPoint, colorRect, colorFace, colorText, colorDark, colorLight;
         int alphaLight, alphaDark;
     } theme;
-    char message[50];
+    char* message;  // malloc or NULL
 } debug;
 
 
@@ -50,7 +50,10 @@ void DEBUG_Renew() {
     if (!debug.on) {return;}
 
     //
-    debug.message[0] = '\0';
+    if (debug.message != NULL) {
+        free(debug.message);
+        debug.message = NULL;
+    }
 }
 
 
@@ -182,11 +185,33 @@ void DEBUG_SendMessage(const char* format, ...) {
     // Pre Condition
     if (!debug.on) {return;}
 
-    //
+    // getNewMessage
+    char newMessage[64] = ""; // not malloc
     va_list args;
     va_start(args, format);
-    vsnprintf(debug.message, 50, format, args);
+    vsnprintf(newMessage, 64, format, args);
     va_end(args);
+
+    //
+    if (debug.message == NULL) {
+        debug.message = strdup(newMessage); // malloc
+        if (debug.message == NULL) {
+            printf("%s: failed to malloc.\n", __func__);
+        }
+    }
+    else {
+        // getOldMessage
+        char* oldMessage = debug.message; // malloc
+
+        // getAllMessage
+        debug.message = malloc(strlen(newMessage) + strlen(oldMessage) + 1); // malloc
+        if (debug.message == NULL) {
+            printf("%s: failed to malloc.\n", __func__);
+        }
+        strcpy(debug.message, oldMessage);
+        strcat(debug.message, newMessage);
+        free(oldMessage); // free
+    }
 }
 bool DEBUG_HaveMessage() {
     if (!debug.on) {return false;}
@@ -198,5 +223,6 @@ bool DEBUG_HaveMessage() {
 void DEBUG_DrawMessage(const Sint16 x, const Sint16 y) {
     if (!debug.on) {return;}
 
+    if (debug.message == NULL) {return;}
     DEBUG_DrawText(x, y, debug.message);
 }

@@ -2,12 +2,14 @@
 #define JASMIN_MENU_FUNC_H
 
 
-#include "draw/draw.h"
-#include "init/init.h"
-#include "kill/kill.h"
-#include "load/load.h"
-#include "renew/renew.h"
-#include "trig.h"
+#include "interface.h"
+
+
+void MENU_Draw();
+void MENU_Init(SDL_Renderer* renderer);
+void MENU_Kill();
+void MENU_Load(const char* menuPagesPath, const char* menuThemePath);
+void MENU_Renew();
 
 
 #endif //JASMIN_MENU_FUNC_H

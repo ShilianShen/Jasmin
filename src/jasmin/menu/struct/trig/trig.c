@@ -1,18 +1,17 @@
-#ifndef JASMIN_MENU_FUNC_TRIG_H
-#define JASMIN_MENU_FUNC_TRIG_H
+#include "../struct.h"
 
 
 Trig trig_set[] = {
-    {"pass", trigFuncPass},
-    {"forward", trigFuncForward},
-    {"backward", trigFuncBackward},
-    {"clear", trigFuncClear},
+    {"pass", TRIG_FUNC_Pass},
+    {"forward", TRIG_FUNC_Forward},
+    {"backward", TRIG_FUNC_Backward},
+    {"clear", TRIG_FUNC_Clear},
     {NULL, NULL}
 };
 
 
-void trigFuncPass(const TrigPara para) {}
-void trigFuncForward(const TrigPara pageName) {
+void TRIG_FUNC_Pass(const TrigPara para) {}
+void TRIG_FUNC_Forward(const TrigPara pageName) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
 
     // getPageId
@@ -31,7 +30,7 @@ void trigFuncForward(const TrigPara pageName) {
         }
     }
 }
-void trigFuncBackward(const TrigPara para) {
+void TRIG_FUNC_Backward(const TrigPara para) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
 
     for (PathId i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
@@ -41,13 +40,13 @@ void trigFuncBackward(const TrigPara para) {
         }
     }
 }
-void trigFuncClear(const TrigPara para) {
+void TRIG_FUNC_Clear(const TrigPara para) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
     for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 
 
-TrigFunc findTrigFuncFromName(const TrigName name) {
+TrigFunc TRIG_FindFuncFromName(const TrigName name) {
     // Req Condition
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
 
@@ -59,7 +58,7 @@ TrigFunc findTrigFuncFromName(const TrigName name) {
     }
     return NULL;
 }
-TrigName findTrigNameFromFunc(const TrigFunc func) {
+TrigName TRIG_FindNameFromFunc(const TrigFunc func) {
     // Req Condition
     if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
 
@@ -71,7 +70,3 @@ TrigName findTrigNameFromFunc(const TrigFunc func) {
     }
     return NULL;
 }
-
-
-
-#endif //JASMIN_MENU_FUNC_TRIG_H

@@ -1,5 +1,4 @@
-#ifndef JASMIN_MENU_FUNC_DRAW_H
-#define JASMIN_MENU_FUNC_DRAW_H
+#include "func.h"
 
 
 static void MENU_DrawElem(const Elem* elem) {
@@ -34,6 +33,3 @@ static void MENU_DrawMenu() {
 void MENU_Draw() {
     MENU_DrawMenu();
 }
-
-
-#endif //JASMIN_MENU_FUNC_DRAW_H
