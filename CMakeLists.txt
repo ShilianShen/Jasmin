@@ -54,6 +54,26 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/lo_tri.h
         src/jasmin/lo_tri/interface.h
         src/jasmin/lo_tri/test.c
+        src/jasmin/lo_tri/model/model.c
+        src/jasmin/lo_tri/model/model.h
+        src/jasmin/lo_tri/camera/camera.c
+        src/jasmin/lo_tri/camera/camera.h
+        src/jasmin/lo_tri/pipline/pipline.c
+        src/jasmin/lo_tri/pipline/pipline.h
+        src/jasmin/lo_tri/draw/draw.c
+        src/jasmin/lo_tri/draw/draw.h
+        src/jasmin/lo_tri/model/bone/bone.c
+        src/jasmin/lo_tri/model/bone/bone.h
+        src/jasmin/lo_tri/model/mesh/mesh.c
+        src/jasmin/lo_tri/model/interface.h
+        src/jasmin/lo_tri/model/mesh/mesh.h
+        src/jasmin/lo_tri/math/math.c
+        src/jasmin/lo_tri/math/math.h
+        src/jasmin/lo_tri/math/interface.h
+        src/jasmin/lo_tri/math/mat/mat.c
+        src/jasmin/lo_tri/math/mat/mat.h
+        src/jasmin/lo_tri/math/vec/vec.c
+        src/jasmin/lo_tri/math/vec/vec.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

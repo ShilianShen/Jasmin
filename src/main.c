@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     // init
     DEBUG_Init(renderer);
     MENU_Init(renderer);
-    TEST_Init();
+    TEST_Init(renderer);
     // load
     DEBUG_Load();
     MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
@@ -62,9 +62,10 @@ int main(int argc, char *argv[]) {
         // draw
         SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
         SDL_RenderClear(renderer);
+        LOTRI_RenewCamera();
 
         // logical draw
-        SDL_RenderGeometry(renderer, NULL, vert, 3, NULL, 0);
+        TEST_Draw();
         MENU_Draw();
 
         // physical draw

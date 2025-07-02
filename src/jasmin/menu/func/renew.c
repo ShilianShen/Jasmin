@@ -6,38 +6,7 @@ static void MENU_RenewElemDstRect(Elem* elem) {
     if (!testElem(elem, __func__)) {return;}
 
     //
-    const Anchor x = elem->anchor % 9;
-    const Anchor y = elem->anchor / 9;
-    SDL_GetTextureSize(elem->texture, &elem->dst_rect.w, &elem->dst_rect.h);
-    elem->dst_rect.w *= elem->guide.w;
-    elem->dst_rect.h *= elem->guide.h;
-    Pixel cx = 0, cy = 0, dx = 0, dy = 0;
-    switch (x / 3) {
-        case 0: cx = menu.bck_rect.x                  ; break;
-        case 1: cx = menu.bck_rect.x + menu.bck_rect.w / 2; break;
-        case 2: cx = menu.bck_rect.x + menu.bck_rect.w    ; break;
-        default: break;
-    }
-    switch (y / 3) {
-        case 0: cy = menu.bck_rect.y                  ; break;
-        case 1: cy = menu.bck_rect.y + menu.bck_rect.h / 2; break;
-        case 2: cy = menu.bck_rect.y + menu.bck_rect.h    ; break;
-        default: break;
-    }
-    switch (x % 3) {
-        case 0: dx = -elem->dst_rect.w    ; break;
-        case 1: dx = -elem->dst_rect.w / 2; break;
-        case 2: dx =  0               ; break;
-        default: break;
-    }
-    switch (y % 3) {
-        case 0: dy = -elem->dst_rect.h    ; break;
-        case 1: dy = -elem->dst_rect.h / 2; break;
-        case 2: dy =  0               ; break;
-        default: break;
-    }
-    elem->dst_rect.x = cx + dx + elem->guide.x;
-    elem->dst_rect.y = cy + dy + elem->guide.y;
+    SDL_LoadDstRectAligned(&elem->dst_rect, elem->texture, &elem->src_rect, &elem->guide, &menu.bck_rect, elem->anchor);
 }
 static void MENU_RenewElemState(Elem* elem) {
     // Req Condition

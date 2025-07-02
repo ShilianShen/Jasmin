@@ -30,7 +30,7 @@ static SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
         // 3
         case 'T': {
             if (elemStrLen <= 3) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
-            texture = TXT_LoadTextureWithLines(menu.renderer, menu.theme.font, elemStr+3, menu.theme.color, *(elemStr+1));
+            texture = TXT_LoadTextureWithLines(menu.renderer, menu.theme.font, elemStr+3, menu.theme.color, menu.theme.color, *(elemStr+1));
             break;
         }
         default: {texture = NULL; break;}

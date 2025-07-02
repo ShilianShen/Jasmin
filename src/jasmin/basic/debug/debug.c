@@ -7,11 +7,15 @@ struct Debug {
     SDL_Renderer* renderer;
     struct DebugTheme {
         TTF_Font *font32, *font64, *font128, *font256;
-        SDL_Color colorPoint, colorRect, colorFace, colorText, colorDark, colorLight;
+        SDL_Color pointColor, rectColor, faceColor, textColor, colorDark, colorLight;
+        SDL_Color pointColorDark, rectColorDark, faceColorDark, textColorDark;
         int alphaLight, alphaDark;
     } theme;
     char* message;  // malloc or NULL
+    char* detail[4]; // malloc or NULL
 } debug;
+const int MESSAGE_SIZE_MAX = 64;
+const int DETAIL_SIZE_MAX = 64;
 
 
 void DEBUG_Init(SDL_Renderer* renderer) {
@@ -31,16 +35,26 @@ static void DEBUG_LoadTheme() {
     debug.on = true;
 
     // color
-    debug.theme.colorPoint = (SDL_Color){246, 202, 124, 255};
-    debug.theme.colorRect = (SDL_Color){241, 155, 153, 255};
-    debug.theme.colorFace = (SDL_Color){158, 189, 127, 255};
-    debug.theme.colorText = (SDL_Color){116, 173, 220, 255};
+    debug.theme.pointColor = (SDL_Color){246, 202, 124, 255};
+    debug.theme.rectColor = (SDL_Color){241, 155, 153, 255};
+    debug.theme.faceColor = (SDL_Color){158, 189, 127, 255};
+    debug.theme.textColor = (SDL_Color){116, 173, 220, 255};
     debug.theme.colorDark = (SDL_Color){0, 0, 0, 255};
     debug.theme.colorLight = (SDL_Color){255, 255, 255, 255};
 
     // alpha
     debug.theme.alphaLight = 255;
     debug.theme.alphaDark = 128;
+
+    debug.theme.pointColorDark = debug.theme.pointColor;
+    debug.theme.rectColorDark = debug.theme.rectColor;
+    debug.theme.faceColorDark = debug.theme.faceColor;
+    debug.theme.textColorDark = debug.theme.textColor;
+
+    debug.theme.pointColorDark.a = debug.theme.alphaDark;
+    debug.theme.rectColorDark.a = debug.theme.alphaDark;
+    debug.theme.faceColorDark.a = debug.theme.alphaDark;
+    debug.theme.textColorDark.a = debug.theme.alphaDark;
 }
 void DEBUG_Load() {
     DEBUG_LoadTheme();
@@ -83,7 +97,7 @@ void DEBUG_Intro() {
         textureDark = NULL;
     }
     if (T1 <= nowTime && nowTime < T4) {
-        const SDL_Color colors[] = {debug.theme.colorPoint, debug.theme.colorRect, debug.theme.colorFace, debug.theme.colorText};
+        const SDL_Color colors[] = {debug.theme.pointColor, debug.theme.rectColor, debug.theme.faceColor, debug.theme.textColor};
         const int num_colors = sizeof(colors) / sizeof(SDL_Color);
         SDL_FRect rect = {((float)windowWidth - darkWidth) / 2, ((float)windowHeight - darkHeight) / 2, 0, darkHeight};
         for (int i = 0; i < num_colors; i++) {
@@ -113,7 +127,7 @@ void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
     const SDL_FRect rect = {(float)x - w, (float)y - w, 2 * w, 2 * w};
 
     // draw
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorPoint, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.pointColor, debug.theme.alphaLight);
     SDL_RenderFillRect(debug.renderer, &rect);
 }
 void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
@@ -121,7 +135,7 @@ void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float 
     if (!debug.on) {return;}
 
     // line
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorPoint, debug.theme.alphaDark);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.pointColor, debug.theme.alphaDark);
     SDL_RenderLine(debug.renderer, x1, y1, x2, y2);
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
@@ -132,7 +146,7 @@ void DEBUG_DrawRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorRect, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaLight);
     SDL_RenderRect(debug.renderer, rect);
 }
 void DEBUG_FillRect(const SDL_FRect* rect) {
@@ -143,12 +157,27 @@ void DEBUG_FillRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect back
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorRect, debug.theme.alphaDark);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaDark);
     SDL_RenderFillRect(debug.renderer, rect);
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorRect, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaLight);
     SDL_RenderRect(debug.renderer, rect);
+}
+SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
+    // Pre Condition
+    if (!debug.on) {return NULL;}
+
+    // Req Condition
+    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return NULL;}
+
+    // Req Condition
+    SDL_Texture* textTexture = TXT_LoadTextureWithLines(
+        debug.renderer, debug.theme.font32, text, debug.theme.colorLight, debug.theme.textColorDark, aligned
+        );
+    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return NULL;}
+
+    return textTexture;
 }
 void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     // Pre Condition
@@ -158,25 +187,31 @@ void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
 
     // Req Condition
-    SDL_Texture* textTexture = TXT_LoadTextureWithLines(
-        debug.renderer, debug.theme.font32, text, debug.theme.colorLight, 'L'
-        );
+    SDL_Texture* textTexture = DEBUG_GetTextTexture(text, 'L');
     if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
 
     // rect
     SDL_FRect dst_rect = {x, y};
     SDL_GetTextureSize(textTexture, &dst_rect.w, &dst_rect.h);
 
-    // rect back
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorText, debug.theme.alphaDark);
-    SDL_RenderFillRect(debug.renderer, &dst_rect);
-
-    // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.colorText, debug.theme.alphaLight);
-    SDL_RenderRect(debug.renderer, &dst_rect);
-
     // text
     SDL_RenderTexture(debug.renderer, textTexture, NULL, &dst_rect);
+    SDL_DestroyTexture(textTexture);
+}
+void DEBUG_DrawTextAligned(const char* text, const char aligned) {
+    // Pre Condition
+    if (!debug.on) {return;}
+
+    // Req Condition
+    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
+
+    // Req Condition
+    SDL_Texture* textTexture = DEBUG_GetTextTexture(text, aligned);
+    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
+
+    //
+    const int anchor = aligned == 'R' ? 60 : 20;
+    SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }
 
@@ -186,10 +221,10 @@ void DEBUG_SendMessage(const char* format, ...) {
     if (!debug.on) {return;}
 
     // getNewMessage
-    char newMessage[64] = ""; // not malloc
+    char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
     va_list args;
     va_start(args, format);
-    vsnprintf(newMessage, 64, format, args);
+    vsnprintf(newMessage, MESSAGE_SIZE_MAX, format, args);
     va_end(args);
 
     //
@@ -220,9 +255,9 @@ bool DEBUG_HaveMessage() {
 
     return true;
 }
-void DEBUG_DrawMessage(const Sint16 x, const Sint16 y) {
+void DEBUG_DrawMessage() {
     if (!debug.on) {return;}
 
     if (debug.message == NULL) {return;}
-    DEBUG_DrawText(x, y, debug.message);
+    DEBUG_DrawTextAligned(debug.message, 'R');
 }

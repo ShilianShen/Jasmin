@@ -1,14 +1,15 @@
-#ifndef LO_TRI_H
-#define LO_TRI_H
+#ifndef JASMIN_LOTRI_H
+#define JASMIN_LOTRI_H
 
 
-#include "interface.h"
+#include "draw/draw.h"
 
 
 extern SDL_Vertex vert[3];
 
 
 void TEST_Init();
+void TEST_Draw();
 
 
-#endif //LO_TRI_H
+#endif //JASMIN_LOTRI_H

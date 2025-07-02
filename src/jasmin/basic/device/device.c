@@ -66,7 +66,11 @@ struct Keyboard {} keyboard;
 void renewKeyboard() {
     //
 }
-bool keyInKeyBoard(SDL_Scancode key) {
+bool keyPressed(const SDL_Scancode key) {
+    const bool* state = SDL_GetKeyboardState(NULL);
     //
+    if (state[key]) {
+        return true;
+    }
     return false;
 }

@@ -12,7 +12,7 @@ bool mouseLeftInRect(const SDL_FRect* rect);
 
 
 void renewKeyboard();
-bool keyInKeyBoard(SDL_Scancode key);
+bool keyPressed(SDL_Scancode key);
 
 
 #endif //JASMIN_BASIC_DEVICE_H
