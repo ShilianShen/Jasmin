@@ -10,7 +10,9 @@ const char MENU_EDGE_NAME[] = "Edge";
 Menu menu;
 
 
-Page* getMenuPageFromPathId(const PathId pathId) {
+Page* getMenuPageFromPathId(const int pathId) {
+    if (pathId == 0) {return menu.pageRoot;}
+    if (pathId == MENU_PATH_VOLUME) {return menu.pageEdge;}
     return menu.pages[menu.path[pathId]];
 }
 Page* getMenuPageFromPageId(const PageId pageId) {

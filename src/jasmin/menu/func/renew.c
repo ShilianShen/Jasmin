@@ -16,9 +16,11 @@ static void MENU_RenewElemState(Elem* elem) {
     const bool mouseIn = mouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
     if (elem->state == PRESSED) {
-        DEBUG_SendMessage("Elem: %d\n", elem->id);
-        DEBUG_SendMessage("State: %d\n", elem->state);
-        DEBUG_SendMessage("Trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
+        DEBUG_SendMessageL("elem.id: %d\n", elem->id);
+        DEBUG_SendMessageL("elem.state: %s\n", getElemStateName(elem->state));
+        if (elem->trig_func != NULL) {
+            DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
+        }
     }
     if (elem->state == PRESSED && mouseIn == true && mouseLeftIn == false) {elem->state = RELEASE;}
     else {
@@ -48,23 +50,17 @@ static void MENU_RenewPage(Page* page) {
 }
 
 
-static void MENU_RenewMenuPathString() {
-    strcpy(menu.pathString, menu.pageRoot->name);
-    for (int i = 0; i < MENU_PATH_VOLUME && menu.path[i] != 0; i++) {
-        strcat(menu.pathString, "/");
-        strcat(menu.pathString, menu.pages[menu.path[i]]->name);
-    }
-    if (menu.path[MENU_PATH_VOLUME - 1] != 0) {
-        strcat(menu.pathString, "/");
-        strcat(menu.pathString, menu.pageEdge->name);
-    }
-}
 static void MENU_RenewMenuPath() {
     bool need_clear = false;
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
-        if (need_clear) {menu.path[i] = 0;}
-        else if (getMenuPageFromPathId(i) == NULL) {need_clear = true;}
+    DEBUG_SendMessageL("menu.path: ");
+    for (int i = 0; i < MENU_PATH_VOLUME; i++) {
+        if (need_clear) { menu.path[i] = 0; }
+        else if (getMenuPageFromPathId(i) == NULL) { need_clear = true; }
+        else {
+            DEBUG_SendMessageL("/%s", getMenuPageFromPathId(i)->name);
+        }
     }
+    DEBUG_SendMessageL("\n");
 }
 static void MENU_RenewMenuPageNow() {
     // if pageRoot
@@ -73,7 +69,7 @@ static void MENU_RenewMenuPageNow() {
         return;
     }
     // else if pageOther
-    for (PathId i = 0; i + 1 < MENU_PATH_VOLUME; i++) {
+    for (int i = 0; i + 1 < MENU_PATH_VOLUME; i++) {
         if (getMenuPageFromPathId(i) != NULL && getMenuPageFromPathId(i+1) == NULL) {
             menu.pageNow = getMenuPageFromPathId(i);
             return;
@@ -89,7 +85,6 @@ static void MENU_RenewMenu() {
     MENU_RenewPage(menu.pageNow);
     // printf("%s\n", menu.pageNow->name);
     // printMenuPath();
-    MENU_RenewMenuPathString();
 }
 
 

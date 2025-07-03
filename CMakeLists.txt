@@ -47,7 +47,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/menu/struct/page/page.c
         src/jasmin/menu/struct/trig/trig.c
         src/jasmin/menu/func/init.c
-        src/jasmin/menu/func/kill.c
+        src/jasmin/menu/func/unload.c
         src/jasmin/menu/func/load.c
         src/jasmin/menu/func/renew.c
         src/jasmin/basic/interface.h
@@ -74,6 +74,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/math/mat/mat.h
         src/jasmin/lo_tri/math/vec/vec.c
         src/jasmin/lo_tri/math/vec/vec.h
+        src/jasmin/menu/func/deinit.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

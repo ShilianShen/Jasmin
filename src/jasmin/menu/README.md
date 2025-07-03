@@ -5,9 +5,9 @@ graph
     interface.h --> STRUCT --> FUNC --> menu.h
 ```
 
-## Intro
+## 介绍
 
-为Jasmin的子模块
+Menu为Jasmin的子模块, 承担Mouse和屏幕交互的主要功能.
 
 ## 功能
 
@@ -15,6 +15,8 @@ graph
 * 可选, 频繁从toml文件重新渲染
 * 按钮事件
 * 界面跳转
+
+## 设计
 
 非频繁重载: $init \rightarrow load \rightarrow (renew \rightarrow draw)_n \rightarrow kill$.
 

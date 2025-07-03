@@ -25,6 +25,7 @@ typedef struct Elem {
 
 
 bool testElem(const Elem* elem, const char* string);
+char* getElemStateName(ElemState state);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H

@@ -39,6 +39,8 @@ int main(int argc, char *argv[]) {
     DEBUG_Init(renderer);
     MENU_Init(renderer);
     TEST_Init(renderer);
+    SDL_Texture* background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
+
     // load
     DEBUG_Load();
     MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
@@ -65,11 +67,13 @@ int main(int argc, char *argv[]) {
         LOTRI_RenewCamera();
 
         // logical draw
+        SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
         TEST_Draw();
         MENU_Draw();
 
         // physical draw
         drawMouse(renderer);
+        DEBUG_DrawMessage();
         DEBUG_Intro();
 
         //
@@ -77,13 +81,14 @@ int main(int argc, char *argv[]) {
 
         //
         if (oftenReload) {
-            MENU_Kill();
+            MENU_Unload();
             MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
         }
     }
 
     // kill & destroy
-    MENU_Kill();
+    MENU_Unload();
+    SDL_DestroyTexture(background);
     SDL_DestroyWindow(window);
     SDL_Quit();
 

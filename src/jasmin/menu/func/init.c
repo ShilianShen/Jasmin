@@ -18,17 +18,34 @@ static void MENU_InitPage(Page* page) {
 }
 static void MENU_InitMenu(SDL_Renderer* renderer) {
     // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
+    if (renderer == NULL) {
+        printf("%s: renderer not exists.\n", __func__);
+        return;
+    }
+    if (menu.pageRoot != NULL) {
+        printf("%s: menu.pageRoot shouldn't exist.\n", __func__);
+        return;
+    }
+    if (menu.pageEdge != NULL) {
+        printf("%s: menu.pageEdge shouldn't exist.\n", __func__);
+        return;
+    }
+    for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
+        if (menu.pages[i] != NULL) {
+            printf("%s: menu.pages[%d] shouldn't exist.\n", __func__, i);
+            return;
+        }
+    }
 
     //
     menu.renderer = renderer;
-    if (menu.pageRoot == NULL) {menu.pageRoot = malloc(sizeof(Page));}
-    if (menu.pageEdge == NULL) {menu.pageEdge = malloc(sizeof(Page));}
+    menu.pageRoot = malloc(sizeof(Page)); // malloc pageRoot
+    menu.pageEdge = malloc(sizeof(Page)); // malloc pageEdge
     MENU_InitPage(menu.pageRoot);
     MENU_InitPage(menu.pageEdge);
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] == NULL) {
-            menu.pages[i] = malloc(sizeof(Page));
+            menu.pages[i] = malloc(sizeof(Page)); // malloc
             MENU_InitPage(menu.pages[i]);
         }
     }

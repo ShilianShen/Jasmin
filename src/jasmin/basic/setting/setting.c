@@ -4,6 +4,7 @@
 int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;
+SDL_Color EMPTY = {0, 0, 0, 0};
 
 
 void renewScreenParas(SDL_Window* window) {
@@ -37,20 +38,17 @@ SDL_Texture* TXT_LoadTextureWithLines(
     const SDL_Color colorBack,
     const char aligned
     ) {
-    // getText
-    char text[strlen(scr_text)];
-    strcpy(text, scr_text);
+    // get text
+    char* text = strdup(scr_text);
 
-    // getNumLines N-Condition
+    // get num_lines (Opt Condition)
+    if (strlen(scr_text) == 0) { return NULL; }
     int num_lines = 1;
-    for (int i = 0; text[i] != '\0'; i++) {
-        if (text[i] == '\n') {
-            num_lines++;
-        }
+    for (int i = 0; text[i+1] != '\0'; i++) {
+        if (text[i] == '\n') { num_lines++; }
     }
-    if (num_lines == 1) {return TXT_LoadTexture(renderer, font, scr_text, colorText);}
 
-    // getLineHeads
+    // get line_offsets
     int line_offsets[num_lines];
     line_offsets[0] = 0;
     for (int i = 0, j = 1; text[i] != '\0'; i++) {
@@ -62,12 +60,11 @@ SDL_Texture* TXT_LoadTextureWithLines(
         }
     }
 
-    // getSubTextures N-Condition
+    // get sub_textures (Req Condition)
     SDL_Texture* sub_textures[num_lines];
     for (int i = 0; i < num_lines; i++) {
         sub_textures[i] = TXT_LoadTexture(renderer, font, text + line_offsets[i], colorText);  // malloc
         if (sub_textures[i] == NULL) {
-            // U-Condition
             printf("%s: fail to create texture from \"%s\".\n", __func__, text + line_offsets[i]);
         }
     }
@@ -109,6 +106,7 @@ SDL_Texture* TXT_LoadTextureWithLines(
     }
 
     // end
+    free(text);
     for (int i = 0; i < num_lines; i++) {SDL_DestroyTexture(sub_textures[i]);}
     SDL_SetRenderTarget(renderer, NULL);
 

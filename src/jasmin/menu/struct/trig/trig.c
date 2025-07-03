@@ -23,7 +23,7 @@ void TRIG_FUNC_Forward(const TrigPara pageName) {
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 
     // forward
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {
+    for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (menu.path[i] == 0) {
             menu.path[i] = pageId;
             break;
@@ -33,7 +33,7 @@ void TRIG_FUNC_Forward(const TrigPara pageName) {
 void TRIG_FUNC_Backward(const TrigPara para) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
 
-    for (PathId i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
+    for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
             break;
@@ -42,7 +42,7 @@ void TRIG_FUNC_Backward(const TrigPara para) {
 }
 void TRIG_FUNC_Clear(const TrigPara para) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
-    for (PathId i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
+    for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 
 

@@ -8,3 +8,7 @@ bool testElem(const Elem* elem, const char* string) {
     if (elem->texture == NULL) {printf("%s: elem[%d].texture not exists.\n", string, elem->id); return false;}
     return true;
 }
+char* getElemStateName(const ElemState state) {
+    static char* names[] = {"OUTSIDE", "INSIDE", "PRESSED", "RELEASED"};
+    return names[state];
+}

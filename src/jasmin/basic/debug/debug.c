@@ -6,13 +6,12 @@ struct Debug {
     bool on;
     SDL_Renderer* renderer;
     struct DebugTheme {
-        TTF_Font *font32, *font64, *font128, *font256;
-        SDL_Color pointColor, rectColor, faceColor, textColor, colorDark, colorLight;
-        SDL_Color pointColorDark, rectColorDark, faceColorDark, textColorDark;
+        TTF_Font *font24, *font32, *font64, *font128, *font256;
+        SDL_Color point, rect, face, text, dark, light;
+        SDL_Color darkPoint, darkRect, darkFace, darkText;
         int alphaLight, alphaDark;
     } theme;
-    char* message;  // malloc or NULL
-    char* detail[4]; // malloc or NULL
+    char* message[2];  // malloc or NULL
 } debug;
 const int MESSAGE_SIZE_MAX = 64;
 const int DETAIL_SIZE_MAX = 64;
@@ -27,6 +26,7 @@ void DEBUG_Init(SDL_Renderer* renderer) {
     debug.renderer = renderer;
 }
 static void DEBUG_LoadTheme() {
+    debug.theme.font24 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 24);
     debug.theme.font32 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 32);
     debug.theme.font64 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 64);
     debug.theme.font128 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 128);
@@ -35,26 +35,26 @@ static void DEBUG_LoadTheme() {
     debug.on = true;
 
     // color
-    debug.theme.pointColor = (SDL_Color){246, 202, 124, 255};
-    debug.theme.rectColor = (SDL_Color){241, 155, 153, 255};
-    debug.theme.faceColor = (SDL_Color){158, 189, 127, 255};
-    debug.theme.textColor = (SDL_Color){116, 173, 220, 255};
-    debug.theme.colorDark = (SDL_Color){0, 0, 0, 255};
-    debug.theme.colorLight = (SDL_Color){255, 255, 255, 255};
+    debug.theme.point = (SDL_Color){246, 202, 124, 255};
+    debug.theme.rect = (SDL_Color){241, 155, 153, 255};
+    debug.theme.face = (SDL_Color){158, 189, 127, 255};
+    debug.theme.text = (SDL_Color){116, 173, 220, 255};
+    debug.theme.dark = (SDL_Color){0, 0, 0, 128};
+    debug.theme.light = (SDL_Color){255, 255, 255, 255};
 
     // alpha
     debug.theme.alphaLight = 255;
     debug.theme.alphaDark = 128;
 
-    debug.theme.pointColorDark = debug.theme.pointColor;
-    debug.theme.rectColorDark = debug.theme.rectColor;
-    debug.theme.faceColorDark = debug.theme.faceColor;
-    debug.theme.textColorDark = debug.theme.textColor;
+    debug.theme.darkPoint = debug.theme.point;
+    debug.theme.darkRect = debug.theme.rect;
+    debug.theme.darkFace = debug.theme.face;
+    debug.theme.darkText = debug.theme.text;
 
-    debug.theme.pointColorDark.a = debug.theme.alphaDark;
-    debug.theme.rectColorDark.a = debug.theme.alphaDark;
-    debug.theme.faceColorDark.a = debug.theme.alphaDark;
-    debug.theme.textColorDark.a = debug.theme.alphaDark;
+    debug.theme.darkPoint.a = debug.theme.alphaDark;
+    debug.theme.darkRect.a = debug.theme.alphaDark;
+    debug.theme.darkFace.a = debug.theme.alphaDark;
+    debug.theme.darkText.a = debug.theme.alphaDark;
 }
 void DEBUG_Load() {
     DEBUG_LoadTheme();
@@ -64,9 +64,11 @@ void DEBUG_Renew() {
     if (!debug.on) {return;}
 
     //
-    if (debug.message != NULL) {
-        free(debug.message);
-        debug.message = NULL;
+    for (int i = 0; i < 2; i++) {
+        if (debug.message[i] != NULL) {
+            free(debug.message[i]);
+            debug.message[i] = NULL;
+        }
     }
 }
 
@@ -82,11 +84,11 @@ void DEBUG_Intro() {
     const Uint64 nowTime = SDL_GetTicks();
     if (nowTime < T4) {
         if (textureDark == NULL) {
-            textureDark = TXT_LoadTexture(debug.renderer, debug.theme.font128, "[DEBUG:]", debug.theme.colorDark);
+            textureDark = TXT_LoadTexture(debug.renderer, debug.theme.font128, "[DEBUG:]", debug.theme.dark);
             SDL_GetTextureSize(textureDark, &darkWidth, &darkHeight);
         }
         if (textureLight == NULL) {
-            textureLight = TXT_LoadTexture(debug.renderer, debug.theme.font256, "ON", debug.theme.colorLight);
+            textureLight = TXT_LoadTexture(debug.renderer, debug.theme.font256, "ON", debug.theme.light);
             SDL_GetTextureSize(textureLight, &lightWidth, &lightHeight);
         }
     }
@@ -97,7 +99,7 @@ void DEBUG_Intro() {
         textureDark = NULL;
     }
     if (T1 <= nowTime && nowTime < T4) {
-        const SDL_Color colors[] = {debug.theme.pointColor, debug.theme.rectColor, debug.theme.faceColor, debug.theme.textColor};
+        const SDL_Color colors[] = {debug.theme.point, debug.theme.rect, debug.theme.face, debug.theme.text};
         const int num_colors = sizeof(colors) / sizeof(SDL_Color);
         SDL_FRect rect = {((float)windowWidth - darkWidth) / 2, ((float)windowHeight - darkHeight) / 2, 0, darkHeight};
         for (int i = 0; i < num_colors; i++) {
@@ -127,7 +129,7 @@ void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
     const SDL_FRect rect = {(float)x - w, (float)y - w, 2 * w, 2 * w};
 
     // draw
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.pointColor, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.point, debug.theme.alphaLight);
     SDL_RenderFillRect(debug.renderer, &rect);
 }
 void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
@@ -135,7 +137,7 @@ void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float 
     if (!debug.on) {return;}
 
     // line
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.pointColor, debug.theme.alphaDark);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.point, debug.theme.alphaDark);
     SDL_RenderLine(debug.renderer, x1, y1, x2, y2);
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
@@ -146,7 +148,7 @@ void DEBUG_DrawRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaLight);
     SDL_RenderRect(debug.renderer, rect);
 }
 void DEBUG_FillRect(const SDL_FRect* rect) {
@@ -157,14 +159,14 @@ void DEBUG_FillRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect back
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaDark);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaDark);
     SDL_RenderFillRect(debug.renderer, rect);
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rectColor, debug.theme.alphaLight);
+    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaLight);
     SDL_RenderRect(debug.renderer, rect);
 }
-SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
+static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     // Pre Condition
     if (!debug.on) {return NULL;}
 
@@ -173,7 +175,7 @@ SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
 
     // Req Condition
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
-        debug.renderer, debug.theme.font32, text, debug.theme.colorLight, debug.theme.textColorDark, aligned
+        debug.renderer, debug.theme.font24, text, debug.theme.light, debug.theme.dark, aligned
         );
     if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return NULL;}
 
@@ -216,7 +218,32 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 }
 
 
-void DEBUG_SendMessage(const char* format, ...) {
+static void DEBUG_SendMessage(const int i, const char* newMessage) {
+    // Pre Condition
+    if (!debug.on) {return;}
+
+    // getMessage
+    if (debug.message[i] == NULL) {
+        debug.message[i] = strdup(newMessage); // malloc
+        if (debug.message[i] == NULL) {
+            printf("%s: failed to malloc.\n", __func__);
+        }
+    }
+    else {
+        // getOldMessage
+        char* oldMessage = debug.message[i]; // malloc
+
+        // getAllMessage
+        debug.message[i] = malloc(strlen(newMessage) + strlen(oldMessage) + 1); // malloc
+        if (debug.message[i] == NULL) {
+            printf("%s: failed to malloc.\n", __func__);
+        }
+        strcpy(debug.message[i], oldMessage);
+        strcat(debug.message[i], newMessage);
+        free(oldMessage); // free
+    }
+}
+void DEBUG_SendMessageL(const char* format, ...) {
     // Pre Condition
     if (!debug.on) {return;}
 
@@ -228,36 +255,29 @@ void DEBUG_SendMessage(const char* format, ...) {
     va_end(args);
 
     //
-    if (debug.message == NULL) {
-        debug.message = strdup(newMessage); // malloc
-        if (debug.message == NULL) {
-            printf("%s: failed to malloc.\n", __func__);
-        }
-    }
-    else {
-        // getOldMessage
-        char* oldMessage = debug.message; // malloc
-
-        // getAllMessage
-        debug.message = malloc(strlen(newMessage) + strlen(oldMessage) + 1); // malloc
-        if (debug.message == NULL) {
-            printf("%s: failed to malloc.\n", __func__);
-        }
-        strcpy(debug.message, oldMessage);
-        strcat(debug.message, newMessage);
-        free(oldMessage); // free
-    }
+    DEBUG_SendMessage(0, newMessage);
 }
-bool DEBUG_HaveMessage() {
-    if (!debug.on) {return false;}
-
-    if (debug.message == NULL || strlen(debug.message) == 0) {return false;}
-
-    return true;
-}
-void DEBUG_DrawMessage() {
+void DEBUG_SendMessageR(const char* format, ...) {
+    // Pre Condition
     if (!debug.on) {return;}
 
-    if (debug.message == NULL) {return;}
-    DEBUG_DrawTextAligned(debug.message, 'R');
+    // getNewMessage
+    char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
+    va_list args;
+    va_start(args, format);
+    vsnprintf(newMessage, MESSAGE_SIZE_MAX, format, args);
+    va_end(args);
+
+    //
+    DEBUG_SendMessage(1, newMessage);
+}
+void DEBUG_DrawMessage() {
+    // Pre Condition
+    if (!debug.on) {return;}
+    const bool* state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_LSHIFT] == false) { return; }
+
+    // Opt Condition
+    if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
+    if (debug.message[1] != NULL) {DEBUG_DrawTextAligned(debug.message[1], 'R');}
 }

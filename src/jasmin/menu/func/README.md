@@ -1,6 +1,9 @@
 # Func
+
 ```mermaid
-graph
+graph LR
     interface.h --> func.h
-    func.h -- draw.c, init.c, kill.c, load.c, renew.c --> func.h
+    func.h -- load.c, unload.c --> func.h
+    func.h -- init.c, deinit.c --> func.h
+    func.h -- draw.c, renew.c --> func.h
 ```

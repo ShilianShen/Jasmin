@@ -9,7 +9,7 @@
 
 void MENU_Draw();
 void MENU_Init(SDL_Renderer*);
-void MENU_Kill();
+void MENU_Unload();
 void MENU_Load(const char*, const char*);
 void MENU_Renew();
 

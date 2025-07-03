@@ -11,11 +11,6 @@ static SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
     SDL_Texture* texture = NULL;
     const int elemStrLen = strlen(elemStr);
     switch (elemStr[0]) {
-        // 0
-        case 'p': {
-            texture = TXT_LoadTexture(menu.renderer, menu.theme.font, menu.pathString, menu.theme.color);
-            break;
-        }
         // 2
         case 'f': {
             if (elemStrLen <= 2) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
@@ -30,7 +25,7 @@ static SDL_Texture* getTextureFromElemString(const ElemStr elemStr) {
         // 3
         case 'T': {
             if (elemStrLen <= 3) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
-            texture = TXT_LoadTextureWithLines(menu.renderer, menu.theme.font, elemStr+3, menu.theme.color, menu.theme.color, *(elemStr+1));
+            texture = TXT_LoadTextureWithLines(menu.renderer, menu.theme.font, elemStr+3, menu.theme.color, EMPTY, *(elemStr+1));
             break;
         }
         default: {texture = NULL; break;}

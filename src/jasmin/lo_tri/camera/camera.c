@@ -17,7 +17,6 @@ void LOTRI_RenewCamera() {
     if (keyPressed(SDL_SCANCODE_D)) {
         camera.position.y += 1;
     }
-    DEBUG_SendMessage("Camera{%d}\n", keyPressed(SDL_SCANCODE_LEFT));
-    DEBUG_SendMessage("Pos: %.2f, %.2f, %.2f\n", camera.position.x, camera.position.y, camera.position.z);
-    DEBUG_SendMessage("Rot: %.2f, %.2f, %.2f", camera.rotation.x, camera.rotation.y, camera.rotation.z);
+    DEBUG_SendMessageL("camera.pos: %.2f, %.2f, %.2f\n", camera.position.x, camera.position.y, camera.position.z);
+    DEBUG_SendMessageL("camera.rot: %.2f, %.2f, %.2f\n", camera.rotation.x, camera.rotation.y, camera.rotation.z);
 }

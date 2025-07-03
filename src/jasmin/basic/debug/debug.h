@@ -19,16 +19,16 @@ void DEBUG_Renew();
 void DEBUG_Intro();
 
 
-void DEBUG_DrawPoint(const Sint16 x, const Sint16 y);
-void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2);
+void DEBUG_DrawPoint(Sint16 x, Sint16 y);
+void DEBUG_DrawLine(float x1, float y1, float x2, float y2);
 void DEBUG_DrawRect(const SDL_FRect* rect);
 void DEBUG_FillRect(const SDL_FRect* rect);
-void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text);
-void DEBUG_DrawTextAligned(const char* text, const char aligned);
+void DEBUG_DrawText(Sint16 x, Sint16 y, const char* text);
+void DEBUG_DrawTextAligned(const char* text, char aligned);
 
 
-void DEBUG_SendMessage(const char* format, ...);
-bool DEBUG_HaveMessage();
+void DEBUG_SendMessageL(const char* format, ...);
+void DEBUG_SendMessageR(const char* format, ...);
 void DEBUG_DrawMessage();
 
 
