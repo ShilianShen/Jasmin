@@ -36,7 +36,7 @@ SDL_Texture* getTextureFromElemString(const char* elemStr) {
 }
 
 
-void MENU_LoadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
+void ELEM_LoadGuide(Elem* elem, const toml_array_t* tomlGuide) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
@@ -58,7 +58,7 @@ void MENU_LoadElemGuide(Elem* elem, const toml_array_t* tomlGuide) {
         elem->guide.h = 1;
     }
 }
-void MENU_LoadElemString(Elem* elem, const toml_datum_t tomlString) {
+void ELEM_LoadString(Elem* elem, const toml_datum_t tomlString) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (!tomlString.ok) {printf("%s: tomlString not exists.\n", __func__); return;}
@@ -70,7 +70,7 @@ void MENU_LoadElemString(Elem* elem, const toml_datum_t tomlString) {
     // Req Condition
     if (elem->string == NULL) {printf("%s: failed to malloc from \"%s\".\n", __func__, tomlString.u.s);}
 }
-void MENU_LoadElemPara(Elem* elem, const toml_datum_t tomlPara) {
+void ELEM_LoadPara(Elem* elem, const toml_datum_t tomlPara) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (elem->trig_para != NULL) {printf("%s: elem.para not freed.\n", __func__); return;}
@@ -78,7 +78,7 @@ void MENU_LoadElemPara(Elem* elem, const toml_datum_t tomlPara) {
     // Opt Condition
     elem->trig_para = tomlPara.ok ? strdup(tomlPara.u.s) : NULL;
 }
-void MENU_LoadElemTexture(Elem* elem) {
+void ELEM_LoadTexture(Elem* elem) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (elem->texture != NULL) {printf("%s: elem.texture not free.\n", __func__); return;}
@@ -92,7 +92,7 @@ void MENU_LoadElemTexture(Elem* elem) {
     SDL_GetTextureSize(elem->texture, &w, &h);
     elem->src_rect = (SDL_FRect){0, 0, w, h};
 }
-void MENU_LoadElemOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+void ELEM_LoadOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
@@ -108,7 +108,7 @@ void MENU_LoadElemOther(Elem* elem, const toml_table_t* tomlElem, const int toml
     // loadElemIdFromToml
     elem->id = tomlElemId;
 }
-void MENU_LoadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     // Req Condition
     if (elem == NULL) {
         printf("%s: elem not exists.\n", __func__);
@@ -120,11 +120,11 @@ void MENU_LoadElem(Elem* elem, const toml_table_t* tomlElem, const int tomlElemI
     }
 
     //
-    MENU_LoadElemOther(elem, tomlElem, tomlElemId);
-    MENU_LoadElemGuide(elem, toml_array_in(tomlElem, "guide"));
-    MENU_LoadElemPara(elem, toml_string_in(tomlElem, "para"));
-    MENU_LoadElemString(elem, toml_string_in(tomlElem, "string"));
-    MENU_LoadElemTexture(elem);
+    ELEM_LoadOther(elem, tomlElem, tomlElemId);
+    ELEM_LoadGuide(elem, toml_array_in(tomlElem, "guide"));
+    ELEM_LoadPara(elem, toml_string_in(tomlElem, "para"));
+    ELEM_LoadString(elem, toml_string_in(tomlElem, "string"));
+    ELEM_LoadTexture(elem);
     ELEM_TurnOn(elem);
 }
 
@@ -143,7 +143,7 @@ toml_table_t* getToml(const char* tomlPath) {
 
     return toml;
 }
-void MENU_LoadPageName(Page* page, const char* name) {
+void PAGE_LoadName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -162,7 +162,7 @@ void MENU_LoadPageName(Page* page, const char* name) {
         printf("%s: failed malloc page.name.\n", __func__);
     }
 }
-void MENU_LoadPageElems(Page* page, const toml_array_t* tomlElems) {
+void PAGE_LoadElems(Page* page, const toml_array_t* tomlElems) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (tomlElems == NULL) {printf("%s: tomlElems not exists.\n", __func__); return;}
@@ -179,19 +179,19 @@ void MENU_LoadPageElems(Page* page, const toml_array_t* tomlElems) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         // Opt Condition
         if (tomlElem != NULL) {
-            MENU_LoadElem(&page->elems[i], tomlElem, i+1);
+            ELEM_Load(&page->elems[i], tomlElem, i+1);
         }
     }
 }
-void MENU_LoadPage(Page* page, const char* name, const toml_table_t* tomlPage) {
+void PAGE_Load(Page* page, const char* name, const toml_table_t* tomlPage) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return;}
     if (tomlPage == NULL) {printf("%s: tomlPage not exists.\n", __func__); return;}
 
     //
-    MENU_LoadPageName(page, name);
-    MENU_LoadPageElems(page, toml_array_in(tomlPage, "elems"));
+    PAGE_LoadName(page, name);
+    PAGE_LoadElems(page, toml_array_in(tomlPage, "elems"));
 }
 
 
@@ -265,16 +265,16 @@ void MENU_LoadMenuPages(const char* tomlPath) {
             printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
         }
         else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {
-            MENU_LoadPage(menu.pageRoot, pageName, tomlPage);
+            PAGE_Load(menu.pageRoot, pageName, tomlPage);
         }
         else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {
-            MENU_LoadPage(menu.pageEdge, pageName, tomlPage);
+            PAGE_Load(menu.pageEdge, pageName, tomlPage);
         }
         else {
             if (menu.pages[pageId] == NULL) {
                 menu.pages[pageId] = malloc(sizeof(Page));
             }
-            MENU_LoadPage(menu.pages[pageId], pageName, tomlPage);
+            PAGE_Load(menu.pages[pageId], pageName, tomlPage);
             pageId++;
         }
     }

@@ -1,7 +1,7 @@
 #include "func.h"
 
 
-static void MENU_RenewElemDstRect(Elem* elem) {
+void ELEM_RenewDstRect(Elem* elem) {
     // Req Condition
     if (ELEM_IfReady(elem) == false) {
         printf("%s: elem not ready.\n", __func__);
@@ -11,7 +11,7 @@ static void MENU_RenewElemDstRect(Elem* elem) {
     //
     SDL_LoadDstRectAligned(&elem->dst_rect, elem->texture, &elem->src_rect, &elem->guide, &menu.bck_rect, elem->anchor);
 }
-static void MENU_RenewElemState(Elem* elem) {
+void ELEM_RenewState(Elem* elem) {
     // Req Condition
     if (!ELEM_IfReady(elem)) {
         printf("%s: elem not ready.\n", __func__);
@@ -44,7 +44,7 @@ static void MENU_RenewElemState(Elem* elem) {
         elem->trig_func(elem->trig_para);
     }
 }
-static void MENU_RenewElem(Elem* elem) {
+void MENU_RenewElem(Elem* elem) {
     // Req Condition
     if (!ELEM_IfReady(elem)) {
         printf("%s: elem not ready.\n", __func__);
@@ -52,12 +52,12 @@ static void MENU_RenewElem(Elem* elem) {
     }
 
     //
-    MENU_RenewElemDstRect(elem);
-    MENU_RenewElemState(elem);
+    ELEM_RenewDstRect(elem);
+    ELEM_RenewState(elem);
 }
 
 
-static void MENU_RenewPage(Page* page) {
+void MENU_RenewPage(Page* page) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -72,7 +72,7 @@ static void MENU_RenewPage(Page* page) {
     }
 }
 
-static void MENU_RenewMenuPath() {
+void MENU_RenewMenuPath() {
     bool need_clear = false;
     DEBUG_SendMessageL("menu.path: /%s", menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
@@ -91,7 +91,7 @@ static void MENU_RenewMenuPath() {
     }
     DEBUG_SendMessageL("\n");
 }
-static void MENU_RenewMenuPageNow() {
+void MENU_RenewMenuPageNow() {
     // if pageRoot
     if (MENU_getPageFromPathId(0) == NULL) {
         menu.pageNow = menu.pageRoot;
@@ -107,7 +107,7 @@ static void MENU_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-static void MENU_RenewMenu() {
+void MENU_RenewMenu() {
     static bool need_load = true;
     MENU_RenewMenuPath();
     MENU_RenewMenuPageNow();

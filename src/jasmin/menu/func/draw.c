@@ -1,7 +1,7 @@
 #include "func.h"
 
 
-static void MENU_DrawElem(const Elem* elem) {
+void MENU_DrawElem(const Elem* elem) {
     // Req Condition
     if (!ELEM_IfReady(elem)) {
         printf("%s: elem not ready.\n", __func__);
@@ -19,7 +19,7 @@ static void MENU_DrawElem(const Elem* elem) {
     }
     SDL_RenderTexture(menu.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 }
-static void MENU_DrawPage(const Page* page) {
+void MENU_DrawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
 
@@ -30,7 +30,7 @@ static void MENU_DrawPage(const Page* page) {
         }
     }
 }
-static void MENU_DrawMenu() {
+void MENU_DrawMenu() {
     MENU_DrawPage(menu.pageNow);
 }
 
