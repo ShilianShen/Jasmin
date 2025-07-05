@@ -5,27 +5,32 @@
 #include "../trig/trig.h"
 
 
-typedef uint8_t Anchor;
-typedef int ElemId;
-typedef char* ElemStr;
 typedef enum ElemState {OUTSIDE, INSIDE, PRESSED, RELEASE, NUM_ELEM_STATES} ElemState;
+
+
 typedef struct Elem {
-    // file
-    ElemId id;  // id意味着page的第几个元素, 从1开始, id=0意味着未初始化
-    Anchor anchor;
+    // given in LOAD
+    bool on;
+    int id;
+    int anchor;
     SDL_FRect guide;
-    TrigFunc trig_func;
-    TrigPara trig_para; // malloc
-    ElemStr string; // malloc
-    SDL_Texture* texture; // malloc
-    // renewable
+    TrigFunc trig_func; // maybe NULL
+
+    // malloc in LOAD
+    char* trig_para; // maybe NULL
+    char* string;
+    SDL_Texture* texture;
+
+    // given in RENEW
     SDL_FRect src_rect, dst_rect;
     ElemState state;
 } Elem;
 
 
-bool testElem(const Elem* elem, const char* string);
-char* getElemStateName(ElemState state);
+void ELEM_TurnOn(Elem* elem);
+void ELEM_TurnOff(Elem* elem);
+bool ELEM_IfReady(const Elem* elem);
+char* ELEM_GetStateName(ElemState state);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H

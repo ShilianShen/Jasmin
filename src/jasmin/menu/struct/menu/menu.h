@@ -16,13 +16,13 @@ typedef struct Menu {
     SDL_Renderer* renderer;
 
     // malloc in INIT
-    Page* pageRoot;                // pageId = 0
-    Page* pageEdge;                // pageId = MENU_PAGE_VOLUME
-    Page* pages[MENU_PAGE_VOLUME]; // 0 < pageId < MENU_PAGE_VOLUME, pages[0] = NULL
+    Page* pageRoot;
+    Page* pageEdge;
+    Page* pages[MENU_PAGE_VOLUME];
 
     // other
     SDL_FRect bck_rect;
-    PageId path[MENU_PATH_VOLUME];
+    int path[MENU_PATH_VOLUME];
     Page* pageNow;
 
     //
@@ -34,8 +34,8 @@ typedef struct Menu {
 extern Menu menu;
 
 
-Page* getMenuPageFromPathId(int pathId);
-Page* getMenuPageFromPageId(int pageId);
+Page* MENU_getPageFromPathId(int pathId);
+Page* MENU_GetPageFromPageId(int pageId);
 
 
 #endif //JASMIN_MENU_STRUCT_MENU_H

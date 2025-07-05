@@ -10,14 +10,14 @@ Trig trig_set[] = {
 };
 
 
-void TRIG_FUNC_Pass(const TrigPara para) {}
-void TRIG_FUNC_Forward(const TrigPara pageName) {
+void TRIG_FUNC_Pass(const char* para) {}
+void TRIG_FUNC_Forward(const char* pageName) {
     // ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
 
     // getPageId
-    PageId pageId = 0;
-    for (PageId i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (!testPage(menu.pages[i], NULL)) {continue;}
+    int pageId = 0;
+    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
+        if (PAGE_IfReady(menu.pages[i]) == false) {continue;}
         if (strcmp(menu.pages[i]->name, pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
@@ -30,9 +30,7 @@ void TRIG_FUNC_Forward(const TrigPara pageName) {
         }
     }
 }
-void TRIG_FUNC_Backward(const TrigPara para) {
-    // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
-
+void TRIG_FUNC_Backward(const char* para) {
     for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -40,13 +38,12 @@ void TRIG_FUNC_Backward(const TrigPara para) {
         }
     }
 }
-void TRIG_FUNC_Clear(const TrigPara para) {
-    // ma_engine_play_sound(&maEngine, "../sound effects/ring08.wav", NULL);
+void TRIG_FUNC_Clear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 
 
-TrigFunc TRIG_FindFuncFromName(const TrigName name) {
+TrigFunc TRIG_FindFuncFromName(const char* name) {
     // Req Condition
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
 
@@ -58,7 +55,7 @@ TrigFunc TRIG_FindFuncFromName(const TrigName name) {
     }
     return NULL;
 }
-TrigName TRIG_FindNameFromFunc(const TrigFunc func) {
+char* TRIG_FindNameFromFunc(const TrigFunc func) {
     // Req Condition
     if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
 

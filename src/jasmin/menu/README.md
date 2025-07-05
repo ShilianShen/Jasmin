@@ -1,7 +1,7 @@
 # Menu
 
 ```mermaid
-graph
+graph LR
     interface.h --> STRUCT --> FUNC --> menu.h
 ```
 

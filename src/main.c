@@ -4,19 +4,21 @@
 #include "jasmin/jasmin.h"
 
 
+SDL_Window *window;
+SDL_Renderer *renderer;
+SDL_Texture* background;
 
-int main(int argc, char *argv[]) {
-    // window & renderer
-    const char WINDOW_TITLE[] = "Test";
-    const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
-    bool oftenReload = true;
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    bool running = true;
-    const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
-    SDL_Event event;
-    const SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
 
+const char WINDOW_TITLE[] = "Test";
+const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
+bool oftenReload = true;
+bool running = true;
+const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+SDL_Event event;
+
+
+static void INIT() {
+    // SDL
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
     }
@@ -28,68 +30,82 @@ int main(int argc, char *argv[]) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
 
-    /*if (ma_engine_init(NULL, &maEngine) != MA_SUCCESS) {
-        return -1;
-    }*/
-    // ma_engine_play_sound(&maEngine, "../sound effects/CD_case_C.mp3", NULL);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_HideCursor();
-
-    // init
+    // Jasmin
     DEBUG_Init(renderer);
     MENU_Init(renderer);
     TEST_Init(renderer);
-    SDL_Texture* background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
+    background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
+}
+static void DEINIT() {
+    // Jasmin
+    MENU_Deinit();
 
-    // load
+    // SDL
+    SDL_DestroyTexture(background);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+static void LOAD() {
     DEBUG_Load();
     MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
+}
+static void UNLOAD() {
+    MENU_Unload();
+}
 
-    // running
+static void RENEW() {
+    // physical renew
+    renewScreenParas(window);
+    renewMouse();
+    DEBUG_Renew();
+
+    // logical renew
+    menu.bck_rect.w = (float)windowWidth;
+    menu.bck_rect.h = (float)windowHeight;
+    MENU_Renew();
+}
+static void DRAW() {
+    const static SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
+    SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
+    SDL_RenderClear(renderer);
+    LOTRI_RenewCamera();
+
+    // logical draw
+    SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
+    TEST_Draw();
+    MENU_Draw();
+
+    // physical draw
+    drawMouse(renderer);
+    DEBUG_DrawMessage();
+    DEBUG_Intro();
+
+    //
+    SDL_RenderPresent(renderer);
+}
+
+int main(int argc, char *argv[]) {
+    // window & renderer
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_HideCursor();
+
+    //
+    INIT();
+    LOAD();
     while (running) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {running = false;}
+            if (event.type == SDL_EVENT_QUIT) {
+                running = false;
+            }
         }
-        // renew
-        // physical renew
-        renewScreenParas(window);
-        renewMouse();
-        DEBUG_Renew();
-
-        // logical renew
-        menu.bck_rect.w = (float)windowWidth;
-        menu.bck_rect.h = (float)windowHeight;
-        MENU_Renew();
-
-        // draw
-        SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
-        SDL_RenderClear(renderer);
-        LOTRI_RenewCamera();
-
-        // logical draw
-        SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
-        TEST_Draw();
-        MENU_Draw();
-
-        // physical draw
-        drawMouse(renderer);
-        DEBUG_DrawMessage();
-        DEBUG_Intro();
-
-        //
-        SDL_RenderPresent(renderer);
-
-        //
+        RENEW();
+        DRAW();
         if (oftenReload) {
             MENU_Unload();
             MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
         }
     }
-
-    // kill & destroy
-    MENU_Unload();
-    SDL_DestroyTexture(background);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    UNLOAD();
+    DEINIT();
 }

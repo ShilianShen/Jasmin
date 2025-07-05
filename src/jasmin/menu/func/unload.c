@@ -9,6 +9,7 @@ static void MENU_UnloadElem(Elem* elem) {
     if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
     if (elem->trig_para != NULL) {free(elem->trig_para); elem->trig_para = NULL;}
     if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
+    ELEM_TurnOff(elem);
 }
 static void MENU_UnloadPage(Page* page) {
     // Req Condition
@@ -16,7 +17,7 @@ static void MENU_UnloadPage(Page* page) {
 
     //
     if (page->name != NULL) {free(page->name); page->name = NULL;}
-    for (int i = 0; i < PAGE_MAX_VOLUME; i++) {MENU_UnloadElem(&page->elems[i]);}
+    for (int i = 0; i < PAGE_ELEM_VOLUME; i++) {MENU_UnloadElem(&page->elems[i]);}
 }
 static void MENU_UnloadMenuTheme() {
     if (menu.theme.font != NULL) {

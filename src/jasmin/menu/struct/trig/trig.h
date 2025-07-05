@@ -22,10 +22,12 @@
 
 
 // datatype
-typedef char* TrigPara;
-typedef char* TrigName;
+typedef const char* TrigPara;
 typedef void (*TrigFunc)(TrigPara);
-typedef struct Trig {const TrigName name; const TrigFunc func;} Trig;
+typedef struct Trig {
+    char* name;
+    const TrigFunc func;
+} Trig;
 
 
 void TRIG_FUNC_Pass(TrigPara);
@@ -37,8 +39,8 @@ void TRIG_FUNC_Clear(TrigPara);
 extern Trig trig_set[];
 
 
-TrigFunc TRIG_FindFuncFromName(TrigName);
-TrigName TRIG_FindNameFromFunc(TrigFunc);
+TrigFunc TRIG_FindFuncFromName(const char* name);
+char* TRIG_FindNameFromFunc(TrigFunc func);
 
 
 #endif //JASMIN_MENU_STRUCT_TRIG_H
