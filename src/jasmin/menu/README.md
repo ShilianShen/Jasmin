@@ -2,12 +2,12 @@
 
 ```mermaid
 graph LR
-    interface.h --> trig.h --> elem.h --> page.h --> menu.h --> ../menu.h
+    ../interface.h --> trig.h --> elem.h --> page.h --> menu.h --> ../menu.h
     trig.h -- trig.c --> menu.h
     elem.h -- elem.c --> elem.h
     page.h -- page.c --> page.h
     menu.h -- menu.c --> menu.h
-    interface.h --> ../menu.h
+    ../interface.h --> ../menu.h
 ```
 
 > trig.c依赖menu.h的部分函数, 这部分函数不属于../menu.h所暴露的函数, 所以不能指向../menu.h.
@@ -25,6 +25,15 @@ Menu为Jasmin的子模块, 承担Mouse和屏幕交互的主要功能.
 
 ## 设计
 
-非频繁重载: $init \rightarrow load \rightarrow (renew \rightarrow draw)_n \rightarrow kill$.
+```mermaid
+graph LR
+    INIT --> LOAD --> run{RUN?}
+    run -- true --> RENEW --> DRAW --> reload{RELOAD?}
+    reload -- true --> RELOAD --> run
+    reload -- false --> run
+    run -- false --> UNLOAD --> DEINIT
+```
 
-频繁重载: $init \rightarrow load \rightarrow (renew \rightarrow draw\rightarrow kill \rightarrow load)_n \rightarrow kill$.
+非频繁重载: init -> load -> renew -> draw -> unload -> deinit
+
+频繁重载:
