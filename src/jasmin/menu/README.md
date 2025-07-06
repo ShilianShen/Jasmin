@@ -2,8 +2,15 @@
 
 ```mermaid
 graph LR
-    interface.h --> STRUCT --> FUNC --> menu.h
+    interface.h --> trig.h --> elem.h --> page.h --> menu.h --> ../menu.h
+    trig.h -- trig.c --> menu.h
+    elem.h -- elem.c --> elem.h
+    page.h -- page.c --> page.h
+    menu.h -- menu.c --> menu.h
+    interface.h --> ../menu.h
 ```
+
+> trig.c依赖menu.h的部分函数, 这部分函数不属于../menu.h所暴露的函数, 所以不能指向../menu.h.
 
 ## 介绍
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "jasmin/jasmin.h"
+#include "jasmin/menu/page/page.h"
 
 
 SDL_Window *window;
@@ -61,9 +62,8 @@ static void RENEW() {
     DEBUG_Renew();
 
     // logical renew
-    menu.bck_rect.w = (float)windowWidth;
-    menu.bck_rect.h = (float)windowHeight;
-    MENU_Renew();
+    SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
+    MENU_Renew(bck_rect);
 }
 static void DRAW() {
     const static SDL_Color COLOR_CLEAR = {0, 0, 0, 255};

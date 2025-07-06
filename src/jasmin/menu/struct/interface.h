@@ -1,8 +1,0 @@
-#ifndef JASMIN_MENU_STRUCT_INTERFACE_H
-#define JASMIN_MENU_STRUCT_INTERFACE_H
-
-
-#include "../menu_interface.h"
-
-
-#endif //JASMIN_MENU_STRUCT_INTERFACE_H

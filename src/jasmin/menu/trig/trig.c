@@ -1,4 +1,4 @@
-#include "../struct.h"
+#include "../menu/menu.h"
 
 
 Trig trig_set[] = {

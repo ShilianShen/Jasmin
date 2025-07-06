@@ -1,14 +1,11 @@
-#ifndef JASMIN_MENU_STRUCT_MENU_H
-#define JASMIN_MENU_STRUCT_MENU_H
+#ifndef JASMIN_MENU_MENU_H
+#define JASMIN_MENU_MENU_H
 
 
 #include "../page/page.h"
 
-
 #define MENU_PAGE_VOLUME 16
 #define MENU_PATH_VOLUME 6
-extern const char MENU_ROOT_NAME[];
-extern const char MENU_EDGE_NAME[];
 
 
 typedef struct Menu {
@@ -34,8 +31,12 @@ typedef struct Menu {
 extern Menu menu;
 
 
-Page* MENU_getPageFromPathId(int pathId);
-Page* MENU_GetPageFromPageId(int pageId);
+void MENU_Init(SDL_Renderer* renderer);
+void MENU_Deinit();
+void MENU_Load(const char* menuPagesPath, const char* menuThemePath);
+void MENU_Unload();
+void MENU_Renew(SDL_FRect bck_rect);
+void MENU_Draw();
 
 
-#endif //JASMIN_MENU_STRUCT_MENU_H
+#endif //JASMIN_MENU_MENU_H

@@ -1,17 +1,16 @@
-#ifndef JASMIN_MENU_H
-#define JASMIN_MENU_H
+#ifndef JASMIN_MENU_STRUCT_MENU_H
+#define JASMIN_MENU_STRUCT_MENU_H
 
 
-#include "../basic/basic.h"
-#include "struct/struct.h"
-#include "func/func.h"
+#include "interface.h"
 
 
-void MENU_Draw();
-void MENU_Init(SDL_Renderer*);
+void MENU_Init(SDL_Renderer* renderer);
+void MENU_Deinit();
+void MENU_Load(const char* menuPagesPath, const char* menuThemePath);
 void MENU_Unload();
-void MENU_Load(const char*, const char*);
-void MENU_Renew();
+void MENU_Renew(SDL_FRect bck_rect);
+void MENU_Draw();
 
 
-#endif //JASMIN_MENU_H
+#endif //JASMIN_MENU_STRUCT_MENU_H

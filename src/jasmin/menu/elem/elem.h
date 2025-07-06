@@ -27,6 +27,20 @@ typedef struct Elem {
 } Elem;
 
 
+extern SDL_Renderer* elem_renderer;
+extern TTF_Font* elem_font;
+extern SDL_Color elem_color;
+extern SDL_FRect elem_bck_rect;
+
+
+void ELEM_Init(Elem* elem);
+void ELEM_Deinit(const Elem* elem);
+void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, int tomlElemId);
+void ELEM_Unload(Elem* elem);
+void ELEM_Renew(Elem* elem);
+void ELEM_Draw(const Elem* elem);
+
+
 void ELEM_TurnOn(Elem* elem);
 void ELEM_TurnOff(Elem* elem);
 bool ELEM_IfReady(const Elem* elem);

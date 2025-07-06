@@ -18,17 +18,16 @@ find_package(SDL3_ttf REQUIRED)
 find_package(SDL3_image REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        src/jasmin/menu/struct/menu/menu.h
+        src/jasmin/menu/menu.h
         src/jasmin/basic/device/device.h
         src/jasmin/basic/debug/debug.h
         src/jasmin/basic/setting/setting.h
 
         # toml/toml.h
         third_party/toml/toml.c
-        src/jasmin/menu/struct/trig/trig.h
-        src/jasmin/menu/struct/elem/elem.h
-        src/jasmin/menu/struct/page/page.h
-        src/jasmin/menu/menu.h
+        src/jasmin/menu/trig/trig.h
+        src/jasmin/menu/elem/elem.h
+        src/jasmin/menu/page/page.h
         src/jasmin/jasmin.h
         src/jasmin/basic/basic.h
         src/jasmin/basic/setting/setting.c
@@ -36,20 +35,11 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/basic/device/device.c
         src/jasmin/basic/ease/ease.c
         src/jasmin/basic/ease/ease.h
-        src/jasmin/menu/func/draw.c
-        src/jasmin/menu/struct/struct.h
-        src/jasmin/menu/func/func.h
-        src/jasmin/menu/struct/elem/elem.c
-        src/jasmin/menu/menu_interface.h
-        src/jasmin/menu/struct/interface.h
-        src/jasmin/menu/func/interface.h
-        src/jasmin/menu/struct/menu/menu.c
-        src/jasmin/menu/struct/page/page.c
-        src/jasmin/menu/struct/trig/trig.c
-        src/jasmin/menu/func/init.c
-        src/jasmin/menu/func/unload.c
-        src/jasmin/menu/func/load.c
-        src/jasmin/menu/func/renew.c
+        src/jasmin/menu/elem/elem.c
+        src/jasmin/menu/interface.h
+        src/jasmin/menu/menu.c
+        src/jasmin/menu/page/page.c
+        src/jasmin/menu/trig/trig.c
         src/jasmin/basic/interface.h
         src/jasmin/lo_tri/lo_tri.h
         src/jasmin/lo_tri/interface.h
@@ -74,7 +64,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/math/mat/mat.h
         src/jasmin/lo_tri/math/vec/vec.c
         src/jasmin/lo_tri/math/vec/vec.h
-        src/jasmin/menu/func/deinit.c
+        src/jasmin/menu/menu/menu.c
+        src/jasmin/menu/menu/menu.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
