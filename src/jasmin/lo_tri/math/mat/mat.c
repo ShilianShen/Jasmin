@@ -1,6 +1,16 @@
 #include "mat.h"
 
 
+const Mat4x4f unitMat = {
+    {
+        {1, 0, 0, 0},
+        {0, 1, 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 1},
+    }
+};
+
+
 Mat4x4f MAT_GetProduct(const Mat4x4f matA, const Mat4x4f matB) {
     Mat4x4f matAB = {0};
     for (int i = 0; i < 4; i++) {

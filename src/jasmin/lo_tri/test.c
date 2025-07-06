@@ -6,7 +6,7 @@ static SDL_Renderer* TEST_Renderer;
 static SDL_Texture *texture = NULL;
 
 static void printVertex(const SDL_Vertex vert) {
-    printf("position: (%.2f, %.2f)\n", vert.position.x, vert.position.y);
+    printf("translation: (%.2f, %.2f)\n", vert.position.x, vert.position.y);
     printf("color: (%.2f, %.2f, %.2f, %.2f)\n", vert.color.r, vert.color.g, vert.color.b, vert.color.a);
     printf("tex_coord: (%.2f, %.2f)\n", vert.tex_coord.x, vert.tex_coord.y);
 }

@@ -200,6 +200,7 @@ void MENU_Unload() {
     MENU_UnloadMenuTheme();
 }
 static void MENU_RenewMenuPath() {
+    //
     bool need_clear = false;
     DEBUG_SendMessageL("menu.path: /%s", menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
@@ -234,13 +235,11 @@ static void MENU_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-void MENU_Renew(SDL_FRect bck_rect) {
+void MENU_Renew(const SDL_FRect bck_rect) {
     static bool need_load = true;
     MENU_RenewMenuPath();
     MENU_RenewMenuPageNow();
     PAGE_Renew(menu.pageNow);
-    // printf("%s\n", menu.pageNow->name);
-    // printMenuPath();
     menu.bck_rect = bck_rect;
     elem_bck_rect = menu.bck_rect;
 }

@@ -100,7 +100,7 @@ void PAGE_Unload(Page* page) {
 void PAGE_Renew(Page* page) {
     // Req Condition
     if (page == NULL) {
-        printf("%s: page not exists.\n", __func__);
+        DEBUG_SendMessageR("%s: page not exists.\n", __func__);
         return;
     }
 
@@ -113,7 +113,10 @@ void PAGE_Renew(Page* page) {
 }
 void PAGE_Draw(const Page* page) {
     // Req Condition
-    if (page == NULL) {printf("%s: page not exists.\n", __func__); return;}
+    if (page == NULL) {
+        DEBUG_SendMessageR("%s: page not exists.\n", __func__);
+        return;
+    }
 
     //
     for (int i = 0; i < PAGE_ELEM_VOLUME; i++) {

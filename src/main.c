@@ -1,8 +1,6 @@
-#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <stdio.h>
 #include <stdarg.h>
 #include "jasmin/jasmin.h"
-#include "jasmin/menu/page/page.h"
 
 
 SDL_Window *window;
@@ -35,11 +33,13 @@ static void INIT() {
     DEBUG_Init(renderer);
     MENU_Init(renderer);
     TEST_Init(renderer);
+    MODEL_InitTestCube();
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
 }
 static void DEINIT() {
     // Jasmin
     MENU_Deinit();
+    MODEL_DeinitTestCube();
 
     // SDL
     SDL_DestroyTexture(background);
@@ -61,8 +61,13 @@ static void RENEW() {
     renewMouse();
     DEBUG_Renew();
 
+    //
+    PIPLINE_RenewView();
+    PIPLINE_RenewProj();
+    PIPLINE_RenewModelVertices(testCube);
+
     // logical renew
-    SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
+    const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
     MENU_Renew(bck_rect);
 }
 static void DRAW() {
@@ -73,8 +78,10 @@ static void DRAW() {
 
     // logical draw
     SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
-    TEST_Draw();
+    // TEST_Draw();
+    PIPLINE_Draw(testCube);
     MENU_Draw();
+
 
     // physical draw
     drawMouse(renderer);

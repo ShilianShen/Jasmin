@@ -87,22 +87,22 @@ static SDL_Texture* ELEM_GetTextureFromString(const char* elemStr) {
 
     //
     SDL_Texture* texture = NULL;
-    const int elemStrLen = strlen(elemStr);
+    const unsigned long elemStrLen = strlen(elemStr);
     switch (elemStr[0]) {
         // 2
         case 'f': {
-            if (elemStrLen <= 2) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
+            if (elemStrLen <= 2) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
             texture = IMG_LoadTexture(elem_renderer, elemStr+2);
             break;
         }
         case 't': {
-            if (elemStrLen <= 2) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
+            if (elemStrLen <= 2) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
             texture = TXT_LoadTexture(elem_renderer, elem_font, elemStr+2, elem_color);
             break;
         }
         // 3
         case 'T': {
-            if (elemStrLen <= 3) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
+            if (elemStrLen <= 3) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
             texture = TXT_LoadTextureWithLines(elem_renderer, elem_font, elemStr+3, elem_color, EMPTY, *(elemStr+1));
             break;
         }
@@ -220,7 +220,7 @@ void ELEM_Unload(Elem* elem) {
 static void ELEM_RenewDstRect(Elem* elem) {
     // Req Condition
     if (ELEM_IfReady(elem) == false) {
-        printf("%s: elem not ready.\n", __func__);
+        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
 
@@ -230,7 +230,7 @@ static void ELEM_RenewDstRect(Elem* elem) {
 static void ELEM_RenewState(Elem* elem) {
     // Req Condition
     if (!ELEM_IfReady(elem)) {
-        printf("%s: elem not ready.\n", __func__);
+        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
 
@@ -262,8 +262,8 @@ static void ELEM_RenewState(Elem* elem) {
 }
 void ELEM_Renew(Elem* elem) {
     // Req Condition
-    if (!ELEM_IfReady(elem)) {
-        printf("%s: elem not ready.\n", __func__);
+    if (ELEM_IfReady(elem) == false) {
+        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
 
@@ -275,8 +275,8 @@ void ELEM_Renew(Elem* elem) {
 
 void ELEM_Draw(const Elem* elem) {
     // Req Condition
-    if (!ELEM_IfReady(elem)) {
-        printf("%s: elem not ready.\n", __func__);
+    if (ELEM_IfReady(elem) == false) {
+        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
     if (elem_renderer == NULL) {printf("%s: menu.renderer is NULL.\n", __func__); return;}
@@ -284,10 +284,16 @@ void ELEM_Draw(const Elem* elem) {
     //
     switch (elem->state) {
         case PRESSED:
-        case RELEASE: {DEBUG_FillRect(&elem->dst_rect); break;}
-        case INSIDE: {DEBUG_DrawRect(&elem->dst_rect); break;}
+        case RELEASE: {
+            DEBUG_FillRect(&elem->dst_rect);
+            break;
+        }
+        case INSIDE: {
+            DEBUG_DrawRect(&elem->dst_rect);
+            break;
+        }
         case OUTSIDE:
-            default: {break;}
+        default: break;
     }
     SDL_RenderTexture(elem_renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
 }

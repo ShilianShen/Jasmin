@@ -7,11 +7,21 @@
 
 
 typedef struct Model {
-    int num; // file
-    int num_bones;  // file
-    Mesh* meshes;   // file
-    Bone* bones;    // file
+    int numVertices;
+    Vec3f* vertices;
+    Vec3f* vertices2;
+    int numFaces;
+    Vec3i* faces;
+    Vec3f translation;
+    Vec3f rotation;
 } Model;
+
+
+extern Model testCube;
+
+
+void MODEL_InitTestCube();
+void MODEL_DeinitTestCube();
 
 
 #endif //JASMIN_LOTRI_MODEL_H

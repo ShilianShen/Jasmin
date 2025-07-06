@@ -8,6 +8,9 @@
 typedef struct Mat4x4f {float m[4][4];} Mat4x4f;
 
 
+extern const Mat4x4f unitMat;
+
+
 Mat4x4f MAT_GetProduct(Mat4x4f, Mat4x4f);
 
 

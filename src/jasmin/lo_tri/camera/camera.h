@@ -6,7 +6,7 @@
 
 
 typedef struct Camera {
-    Vec3f position;
+    Vec3f translation;
     Vec3f rotation;
 } Camera;
 

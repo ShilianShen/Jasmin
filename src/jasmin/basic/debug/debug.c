@@ -216,6 +216,29 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }
+void DEBUG_DrawFace(const float xys[3][2]) {
+    const SDL_FColor color = {
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    // Req Condition
+    if (!debug.on) {
+        return;
+    }
+
+    //
+    SDL_Vertex v[3];
+    for (int i = 0; i < 3; i++) {
+        v[i].position = (SDL_FPoint){xys[i][0], xys[i][1]};
+        v[i].color = color;
+    }
+    SDL_SetRenderDrawBlendMode(debug.renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderGeometry(debug.renderer, NULL, v, 3, NULL, 0);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
+    for (int i = 0; i < 3; i++) {
+        SDL_RenderLine(debug.renderer, xys[i][0], xys[i][1], xys[(i+1)%3][0], xys[(i+1)%3][1]);
+    }
+}
 
 
 static void DEBUG_SendMessage(const int i, const char* newMessage) {
