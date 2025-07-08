@@ -18,6 +18,7 @@ typedef struct Model {
 
 
 extern Model testCube;
+extern Model testAxisXYZ;
 
 
 void MODEL_InitTestCube();

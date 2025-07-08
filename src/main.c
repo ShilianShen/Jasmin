@@ -10,7 +10,7 @@ SDL_Texture* background;
 
 const char WINDOW_TITLE[] = "Test";
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
-bool oftenReload = true;
+bool oftenReload = false;
 bool running = true;
 const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
 SDL_Event event;
@@ -77,7 +77,7 @@ static void DRAW() {
     LOTRI_RenewCamera();
 
     // logical draw
-    SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
+    // SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
     // TEST_Draw();
     PIPLINE_Draw(testCube);
     MENU_Draw();
@@ -101,6 +101,7 @@ int main(int argc, char *argv[]) {
     INIT();
     LOAD();
     while (running) {
+        //
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;

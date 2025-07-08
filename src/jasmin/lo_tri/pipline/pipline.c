@@ -6,10 +6,11 @@ Mat4x4f proj;
 
 
 void PIPLINE_RenewView() {
-    view = MAT_GetProduct(
-        MAT_GetRotation(camera.rotation),
-        MAT_GetTranslation(camera.translation)
-        );
+    view = MAT_GetInvSRT(
+        NULL,
+        &camera.rotation,
+        &camera.translation
+    );
 }
 void PIPLINE_RenewProj() {
     proj = (Mat4x4f){
@@ -22,10 +23,7 @@ void PIPLINE_RenewProj() {
     };
 }
 Mat4x4f PIPLINE_GetWorld(const Vec3f translation, const Vec3f rotation) {
-    const Mat4x4f world = MAT_GetProduct(
-        MAT_GetRotation(rotation),
-        MAT_GetTranslation(translation)
-        );
+    const Mat4x4f world = MAT_GetMatSRT(NULL, &rotation, &translation);
     return world;
 }
 Mat4x4f PIPLINE_GetTran(const Vec3f translation, const Vec3f rotation) {
@@ -39,16 +37,7 @@ Mat4x4f PIPLINE_GetTran(const Vec3f translation, const Vec3f rotation) {
 
 void PIPLINE_RenewModelVertices(const Model model) {
     const Mat4x4f tran = PIPLINE_GetTran(model.translation, model.rotation);
-    // (N * 3) * (3 * 3)
-    for (int i = 0; i < model.numVertices; i++) {
-        for (int j = 0; j < 3; j++) {
-            model.vertices2[i].v[j] = 0;
-            for (int k = 0; k < 3; k++) {
-                model.vertices2[i].v[j] += model.vertices[i].v[k] * tran.m[k][j];
-            }
-            model.vertices2[i].v[j] += tran.m[3][j];
-        }
-    }
+    MAT_LoadProductVecMat(model.numVertices, true, model.vertices2, model.vertices, tran);
 }
 void PIPLINE_Draw(const Model model) {
     float v[3][2];

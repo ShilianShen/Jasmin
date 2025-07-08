@@ -1,5 +1,7 @@
+set(CMAKE_OSX_SYSROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
 cmake_minimum_required(VERSION 3.30)
 project(Lo_Tri C)
+
 
 
 # 设置C标准

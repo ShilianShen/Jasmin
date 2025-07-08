@@ -70,6 +70,12 @@ void DEBUG_Renew() {
             debug.message[i] = NULL;
         }
     }
+
+    //
+    static Uint64 t1 = 0, t2 = 0;
+    t2 = SDL_GetTicks();
+    DEBUG_SendMessageL("%d, %d, FPS: %4.2f\n", t1, t2, 1000.f / (float)(t2 - t1));
+    t1 = SDL_GetTicks();
 }
 
 
@@ -218,7 +224,10 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 }
 void DEBUG_DrawFace(const float xys[3][2]) {
     const SDL_FColor color = {
-        0.f, 0.f, 0.f, 1.f
+        (float)debug.theme.face.r / 256,
+        (float)debug.theme.face.g / 256,
+        (float)debug.theme.face.b / 256,
+        0.1f,
     };
 
     // Req Condition

@@ -2,7 +2,7 @@
 
 
 Model testCube;
-
+Model testAxisXYZ;
 
 
 void MODEL_InitTestCube() {
@@ -21,10 +21,11 @@ void MODEL_InitTestCube() {
             {-0.5f, -0.5f, -0.5f},
 
             {-0.5f, -0.5f,  0.5f},
-            { 0.5f, -0.5f,  0.5f},
+            {0.5f, -0.5f,  0.5f},
             {0.5f,  0.5f,  0.5f},
             {0.5f,  0.5f,  0.5f},
             {-0.5f,  0.5f,  0.5f},
+            {-0.5f, -0.5f,  0.5f},
 
             {-0.5f,  0.5f,  0.5f},
             {-0.5f,  0.5f, -0.5f},

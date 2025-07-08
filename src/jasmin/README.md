@@ -10,6 +10,8 @@ graph LR
 
 Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
+关于此文档可能任然有模糊之处, 可以直接联系我:)
+
 ## 功能 FUNCTION
 
 * debug能力
@@ -17,6 +19,12 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 * 3d模型的渲染
 
 ## 代码风格 CODING-STYLE
+
+### 约束对象
+
+* 标识符
+* 签名
+* 环境
 
 ### 函数标识符
 
@@ -38,6 +46,8 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 ### 参数检查
 
+所谓参数不仅仅是狭义的「传入参数」, 一个函数依赖的所有外部变量/常量都可以叫做参数.
+
 条件检查类型分别为:
 
 * 先决条件, Pre Condition: 调用函数的条件, 条件判断被写到了函数内部, 「不满足先决条件」不被视作「错误」.
@@ -48,3 +58,13 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 * printf: 最泛用的输出方式.
 * DEBUG_SendMessageR: 如果报错是在循环中发生的, 也就是说「在每一次循环中都会发生这样的错误」, 则通过DEBUG_SendMessageR输出到窗口.
+
+### 环境依赖
+
+大部分README.md都会以一个环境依赖图开头.
+
+图中的点线代表:
+
+* 点: 环境.
+* 线(有向, 无名): 被依赖. (例如A -> B为“A被B依赖”或“B依赖A”.)
+* 线(有向, *.c): 谁的源文件在你实现. (例如a.h -- a.c -> b.h为“a.h对应的a.c在b.h处实现”.)
