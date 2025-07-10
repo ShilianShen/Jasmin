@@ -33,6 +33,7 @@ static void INIT() {
     DEBUG_Init(renderer);
     MENU_Init(renderer);
     TEST_Init(renderer);
+    ZBUFFER_Init();
     MODEL_InitTestCube();
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
 }
@@ -40,6 +41,7 @@ static void DEINIT() {
     // Jasmin
     MENU_Deinit();
     MODEL_DeinitTestCube();
+    ZBUFFER_Deinit();
 
     // SDL
     SDL_DestroyTexture(background);
@@ -62,9 +64,8 @@ static void RENEW() {
     DEBUG_Renew();
 
     //
-    PIPLINE_RenewView();
-    PIPLINE_RenewProj();
-    PIPLINE_RenewModelVertices(testCube);
+    PIPLINE_Renew();
+    ZBUFFER_Renew();
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
@@ -79,8 +80,9 @@ static void DRAW() {
     // logical draw
     // SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
     // TEST_Draw();
-    PIPLINE_Draw(testCube);
-    MENU_Draw();
+    ZBUFFER_DrawModel(testCube);
+    ZBUFFER_Draw();
+    // MENU_Draw();
 
 
     // physical draw

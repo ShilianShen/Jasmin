@@ -25,7 +25,7 @@ void DEBUG_DrawRect(const SDL_FRect* rect);
 void DEBUG_FillRect(const SDL_FRect* rect);
 void DEBUG_DrawText(Sint16 x, Sint16 y, const char* text);
 void DEBUG_DrawTextAligned(const char* text, char aligned);
-void DEBUG_DrawFace(const float xys[3][2]);
+void DEBUG_DrawFace(const SDL_Vertex* vertices);
 
 
 void DEBUG_SendMessageL(const char* format, ...);

@@ -24,6 +24,8 @@ void DEBUG_Init(SDL_Renderer* renderer) {
     //
     debug = (Debug){0};
     debug.renderer = renderer;
+    // 设置渲染器的混合模式（启用 Alpha 混合）
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 static void DEBUG_LoadTheme() {
     debug.theme.font24 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 24);
@@ -74,7 +76,7 @@ void DEBUG_Renew() {
     //
     static Uint64 t1 = 0, t2 = 0;
     t2 = SDL_GetTicks();
-    DEBUG_SendMessageL("%d, %d, FPS: %4.2f\n", t1, t2, 1000.f / (float)(t2 - t1));
+    DEBUG_SendMessageL("FPS: %4.2f\n", 1000.f / (float)(t2 - t1));
     t1 = SDL_GetTicks();
 }
 
@@ -222,31 +224,31 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }
-void DEBUG_DrawFace(const float xys[3][2]) {
-    const SDL_FColor color = {
-        (float)debug.theme.face.r / 256,
-        (float)debug.theme.face.g / 256,
-        (float)debug.theme.face.b / 256,
-        0.1f,
-    };
-
-    // Req Condition
-    if (!debug.on) {
-        return;
-    }
+void DEBUG_DrawFace(const SDL_Vertex* vertices) {
+    // Pre Condition
+    if (!debug.on) {return;}
 
     //
+    const float a = 0.1f;
+    const SDL_FColor color = {
+        a * (float)debug.theme.face.r / 256,
+        a * (float)debug.theme.face.g / 256,
+        a * (float)debug.theme.face.b / 256,
+        0.75f
+    };
     SDL_Vertex v[3];
     for (int i = 0; i < 3; i++) {
-        v[i].position = (SDL_FPoint){xys[i][0], xys[i][1]};
+        v[i] = vertices[i];
         v[i].color = color;
     }
-    SDL_SetRenderDrawBlendMode(debug.renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderGeometry(debug.renderer, NULL, v, 3, NULL, 0);
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
+    SDL_FPoint points[4];
     for (int i = 0; i < 3; i++) {
-        SDL_RenderLine(debug.renderer, xys[i][0], xys[i][1], xys[(i+1)%3][0], xys[(i+1)%3][1]);
+        points[i] = vertices[i].position;
     }
+    points[3] = vertices[0].position;
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
+    SDL_RenderLines(debug.renderer, points, 4);
 }
 
 

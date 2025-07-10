@@ -2,7 +2,7 @@
 #define JASMIN_LOTRI_H
 
 
-#include "draw/draw.h"
+#include "zbuffer/zbuffer.h"
 
 
 extern SDL_Vertex vert[3];

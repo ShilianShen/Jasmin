@@ -5,7 +5,7 @@ Camera camera = {(Vec3f){-100, 0, 0}, (Vec3f){0}};
 
 
 void LOTRI_RenewCamera() {
-    const float r = 0.1f, t = 10.f;
+    const float r = 0.001f, t = 0.1f;
 
     camera.rotation.z += r * (float)(keyPressed(SDL_SCANCODE_LEFT) - keyPressed(SDL_SCANCODE_RIGHT));
     camera.rotation.y += r * (float)(keyPressed(SDL_SCANCODE_DOWN) - keyPressed(SDL_SCANCODE_UP));

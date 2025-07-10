@@ -6,11 +6,14 @@
 #include "../camera/camera.h"
 
 
-void PIPLINE_RenewView();
-void PIPLINE_RenewProj();
-Mat4x4f PIPLINE_GetTran(const Vec3f translation, const Vec3f rotation);
-void PIPLINE_RenewModelVertices(const Model model);
-void PIPLINE_Draw(const Model model);
+void PIPLINE_Init();
+void PIPLINE_Deinit();
+
+void PIPLINE_Load();
+void PIPLINE_Unload();
+
+void PIPLINE_Draw();
+void PIPLINE_Renew();
 
 
 #endif //JASMIN_LOTRI_PIPLINE_H

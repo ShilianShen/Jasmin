@@ -35,3 +35,6 @@ Vec3f VEC_GetReciprocal(const Vec3f vec) {
     vec2.z = 1 / vec.z;
     return vec2;
 }
+float VEC_GetMean(const Vec3f vec) {
+    return (vec.x + vec.y + vec.z) / 3;
+}

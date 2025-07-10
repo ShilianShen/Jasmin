@@ -52,8 +52,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/camera/camera.h
         src/jasmin/lo_tri/pipline/pipline.c
         src/jasmin/lo_tri/pipline/pipline.h
-        src/jasmin/lo_tri/draw/draw.c
-        src/jasmin/lo_tri/draw/draw.h
         src/jasmin/lo_tri/model/bone/bone.c
         src/jasmin/lo_tri/model/bone/bone.h
         src/jasmin/lo_tri/model/mesh/mesh.c
@@ -68,6 +66,9 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/math/vec/vec.h
         src/jasmin/menu/menu/menu.c
         src/jasmin/menu/menu/menu.h
+        src/jasmin/lo_tri/zbuffer/zbuffer.c
+        src/jasmin/lo_tri/zbuffer/zbuffer.h
+        src/jasmin/lo_tri/lopo.c
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
