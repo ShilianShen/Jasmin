@@ -6,7 +6,7 @@ graph LR
     trig.h -- trig.c --> menu.h
     elem.h -- elem.c --> elem.h
     page.h -- page.c --> page.h
-    menu.h -- menu.c --> menu.h
+    menu.h -- tempo.c --> menu.h
     ../interface.h --> ../menu.h
 ```
 

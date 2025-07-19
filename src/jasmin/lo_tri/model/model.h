@@ -6,14 +6,6 @@
 #include "bone/bone.h"
 
 
-typedef struct Face {
-    bool on;
-    int indices[3];
-    Vec3f z;
-    Vec3f normal;
-    SDL_Vertex vertices[3];
-} Face;
-
 typedef struct Model {
     // vertices
     int numVertices;

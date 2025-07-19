@@ -61,4 +61,5 @@ void PIPLINE_Renew() {
     PIPLINE_RenewView();
     PIPLINE_RenewProj();
     PIPLINE_RenewModel(testCube);
+    printf("%d\n", SDL_GetVersion());
 }

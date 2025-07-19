@@ -19,17 +19,18 @@ find_package(SDL3 REQUIRED)
 find_package(SDL3_ttf REQUIRED)
 find_package(SDL3_image REQUIRED)
 
+
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        src/jasmin/menu/menu.h
+        src/jasmin/tempo/tempo.h
         src/jasmin/basic/device/device.h
         src/jasmin/basic/debug/debug.h
         src/jasmin/basic/setting/setting.h
 
         # toml/toml.h
         third_party/toml/toml.c
-        src/jasmin/menu/trig/trig.h
-        src/jasmin/menu/elem/elem.h
-        src/jasmin/menu/page/page.h
+        src/jasmin/tempo/trig/trig.h
+        src/jasmin/tempo/elem/elem.h
+        src/jasmin/tempo/page/page.h
         src/jasmin/jasmin.h
         src/jasmin/basic/basic.h
         src/jasmin/basic/setting/setting.c
@@ -37,15 +38,14 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/basic/device/device.c
         src/jasmin/basic/ease/ease.c
         src/jasmin/basic/ease/ease.h
-        src/jasmin/menu/elem/elem.c
-        src/jasmin/menu/interface.h
-        src/jasmin/menu/menu.c
-        src/jasmin/menu/page/page.c
-        src/jasmin/menu/trig/trig.c
+        src/jasmin/tempo/elem/elem.c
+        src/jasmin/tempo/interface.h
+        src/jasmin/tempo/tempo.c
+        src/jasmin/tempo/page/page.c
+        src/jasmin/tempo/trig/trig.c
         src/jasmin/basic/interface.h
         src/jasmin/lo_tri/lo_tri.h
         src/jasmin/lo_tri/interface.h
-        src/jasmin/lo_tri/test.c
         src/jasmin/lo_tri/model/model.c
         src/jasmin/lo_tri/model/model.h
         src/jasmin/lo_tri/camera/camera.c
@@ -64,11 +64,26 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lo_tri/math/mat/mat.h
         src/jasmin/lo_tri/math/vec/vec.c
         src/jasmin/lo_tri/math/vec/vec.h
-        src/jasmin/menu/menu/menu.c
-        src/jasmin/menu/menu/menu.h
+        src/jasmin/tempo/menu/menu.c
+        src/jasmin/tempo/menu/menu.h
         src/jasmin/lo_tri/zbuffer/zbuffer.c
         src/jasmin/lo_tri/zbuffer/zbuffer.h
         src/jasmin/lo_tri/lopo.c
+        src/jasmin/lopo/interface.h
+        src/jasmin/lopo/lopo.c
+        src/jasmin/lopo/lopo.h
+        src/jasmin/lopo/shaders/debugShader.cpp
+        src/maze/maze.c
+        src/maze/maze.h
+        src/maze/interface.h
+        src/maze/monster/monster.c
+        src/maze/monster/monster.h
+        src/maze/gene/gene.c
+        src/maze/gene/gene.h
+        src/maze/block/block.c
+        src/maze/block/block.h
+        src/maze/basic/basic.c
+        src/maze/basic/basic.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

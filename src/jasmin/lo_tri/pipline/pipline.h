@@ -4,6 +4,7 @@
 
 #include "../model/model.h"
 #include "../camera/camera.h"
+#include "../zbuffer/zbuffer.h"
 
 
 void PIPLINE_Init();

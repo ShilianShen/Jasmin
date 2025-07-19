@@ -5,4 +5,4 @@
 #include "../math/math.h"
 
 
-#endif //JASMIN_LOTRI_MODEL_INTERFACE_H
+#endif // JASMIN_LOTRI_MODEL_INTERFACE_H

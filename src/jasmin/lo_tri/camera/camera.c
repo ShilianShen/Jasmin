@@ -9,7 +9,7 @@ void LOTRI_RenewCamera() {
 
     camera.rotation.z += r * (float)(keyPressed(SDL_SCANCODE_LEFT) - keyPressed(SDL_SCANCODE_RIGHT));
     camera.rotation.y += r * (float)(keyPressed(SDL_SCANCODE_DOWN) - keyPressed(SDL_SCANCODE_UP));
-    camera.rotation.x += r * (float)(keyPressed(SDL_SCANCODE_PERIOD) - keyPressed(SDL_SCANCODE_COMMA));
+    camera.rotation.x += r * (float)(keyPressed(SDL_SCANCODE_COMMA) - keyPressed(SDL_SCANCODE_PERIOD));
 
     camera.translation.x += t * (float)(keyPressed(SDL_SCANCODE_W) - keyPressed(SDL_SCANCODE_S));
     camera.translation.y += t * (float)(keyPressed(SDL_SCANCODE_A) - keyPressed(SDL_SCANCODE_D));

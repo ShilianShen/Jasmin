@@ -7,6 +7,20 @@ float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
 
 
+toml_table_t* getToml(const char* tomlPath) {
+    // Req Condition
+    FILE* file = fopen(tomlPath, "r"); // malloc
+    if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
+
+    //
+    toml_table_t* toml = toml_parse_file(file, NULL, 0); // malloc
+    fclose(file); // end malloc
+
+    // Req Condition
+    if (toml == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return NULL;}
+
+    return toml;
+}
 void renewScreenParas(SDL_Window* window) {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);

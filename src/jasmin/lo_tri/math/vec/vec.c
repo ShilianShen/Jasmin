@@ -35,6 +35,13 @@ Vec3f VEC_GetReciprocal(const Vec3f vec) {
     vec2.z = 1 / vec.z;
     return vec2;
 }
-float VEC_GetMean(const Vec3f vec) {
-    return (vec.x + vec.y + vec.z) / 3;
+float VEC_GetMax(const Vec3f vec) {
+    float max = vec.x;
+    if (max < vec.y) {
+        max = vec.y;
+    }
+    if (max < vec.z) {
+        max = vec.z;
+    }
+    return max;
 }

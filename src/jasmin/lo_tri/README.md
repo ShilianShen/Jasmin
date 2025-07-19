@@ -1,14 +1,19 @@
-# Lo_Tri
+# Lo-Po
 
 ```mermaid
-graph LR
-    interface.h --> MATH
-    MATH --> MODEL --> pipline.h
-    MATH -->camera.h --> pipline.h
-    pipline.h --> zbuffer.h --> lo_tri.h
+flowchart LR
+    A --> interface.h
+    subgraph LOPO
+        interface.h --> MATH
+        MATH --> MODEL --> pipline.h
+        MATH --> camera.h --> pipline.h
+        MATH --> zbuffer.h --> pipline.h
+        pipline.h --> lopo.h
+    end
+    lopo.h --> B
 ```
 
-trans: mesh ---> model -> world -> view -> proj
+trans: mesh -> model -> world -> view -> proj
 
 ```mermaid
 graph LR

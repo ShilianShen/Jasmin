@@ -2,7 +2,8 @@
 
 
 ZBuffer zBuffer;
-void ZBUFFER_Init() {
+void ZBUFFER_Init(SDL_Renderer* ren) {
+    renderer = ren;
     zBuffer = (ZBuffer){0};
     zBuffer.numFaces = 100;
     zBuffer.head = 0;
@@ -33,22 +34,22 @@ int compare(const void *a, const void *b) {
     if (global_arr[ia] < global_arr[ib]) return 1;
     return 0;
 }
-void sort_indices_desc(int N, const float arr[], int idx[]) {
+void sort_indices_desc(const int num, const float arr[num], int idx[num]) {
     // 初始化索引数组
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < num; i++) {
         idx[i] = i;
     }
 
     // 设置全局变量并排序
     global_arr = arr;
-    qsort(idx, N, sizeof(int), compare);
+    qsort(idx, num, sizeof(int), compare);
 }
 
 
-void ZBUFFER_DrawModel(const Model model) {
-    for (int i = 0; i < model.numFaces; i++) {
-        zBuffer.faces[zBuffer.head] = &model.faces[i];
-        zBuffer.zs[zBuffer.head] = VEC_GetMean(model.faces[i].z);
+void ZBUFFER_SendFaces(const int num, Face faces[num]) {
+    for (int i = 0; i < num; i++) {
+        zBuffer.faces[zBuffer.head] = &faces[i];
+        zBuffer.zs[zBuffer.head] = VEC_GetMax(faces[i].z);
         zBuffer.head += 1;
     }
 }
@@ -56,10 +57,13 @@ void ZBUFFER_Draw() {
     sort_indices_desc(zBuffer.head, zBuffer.zs, zBuffer.indices);
     for (int i = 0; i < zBuffer.head; i++) {
         const int idx = zBuffer.indices[i];
-        DEBUG_SendMessageR("%.2f, ", zBuffer.zs[idx]);
-        const Face* face = zBuffer.faces[idx];
-        DEBUG_DrawFace(face->vertices);
+        const Face* face = zBuffer.faces[i];
+        if (face->on) {
+            SDL_RenderGeometry(renderer, NULL, face->vertices, 3, NULL, 0);
+        }
+        // DEBUG_DrawFace(zBuffer.faces[idx]->vertices);
     }
+
     DEBUG_SendMessageR("\n");
     DEBUG_SendMessageL("%s: zBuffer.head: %d\n", __func__, zBuffer.head);
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "jasmin/jasmin.h"
+#include "maze/maze.h"
 
 
 SDL_Window *window;
@@ -24,24 +25,27 @@ static void INIT() {
     if (!TTF_Init()) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
     }
-
     if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
 
     // Jasmin
     DEBUG_Init(renderer);
+    LOPO_Init();
     MENU_Init(renderer);
-    TEST_Init(renderer);
-    ZBUFFER_Init();
-    MODEL_InitTestCube();
+
+    MAZE_Init(renderer);
+    //LOTRI_Init(renderer);
+
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
 }
 static void DEINIT() {
     // Jasmin
     MENU_Deinit();
-    MODEL_DeinitTestCube();
-    ZBUFFER_Deinit();
+    LOPO_Deinit();
+    //LOTRI_Deinit();
+
+    MAZE_Deinit();
 
     // SDL
     SDL_DestroyTexture(background);
@@ -51,10 +55,14 @@ static void DEINIT() {
 
 static void LOAD() {
     DEBUG_Load();
+    LOPO_Load();
     MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
+    MAZE_Load();
 }
 static void UNLOAD() {
+    LOPO_Unload();
     MENU_Unload();
+    MAZE_Unload();
 }
 
 static void RENEW() {
@@ -64,8 +72,9 @@ static void RENEW() {
     DEBUG_Renew();
 
     //
-    PIPLINE_Renew();
-    ZBUFFER_Renew();
+    LOPO_Renew();
+    MAZE_Renew();
+    //LOTRI_Renew();
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
@@ -75,14 +84,15 @@ static void DRAW() {
     const static SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
     SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
     SDL_RenderClear(renderer);
-    LOTRI_RenewCamera();
 
     // logical draw
     // SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
     // TEST_Draw();
-    ZBUFFER_DrawModel(testCube);
-    ZBUFFER_Draw();
-    // MENU_Draw();
+    MAZE_Draw();
+    LOPO_Draw();
+    //LOTRI_Draw();
+
+    MENU_Draw();
 
 
     // physical draw
@@ -93,6 +103,7 @@ static void DRAW() {
     //
     SDL_RenderPresent(renderer);
 }
+
 
 int main(int argc, char *argv[]) {
     // window & renderer
@@ -111,6 +122,7 @@ int main(int argc, char *argv[]) {
         }
         RENEW();
         DRAW();
+        // SDL_GPUShader* shader = SDL_CreateGPUShader();
         if (oftenReload) {
             MENU_Unload();
             MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");

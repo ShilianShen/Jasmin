@@ -1,72 +1,15 @@
 #include "elem.h"
 
 
-SDL_Renderer* elem_renderer;
-TTF_Font* elem_font;
-SDL_Color elem_color;
-SDL_FRect elem_bck_rect;
-
-
-void ELEM_Init(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-
-    //
-    *elem = (Elem){0};
-}
-void ELEM_Deinit(const Elem* elem) {
-    // Opt Condition
-    if (elem != NULL) {}
-}
-
-
-void ELEM_TurnOn(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {
-        printf("%s: elem not exists.\n", __func__);
-        return;
-    }
-
-    //
-    elem->on = true;
-}
-void ELEM_TurnOff(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {
-        printf("%s: elem not exists.\n", __func__);
-        return;
-    }
-
-    //
-    elem->on = false;
-}
-bool ELEM_IfReady(const Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {
-        printf("%s: elem not exists.\n", __func__);
-        return false;
-    }
-    if (elem->on == false) {
-        printf("%s: elem is off.\n", __func__);
-        return false;
-    }
-    if (elem->id < 0) {
-        printf("%s: elem.id is illegal.\n", __func__);
-        return false;
-    }
-    if (elem->string == NULL) {
-        printf("%s: elem[%d].string not exists.\n", __func__, elem->id);
-        return false;
-    }
-    if (elem->texture == NULL) {
-        printf("%s: elem[%d].texture not exists.\n", __func__, elem->id);
-        return false;
-    }
-
-    //
-    return true;
-}
-char* ELEM_GetStateName(const ElemState state) {
+// ElemState
+enum ElemState {
+    ELEM_STATE_OUTSIDE,
+    ELEM_STATE_INSIDE,
+    ELEM_STATE_PRESSED,
+    ELEM_STATE_RELEASE,
+    NUM_ELEM_STATES
+};
+static char* ELEM_GetStringFromState(const ElemState state) {
     // Req Condition
     if (state >= NUM_ELEM_STATES) {
         printf("%s: state is illegal.\n", __func__);
@@ -79,6 +22,61 @@ char* ELEM_GetStateName(const ElemState state) {
 }
 
 
+// ElemType
+enum ElemType {
+    ELEM_TYPE_DEFAULT,
+    ELEM_TYPE_PATH,
+    ELEM_TYPE_TEXT,
+    NUM_ELEM_TYPES
+};
+static ElemStrType ELEM_GetTypeFromString(const char* string) {
+    if (strcmp(string, "PATH") == 0) return ELEM_TYPE_PATH;
+    if (strcmp(string, "TEXT") == 0) return ELEM_TYPE_TEXT;
+    return ELEM_TYPE_DEFAULT;
+}
+
+
+// other
+SDL_Renderer* elem_renderer;
+TTF_Font* elem_font;
+SDL_Color elem_color;
+SDL_FRect elem_bck_rect;
+
+
+// Elem
+struct Elem {
+    //
+    int info;
+    int anchor; SDL_FRect gid_rect;
+    TrigFunc trig_func; char* trig_para;
+    char* string;
+    SDL_Texture* texture; SDL_FRect src_rect;
+
+    //
+    bool ok;
+
+    //
+    SDL_FRect dst_rect;
+    ElemState state;
+};
+
+
+void ELEM_SetGidRect(Elem* elem, const SDL_FRect gid_rect) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return;
+    }
+    elem->src_rect = gid_rect;
+}
+
+
+// if
+bool ELEM_IfOk(const Elem* elem) {
+    return elem->ok;
+}
+
+
+// malloc
 static SDL_Texture* ELEM_GetTextureFromString(const char* elemStr) {
     // Req Condition
     if (elemStr == NULL) {printf("%s: elemStr not exist.\n", __func__); return NULL;}
@@ -122,23 +120,23 @@ static void ELEM_LoadGuide(Elem* elem, const toml_array_t* tomlGuide) {
         const toml_datum_t tomlGuideY = toml_double_at(tomlGuide, 1);
         const toml_datum_t tomlGuideW = toml_double_at(tomlGuide, 2);
         const toml_datum_t tomlGuideH = toml_double_at(tomlGuide, 3);
-        elem->guide.x = (float)(tomlGuideX.ok ? tomlGuideX.u.d : 0);
-        elem->guide.y = (float)(tomlGuideY.ok ? tomlGuideY.u.d : 0);
-        elem->guide.w = (float)(tomlGuideW.ok ? tomlGuideW.u.d : 1);
-        elem->guide.h = (float)(tomlGuideH.ok ? tomlGuideH.u.d : 1);
+        elem->gid_rect.x = (float)(tomlGuideX.ok ? tomlGuideX.u.d : 0);
+        elem->gid_rect.y = (float)(tomlGuideY.ok ? tomlGuideY.u.d : 0);
+        elem->gid_rect.w = (float)(tomlGuideW.ok ? tomlGuideW.u.d : 1);
+        elem->gid_rect.h = (float)(tomlGuideH.ok ? tomlGuideH.u.d : 1);
     }
     else {
-        elem->guide.x = 0;
-        elem->guide.y = 0;
-        elem->guide.w = 1;
-        elem->guide.h = 1;
+        elem->gid_rect.x = 0;
+        elem->gid_rect.y = 0;
+        elem->gid_rect.w = 1;
+        elem->gid_rect.h = 1;
     }
 }
 static void ELEM_LoadString(Elem* elem, const toml_datum_t tomlString) {
     // Req Condition
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
     if (!tomlString.ok) {printf("%s: tomlString not exists.\n", __func__); return;}
-    if (elem->string != NULL) {printf("%s: elem[%d].string not free.\n", __func__, elem->id); return;}
+    if (elem->string != NULL) {printf("%s: elem[%d].string not free.\n", __func__, elem->info); return;}
 
     //
     elem->string = strdup(tomlString.u.s);
@@ -182,9 +180,9 @@ static void ELEM_LoadOther(Elem* elem, const toml_table_t* tomlElem, const int t
     elem->trig_func = tomlFuncName.ok ? TRIG_FindFuncFromName(tomlFuncName.u.s) : NULL;
 
     // loadElemIdFromToml
-    elem->id = tomlElemId;
+    elem->info = tomlElemId;
 }
-void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
+static void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     // Req Condition
     if (elem == NULL) {
         printf("%s: elem not exists.\n", __func__);
@@ -201,81 +199,105 @@ void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
     ELEM_LoadPara(elem, toml_string_in(tomlElem, "para"));
     ELEM_LoadString(elem, toml_string_in(tomlElem, "string"));
     ELEM_LoadTexture(elem);
-    ELEM_TurnOn(elem);
+}
+Elem* ELEM_Malloc(const toml_table_t* tomlElem, const int tomlElemId) {
+    Elem* elem = malloc(sizeof(Elem));
+    if (elem == NULL) {
+        printf("malloc failed\n");
+        return NULL;
+    }
+
+    //
+    *elem = (Elem){0};
+    ELEM_Load(elem, tomlElem, tomlElemId);
+    ELEM_RenewOk(elem);
+    return elem;
 }
 
 
-void ELEM_Unload(Elem* elem) {
-    // Req Condition
+// free
+void ELEM_Free(Elem* elem) {
     if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
 
-    //
     if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
     if (elem->trig_para != NULL) {free(elem->trig_para); elem->trig_para = NULL;}
     if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
-    ELEM_TurnOff(elem);
+    free(elem);
 }
 
 
-static void ELEM_RenewDstRect(Elem* elem) {
-    // Req Condition
-    if (ELEM_IfReady(elem) == false) {
-        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
-        return;
-    }
-
-    //
-    SDL_LoadDstRectAligned(&elem->dst_rect, elem->texture, &elem->src_rect, &elem->guide, &elem_bck_rect, elem->anchor);
-}
-static void ELEM_RenewState(Elem* elem) {
-    // Req Condition
-    if (!ELEM_IfReady(elem)) {
-        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
-        return;
-    }
-
-    //
-    const bool mouseIn = mouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
-    if (elem->state == PRESSED) {
-        DEBUG_SendMessageL("elem.on: %d\n", elem->on);
-        DEBUG_SendMessageL("elem.id: %d\n", elem->id);
-        DEBUG_SendMessageL("elem.state: %s\n", ELEM_GetStateName(elem->state));
-        if (elem->trig_func != NULL) {
-            DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
-        }
-    }
-    if (elem->state == PRESSED && mouseIn == true && mouseLeftIn == false) {
-        elem->state = RELEASE;
-    }
-    else {
-        if (mouseIn == true) {
-            elem->state = mouseLeftIn ? PRESSED : INSIDE;
-        }
-        else {
-            elem->state = OUTSIDE;
-        }
-    }
-    if (elem->state == RELEASE && elem->trig_func != NULL) {
-        elem->trig_func(elem->trig_para);
-    }
-}
+// renew
 void ELEM_Renew(Elem* elem) {
     // Req Condition
-    if (ELEM_IfReady(elem) == false) {
+    if (elem->ok != true) {
         DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
 
-    //
-    ELEM_RenewDstRect(elem);
-    ELEM_RenewState(elem);
+    // ELEM_RenewDstRect
+    SDL_LoadDstRectAligned(
+        &elem->dst_rect,
+        elem->texture,
+        &elem->src_rect,
+        &elem->gid_rect,
+        &elem_bck_rect,
+        elem->anchor
+        );
+
+    // ELEM_RenewState
+    {
+        const bool mouseIn = mouseInRect(&elem->dst_rect);
+        const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
+        if (elem->state == ELEM_STATE_PRESSED) {
+            DEBUG_SendMessageL("elem.on: %d\n", elem->ok);
+            DEBUG_SendMessageL("elem.id: %d\n", elem->info);
+            DEBUG_SendMessageL("elem.state: %s\n", ELEM_GetStringFromState(elem->state));
+            if (elem->trig_func != NULL) {
+                DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
+            }
+        }
+        if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
+            elem->state = ELEM_STATE_RELEASE;
+        }
+        else {
+            if (mouseIn == true) {
+                elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
+            }
+            else {
+                elem->state = ELEM_STATE_OUTSIDE;
+            }
+        }
+        if (elem->state == ELEM_STATE_RELEASE && elem->trig_func != NULL) {
+            elem->trig_func(elem->trig_para);
+        }
+    }
+}
+void ELEM_RenewOk(Elem* elem) {
+    if (elem == NULL) {
+        printf("%s: elem not exists.\n", __func__);
+        return;
+    }
+    elem->ok = false;
+    if (elem->info < 0) {
+        printf("%s: elem.id is illegal.\n", __func__);
+        return;
+    }
+    if (elem->string == NULL) {
+        printf("%s: elem[%d].string not exists.\n", __func__, elem->info);
+        return;
+    }
+    if (elem->texture == NULL) {
+        printf("%s: elem[%d].texture not exists.\n", __func__, elem->info);
+        return;
+    }
+    elem->ok = true;
 }
 
 
+// draw
 void ELEM_Draw(const Elem* elem) {
     // Req Condition
-    if (ELEM_IfReady(elem) == false) {
+    if (elem->ok != true) {
         DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
@@ -283,16 +305,16 @@ void ELEM_Draw(const Elem* elem) {
 
     //
     switch (elem->state) {
-        case PRESSED:
-        case RELEASE: {
+        case ELEM_STATE_PRESSED:
+        case ELEM_STATE_RELEASE: {
             DEBUG_FillRect(&elem->dst_rect);
             break;
         }
-        case INSIDE: {
+        case ELEM_STATE_INSIDE: {
             DEBUG_DrawRect(&elem->dst_rect);
             break;
         }
-        case OUTSIDE:
+        case ELEM_STATE_OUTSIDE:
         default: break;
     }
     SDL_RenderTexture(elem_renderer, elem->texture, &elem->src_rect, &elem->dst_rect);

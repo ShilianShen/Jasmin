@@ -2,14 +2,17 @@
 #define JASMIN_LOTRI_H
 
 
-#include "zbuffer/zbuffer.h"
+#include "interface.h"
 
 
-extern SDL_Vertex vert[3];
+void LOTRI_Init(SDL_Renderer* renderer);
+void LOTRI_Deinit();
 
+void LOTRI_Load();
+void LOTRI_Unload();
 
-void TEST_Init();
-void TEST_Draw();
+void LOTRI_Renew();
+void LOTRI_Draw();
 
 
 #endif //JASMIN_LOTRI_H

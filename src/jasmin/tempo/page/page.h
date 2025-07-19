@@ -5,18 +5,18 @@
 #include "../elem/elem.h"
 
 
-#define PAGE_ELEM_VOLUME 16
+// #define PAGE_ELEM_VOLUME 16
 
 
 typedef struct Page {
+    bool ok;
     int id; // id < 0 means it's off
     char* name; // malloc in LOAD
-    Elem elems[PAGE_ELEM_VOLUME];
+    int numElems;
+    Elem** elems;
 } Page;
 
 
-void PAGE_Init(Page* page);
-void PAGE_Deinit(const Page* page);
 void PAGE_Load(Page* page, const char* name, const toml_table_t* tomlPage);
 void PAGE_Unload(Page* page);
 void PAGE_Renew(Page* page);

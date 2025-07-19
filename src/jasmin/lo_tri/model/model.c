@@ -33,24 +33,30 @@ void MODEL_InitTestCube() {
     testCube.faces = malloc(testCube.numFaces * sizeof(Face)); // malloc
     {
         const int indices[12][3] = {
-            {0, 1, 2},
-            {1, 2, 3},
-            {4, 5, 6},
-            {5, 6, 7},
+            {0, 2, 1}, {1, 2, 3},
+            {4, 5, 6}, {6, 5, 7},
 
-            {0, 1, 4},
-            {1, 4, 5},
-            {2, 3, 6},
-            {3, 6, 7},
+            {0, 4, 1}, {1, 4, 5},
+            {2, 3, 6}, {6, 3, 7},
 
-            {0, 2, 4},
-            {2, 4, 6},
-            {1, 3, 5},
-            {3, 5, 7},
+            {0, 4, 2}, {2, 4, 6},
+            {1, 5, 3}, {3, 5, 7},
         };
         for (int i = 0; i < testCube.numFaces; i++) {
             for (int j = 0; j < 3; j++) {
                 testCube.faces[i].indices[j] = indices[i][j];
+            }
+        }
+        const float r = 0.9f, g = 0.9f, b = 0.0f;
+        const SDL_FColor c[6] = {
+            {1.0f, 0, 0, r}, {0.5f, 0, 0, r},
+            {0, 1.0f, 0, g}, {0, 0.5f, 0, g},
+            {0, 0, 1.0f, b}, {0, 0, 0.5f, b},
+        };
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 6; j++) {
+                testCube.faces[2 * j].vertices[i].color = c[j];
+                testCube.faces[2 * j + 1].vertices[i].color = c[j];
             }
         }
     }

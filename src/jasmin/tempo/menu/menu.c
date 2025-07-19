@@ -23,16 +23,16 @@ void MENU_Init(SDL_Renderer* renderer) {
         return;
     }
     if (menu.pageRoot != NULL) {
-        printf("%s: menu.pageRoot shouldn't exist.\n", __func__);
+        printf("%s: tempo.pageRoot shouldn't exist.\n", __func__);
         return;
     }
     if (menu.pageEdge != NULL) {
-        printf("%s: menu.pageEdge shouldn't exist.\n", __func__);
+        printf("%s: tempo.pageEdge shouldn't exist.\n", __func__);
         return;
     }
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            printf("%s: menu.pages[%d] shouldn't exist.\n", __func__, i);
+            printf("%s: tempo.pages[%d] shouldn't exist.\n", __func__, i);
             return;
         }
     }
@@ -42,12 +42,9 @@ void MENU_Init(SDL_Renderer* renderer) {
     menu.renderer = renderer;
     menu.pageRoot = malloc(sizeof(Page)); // malloc pageRoot
     menu.pageEdge = malloc(sizeof(Page)); // malloc pageEdge
-    PAGE_Init(menu.pageRoot);
-    PAGE_Init(menu.pageEdge);
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] == NULL) {
             menu.pages[i] = malloc(sizeof(Page)); // malloc pages
-            PAGE_Init(menu.pages[i]);
         }
     }
     elem_renderer = menu.renderer;
@@ -55,37 +52,21 @@ void MENU_Init(SDL_Renderer* renderer) {
 void MENU_Deinit() {
     // Opt Condition
     if (menu.pageRoot != NULL) {
-        PAGE_Deinit(menu.pageRoot);
         free(menu.pageRoot); // free pageRoot
         menu.pageRoot = NULL;
     }
     if (menu.pageEdge != NULL) {
-        PAGE_Deinit(menu.pageEdge);
         free(menu.pageEdge); // free pageEdge
         menu.pageEdge = NULL;
     }
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            PAGE_Deinit(menu.pages[i]);
             free(menu.pages[i]); // free pages
             menu.pages[i] = NULL;
         }
     }
 }
-static toml_table_t* getToml(const char* tomlPath) {
-    // Req Condition
-    FILE* file = fopen(tomlPath, "r"); // malloc
-    if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
 
-    //
-    toml_table_t* toml = toml_parse_file(file, NULL, 0); // malloc
-    fclose(file); // end malloc
-
-    // Req Condition
-    if (toml == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return NULL;}
-
-    return toml;
-}
 static void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
     if (menu.theme.font != NULL) {
@@ -202,7 +183,7 @@ void MENU_Unload() {
 static void MENU_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("menu.path: /%s", menu.pageRoot->name);
+    DEBUG_SendMessageL("tempo.path: /%s", menu.pageRoot->name);
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear) {
             menu.path[i] = 0;
