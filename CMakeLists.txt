@@ -84,6 +84,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/maze/block/block.h
         src/maze/basic/basic.c
         src/maze/basic/basic.h
+        src/jasmin/tempo/basic/basic.c
+        src/jasmin/tempo/basic/basic.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

@@ -13,7 +13,7 @@ struct Debug {
     } theme;
     char* message[2];  // malloc or NULL
 } debug;
-const int MESSAGE_SIZE_MAX = 64;
+const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
 
 

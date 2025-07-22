@@ -18,6 +18,8 @@ extern int windowWidth, windowHeight;
 extern float scale_x, scale_y;
 extern SDL_Color EMPTY;
 
+
+void SDL_PrintFRect(SDL_FRect rect);
 toml_table_t* getToml(const char* tomlPath);
 void renewScreenParas(SDL_Window* window);
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_Color color);

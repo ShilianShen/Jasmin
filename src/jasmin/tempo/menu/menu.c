@@ -8,17 +8,17 @@ const char MENU_EDGE_NAME[] = "Edge";
 Menu menu;
 
 
-static Page* MENU_getPageFromPathId(const int pathId) {
+static Page* TEMPO_getPageFromMenuPathId(const int pathId) {
     return menu.pages[menu.path[pathId]];
 }
-static Page* MENU_GetPageFromPageId(const int pageId) {
+static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
     return menu.pages[pageId];
 }
 
 
-void MENU_Init(SDL_Renderer* renderer) {
+void TEMPO_InitMenu() {
     // Req Condition
-    if (renderer == NULL) {
+    if (tempoRenderer == NULL) {
         printf("%s: renderer not exists.\n", __func__);
         return;
     }
@@ -39,7 +39,7 @@ void MENU_Init(SDL_Renderer* renderer) {
 
     //
     menu = (Menu){0};
-    menu.renderer = renderer;
+    menu.renderer = tempoRenderer;
     menu.pageRoot = malloc(sizeof(Page)); // malloc pageRoot
     menu.pageEdge = malloc(sizeof(Page)); // malloc pageEdge
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
@@ -47,9 +47,9 @@ void MENU_Init(SDL_Renderer* renderer) {
             menu.pages[i] = malloc(sizeof(Page)); // malloc pages
         }
     }
-    elem_renderer = menu.renderer;
+    tempoRenderer = menu.renderer;
 }
-void MENU_Deinit() {
+void TEMPO_DeinitMenu() {
     // Opt Condition
     if (menu.pageRoot != NULL) {
         free(menu.pageRoot); // free pageRoot
@@ -67,7 +67,7 @@ void MENU_Deinit() {
     }
 }
 
-static void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
+static void TEMPO_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
     if (menu.theme.font != NULL) {
         printf("%s: theme.font not free.\n", __func__); return;
@@ -80,13 +80,14 @@ static void MENU_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_d
     }
 
     //
-    menu.theme.font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d);
-    if (menu.theme.font == NULL) {
+    TTF_Font* font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d);
+    if (font == NULL) {
         printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);
     }
-    elem_font = menu.theme.font;
+    TEMPO_SetBasicFont(font);
+    menu.theme.font = font;
 }
-static void MENU_LoadMenuThemeColor(const toml_array_t* tomlColor) {
+static void TEMPO_LoadMenuThemeColor(const toml_array_t* tomlColor) {
     // Req Condition
     if (tomlColor == NULL) {
         printf("%s: tomlColor not exists.\n", __func__);
@@ -103,9 +104,8 @@ static void MENU_LoadMenuThemeColor(const toml_array_t* tomlColor) {
     menu.theme.color.g = color[1];
     menu.theme.color.b = color[2];
     menu.theme.color.a = color[3];
-    elem_color = menu.theme.color;
 }
-static void MENU_LoadMenuTheme(const char* tomlPath) {
+static void TEMPO_LoadMenuTheme(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenuTheme = getToml(tomlPath); // malloc tomlMenuTheme
     if (tomlMenuTheme == NULL) {
@@ -117,13 +117,13 @@ static void MENU_LoadMenuTheme(const char* tomlPath) {
     const toml_datum_t tomlFontPath = toml_string_in(tomlMenuTheme, "font_path");
     const toml_datum_t tomlFontSize = toml_double_in(tomlMenuTheme, "font_size");
     const toml_array_t* tomlColor = toml_array_in(tomlMenuTheme, "font_color");
-    MENU_LoadMenuThemeFont(tomlFontPath, tomlFontSize);
-    MENU_LoadMenuThemeColor(tomlColor);
+    TEMPO_LoadMenuThemeFont(tomlFontPath, tomlFontSize);
+    TEMPO_LoadMenuThemeColor(tomlColor);
 
     //
     toml_free(tomlMenuTheme); // free tomlMenuTheme
 }
-static void MENU_LoadMenuPages(const char* tomlPath) {
+static void TEMPO_LoadMenuPages(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
@@ -154,23 +154,22 @@ static void MENU_LoadMenuPages(const char* tomlPath) {
     //
     toml_free(tomlMenu); // end malloc
 }
-void MENU_Load(const char* menuPagesPath, const char* menuThemePath) {
+void TEMPO_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
     //
-    MENU_LoadMenuTheme(menuThemePath);
-    MENU_LoadMenuPages(menuPagesPath);
-    elem_color = menu.theme.color;
-    elem_font = menu.theme.font;
+    TEMPO_LoadMenuTheme(menuThemePath);
+    TEMPO_LoadMenuPages(menuPagesPath);
 }
-static void MENU_UnloadMenuTheme() {
+
+static void TEMPO_UnloadMenuTheme() {
     if (menu.theme.font != NULL) {
         TTF_CloseFont(menu.theme.font);
         menu.theme.font = NULL;
     }
 }
-void MENU_Unload() {
+void TEMPO_UnloadMenu() {
     PAGE_Unload(menu.pageRoot);
     PAGE_Unload(menu.pageEdge);
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
@@ -178,9 +177,10 @@ void MENU_Unload() {
             PAGE_Unload(menu.pages[i]);
         }
     }
-    MENU_UnloadMenuTheme();
+    TEMPO_UnloadMenuTheme();
 }
-static void MENU_RenewMenuPath() {
+
+static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
     DEBUG_SendMessageL("tempo.path: /%s", menu.pageRoot->name);
@@ -188,11 +188,11 @@ static void MENU_RenewMenuPath() {
         if (need_clear) {
             menu.path[i] = 0;
         }
-        else if (MENU_getPageFromPathId(i) == NULL) {
+        else if (TEMPO_getPageFromMenuPathId(i) == NULL) {
             need_clear = true;
         }
         else {
-            DEBUG_SendMessageL("/%s", MENU_getPageFromPathId(i)->name);
+            DEBUG_SendMessageL("/%s", TEMPO_getPageFromMenuPathId(i)->name);
         }
     }
     if (need_clear == false) {
@@ -200,30 +200,30 @@ static void MENU_RenewMenuPath() {
     }
     DEBUG_SendMessageL("\n");
 }
-static void MENU_RenewMenuPageNow() {
+static void TEMPO_RenewMenuPageNow() {
     // if pageRoot
-    if (MENU_getPageFromPathId(0) == NULL) {
+    if (TEMPO_getPageFromMenuPathId(0) == NULL) {
         menu.pageNow = menu.pageRoot;
         return;
     }
     // else if pageOther
     for (int i = 0; i + 1 < MENU_PATH_VOLUME; i++) {
-        if (MENU_getPageFromPathId(i) != NULL && MENU_getPageFromPathId(i+1) == NULL) {
-            menu.pageNow = MENU_getPageFromPathId(i);
+        if (TEMPO_getPageFromMenuPathId(i) != NULL && TEMPO_getPageFromMenuPathId(i+1) == NULL) {
+            menu.pageNow = TEMPO_getPageFromMenuPathId(i);
             return;
         }
     }
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-void MENU_Renew(const SDL_FRect bck_rect) {
+void TEMPO_RenewMenu(const SDL_FRect bck_rect) {
     static bool need_load = true;
-    MENU_RenewMenuPath();
-    MENU_RenewMenuPageNow();
+    TEMPO_RenewMenuPath();
+    TEMPO_RenewMenuPageNow();
     PAGE_Renew(menu.pageNow);
     menu.bck_rect = bck_rect;
-    elem_bck_rect = menu.bck_rect;
 }
-void MENU_Draw() {
+
+void TEMPO_DrawMenu() {
     PAGE_Draw(menu.pageNow);
 }

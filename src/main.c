@@ -32,7 +32,8 @@ static void INIT() {
     // Jasmin
     DEBUG_Init(renderer);
     LOPO_Init();
-    MENU_Init(renderer);
+    TEMPO_SetBasicRenderer(renderer);
+    TEMPO_InitMenu();
 
     MAZE_Init(renderer);
     //LOTRI_Init(renderer);
@@ -41,7 +42,7 @@ static void INIT() {
 }
 static void DEINIT() {
     // Jasmin
-    MENU_Deinit();
+    TEMPO_DeinitMenu();
     LOPO_Deinit();
     //LOTRI_Deinit();
 
@@ -56,12 +57,12 @@ static void DEINIT() {
 static void LOAD() {
     DEBUG_Load();
     LOPO_Load();
-    MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
+    TEMPO_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
     MAZE_Load();
 }
 static void UNLOAD() {
     LOPO_Unload();
-    MENU_Unload();
+    TEMPO_UnloadMenu();
     MAZE_Unload();
 }
 
@@ -78,7 +79,8 @@ static void RENEW() {
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
-    MENU_Renew(bck_rect);
+    TEMPO_SetBasicBckRect(bck_rect);
+    TEMPO_RenewMenu(bck_rect);
 }
 static void DRAW() {
     const static SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
@@ -92,7 +94,7 @@ static void DRAW() {
     LOPO_Draw();
     //LOTRI_Draw();
 
-    MENU_Draw();
+    // TEMPO_DrawMenu();
 
 
     // physical draw
@@ -124,8 +126,8 @@ int main(int argc, char *argv[]) {
         DRAW();
         // SDL_GPUShader* shader = SDL_CreateGPUShader();
         if (oftenReload) {
-            MENU_Unload();
-            MENU_Load("../src/menu_pages.toml", "../src/menu_theme.toml");
+            TEMPO_UnloadMenu();
+            TEMPO_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
         }
     }
     UNLOAD();

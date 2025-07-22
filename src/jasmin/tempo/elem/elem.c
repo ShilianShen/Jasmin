@@ -1,7 +1,10 @@
 #include "elem.h"
 
 
-// ElemState
+const SDL_FRect ELEM_DEFAULT_GID_RECT = {0, 0, 1, 1};
+
+
+// ELEM_STATE ==========================================================================================================
 enum ElemState {
     ELEM_STATE_OUTSIDE,
     ELEM_STATE_INSIDE,
@@ -9,7 +12,7 @@ enum ElemState {
     ELEM_STATE_RELEASE,
     NUM_ELEM_STATES
 };
-static char* ELEM_GetStringFromState(const ElemState state) {
+static char* TEMPO_GetStringFromElemState(const ElemState state) {
     // Req Condition
     if (state >= NUM_ELEM_STATES) {
         printf("%s: state is illegal.\n", __func__);
@@ -22,300 +25,340 @@ static char* ELEM_GetStringFromState(const ElemState state) {
 }
 
 
-// ElemType
-enum ElemType {
-    ELEM_TYPE_DEFAULT,
-    ELEM_TYPE_PATH,
-    ELEM_TYPE_TEXT,
-    NUM_ELEM_TYPES
-};
-static ElemStrType ELEM_GetTypeFromString(const char* string) {
-    if (strcmp(string, "PATH") == 0) return ELEM_TYPE_PATH;
-    if (strcmp(string, "TEXT") == 0) return ELEM_TYPE_TEXT;
+// ELEM_TYPE ===========================================================================================================
+char* elemTypeStrings[NUM_ELEM_TYPES] = {"NULL", "FILE", "TEXT"};
+static ElemType TEMPO_GetElemTypeFromString(const char* string) {
+    for (int i = 0; i < NUM_ELEM_TYPES; i++) {
+        if (strcmp(string, elemTypeStrings[i]) == 0) {
+            return i;
+        }
+    }
     return ELEM_TYPE_DEFAULT;
+}
+static char* TEMPO_GetStringFromElemType(const ElemType type) {
+    if (type >= NUM_ELEM_TYPES) {
+        printf("%s: type is illegal.\n", __func__);
+        return NULL;
+    }
+    return elemTypeStrings[type];
 }
 
 
 // other
-SDL_Renderer* elem_renderer;
-TTF_Font* elem_font;
-SDL_Color elem_color;
-SDL_FRect elem_bck_rect;
+bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array) {
+    if (rect == NULL) {
+        printf("%s: rect is null.\n", __func__);
+        return false;
+    }
+    if (array == NULL) {
+        printf("%s: array is null.\n", __func__);
+        return false;
+    }
+    const toml_datum_t x = toml_double_at(array, 0);
+    const toml_datum_t y = toml_double_at(array, 1);
+    const toml_datum_t w = toml_double_at(array, 2);
+    const toml_datum_t h = toml_double_at(array, 3);
+    if (x.ok && y.ok && w.ok && h.ok) {
+        *rect = (SDL_FRect){(float)x.u.d, (float)y.u.d, (float)w.u.d, (float)h.u.d};
+        return true;
+    }
+    return false;
+}
 
 
-// Elem
+// ELEM ================================================================================================================
 struct Elem {
-    //
-    int info;
+    // read
+    ElemType type; char* info;
     int anchor; SDL_FRect gid_rect;
     TrigFunc trig_func; char* trig_para;
-    char* string;
+
+    // create
     SDL_Texture* texture; SDL_FRect src_rect;
+    bool ok; // ok为true意味着可以正常renew和draw
 
-    //
-    bool ok;
-
-    //
+    // renew
     SDL_FRect dst_rect;
     ElemState state;
+    bool visible;
 };
 
 
-void ELEM_SetGidRect(Elem* elem, const SDL_FRect gid_rect) {
+// SET & GET ===========================================================================================================
+void TEMPO_SetElemGidRect(Elem* elem, const SDL_FRect gid_rect) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return;
     }
-    elem->src_rect = gid_rect;
+    elem->gid_rect = gid_rect;
 }
-
-
-// if
-bool ELEM_IfOk(const Elem* elem) {
+void TEMPO_SetElemDstRect(Elem* elem, const SDL_FRect dst_rect) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return;
+    }
+    elem->dst_rect = dst_rect;
+}
+void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return;
+    }
+    *dst_rect = elem->dst_rect;
+}
+bool TEMPO_GetElemOk(const Elem* elem) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return false;
+    }
     return elem->ok;
 }
 
 
-// malloc
-static SDL_Texture* ELEM_GetTextureFromString(const char* elemStr) {
-    // Req Condition
-    if (elemStr == NULL) {printf("%s: elemStr not exist.\n", __func__); return NULL;}
-    if (elemStr[0] == '\0') {printf("%s: elemStr[%p] isn't legal.\n", __func__, elemStr); return NULL;}
-    if (strlen(elemStr) <= 2) {printf("%s: elemStr[%s] isn't legal.\n", __func__, elemStr); return NULL;}
-
-    //
-    SDL_Texture* texture = NULL;
-    const unsigned long elemStrLen = strlen(elemStr);
-    switch (elemStr[0]) {
-        // 2
-        case 'f': {
-            if (elemStrLen <= 2) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
-            texture = IMG_LoadTexture(elem_renderer, elemStr+2);
-            break;
-        }
-        case 't': {
-            if (elemStrLen <= 2) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
-            texture = TXT_LoadTexture(elem_renderer, elem_font, elemStr+2, elem_color);
-            break;
-        }
-        // 3
-        case 'T': {
-            if (elemStrLen <= 3) {printf("%s: elemStr[%s] is illegal.\n", __func__, elemStr); return NULL;}
-            texture = TXT_LoadTextureWithLines(elem_renderer, elem_font, elemStr+3, elem_color, EMPTY, *(elemStr+1));
-            break;
-        }
-        default: {texture = NULL; break;}
+// CREATE ==============================================================================================================
+static void TEMPO_CreateElem_CheckOk(Elem* elem) {
+    elem->ok = false;
+    if (elem->info == NULL) {
+        printf("%s: elem.string not exists.\n", __func__);
+        return;
     }
-    if (texture == NULL) {printf("%s: failed from \"%s\".\n", __func__, elemStr);}
-
-    return texture;
+    if (elem->texture == NULL) {
+        printf("%s: elem[%s].texture not exists.\n", __func__, elem->info);
+        return;
+    }
+    elem->ok = true;
 }
-static void ELEM_LoadGuide(Elem* elem, const toml_array_t* tomlGuide) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
+Elem* TEMPO_CreateElem(
+    const ElemType type,
+    const char* info,
+    const int anchor,
+    const SDL_FRect* gid_rect,
+    const TrigFunc trig_func,
+    const char* trig_para
+    )
+{
+    if (info == NULL) {
+        printf("%s: info is null.\n", __func__);
+        return NULL;
+    } // Req Condition
 
-    // Opt Condition
-    if (tomlGuide != NULL) {
-        const toml_datum_t tomlGuideX = toml_double_at(tomlGuide, 0);
-        const toml_datum_t tomlGuideY = toml_double_at(tomlGuide, 1);
-        const toml_datum_t tomlGuideW = toml_double_at(tomlGuide, 2);
-        const toml_datum_t tomlGuideH = toml_double_at(tomlGuide, 3);
-        elem->gid_rect.x = (float)(tomlGuideX.ok ? tomlGuideX.u.d : 0);
-        elem->gid_rect.y = (float)(tomlGuideY.ok ? tomlGuideY.u.d : 0);
-        elem->gid_rect.w = (float)(tomlGuideW.ok ? tomlGuideW.u.d : 1);
-        elem->gid_rect.h = (float)(tomlGuideH.ok ? tomlGuideH.u.d : 1);
+
+    Elem* elem = malloc(sizeof(Elem)); // malloc
+    if (elem == NULL) {
+        printf("%s: malloc failed\n", __func__);
+        return NULL;
+    } // Req Condition
+
+
+    *elem = (Elem){0};
+
+
+    elem->type = type;
+    elem->info = strdup(info); // malloc
+    if (elem->info == NULL) {
+        printf("%s: failed to malloc from \"%s\".\n", __func__, info);
+        return elem;
+    } // Req Condition
+
+
+    elem->anchor = anchor;
+    if (gid_rect != NULL) {
+        elem->gid_rect = *gid_rect;
     }
     else {
-        elem->gid_rect.x = 0;
-        elem->gid_rect.y = 0;
-        elem->gid_rect.w = 1;
-        elem->gid_rect.h = 1;
+        elem->gid_rect = ELEM_DEFAULT_GID_RECT;
     }
-}
-static void ELEM_LoadString(Elem* elem, const toml_datum_t tomlString) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (!tomlString.ok) {printf("%s: tomlString not exists.\n", __func__); return;}
-    if (elem->string != NULL) {printf("%s: elem[%d].string not free.\n", __func__, elem->info); return;}
 
-    //
-    elem->string = strdup(tomlString.u.s);
 
-    // Req Condition
-    if (elem->string == NULL) {printf("%s: failed to malloc from \"%s\".\n", __func__, tomlString.u.s);}
-}
-static void ELEM_LoadPara(Elem* elem, const toml_datum_t tomlPara) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->trig_para != NULL) {printf("%s: elem.para not freed.\n", __func__); return;}
+    elem->trig_func = trig_func;
+    if (trig_para != NULL) {
+        elem->trig_para = strdup(trig_para); // malloc
+        if (elem->trig_para == NULL) {
+            printf("%s: failed to malloc from \"%s\".\n", __func__, trig_para);
+            return elem;
+        } // Req Condition
+    } // Opt Condition
 
-    // Opt Condition
-    elem->trig_para = tomlPara.ok ? strdup(tomlPara.u.s) : NULL;
-}
-static void ELEM_LoadTexture(Elem* elem) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (elem->texture != NULL) {printf("%s: elem.texture not free.\n", __func__); return;}
 
-    //
-    elem->texture = ELEM_GetTextureFromString(elem->string);
+    switch (type) {
+        case ELEM_TYPE_FILE: {
+            elem->texture = IMG_LoadTexture(tempoRenderer, elem->info); // malloc
+            break;
+        }
+        case ELEM_TYPE_TEXT: {
+            elem->texture = TXT_LoadTextureWithLines(tempoRenderer, tempoTextFont, elem->info, (SDL_Color){255, 255, 255, 255}, EMPTY, 'C'); // malloc
+            break;
+        }
+        default: {
+            elem->texture = NULL;
+            break;
+        }
+    }
+    if (elem->texture == NULL) {
+        printf("%s: failed from \"%s\".\n", __func__, elem->info);
+        return elem;
+    } // Req Condition
     SDL_SetTextureScaleMode(elem->texture, SDL_SCALEMODE_NEAREST);
 
-    //
+
     float w, h;
     SDL_GetTextureSize(elem->texture, &w, &h);
     elem->src_rect = (SDL_FRect){0, 0, w, h};
+
+
+    TEMPO_CreateElem_CheckOk(elem);
+    return elem;
 }
-static void ELEM_LoadOther(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
-    // Req Condition
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-    if (tomlElem == NULL) {printf("%s: tomlElem not exists.\n", __func__); return;}
-
-    // loadElemAnchorFromToml
-    const toml_datum_t tomlAnchor = toml_int_in(tomlElem, "anchor");
-    elem->anchor = (int)(tomlAnchor.ok ? tomlAnchor.u.i : 0);
-
-    // loadElemFuncFromToml
-    const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
-    elem->trig_func = tomlFuncName.ok ? TRIG_FindFuncFromName(tomlFuncName.u.s) : NULL;
-
-    // loadElemIdFromToml
-    elem->info = tomlElemId;
-}
-static void ELEM_Load(Elem* elem, const toml_table_t* tomlElem, const int tomlElemId) {
-    // Req Condition
-    if (elem == NULL) {
-        printf("%s: elem not exists.\n", __func__);
-        return;
-    }
+Elem* TEMPO_CreateElemFromToml(const toml_table_t* tomlElem) {
     if (tomlElem == NULL) {
         printf("%s: tomlElem not exists.\n", __func__);
-        return;
-    }
-
-    //
-    ELEM_LoadOther(elem, tomlElem, tomlElemId);
-    ELEM_LoadGuide(elem, toml_array_in(tomlElem, "guide"));
-    ELEM_LoadPara(elem, toml_string_in(tomlElem, "para"));
-    ELEM_LoadString(elem, toml_string_in(tomlElem, "string"));
-    ELEM_LoadTexture(elem);
-}
-Elem* ELEM_Malloc(const toml_table_t* tomlElem, const int tomlElemId) {
-    Elem* elem = malloc(sizeof(Elem));
-    if (elem == NULL) {
-        printf("malloc failed\n");
         return NULL;
     }
 
+    // type
+    const toml_datum_t tomlType = toml_string_in(tomlElem, "type");
+    const ElemType type = TEMPO_GetElemTypeFromString(tomlType.ok ? tomlType.u.s : NULL);
+
+    // info
+    const toml_datum_t tomlInfo = toml_string_in(tomlElem, "info");
+    if (!tomlInfo.ok) {
+        printf("%s: tomlString not exists.\n", __func__);
+        return NULL;
+    }
+    const char* info = tomlInfo.u.s;
+
+    // anchor
+    const toml_datum_t tomlAnchor = toml_int_in(tomlElem, "anchor");
+    const int anchor = tomlAnchor.ok ? (int)tomlAnchor.u.i : 0;
+
+    // gid rect
+    const toml_array_t* tomlGidRect = toml_array_in(tomlElem, "guide");
+    SDL_FRect gid_rect = ELEM_DEFAULT_GID_RECT;
+    loadFRectFromTomlArray(&gid_rect, tomlGidRect);
+
+    // trig func
+    const toml_datum_t tomlFuncName = toml_string_in(tomlElem, "func");
+    const TrigFunc trig_func = tomlFuncName.ok ? TRIG_FindFuncFromName(tomlFuncName.u.s) : NULL;
+
+    // trig para
+    const toml_datum_t tomlPara = toml_string_in(tomlElem, "para");
+    const char* trig_para = tomlPara.ok ? tomlPara.u.s : NULL;
+
+
     //
-    *elem = (Elem){0};
-    ELEM_Load(elem, tomlElem, tomlElemId);
-    ELEM_RenewOk(elem);
+    Elem* elem = TEMPO_CreateElem(type, info, anchor, &gid_rect, trig_func, trig_para);
     return elem;
 }
 
 
-// free
-void ELEM_Free(Elem* elem) {
-    if (elem == NULL) {printf("%s: elem not exists.\n", __func__); return;}
-
-    if (elem->string != NULL) {free(elem->string); elem->string = NULL;}
-    if (elem->trig_para != NULL) {free(elem->trig_para); elem->trig_para = NULL;}
-    if (elem->texture != NULL) {SDL_DestroyTexture(elem->texture); elem->texture = NULL;}
-    free(elem);
+// DESTROY =============================================================================================================
+void TEMPO_DestroyElem(Elem* elem) {
+    if (elem != NULL) {
+        if (elem->info != NULL) {
+            free(elem->info); // free
+            elem->info = NULL;
+        }
+        if (elem->trig_para != NULL) {
+            free(elem->trig_para); // free
+            elem->trig_para = NULL;
+        }
+        if (elem->texture != NULL) {
+            SDL_DestroyTexture(elem->texture); // free
+            elem->texture = NULL;
+        }
+        free(elem); // free
+    }
 }
 
 
-// renew
-void ELEM_Renew(Elem* elem) {
-    // Req Condition
-    if (elem->ok != true) {
-        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
-        return;
-    }
-
-    // ELEM_RenewDstRect
+// RENEW ===============================================================================================================
+static void TEMPO_RenewElem_DstRect(Elem* elem) {
     SDL_LoadDstRectAligned(
         &elem->dst_rect,
         elem->texture,
         &elem->src_rect,
         &elem->gid_rect,
-        &elem_bck_rect,
+        &tempoBckRect,
         elem->anchor
         );
-
-    // ELEM_RenewState
-    {
-        const bool mouseIn = mouseInRect(&elem->dst_rect);
-        const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
-        if (elem->state == ELEM_STATE_PRESSED) {
-            DEBUG_SendMessageL("elem.on: %d\n", elem->ok);
-            DEBUG_SendMessageL("elem.id: %d\n", elem->info);
-            DEBUG_SendMessageL("elem.state: %s\n", ELEM_GetStringFromState(elem->state));
-            if (elem->trig_func != NULL) {
-                DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
-            }
+}
+static void TEMPO_RenewElem_State(Elem* elem) {
+    if (elem->visible == false) {
+        return;
+    }
+    const bool mouseIn = mouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
+    if (elem->state == ELEM_STATE_PRESSED) {
+        DEBUG_SendMessageL("elem: %s\n", elem->info);
+        DEBUG_SendMessageL("elem.on: %d\n", elem->ok);
+        DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
+        if (elem->trig_func != NULL) {
+            DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
         }
-        if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
-            elem->state = ELEM_STATE_RELEASE;
+    }
+    if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
+        elem->state = ELEM_STATE_RELEASE;
+    }
+    else {
+        if (mouseIn == true) {
+            elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
         }
         else {
-            if (mouseIn == true) {
-                elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
-            }
-            else {
-                elem->state = ELEM_STATE_OUTSIDE;
-            }
-        }
-        if (elem->state == ELEM_STATE_RELEASE && elem->trig_func != NULL) {
-            elem->trig_func(elem->trig_para);
+            elem->state = ELEM_STATE_OUTSIDE;
         }
     }
+    if (elem->state == ELEM_STATE_RELEASE && elem->trig_func != NULL) {
+        elem->trig_func(elem->trig_para);
+    }
 }
-void ELEM_RenewOk(Elem* elem) {
-    if (elem == NULL) {
-        printf("%s: elem not exists.\n", __func__);
-        return;
-    }
-    elem->ok = false;
-    if (elem->info < 0) {
-        printf("%s: elem.id is illegal.\n", __func__);
-        return;
-    }
-    if (elem->string == NULL) {
-        printf("%s: elem[%d].string not exists.\n", __func__, elem->info);
-        return;
-    }
-    if (elem->texture == NULL) {
-        printf("%s: elem[%d].texture not exists.\n", __func__, elem->info);
-        return;
-    }
-    elem->ok = true;
-}
-
-
-// draw
-void ELEM_Draw(const Elem* elem) {
+void TEMPO_RenewElem(Elem* elem) {
     // Req Condition
     if (elem->ok != true) {
         DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
         return;
     }
-    if (elem_renderer == NULL) {printf("%s: menu.renderer is NULL.\n", __func__); return;}
+    TEMPO_RenewElem_State(elem);
+    elem->visible = false;
+    TEMPO_RenewElem_DstRect(elem);
+}
+
+
+// DRAW -===============================================================================================================
+static bool TEMPO_DrawElem_(const Elem* elem) {
+    // Req Condition
 
     //
     switch (elem->state) {
-        case ELEM_STATE_PRESSED:
-        case ELEM_STATE_RELEASE: {
+        case ELEM_STATE_PRESSED: {
             DEBUG_FillRect(&elem->dst_rect);
-            break;
-        }
-        case ELEM_STATE_INSIDE: {
+            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
             DEBUG_DrawRect(&elem->dst_rect);
             break;
         }
-        case ELEM_STATE_OUTSIDE:
+        case ELEM_STATE_RELEASE:
+        case ELEM_STATE_INSIDE: {
+            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+            DEBUG_DrawRect(&elem->dst_rect);
+            break;
+        }
+        case ELEM_STATE_OUTSIDE: {
+            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+            break;
+        }
         default: break;
     }
-    SDL_RenderTexture(elem_renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+    return true;
+}
+void TEMPO_DrawElem(Elem *elem) {
+    // Req Condition
+    if (TEMPO_GetElemOk(elem) != true) {
+        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
+        return;
+    }
+    elem->visible = false;
+    if (tempoRenderer == NULL) {
+        printf("%s: menu.renderer is NULL.\n", __func__);
+        return;
+    }
+    elem->visible = TEMPO_DrawElem_(elem);
 }

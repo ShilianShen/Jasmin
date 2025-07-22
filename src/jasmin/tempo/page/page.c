@@ -71,7 +71,7 @@ void PAGE_Load(Page* page, const char* name, const toml_table_t* tomlPage) {
     for (int i = 0; i < page->numElems; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         if (tomlElem != NULL) {
-            page->elems[i] = ELEM_Malloc(tomlElem, i); // malloc
+            page->elems[i] = TEMPO_CreateElemFromToml(tomlElem); // malloc
         }
     }
 }
@@ -88,7 +88,7 @@ void PAGE_Unload(Page* page) {
     if (page->elems != NULL) {
         for (int i = 0; i < page->numElems; i++) {
             if (page->elems[i] != NULL) {
-                ELEM_Free(page->elems[i]); // free
+                TEMPO_DestroyElem(page->elems[i]); // free
                 page->elems[i] = NULL;
             }
         }
@@ -107,8 +107,8 @@ void PAGE_Renew(Page* page) {
 
     //
     for (int i = 0; i < page->numElems; i++) {
-        if (ELEM_IfOk(page->elems[i])) {
-            ELEM_Renew(page->elems[i]);
+        if (TEMPO_GetElemOk(page->elems[i])) {
+            TEMPO_RenewElem(page->elems[i]);
         }
     }
 }
@@ -121,8 +121,8 @@ void PAGE_Draw(const Page* page) {
 
     //
     for (int i = 0; i < page->numElems; i++) {
-        if (ELEM_IfOk(page->elems[i])) {
-            ELEM_Draw(page->elems[i]);
+        if (TEMPO_GetElemOk(page->elems[i])) {
+            TEMPO_DrawElem(page->elems[i]);
         }
     }
 }

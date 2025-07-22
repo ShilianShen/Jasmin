@@ -2,7 +2,7 @@
 #define JASMIN_MENU_STRUCT_TRIG_H
 
 
-#include "../interface.h"
+#include "../basic/basic.h"
 
 
 /*
@@ -22,18 +22,17 @@
 
 
 // datatype
-typedef const char* TrigPara;
-typedef void (*TrigFunc)(TrigPara);
+typedef void (*TrigFunc)(const char*);
 typedef struct Trig {
     char* name;
     const TrigFunc func;
 } Trig;
 
 
-void TRIG_FUNC_Pass(TrigPara);
-void TRIG_FUNC_Forward(TrigPara);
-void TRIG_FUNC_Backward(TrigPara);
-void TRIG_FUNC_Clear(TrigPara);
+void TRIG_FUNC_Pass(const char*);
+void TRIG_FUNC_Forward(const char*);
+void TRIG_FUNC_Backward(const char*);
+void TRIG_FUNC_Clear(const char*);
 
 
 extern Trig trig_set[];

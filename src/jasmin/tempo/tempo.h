@@ -2,15 +2,7 @@
 #define JASMIN_MENU_STRUCT_MENU_H
 
 
-#include "interface.h"
-
-
-void MENU_Init(SDL_Renderer* renderer);
-void MENU_Deinit();
-void MENU_Load(const char* menuPagesPath, const char* menuThemePath);
-void MENU_Unload();
-void MENU_Renew(SDL_FRect bck_rect);
-void MENU_Draw();
+#include "menu/menu.h"
 
 
 #endif //JASMIN_MENU_STRUCT_MENU_H

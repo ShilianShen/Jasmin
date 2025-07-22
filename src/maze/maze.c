@@ -22,7 +22,7 @@ void MAZE_Unload() {
 
 
 void MAZE_Renew() {
-
+    BLOCK_Renew();
 }
 void MAZE_Draw() {
     BLOCK_Draw();

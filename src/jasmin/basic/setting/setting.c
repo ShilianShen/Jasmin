@@ -132,6 +132,11 @@ bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
 bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
 }
+
+
+void SDL_PrintFRect(const SDL_FRect rect) {
+    printf("[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
+}
 void SDL_LoadDstRectAligned(
     SDL_FRect* dst_rect,
     SDL_Texture* texture,

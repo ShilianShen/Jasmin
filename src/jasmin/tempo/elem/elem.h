@@ -5,29 +5,33 @@
 #include "../trig/trig.h"
 
 
-typedef enum ElemState ElemState;
-typedef enum ElemType ElemStrType;
 typedef struct Elem Elem;
+typedef enum ElemState ElemState;
+typedef enum ElemType ElemType;
 
 
-extern SDL_Renderer* elem_renderer;
-extern TTF_Font* elem_font;
-extern SDL_Color elem_color;
-extern SDL_FRect elem_bck_rect;
+enum ElemType {
+    ELEM_TYPE_DEFAULT,
+    ELEM_TYPE_FILE,
+    ELEM_TYPE_TEXT,
+    NUM_ELEM_TYPES
+};
 
 
-
-void ELEM_SetGidRect(Elem* elem, SDL_FRect gid_rect);
-
-
-void ELEM_RenewOk(Elem* elem);
-Elem* ELEM_Malloc(const toml_table_t* tomlElem, int tomlElemId);
-void ELEM_Free(Elem* elem);
-void ELEM_Renew(Elem* elem);
-void ELEM_Draw(const Elem* elem);
+extern const SDL_FRect ELEM_DEFAULT_GID_RECT;
 
 
-bool ELEM_IfOk(const Elem* elem);
+void TEMPO_SetElemGidRect(Elem* elem, SDL_FRect gid_rect);
+void TEMPO_SetElemDstRect(Elem* elem, SDL_FRect dst_rect);
+void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect);
+bool TEMPO_GetElemOk(const Elem* elem);
+
+
+Elem* TEMPO_CreateElem(ElemType, const char*, int, const SDL_FRect*, TrigFunc, const char*);
+Elem* TEMPO_CreateElemFromToml(const toml_table_t*);
+void TEMPO_DestroyElem(Elem* elem);
+void TEMPO_RenewElem(Elem* elem);
+void TEMPO_DrawElem(Elem *elem);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H

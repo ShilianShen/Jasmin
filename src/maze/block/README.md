@@ -21,3 +21,5 @@ Gene色集:
 * white: 空地
 * black: 墙
 * other: 墙
+
+## Draw
