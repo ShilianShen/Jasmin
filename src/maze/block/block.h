@@ -31,10 +31,6 @@ typedef struct Block {
     Elem* elem; // malloc
 
     SDL_Color gateColors[NUM_BLOCK_GATES];
-    int depth;
-    int gateDepths[NUM_BLOCK_GATES];
-    SDL_FRect dst_rect;
-    SDL_FRect dst_rects[NUM_BLOCK_GATES];
 } Block;
 
 

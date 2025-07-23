@@ -2,6 +2,6 @@ blockSet=[
     "../images/blocks/00.png",
     "../images/blocks/01.png",
     "../images/blocks/10.png",
-    "../images/blocks/11.png",
+    # "../images/blocks/11.png",
     "../images/blocks/20.png"
 ]

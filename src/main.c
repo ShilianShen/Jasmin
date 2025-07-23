@@ -94,7 +94,7 @@ static void DRAW() {
     LOPO_Draw();
     //LOTRI_Draw();
 
-    // TEMPO_DrawMenu();
+    //TEMPO_DrawMenu();
 
 
     // physical draw
