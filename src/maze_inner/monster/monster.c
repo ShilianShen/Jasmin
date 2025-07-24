@@ -5,7 +5,7 @@ Monster* monsterSet;
 int lenMonsterSet;
 
 
-static void MONSTER_Load_Monster(Monster* monster, Block* block, const int x, const int y, Gene* gene) {
+static void MONSTER_Load_Monster(Monster* monster, Room* block, const int x, const int y, Gene* gene) {
     if (monster == NULL) {
         printf("%s, f.\n", __func__);
         return;
@@ -20,8 +20,8 @@ static void MONSTER_Unload_Monster(Monster* monster) {
 
 static void MONSTER_Load_MonsterSet() {
     //
-    for (int i = 0; i < lenBlockSet; i++) {
-        const Block* block = &blockSet[i];
+    for (int i = 0; i < lenRoomSet; i++) {
+        const Room* block = &roomSet[i];
         for (int x = 2; x < block->w-2; x++) {
             for (int y = 2; y < block->h-2; y++) {
                 SDL_Color color;
@@ -45,8 +45,8 @@ static void MONSTER_Load_MonsterSet() {
     } // Req Condition
     //
     int idx = 0;
-    for (int i = 0; i < lenBlockSet; i++) {
-        Block* block = &blockSet[i];
+    for (int i = 0; i < lenRoomSet; i++) {
+        Room* block = &roomSet[i];
         for (int x = 2; x < block->w-2; x++) {
             for (int y = 2; y < block->h-2; y++) {
                 SDL_Color color;

@@ -7,7 +7,7 @@
 
 
 
-typedef struct Block {
+typedef struct Room {
     SDL_Color color;
     SDL_Color gateColors[NUM_DIRECTIONS];
     SDL_Surface* surface;
@@ -16,22 +16,22 @@ typedef struct Block {
     bool** wall; // malloc in LOAD
 
     Elem* elem; // malloc
-} Block;
+} Room;
 
 
 
 
-extern int lenBlockSet;
-extern Block* blockSet;
-extern Direction** blockNet;
+extern int lenRoomSet;
+extern Room* roomSet;
+extern Direction** roomNet;
 
 
-void BLOCK_Load();
-void BLOCK_Unload();
+void ROOM_Load();
+void ROOM_Unload();
 
 
-void BLOCK_Renew();
-void BLOCK_Draw_BDI();
+void ROOM_Renew();
+void ROOM_Draw_BDI();
 
 
 #endif //MAZE_BLOCK_H

@@ -1,6 +1,6 @@
 #include "maze_inner.h"
 
-#include "block/block.h"
+#include "room/room.h"
 
 
 void MAZE_INNER_Init(SDL_Renderer* ren) {
@@ -13,21 +13,21 @@ void MAZE_INNER_Deinit() {
 
 void MAZE_INNER_Load() {
     GENE_Load();
-    BLOCK_Load();
+    ROOM_Load();
     MONSTER_Load();
 }
 void MAZE_INNER_Unload() {
     MONSTER_Unload();
     GENE_Unload();
-    BLOCK_Unload();
+    ROOM_Unload();
 }
 
 
 void MAZE_INNER_Renew() {
-    BLOCK_Renew();
+    ROOM_Renew();
     MONSTER_Renew();
 }
 void MAZE_INNER_Draw() {
-    BLOCK_Draw_BDI();
+    ROOM_Draw_BDI();
     MONSTER_Draw();
 }

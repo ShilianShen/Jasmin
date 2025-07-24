@@ -1,13 +1,13 @@
-#include "block.h"
+#include "room.h"
 
 
-const SDL_FRect BLOCK_DEFAULT_GID_RECT = {0, 0, 16, 16};
+const SDL_FRect ROOM_DEFAULT_GID_RECT = {0, 0, 16, 16};
 bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
 
 
-const SDL_Color BLOCK_DEFAULT_COLOR = {0, 0, 0, 0};
+const SDL_Color ROOM_DEFAULT_COLOR = {0, 0, 0, 0};
 void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
     void** array = (void**)malloc(w * sizeof(void*));
     if (array == NULL) {
@@ -49,7 +49,7 @@ bool loadStringFromSDLColor(char* string, const SDL_Color color) {
     snprintf(string, 8, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
     return true;
 }
-static void BLOCK_SetNetCenter(const char* para);
+static void ROOM_SetNetCenter(const char* para);
 SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const float t) {
     SDL_FRect rect;
     rect.x = (1 - t) * rect1.x + t * rect2.x;
@@ -61,53 +61,53 @@ SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const floa
 
 
 // BLOCK NET ===========================================================================================================
-Direction** blockNet;
-static int blockNetCenter = 0;
+Direction** roomNet;
+static int roomNetCenter = 0;
 
 
-static void BLOCK_LoadBlockNet() {
-    blockNet = (Direction**)allocate2DArray(lenBlockSet, lenBlockSet, sizeof(Direction));
-    if (blockNet == NULL) {
+static void ROOM_LoadRoomNet() {
+    roomNet = (Direction**)allocate2DArray(lenRoomSet, lenRoomSet, sizeof(Direction));
+    if (roomNet == NULL) {
         printf("%s.\n", __func__);
         return;
     } // Req Condition
-    for (int i = 0; i < lenBlockSet; i++) {
-        for (int j = 0; j < lenBlockSet; j++) {
-            blockNet[i][j] = DIRECTION_ILLEGAL;
+    for (int i = 0; i < lenRoomSet; i++) {
+        for (int j = 0; j < lenRoomSet; j++) {
+            roomNet[i][j] = DIRECTION_ILLEGAL;
             for (int k = 0; k < NUM_DIRECTIONS; k++) {
-                const SDL_Color color1 = blockSet[i].gateColors[k];
-                const SDL_Color color2 = blockSet[j].color;
+                const SDL_Color color1 = roomSet[i].gateColors[k];
+                const SDL_Color color2 = roomSet[j].color;
                 if (SDL_CompareSDLColor(color1, color2) == true) {
-                    blockNet[i][j] = k;
+                    roomNet[i][j] = k;
                     break;
                 }
             }
         }
     }
-    for (int i = 0; i < lenBlockSet; i++) {
-        for (int j = 0; j < lenBlockSet; j++) {
-            switch (blockNet[i][j]) {
+    for (int i = 0; i < lenRoomSet; i++) {
+        for (int j = 0; j < lenRoomSet; j++) {
+            switch (roomNet[i][j]) {
                 case DIRECTION_W: {
-                    if (blockNet[j][i] != DIRECTION_S) {
-                        blockNet[i][j] = DIRECTION_ILLEGAL;
+                    if (roomNet[j][i] != DIRECTION_S) {
+                        roomNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
                 case DIRECTION_A: {
-                    if (blockNet[j][i] != DIRECTION_D) {
-                        blockNet[i][j] = DIRECTION_ILLEGAL;
+                    if (roomNet[j][i] != DIRECTION_D) {
+                        roomNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
                 case DIRECTION_S: {
-                    if (blockNet[j][i] != DIRECTION_W) {
-                        blockNet[i][j] = DIRECTION_ILLEGAL;
+                    if (roomNet[j][i] != DIRECTION_W) {
+                        roomNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
                 case DIRECTION_D: {
-                    if (blockNet[j][i] != DIRECTION_A) {
-                        blockNet[i][j] = DIRECTION_ILLEGAL;
+                    if (roomNet[j][i] != DIRECTION_A) {
+                        roomNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
@@ -116,15 +116,15 @@ static void BLOCK_LoadBlockNet() {
         }
     }
 }
-static void BLOCK_UnloadBlockNet() {
-    if (blockNet != NULL) {
-        free2DArray((void**)blockNet, lenBlockSet);
-        blockNet = NULL;
+static void ROOM_UnloadRoomNet() {
+    if (roomNet != NULL) {
+        free2DArray((void**)roomNet, lenRoomSet);
+        roomNet = NULL;
     }
 }
-static int BLOCK_GetBlockFromNet(const int i, const Direction gate) {
-    for (int j = 0; j < lenBlockSet; j++) {
-        if (blockNet[i][j] == gate) {
+static int ROOM_GetRoomFromNet(const int i, const Direction gate) {
+    for (int j = 0; j < lenRoomSet; j++) {
+        if (roomNet[i][j] == gate) {
             return j;
         }
     }
@@ -134,7 +134,7 @@ static int BLOCK_GetBlockFromNet(const int i, const Direction gate) {
 
 // BLOCK COVER =========================================================================================================
 static SDL_Texture* cover[NUM_DIRECTIONS];
-static void BLOCK_LoadBlockCover() {
+static void ROOM_LoadRoomCover() {
     cover[DIRECTION_W] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverW.png");
     cover[DIRECTION_A] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverA.png");
     cover[DIRECTION_S] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverS.png");
@@ -143,7 +143,7 @@ static void BLOCK_LoadBlockCover() {
         SDL_SetTextureScaleMode(cover[i], SDL_SCALEMODE_NEAREST);
     }
 }
-static void BLOCK_UnloadBlockCover() {
+static void ROOM_UnloadRoomCover() {
     for (int i = 0; i < NUM_DIRECTIONS; i++) {
         SDL_DestroyTexture(cover[i]);
     }
@@ -151,9 +151,9 @@ static void BLOCK_UnloadBlockCover() {
 
 
 // BLOCK ===============================================================================================================
-static void BLOCK_LoadBlock(Block* block, const char* path) {
+static void ROOM_LoadRoom(Room* room, const char* path) {
     // Req Condition
-    if (block == NULL) {
+    if (room == NULL) {
         printf("%s: block not exists.\n", __func__);
         return;
     }
@@ -167,18 +167,18 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
         return;
     }
     //
-    *block = (Block){0};
+    *room = (Room){0};
 
     // load w, h
-    block->w = surface->w;
-    block->h = surface->h;
-    block->surface = surface;
+    room->w = surface->w;
+    room->h = surface->h;
+    room->surface = surface;
 
     // load wall
-    block->wall = (bool**)allocate2DArray(surface->w, surface->h, sizeof(bool)); // malloc
+    room->wall = (bool**)allocate2DArray(surface->w, surface->h, sizeof(bool)); // malloc
     for (int i = 0; i < surface->w; i++) {
         for (int j = 0; j < surface->h; j++) {
-            block->wall[i][j] = true;
+            room->wall[i][j] = true;
         }
     }
     for (int i = 1; i < surface->w-1; i++) {
@@ -186,7 +186,7 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
             SDL_Color color = {0};
             SDL_ReadSurfaceSDLColor(surface, i, j, &color);
             if (SDL_CompareSDLColor(color, (SDL_Color){255, 255, 255, 255}) == true) {
-                block->wall[i][j] = false;
+                room->wall[i][j] = false;
             }
             else {
                 const Gene* gene = GENE_FindGeneFromColor(color);
@@ -198,101 +198,101 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
                     continue;
                 }
                 if (strcmp(name, "You") == 0) {
-                    block->wall[i][j] = false;
+                    room->wall[i][j] = false;
                 }
             }
         }
     }
 
     // load color
-    SDL_ReadSurfaceSDLColor(surface, 0, 0, &block->color);
+    SDL_ReadSurfaceSDLColor(surface, 0, 0, &room->color);
 
     // load elem
     char para[] = "00FF00FF";
-    loadStringFromSDLColor(para, block->color);
+    loadStringFromSDLColor(para, room->color);
     Elem* elem = TEMPO_CreateElem(
         ELEM_TYPE_FILE,
         path,
         40,
-        &BLOCK_DEFAULT_GID_RECT,
-        &BLOCK_SetNetCenter,
+        &ROOM_DEFAULT_GID_RECT,
+        &ROOM_SetNetCenter,
         para); // malloc
     if (elem == NULL) {
         printf("%s: failed to create elem.\n", __func__);
         return;
     }
-    block->elem = elem;
+    room->elem = elem;
 
     // load gate
     // W
     for (int i = 1, j = 0; i < surface->w-1; i++) {
-        SDL_Color gateColor = BLOCK_DEFAULT_COLOR;
+        SDL_Color gateColor = ROOM_DEFAULT_COLOR;
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
-        if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
-        && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[DIRECTION_W] = gateColor;
+        if (SDL_CompareSDLColor(gateColor, ROOM_DEFAULT_COLOR) == false
+        && SDL_CompareSDLColor(gateColor, room->color) == false) {
+            room->gateColors[DIRECTION_W] = gateColor;
         }
     }
     // A
     for (int i = 0, j = 1; j < surface->h-1; j++) {
-        SDL_Color gateColor = BLOCK_DEFAULT_COLOR;
+        SDL_Color gateColor = ROOM_DEFAULT_COLOR;
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
-        if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
-        && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[DIRECTION_A] = gateColor;
+        if (SDL_CompareSDLColor(gateColor, ROOM_DEFAULT_COLOR) == false
+        && SDL_CompareSDLColor(gateColor, room->color) == false) {
+            room->gateColors[DIRECTION_A] = gateColor;
         }
     }
     // S
     for (int i = 1, j = surface->h-1 ; i < surface->w-1; i++) {
-        SDL_Color gateColor = BLOCK_DEFAULT_COLOR;
+        SDL_Color gateColor = ROOM_DEFAULT_COLOR;
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
-        if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
-        && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[DIRECTION_S] = gateColor;
+        if (SDL_CompareSDLColor(gateColor, ROOM_DEFAULT_COLOR) == false
+        && SDL_CompareSDLColor(gateColor, room->color) == false) {
+            room->gateColors[DIRECTION_S] = gateColor;
         }
     }
     // D
     for (int i = surface->w-1, j = 1; j < surface->h-1; j++) {
-        SDL_Color gateColor = BLOCK_DEFAULT_COLOR;
+        SDL_Color gateColor = ROOM_DEFAULT_COLOR;
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
-        if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
-        && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[DIRECTION_D] = gateColor;
+        if (SDL_CompareSDLColor(gateColor, ROOM_DEFAULT_COLOR) == false
+        && SDL_CompareSDLColor(gateColor, room->color) == false) {
+            room->gateColors[DIRECTION_D] = gateColor;
         }
     }
     //
 }
-static void BLOCK_UnloadBlock(Block* block) {
-    if (block == NULL) {
+static void ROOM_UnloadRoom(Room* room) {
+    if (room == NULL) {
         return;
     }
-    if (block->wall != NULL) {
-        free2DArray((void**)block->wall, block->w);
-        block->wall = NULL;
+    if (room->wall != NULL) {
+        free2DArray((void**)room->wall, room->w);
+        room->wall = NULL;
     }
-    if (block->elem != NULL) {
-        TEMPO_DestroyElem(block->elem);
-        block->elem = NULL;
+    if (room->elem != NULL) {
+        TEMPO_DestroyElem(room->elem);
+        room->elem = NULL;
     }
-    if (block->surface != NULL) {
-        SDL_DestroySurface(block->surface); // free
-        block->surface = NULL;
+    if (room->surface != NULL) {
+        SDL_DestroySurface(room->surface); // free
+        room->surface = NULL;
     }
 }
 
 
 // BLOCK SET ===========================================================================================================
-int lenBlockSet;
-Block* blockSet;
-const char* blockSetPath = "../config/maze/blockSet.toml";
-static void BLOCK_LoadBlockSet() {
+int lenRoomSet;
+Room* roomSet;
+const char* roomSetPath = "../config/maze/roomSet.toml";
+static void ROOM_LoadRoomSet() {
     // Req Condition
-    if (blockSetPath == NULL) {
+    if (roomSetPath == NULL) {
         printf("%s.\n", __func__);
         return;
     }
 
-    toml_table_t* tomlFile = getToml(blockSetPath); // malloc
+    toml_table_t* tomlFile = getToml(roomSetPath); // malloc
     if (tomlFile == NULL) {
         printf("%s.\n", __func__);
         return;
@@ -305,9 +305,9 @@ static void BLOCK_LoadBlockSet() {
     }
 
     //
-    lenBlockSet = toml_array_nelem(tomlBlocks);
-    blockSet = malloc(lenBlockSet * sizeof(Block)); // malloc
-    for (int i = 0; i < lenBlockSet; i++) {
+    lenRoomSet = toml_array_nelem(tomlBlocks);
+    roomSet = malloc(lenRoomSet * sizeof(Room)); // malloc
+    for (int i = 0; i < lenRoomSet; i++) {
         // Req Condition
         const toml_datum_t tomlBlockPath = toml_string_at(tomlBlocks, i);
         if (tomlBlockPath.ok == false) {
@@ -315,18 +315,18 @@ static void BLOCK_LoadBlockSet() {
             continue;
         }
         //
-        BLOCK_LoadBlock(&blockSet[i], tomlBlockPath.u.s); // malloc
+        ROOM_LoadRoom(&roomSet[i], tomlBlockPath.u.s); // malloc
     }
     toml_free(tomlFile); // free
 }
-static void BLOCK_UnloadBlockSet() {
-    if (blockSet != NULL) {
-        for (int i = 0; i < lenBlockSet; i++) {
-            BLOCK_UnloadBlock(&blockSet[i]); // free
+static void ROOM_UnloadRoomSet() {
+    if (roomSet != NULL) {
+        for (int i = 0; i < lenRoomSet; i++) {
+            ROOM_UnloadRoom(&roomSet[i]); // free
         }
-        free(blockSet); // free
-        blockSet = NULL;
-        lenBlockSet = 0;
+        free(roomSet); // free
+        roomSet = NULL;
+        lenRoomSet = 0;
     }
 }
 
@@ -334,38 +334,38 @@ static void BLOCK_UnloadBlockSet() {
 // BLOCK DRAW INFO =====================================================================================================
 static Uint64 time_start = 0, time_end = 0;
 static Uint64 period = 1000;
-typedef struct BlockDrawInfo {
+typedef struct RoomDrawInfo {
     SDL_FRect dst_rect[2];
     int depth;
     SDL_FRect dst_rects[NUM_DIRECTIONS][2];
     int depths[NUM_DIRECTIONS];
-} BDI;
-BDI* BDISet;
+} RDI;
+RDI* RDISet;
 float rate;
-static void BLOCK_LoadBDISet() {
-    BDISet = malloc(lenBlockSet * sizeof(BDI));
-    if (BDISet == NULL) {
+static void ROOM_LoadRDISet() {
+    RDISet = malloc(lenRoomSet * sizeof(RDI));
+    if (RDISet == NULL) {
         printf("%s.\n", __func__);
         return;
     }
-    for (int i = 0; i < lenBlockSet; i++) {
-        BDISet[i] = (BDI){0};
+    for (int i = 0; i < lenRoomSet; i++) {
+        RDISet[i] = (RDI){0};
     }
 }
-static void BLOCK_UnloadBDISet() {
-    if (BDISet != NULL) {
-        free(BDISet);
-        BDISet = NULL;
+static void ROOM_UnloadRDISet() {
+    if (RDISet != NULL) {
+        free(RDISet);
+        RDISet = NULL;
     }
 }
 
 
-static void BLOCK_RenewBDISet() {
+static void ROOM_RenewRDISet() {
     if (SDL_GetTicks() > time_end) {
-        for (int i = 0; i < lenBlockSet; i++) {
-            BDISet[i].dst_rect[0] = BDISet[i].dst_rect[1];
+        for (int i = 0; i < lenRoomSet; i++) {
+            RDISet[i].dst_rect[0] = RDISet[i].dst_rect[1];
             for (int j = 0; j < NUM_DIRECTIONS; j++) {
-                BDISet[i].dst_rects[j][0] = BDISet[i].dst_rects[j][1];
+                RDISet[i].dst_rects[j][0] = RDISet[i].dst_rects[j][1];
             }
         }
         rate = 1;
@@ -376,15 +376,15 @@ static void BLOCK_RenewBDISet() {
 
 
 // TRIG ================================================================================================================
-static void BLOCK_SetNetCenter(const char* para) {
+static void ROOM_SetNetCenter(const char* para) {
     if (para == NULL) {
         return;
     }
     for (int i = 0; i < NUM_DIRECTIONS; i++) {
         char string[] = "0123456789";
-        loadStringFromSDLColor(string, blockSet[i].color);
-        if (blockNetCenter != i && strcmp(para, string) == 0) {
-            blockNetCenter = i;
+        loadStringFromSDLColor(string, roomSet[i].color);
+        if (roomNetCenter != i && strcmp(para, string) == 0) {
+            roomNetCenter = i;
             time_start = SDL_GetTicks();
             time_end = time_start + period;
             return;
@@ -394,22 +394,22 @@ static void BLOCK_SetNetCenter(const char* para) {
 
 
 // LOAD ================================================================================================================
-void BLOCK_Load() {
-    BLOCK_LoadBlockCover();
-    BLOCK_LoadBlockSet();
-    BLOCK_LoadBlockNet();
-    BLOCK_LoadBDISet();
+void ROOM_Load() {
+    ROOM_LoadRoomCover();
+    ROOM_LoadRoomSet();
+    ROOM_LoadRoomNet();
+    ROOM_LoadRDISet();
 }
-void BLOCK_Unload() {
-    BLOCK_UnloadBDISet();
-    BLOCK_UnloadBlockCover();
-    BLOCK_UnloadBlockNet();
-    BLOCK_UnloadBlockSet();
+void ROOM_Unload() {
+    ROOM_UnloadRDISet();
+    ROOM_UnloadRoomCover();
+    ROOM_UnloadRoomNet();
+    ROOM_UnloadRoomSet();
 }
 
 
 // RENEW ===============================================================================================================
-void BLOCK_Renew_DstRect(const SDL_FRect dst_rect1, const Direction gate, SDL_FRect* dst_rect2) {
+void ROOM_Renew_DstRect(const SDL_FRect dst_rect1, const Direction gate, SDL_FRect* dst_rect2) {
     if (dst_rect2 == NULL) {
         printf("%s.\n", __func__);
         return;
@@ -440,58 +440,58 @@ void BLOCK_Renew_DstRect(const SDL_FRect dst_rect1, const Direction gate, SDL_FR
     dst_rect2->x = dst_rect1.x + dx;
     dst_rect2->y = dst_rect1.y + dy;
 }
-void BLOCK_Renew_Block() {}
-void BLOCK_Renew() {
+void ROOM_Renew_Block() {}
+void ROOM_Renew() {
 
-    BLOCK_RenewBDISet();
+    ROOM_RenewRDISet();
 
-    if (0 > blockNetCenter || blockNetCenter >= lenBlockSet) {
+    if (0 > roomNetCenter || roomNetCenter >= lenRoomSet) {
         printf("%s.\n", __func__);
         return;
     }
     bool need_renew = true;
 
-    int find[lenBlockSet];
+    int find[lenRoomSet];
     enum {NOT_FOUND, FOUND_NOW, HAD_FOUND};
-    for (int i = 0; i < lenBlockSet; i++) {
+    for (int i = 0; i < lenRoomSet; i++) {
         find[i] = NOT_FOUND;
     }
-    find[blockNetCenter] = FOUND_NOW;
+    find[roomNetCenter] = FOUND_NOW;
 
-    TEMPO_SetElemGidRect(blockSet[blockNetCenter].elem, BLOCK_DEFAULT_GID_RECT);
-    TEMPO_RenewElem(blockSet[blockNetCenter].elem);
+    TEMPO_SetElemGidRect(roomSet[roomNetCenter].elem, ROOM_DEFAULT_GID_RECT);
+    TEMPO_RenewElem(roomSet[roomNetCenter].elem);
     // TEMPO_GetElemDstRect(blockSet[blockNetCenter].elem, &blockSet[blockNetCenter].dst_rect);
-    TEMPO_GetElemDstRect(blockSet[blockNetCenter].elem, &BDISet[blockNetCenter].dst_rect[1]);
+    TEMPO_GetElemDstRect(roomSet[roomNetCenter].elem, &RDISet[roomNetCenter].dst_rect[1]);
 
     int depth;
-    for (int i = 0; i < lenBlockSet; i++) {
-        BDISet[i].depth = 0;
+    for (int i = 0; i < lenRoomSet; i++) {
+        RDISet[i].depth = 0;
         for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            BDISet[i].depths[j] = 0;
+            RDISet[i].depths[j] = 0;
         }
     }
-    BDISet[blockNetCenter].depth = depth = 1;
+    RDISet[roomNetCenter].depth = depth = 1;
 
     while (need_renew) {
         depth++;
-        for (int i = 0; i < lenBlockSet; i++) {
+        for (int i = 0; i < lenRoomSet; i++) {
             if (find[i] != FOUND_NOW) {
                 continue;
             }
             find[i] = HAD_FOUND;
             for (int j = 0; j < NUM_DIRECTIONS; j++) {
-                const int idx = BLOCK_GetBlockFromNet(i, j);
+                const int idx = ROOM_GetRoomFromNet(i, j);
                 if (idx == i) {
                     continue;
                 }
                 switch (find[idx]) {
                     case NOT_FOUND: {
                         // renew dst, depth by blockSet[i], j
-                        TEMPO_RenewElem(blockSet[idx].elem);
-                        TEMPO_GetElemDstRect(blockSet[idx].elem, &BDISet[idx].dst_rect[1]);
-                        BLOCK_Renew_DstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rect[1]);
+                        TEMPO_RenewElem(roomSet[idx].elem);
+                        TEMPO_GetElemDstRect(roomSet[idx].elem, &RDISet[idx].dst_rect[1]);
+                        ROOM_Renew_DstRect(RDISet[i].dst_rect[1], j, &RDISet[idx].dst_rect[1]);
                         find[idx] = FOUND_NOW;
-                        BDISet[idx].depth = depth;
+                        RDISet[idx].depth = depth;
                         break;
                     }
                     case FOUND_NOW:
@@ -501,13 +501,13 @@ void BLOCK_Renew() {
                     }
                     default: break;
                 }
-                TEMPO_GetElemDstRect(blockSet[idx].elem, &BDISet[idx].dst_rects[j][1]);
-                BLOCK_Renew_DstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rects[j][1]);
-                BDISet[idx].depths[j] = depth;
+                TEMPO_GetElemDstRect(roomSet[idx].elem, &RDISet[idx].dst_rects[j][1]);
+                ROOM_Renew_DstRect(RDISet[i].dst_rect[1], j, &RDISet[idx].dst_rects[j][1]);
+                RDISet[idx].depths[j] = depth;
             }
         } // 遍历find
         need_renew = false;
-        for (int i = 0; i < lenBlockSet; i++) {
+        for (int i = 0; i < lenRoomSet; i++) {
             if (find[i] == FOUND_NOW) {
                 need_renew = true;
                 break;
@@ -518,31 +518,31 @@ void BLOCK_Renew() {
 
 
 // DRAW ================================================================================================================
-void BLOCK_Draw_BDI() {
-    for (int i = 0; i < lenBlockSet; i++) {
+void ROOM_Draw_BDI() {
+    for (int i = 0; i < lenRoomSet; i++) {
         for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            if (BDISet[i].depths[j] < 0) {
+            if (RDISet[i].depths[j] < 0) {
                 continue;
             }
-            const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rects[j][0], BDISet[i].dst_rects[j][1], rate);
-            TEMPO_SetElemDstRect(blockSet[i].elem, dst_rect);
-            TEMPO_DrawElem(blockSet[i].elem);
+            const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rects[j][0], RDISet[i].dst_rects[j][1], rate);
+            TEMPO_SetElemDstRect(roomSet[i].elem, dst_rect);
+            TEMPO_DrawElem(roomSet[i].elem);
         }
     }
-    for (int i = 0; i < lenBlockSet; i++) {
+    for (int i = 0; i < lenRoomSet; i++) {
         for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            if (BDISet[i].depths[j] < 0) {
+            if (RDISet[i].depths[j] < 0) {
                 continue;
             }
-            const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rects[j][0], BDISet[i].dst_rects[j][1], rate);
+            const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rects[j][0], RDISet[i].dst_rects[j][1], rate);
             SDL_RenderTexture(mazeRenderer, cover[j], NULL, &dst_rect);
         }
     }
-    for (int i = 0; i < lenBlockSet; i++) {
-        if (BDISet[i].depth > 0) {
-            const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rect[0], BDISet[i].dst_rect[1], rate);
-            TEMPO_SetElemDstRect(blockSet[i].elem, dst_rect);
-            TEMPO_DrawElem(blockSet[i].elem);
+    for (int i = 0; i < lenRoomSet; i++) {
+        if (RDISet[i].depth > 0) {
+            const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rect[0], RDISet[i].dst_rect[1], rate);
+            TEMPO_SetElemDstRect(roomSet[i].elem, dst_rect);
+            TEMPO_DrawElem(roomSet[i].elem);
         }
     }
 }

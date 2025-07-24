@@ -7,7 +7,7 @@ void ZERO_Draw() {
     const float start_x = 100, start_y = 100;
     const float wall_w = 20, wall_h = 20;
     SDL_FRect rect = {0, 0, wall_w, wall_h};
-    const Block* block = &blockSet[0];
+    const Room* block = &roomSet[0];
     for (int i = 0; i < block->w; i++) {
         for (int j = 0; j < block->h; j++) {
             const bool wall = block->wall[i][j];

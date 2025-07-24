@@ -80,8 +80,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/maze_inner/monster/monster.h
         src/maze_inner/gene/gene.c
         src/maze_inner/gene/gene.h
-        src/maze_inner/block/block.c
-        src/maze_inner/block/block.h
+        src/maze_inner/room/room.c
+        src/maze_inner/room/room.h
         src/maze_inner/basic/basic.c
         src/maze_inner/basic/basic.h
         src/jasmin/tempo/basic/basic.c

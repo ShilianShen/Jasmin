@@ -2,11 +2,11 @@
 #define MAZE_MONSTER_H
 
 
-#include "../block/block.h"
+#include "../room/room.h"
 
 
 typedef struct Position {
-    Block* block;
+    Room* block;
     int x, y;
 } Position;
 
