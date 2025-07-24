@@ -19,8 +19,7 @@ elems = [
 ]
 [Edge]
 elems = [
-    {anchor=31, type="TEXT", info="""
-    The edge of menu system, it shouldn't appear.
+    {anchor=31, type="TEXT", info="""The edge of menu system, it shouldn't appear.
     If you are watching it, there is a bug need to be fixed."""},
     {anchor=49, type="TEXT", info="[R2R]", func='clear'}
 ]

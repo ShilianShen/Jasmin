@@ -13,6 +13,7 @@ void GENE_Unload();
 
 
 Gene* GENE_FindGeneFromColor(SDL_Color color);
+char* GENE_GetNameFromGene(const Gene* gene);
 
 
 #endif //GENE_H

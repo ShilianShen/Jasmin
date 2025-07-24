@@ -102,9 +102,17 @@ static void GENE_UnloadGeneSet() {
 }
 
 
+static void GENE_Print_GeneSet() {
+    printf("GENE SET[%d]:\n", lenGeneSet);
+    for (int i = 0; i < lenGeneSet; i++) {
+        const Gene gene = geneSet[i];
+        printf("%02d. %s, %s\n", i, SDL_GetStringFromSDLColor(gene.color), gene.name);
+    }
+}
 void GENE_Load() {
-    static const char* path = "/Users/shilianshen/Documents/Oolong Press/Lo-Tri/src/maze/gene/geneSet.toml";
+    static const char* path = "../config/maze/geneSet.toml";
     GENE_LoadGeneSet(path);
+    GENE_Print_GeneSet();
 }
 void GENE_Unload() {
     GENE_UnloadGeneSet();
@@ -121,4 +129,10 @@ Gene* GENE_FindGeneFromColor(const SDL_Color color) {
         }
     }
     return NULL;
+}
+char* GENE_GetNameFromGene(const Gene* gene) {
+    if (gene == NULL) {
+        return NULL;
+    }
+    return gene->name;
 }

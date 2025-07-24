@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "jasmin/jasmin.h"
-#include "maze/maze.h"
+#include "maze_inner/maze_inner.h"
+#include "maze_outer/maze_outer.h"
 
 
 SDL_Window *window;
@@ -35,7 +36,8 @@ static void INIT() {
     TEMPO_SetBasicRenderer(renderer);
     TEMPO_InitMenu();
 
-    MAZE_Init(renderer);
+    MAZE_INNER_Init(renderer);
+    MAZE_OUTER_Init();
     //LOTRI_Init(renderer);
 
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
@@ -46,7 +48,8 @@ static void DEINIT() {
     LOPO_Deinit();
     //LOTRI_Deinit();
 
-    MAZE_Deinit();
+    MAZE_OUTER_Deinit();
+    MAZE_INNER_Deinit();
 
     // SDL
     SDL_DestroyTexture(background);
@@ -58,12 +61,15 @@ static void LOAD() {
     DEBUG_Load();
     LOPO_Load();
     TEMPO_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
-    MAZE_Load();
+    MAZE_INNER_Load();
+    MAZE_OUTER_Load();
 }
 static void UNLOAD() {
     LOPO_Unload();
     TEMPO_UnloadMenu();
-    MAZE_Unload();
+
+    MAZE_OUTER_Unload();
+    MAZE_INNER_Unload();
 }
 
 static void RENEW() {
@@ -74,7 +80,8 @@ static void RENEW() {
 
     //
     LOPO_Renew();
-    MAZE_Renew();
+    MAZE_INNER_Renew();
+    MAZE_OUTER_Renew();
     //LOTRI_Renew();
 
     // logical renew
@@ -90,7 +97,8 @@ static void DRAW() {
     // logical draw
     // SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
     // TEST_Draw();
-    MAZE_Draw();
+    MAZE_INNER_Draw();
+    MAZE_OUTER_Draw();
     LOPO_Draw();
     //LOTRI_Draw();
 

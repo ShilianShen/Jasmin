@@ -19,6 +19,9 @@ extern float scale_x, scale_y;
 extern SDL_Color EMPTY;
 
 
+char* SDL_GetStringFromSDLColor(SDL_Color color);
+char* SDL_GetStringFromFRect(SDL_FRect rect);
+bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
 void SDL_PrintFRect(SDL_FRect rect);
 toml_table_t* getToml(const char* tomlPath);
 void renewScreenParas(SDL_Window* window);

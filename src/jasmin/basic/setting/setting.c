@@ -137,6 +137,24 @@ bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, c
 void SDL_PrintFRect(const SDL_FRect rect) {
     printf("[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
 }
+char* SDL_GetStringFromSDLColor(const SDL_Color color) {
+    static char string[11];
+    snprintf(string, 10, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
+    return string;
+}
+char* SDL_GetStringFromFRect(const SDL_FRect rect) {
+    static char string[32];
+    snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
+    return string;
+}
+bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
+    if (surface == NULL) {
+        printf("%s: surface is null.\n", __func__);
+        return false;
+    }
+    SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
+    return true;
+}
 void SDL_LoadDstRectAligned(
     SDL_FRect* dst_rect,
     SDL_Texture* texture,

@@ -73,19 +73,26 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/jasmin/lopo/lopo.c
         src/jasmin/lopo/lopo.h
         src/jasmin/lopo/shaders/debugShader.cpp
-        src/maze/maze.c
-        src/maze/maze.h
-        src/maze/interface.h
-        src/maze/monster/monster.c
-        src/maze/monster/monster.h
-        src/maze/gene/gene.c
-        src/maze/gene/gene.h
-        src/maze/block/block.c
-        src/maze/block/block.h
-        src/maze/basic/basic.c
-        src/maze/basic/basic.h
+        src/maze_inner/maze_inner.c
+        src/maze_inner/maze_inner.h
+        src/maze_inner/interface.h
+        src/maze_inner/monster/monster.c
+        src/maze_inner/monster/monster.h
+        src/maze_inner/gene/gene.c
+        src/maze_inner/gene/gene.h
+        src/maze_inner/block/block.c
+        src/maze_inner/block/block.h
+        src/maze_inner/basic/basic.c
+        src/maze_inner/basic/basic.h
         src/jasmin/tempo/basic/basic.c
         src/jasmin/tempo/basic/basic.h
+        src/maze_outer/interface.h
+        src/maze_outer/maze_outer.c
+        src/maze_outer/maze_outer.h
+        src/maze_outer/zero/zero.c
+        src/maze_outer/zero/zero.h
+        src/maze_inner/action/action.c
+        src/maze_inner/action/action.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

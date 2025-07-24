@@ -2,19 +2,10 @@
 
 
 const SDL_FRect BLOCK_DEFAULT_GID_RECT = {0, 0, 16, 16};
-char* SDL_GetStringFromSDLColor(const SDL_Color color) {
-    static char string[32];
-    snprintf(string, 31, "[%d, %d, %d, %d]", color.r, color.g, color.b, color.a);
-    return string;
-}
-char* SDL_GetStringFromFRect(const SDL_FRect rect) {
-    static char string[32];
-    snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
-    return string;
-}
 bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
+
 
 const SDL_Color BLOCK_DEFAULT_COLOR = {0, 0, 0, 0};
 void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
@@ -45,14 +36,6 @@ void free2DArray(void** array, size_t w) {
     }
     free(array);
 }
-bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
-    if (surface == NULL) {
-        printf("%s: surface is null.\n", __func__);
-        return false;
-    }
-    SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
-    return true;
-}
 bool loadStringFromSDLColor(char* string, const SDL_Color color) {
     if (string == NULL) {
         printf("%s: string is null.\n", __func__);
@@ -78,20 +61,20 @@ SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const floa
 
 
 // BLOCK NET ===========================================================================================================
-BlockGate** blockNet;
+Direction** blockNet;
 static int blockNetCenter = 0;
 
 
 static void BLOCK_LoadBlockNet() {
-    blockNet = (BlockGate**)allocate2DArray(lenBlockSet, lenBlockSet, sizeof(BlockGate));
+    blockNet = (Direction**)allocate2DArray(lenBlockSet, lenBlockSet, sizeof(Direction));
     if (blockNet == NULL) {
         printf("%s.\n", __func__);
         return;
     } // Req Condition
     for (int i = 0; i < lenBlockSet; i++) {
         for (int j = 0; j < lenBlockSet; j++) {
-            blockNet[i][j] = BLOCK_GATE_ILLEGAL;
-            for (int k = 0; k < NUM_BLOCK_GATES; k++) {
+            blockNet[i][j] = DIRECTION_ILLEGAL;
+            for (int k = 0; k < NUM_DIRECTIONS; k++) {
                 const SDL_Color color1 = blockSet[i].gateColors[k];
                 const SDL_Color color2 = blockSet[j].color;
                 if (SDL_CompareSDLColor(color1, color2) == true) {
@@ -104,27 +87,27 @@ static void BLOCK_LoadBlockNet() {
     for (int i = 0; i < lenBlockSet; i++) {
         for (int j = 0; j < lenBlockSet; j++) {
             switch (blockNet[i][j]) {
-                case BLOCK_GATE_W: {
-                    if (blockNet[j][i] != BLOCK_GATE_S) {
-                        blockNet[i][j] = BLOCK_GATE_ILLEGAL;
+                case DIRECTION_W: {
+                    if (blockNet[j][i] != DIRECTION_S) {
+                        blockNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
-                case BLOCK_GATE_A: {
-                    if (blockNet[j][i] != BLOCK_GATE_D) {
-                        blockNet[i][j] = BLOCK_GATE_ILLEGAL;
+                case DIRECTION_A: {
+                    if (blockNet[j][i] != DIRECTION_D) {
+                        blockNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
-                case BLOCK_GATE_S: {
-                    if (blockNet[j][i] != BLOCK_GATE_W) {
-                        blockNet[i][j] = BLOCK_GATE_ILLEGAL;
+                case DIRECTION_S: {
+                    if (blockNet[j][i] != DIRECTION_W) {
+                        blockNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
-                case BLOCK_GATE_D: {
-                    if (blockNet[j][i] != BLOCK_GATE_A) {
-                        blockNet[i][j] = BLOCK_GATE_ILLEGAL;
+                case DIRECTION_D: {
+                    if (blockNet[j][i] != DIRECTION_A) {
+                        blockNet[i][j] = DIRECTION_ILLEGAL;
                     }
                     break;
                 }
@@ -139,7 +122,7 @@ static void BLOCK_UnloadBlockNet() {
         blockNet = NULL;
     }
 }
-static int BLOCK_GetBlockFromNet(const int i, const BlockGate gate) {
+static int BLOCK_GetBlockFromNet(const int i, const Direction gate) {
     for (int j = 0; j < lenBlockSet; j++) {
         if (blockNet[i][j] == gate) {
             return j;
@@ -150,18 +133,18 @@ static int BLOCK_GetBlockFromNet(const int i, const BlockGate gate) {
 
 
 // BLOCK COVER =========================================================================================================
-static SDL_Texture* cover[NUM_BLOCK_GATES];
+static SDL_Texture* cover[NUM_DIRECTIONS];
 static void BLOCK_LoadBlockCover() {
-    cover[BLOCK_GATE_W] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverW.png");
-    cover[BLOCK_GATE_A] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverA.png");
-    cover[BLOCK_GATE_S] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverS.png");
-    cover[BLOCK_GATE_D] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverD.png");
-    for (int i = 0; i < NUM_BLOCK_GATES; i++) {
+    cover[DIRECTION_W] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverW.png");
+    cover[DIRECTION_A] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverA.png");
+    cover[DIRECTION_S] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverS.png");
+    cover[DIRECTION_D] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverD.png");
+    for (int i = 0; i < NUM_DIRECTIONS; i++) {
         SDL_SetTextureScaleMode(cover[i], SDL_SCALEMODE_NEAREST);
     }
 }
 static void BLOCK_UnloadBlockCover() {
-    for (int i = 0; i < NUM_BLOCK_GATES; i++) {
+    for (int i = 0; i < NUM_DIRECTIONS; i++) {
         SDL_DestroyTexture(cover[i]);
     }
 }
@@ -189,9 +172,37 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
     // load w, h
     block->w = surface->w;
     block->h = surface->h;
+    block->surface = surface;
 
     // load wall
-    block->wall = (int**)allocate2DArray(surface->w, surface->h, sizeof(int)); // malloc
+    block->wall = (bool**)allocate2DArray(surface->w, surface->h, sizeof(bool)); // malloc
+    for (int i = 0; i < surface->w; i++) {
+        for (int j = 0; j < surface->h; j++) {
+            block->wall[i][j] = true;
+        }
+    }
+    for (int i = 1; i < surface->w-1; i++) {
+        for (int j = 1; j < surface->h-1; j++) {
+            SDL_Color color = {0};
+            SDL_ReadSurfaceSDLColor(surface, i, j, &color);
+            if (SDL_CompareSDLColor(color, (SDL_Color){255, 255, 255, 255}) == true) {
+                block->wall[i][j] = false;
+            }
+            else {
+                const Gene* gene = GENE_FindGeneFromColor(color);
+                if (gene == NULL) {
+                    continue;
+                }
+                const char* name = GENE_GetNameFromGene(gene);
+                if (name == NULL) {
+                    continue;
+                }
+                if (strcmp(name, "You") == 0) {
+                    block->wall[i][j] = false;
+                }
+            }
+        }
+    }
 
     // load color
     SDL_ReadSurfaceSDLColor(surface, 0, 0, &block->color);
@@ -219,7 +230,7 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
         if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
         && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[BLOCK_GATE_W] = gateColor;
+            block->gateColors[DIRECTION_W] = gateColor;
         }
     }
     // A
@@ -228,7 +239,7 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
         if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
         && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[BLOCK_GATE_A] = gateColor;
+            block->gateColors[DIRECTION_A] = gateColor;
         }
     }
     // S
@@ -237,7 +248,7 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
         if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
         && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[BLOCK_GATE_S] = gateColor;
+            block->gateColors[DIRECTION_S] = gateColor;
         }
     }
     // D
@@ -246,11 +257,10 @@ static void BLOCK_LoadBlock(Block* block, const char* path) {
         SDL_ReadSurfaceSDLColor(surface, i, j, &gateColor);
         if (SDL_CompareSDLColor(gateColor, BLOCK_DEFAULT_COLOR) == false
         && SDL_CompareSDLColor(gateColor, block->color) == false) {
-            block->gateColors[BLOCK_GATE_D] = gateColor;
+            block->gateColors[DIRECTION_D] = gateColor;
         }
     }
     //
-    SDL_DestroySurface(surface); // free
 }
 static void BLOCK_UnloadBlock(Block* block) {
     if (block == NULL) {
@@ -264,13 +274,17 @@ static void BLOCK_UnloadBlock(Block* block) {
         TEMPO_DestroyElem(block->elem);
         block->elem = NULL;
     }
+    if (block->surface != NULL) {
+        SDL_DestroySurface(block->surface); // free
+        block->surface = NULL;
+    }
 }
 
 
 // BLOCK SET ===========================================================================================================
 int lenBlockSet;
 Block* blockSet;
-const char* blockSetPath = "../src/maze/block/blockSet.toml";
+const char* blockSetPath = "../config/maze/blockSet.toml";
 static void BLOCK_LoadBlockSet() {
     // Req Condition
     if (blockSetPath == NULL) {
@@ -319,12 +333,12 @@ static void BLOCK_UnloadBlockSet() {
 
 // BLOCK DRAW INFO =====================================================================================================
 static Uint64 time_start = 0, time_end = 0;
-static Uint64 period = 500;
+static Uint64 period = 1000;
 typedef struct BlockDrawInfo {
     SDL_FRect dst_rect[2];
     int depth;
-    SDL_FRect dst_rects[NUM_BLOCK_GATES][2];
-    int depths[NUM_BLOCK_GATES];
+    SDL_FRect dst_rects[NUM_DIRECTIONS][2];
+    int depths[NUM_DIRECTIONS];
 } BDI;
 BDI* BDISet;
 float rate;
@@ -350,7 +364,7 @@ static void BLOCK_RenewBDISet() {
     if (SDL_GetTicks() > time_end) {
         for (int i = 0; i < lenBlockSet; i++) {
             BDISet[i].dst_rect[0] = BDISet[i].dst_rect[1];
-            for (int j = 0; j < NUM_BLOCK_GATES; j++) {
+            for (int j = 0; j < NUM_DIRECTIONS; j++) {
                 BDISet[i].dst_rects[j][0] = BDISet[i].dst_rects[j][1];
             }
         }
@@ -366,7 +380,7 @@ static void BLOCK_SetNetCenter(const char* para) {
     if (para == NULL) {
         return;
     }
-    for (int i = 0; i < NUM_BLOCK_GATES; i++) {
+    for (int i = 0; i < NUM_DIRECTIONS; i++) {
         char string[] = "0123456789";
         loadStringFromSDLColor(string, blockSet[i].color);
         if (blockNetCenter != i && strcmp(para, string) == 0) {
@@ -394,26 +408,27 @@ void BLOCK_Unload() {
 }
 
 
-void BLOCK_RenewDstRect(const SDL_FRect dst_rect1, const BlockGate gate, SDL_FRect* dst_rect2) {
+// RENEW ===============================================================================================================
+void BLOCK_Renew_DstRect(const SDL_FRect dst_rect1, const Direction gate, SDL_FRect* dst_rect2) {
     if (dst_rect2 == NULL) {
         printf("%s.\n", __func__);
         return;
     }
     float dx = 0, dy = 0;
     switch (gate) {
-        case BLOCK_GATE_W: {
+        case DIRECTION_W: {
             dy = -dst_rect2->h;
             break;
         }
-        case BLOCK_GATE_A: {
+        case DIRECTION_A: {
             dx = -dst_rect2->w;
             break;
         }
-        case BLOCK_GATE_S: {
+        case DIRECTION_S: {
             dy = dst_rect1.h;
             break;
         }
-        case BLOCK_GATE_D: {
+        case DIRECTION_D: {
             dx = dst_rect1.w;
             break;
         }
@@ -425,7 +440,9 @@ void BLOCK_RenewDstRect(const SDL_FRect dst_rect1, const BlockGate gate, SDL_FRe
     dst_rect2->x = dst_rect1.x + dx;
     dst_rect2->y = dst_rect1.y + dy;
 }
+void BLOCK_Renew_Block() {}
 void BLOCK_Renew() {
+
     BLOCK_RenewBDISet();
 
     if (0 > blockNetCenter || blockNetCenter >= lenBlockSet) {
@@ -449,7 +466,7 @@ void BLOCK_Renew() {
     int depth;
     for (int i = 0; i < lenBlockSet; i++) {
         BDISet[i].depth = 0;
-        for (int j = 0; j < NUM_BLOCK_GATES; j++) {
+        for (int j = 0; j < NUM_DIRECTIONS; j++) {
             BDISet[i].depths[j] = 0;
         }
     }
@@ -462,7 +479,7 @@ void BLOCK_Renew() {
                 continue;
             }
             find[i] = HAD_FOUND;
-            for (int j = 0; j < NUM_BLOCK_GATES; j++) {
+            for (int j = 0; j < NUM_DIRECTIONS; j++) {
                 const int idx = BLOCK_GetBlockFromNet(i, j);
                 if (idx == i) {
                     continue;
@@ -472,7 +489,7 @@ void BLOCK_Renew() {
                         // renew dst, depth by blockSet[i], j
                         TEMPO_RenewElem(blockSet[idx].elem);
                         TEMPO_GetElemDstRect(blockSet[idx].elem, &BDISet[idx].dst_rect[1]);
-                        BLOCK_RenewDstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rect[1]);
+                        BLOCK_Renew_DstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rect[1]);
                         find[idx] = FOUND_NOW;
                         BDISet[idx].depth = depth;
                         break;
@@ -480,13 +497,13 @@ void BLOCK_Renew() {
                     case FOUND_NOW:
                     case HAD_FOUND: {
                         // renew gate.dst, gate.depth by blockSet[i], j
-                        TEMPO_GetElemDstRect(blockSet[idx].elem, &BDISet[idx].dst_rects[j][1]);
-                        BLOCK_RenewDstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rects[j][1]);
-                        BDISet[idx].depths[j] = depth;
                         break;
                     }
                     default: break;
                 }
+                TEMPO_GetElemDstRect(blockSet[idx].elem, &BDISet[idx].dst_rects[j][1]);
+                BLOCK_Renew_DstRect(BDISet[i].dst_rect[1], j, &BDISet[idx].dst_rects[j][1]);
+                BDISet[idx].depths[j] = depth;
             }
         } // 遍历find
         need_renew = false;
@@ -498,17 +515,27 @@ void BLOCK_Renew() {
         }
     }
 }
-void BLOCK_Draw() {
-    if (rate == 0 || rate == 1) {
-        for (int i = 0; i < lenBlockSet; i++) {
-            for (int j = 0; j < NUM_BLOCK_GATES; j++) {
-                if (BDISet[i].depths[j] > 0) {
-                    const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rects[j][0], BDISet[i].dst_rects[j][1], rate);
-                    TEMPO_SetElemDstRect(blockSet[i].elem, dst_rect);
-                    TEMPO_DrawElem(blockSet[i].elem);
-                    SDL_RenderTexture(mazeRenderer, cover[j], NULL, &dst_rect);
-                }
+
+
+// DRAW ================================================================================================================
+void BLOCK_Draw_BDI() {
+    for (int i = 0; i < lenBlockSet; i++) {
+        for (int j = 0; j < NUM_DIRECTIONS; j++) {
+            if (BDISet[i].depths[j] < 0) {
+                continue;
             }
+            const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rects[j][0], BDISet[i].dst_rects[j][1], rate);
+            TEMPO_SetElemDstRect(blockSet[i].elem, dst_rect);
+            TEMPO_DrawElem(blockSet[i].elem);
+        }
+    }
+    for (int i = 0; i < lenBlockSet; i++) {
+        for (int j = 0; j < NUM_DIRECTIONS; j++) {
+            if (BDISet[i].depths[j] < 0) {
+                continue;
+            }
+            const SDL_FRect dst_rect = EASE_GetFRect(BDISet[i].dst_rects[j][0], BDISet[i].dst_rects[j][1], rate);
+            SDL_RenderTexture(mazeRenderer, cover[j], NULL, &dst_rect);
         }
     }
     for (int i = 0; i < lenBlockSet; i++) {
@@ -519,3 +546,4 @@ void BLOCK_Draw() {
         }
     }
 }
+
