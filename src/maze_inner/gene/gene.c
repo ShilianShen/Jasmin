@@ -1,14 +1,11 @@
 #include "gene.h"
 
 
+// GENE ================================================================================================================
 struct Gene {
     char* name;
     SDL_Color color;
 };
-
-
-static int lenGeneSet;
-static Gene* geneSet;
 
 
 static void GENE_LoadGene(Gene* gene, const toml_table_t* tomlGene) {
@@ -53,6 +50,11 @@ static void GENE_UnloadGene(Gene* gene) {
         }
     }
 }
+
+
+// GENE SET ============================================================================================================
+static int lenGeneSet;
+static Gene* geneSet;
 
 
 static void GENE_LoadGeneSet(const char* path) {
@@ -100,8 +102,6 @@ static void GENE_UnloadGeneSet() {
         geneSet = NULL;
     }
 }
-
-
 static void GENE_Print_GeneSet() {
     printf("GENE SET[%d]:\n", lenGeneSet);
     for (int i = 0; i < lenGeneSet; i++) {
@@ -109,6 +109,9 @@ static void GENE_Print_GeneSet() {
         printf("%02d. %s, %s\n", i, SDL_GetStringFromSDLColor(gene.color), gene.name);
     }
 }
+
+
+// EXTERN ==============================================================================================================
 void GENE_Load() {
     static const char* path = "../config/maze/geneSet.toml";
     GENE_LoadGeneSet(path);
@@ -117,8 +120,6 @@ void GENE_Load() {
 void GENE_Unload() {
     GENE_UnloadGeneSet();
 }
-
-
 Gene* GENE_FindGeneFromColor(const SDL_Color color) {
     for (int i = 0; i < lenGeneSet; i++) {
         const bool r = geneSet[i].color.r == color.r;

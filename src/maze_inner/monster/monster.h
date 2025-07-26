@@ -31,4 +31,7 @@ void MONSTER_Renew();
 void MONSTER_Draw();
 
 
+void MONSTER_Move(Monster* monster, Direction direction);
+
+
 #endif //MAZE_MONSTER_H

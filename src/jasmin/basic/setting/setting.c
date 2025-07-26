@@ -133,7 +133,47 @@ bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, c
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
 }
 
+void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
+    void** array = (void**)malloc(w * sizeof(void*));
+    if (array == NULL) {
+        return NULL;
+    }
 
+    for (size_t i = 0; i < w; i++) {
+        array[i] = malloc(h * elementSize);
+        if (array[i] == NULL) {
+            // 分配失败，释放之前已分配的内存
+            for (size_t j = 0; j < i; j++) {
+                free(array[j]);
+            }
+            free(array);
+            return NULL;
+        }
+    }
+
+    return array;
+}
+void free2DArray(void** array, size_t w) {
+    if (array == NULL) return;
+
+    for (size_t i = 0; i < w; i++) {
+        free(array[i]);
+    }
+    free(array);
+}
+bool loadStringFromSDLColor(char* string, const SDL_Color color) {
+    if (string == NULL) {
+        printf("%s: string is null.\n", __func__);
+        return false;
+    }
+    // 00000000 - FFFFFFFF
+    if (strlen(string) < 8) {
+        printf("%s: string is too short, %lu.\n", __func__, strlen(string));
+        return false;
+    }
+    snprintf(string, 8, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
+    return true;
+}
 void SDL_PrintFRect(const SDL_FRect rect) {
     printf("[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
 }

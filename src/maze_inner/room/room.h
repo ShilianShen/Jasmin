@@ -23,6 +23,7 @@ typedef struct Room {
 
 extern int lenRoomSet;
 extern Room* roomSet;
+// void ROOM_SetNetCenter(const char* para);
 extern Direction** roomNet;
 
 

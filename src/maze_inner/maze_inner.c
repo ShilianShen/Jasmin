@@ -28,6 +28,5 @@ void MAZE_INNER_Renew() {
     MONSTER_Renew();
 }
 void MAZE_INNER_Draw() {
-    ROOM_Draw_BDI();
-    MONSTER_Draw();
+
 }

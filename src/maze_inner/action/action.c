@@ -2,5 +2,4 @@
 
 
 void ACTION_Move(Monster* monster, Direction direction) {
-
 }

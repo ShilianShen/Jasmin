@@ -19,6 +19,9 @@ extern float scale_x, scale_y;
 extern SDL_Color EMPTY;
 
 
+void** allocate2DArray(size_t w, size_t h, size_t elementSize);
+void free2DArray(void** array, size_t w);
+bool loadStringFromSDLColor(char* string, const SDL_Color color);
 char* SDL_GetStringFromSDLColor(SDL_Color color);
 char* SDL_GetStringFromFRect(SDL_FRect rect);
 bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, int x, int y, SDL_Color* color);

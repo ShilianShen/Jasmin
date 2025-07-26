@@ -5,62 +5,13 @@ const SDL_FRect ROOM_DEFAULT_GID_RECT = {0, 0, 16, 16};
 bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
-
-
 const SDL_Color ROOM_DEFAULT_COLOR = {0, 0, 0, 0};
-void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
-    void** array = (void**)malloc(w * sizeof(void*));
-    if (array == NULL) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i < w; i++) {
-        array[i] = malloc(h * elementSize);
-        if (array[i] == NULL) {
-            // 分配失败，释放之前已分配的内存
-            for (size_t j = 0; j < i; j++) {
-                free(array[j]);
-            }
-            free(array);
-            return NULL;
-        }
-    }
-
-    return array;
-}
-void free2DArray(void** array, size_t w) {
-    if (array == NULL) return;
-
-    for (size_t i = 0; i < w; i++) {
-        free(array[i]);
-    }
-    free(array);
-}
-bool loadStringFromSDLColor(char* string, const SDL_Color color) {
-    if (string == NULL) {
-        printf("%s: string is null.\n", __func__);
-        return false;
-    }
-    // 00000000 - FFFFFFFF
-    if (strlen(string) < 8) {
-        printf("%s: string is too short, %lu.\n", __func__, strlen(string));
-        return false;
-    }
-    snprintf(string, 8, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
-    return true;
-}
 static void ROOM_SetNetCenter(const char* para);
-SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const float t) {
-    SDL_FRect rect;
-    rect.x = (1 - t) * rect1.x + t * rect2.x;
-    rect.y = (1 - t) * rect1.y + t * rect2.y;
-    rect.w = (1 - t) * rect1.w + t * rect2.w;
-    rect.h = (1 - t) * rect1.h + t * rect2.h;
-    return rect;
-}
+const int SET_ILLEGAL_INDEX = -1;
 
 
-// BLOCK NET ===========================================================================================================
+
+// ROOM NET ============================================================================================================
 Direction** roomNet;
 static int roomNetCenter = 0;
 
@@ -128,11 +79,11 @@ static int ROOM_GetRoomFromNet(const int i, const Direction gate) {
             return j;
         }
     }
-    return i;
+    return SET_ILLEGAL_INDEX;
 }
 
 
-// BLOCK COVER =========================================================================================================
+// ROOM COVER ==========================================================================================================
 static SDL_Texture* cover[NUM_DIRECTIONS];
 static void ROOM_LoadRoomCover() {
     cover[DIRECTION_W] = IMG_LoadTexture(mazeRenderer, "../images/blocks/coverW.png");
@@ -150,7 +101,7 @@ static void ROOM_UnloadRoomCover() {
 }
 
 
-// BLOCK ===============================================================================================================
+// ROOM ================================================================================================================
 static void ROOM_LoadRoom(Room* room, const char* path) {
     // Req Condition
     if (room == NULL) {
@@ -281,7 +232,7 @@ static void ROOM_UnloadRoom(Room* room) {
 }
 
 
-// BLOCK SET ===========================================================================================================
+// ROOM SET ============================================================================================================
 int lenRoomSet;
 Room* roomSet;
 const char* roomSetPath = "../config/maze/roomSet.toml";
@@ -331,7 +282,7 @@ static void ROOM_UnloadRoomSet() {
 }
 
 
-// BLOCK DRAW INFO =====================================================================================================
+// ROOM DRAW INFO ======================================================================================================
 static Uint64 time_start = 0, time_end = 0;
 static Uint64 period = 1000;
 typedef struct RoomDrawInfo {
@@ -342,6 +293,7 @@ typedef struct RoomDrawInfo {
 } RDI;
 RDI* RDISet;
 float rate;
+static const int DEPTH_ILLEGAL = -1;
 static void ROOM_LoadRDISet() {
     RDISet = malloc(lenRoomSet * sizeof(RDI));
     if (RDISet == NULL) {
@@ -360,7 +312,7 @@ static void ROOM_UnloadRDISet() {
 }
 
 
-static void ROOM_RenewRDISet() {
+static void ROOM_Renew_RDISet_rate() {
     if (SDL_GetTicks() > time_end) {
         for (int i = 0; i < lenRoomSet; i++) {
             RDISet[i].dst_rect[0] = RDISet[i].dst_rect[1];
@@ -440,79 +392,65 @@ void ROOM_Renew_DstRect(const SDL_FRect dst_rect1, const Direction gate, SDL_FRe
     dst_rect2->x = dst_rect1.x + dx;
     dst_rect2->y = dst_rect1.y + dy;
 }
-void ROOM_Renew_Block() {}
+void ROOM_Renew_Room() {}
+void ROOM_Renew_RDISet_depth() {
+    for (int i = 0; i < lenRoomSet; i++) {
+        RDISet[i].depth = 0;
+    }
+    RDISet[roomNetCenter].depth = 1;
+}
 void ROOM_Renew() {
 
-    ROOM_RenewRDISet();
+    ROOM_Renew_RDISet_rate();
 
     if (0 > roomNetCenter || roomNetCenter >= lenRoomSet) {
         printf("%s.\n", __func__);
         return;
     }
-    bool need_renew = true;
-
-    int find[lenRoomSet];
+    // init
     enum {NOT_FOUND, FOUND_NOW, HAD_FOUND};
+    int find_state[lenRoomSet];
     for (int i = 0; i < lenRoomSet; i++) {
-        find[i] = NOT_FOUND;
+        find_state[i] = NOT_FOUND;
     }
-    find[roomNetCenter] = FOUND_NOW;
+    find_state[roomNetCenter] = FOUND_NOW;
+
+    for (int i = 0; i < lenRoomSet; i++) {
+        RDISet[i].depth = DEPTH_ILLEGAL;
+        for (int j = 0; j < NUM_DIRECTIONS; j++) {
+            RDISet[i].depths[j] = DEPTH_ILLEGAL;
+        }
+    }
+    RDISet[roomNetCenter].depth = 0;
 
     TEMPO_SetElemGidRect(roomSet[roomNetCenter].elem, ROOM_DEFAULT_GID_RECT);
     TEMPO_RenewElem(roomSet[roomNetCenter].elem);
-    // TEMPO_GetElemDstRect(blockSet[blockNetCenter].elem, &blockSet[blockNetCenter].dst_rect);
     TEMPO_GetElemDstRect(roomSet[roomNetCenter].elem, &RDISet[roomNetCenter].dst_rect[1]);
 
-    int depth;
-    for (int i = 0; i < lenRoomSet; i++) {
-        RDISet[i].depth = 0;
-        for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            RDISet[i].depths[j] = 0;
-        }
-    }
-    RDISet[roomNetCenter].depth = depth = 1;
 
-    while (need_renew) {
-        depth++;
+    for (int depth = 1; depth < lenRoomSet; depth++) {
         for (int i = 0; i < lenRoomSet; i++) {
-            if (find[i] != FOUND_NOW) {
+            if (find_state[i] != FOUND_NOW) {
                 continue;
-            }
-            find[i] = HAD_FOUND;
-            for (int j = 0; j < NUM_DIRECTIONS; j++) {
-                const int idx = ROOM_GetRoomFromNet(i, j);
-                if (idx == i) {
+            } // 只通过FOUND_NOW
+            find_state[i] = HAD_FOUND;
+            for (int gate = 0; gate < NUM_DIRECTIONS; gate++) {
+                const int j = ROOM_GetRoomFromNet(i, gate);
+                if (j == SET_ILLEGAL_INDEX) {
                     continue;
+                } // 只通过有效索引
+                if (find_state[j] == NOT_FOUND) {
+                    TEMPO_RenewElem(roomSet[j].elem);
+                    TEMPO_GetElemDstRect(roomSet[j].elem, &RDISet[j].dst_rect[1]);
+                    ROOM_Renew_DstRect(RDISet[i].dst_rect[1], gate, &RDISet[j].dst_rect[1]);
+                    find_state[j] = FOUND_NOW;
+                    RDISet[j].depth = depth;
                 }
-                switch (find[idx]) {
-                    case NOT_FOUND: {
-                        // renew dst, depth by blockSet[i], j
-                        TEMPO_RenewElem(roomSet[idx].elem);
-                        TEMPO_GetElemDstRect(roomSet[idx].elem, &RDISet[idx].dst_rect[1]);
-                        ROOM_Renew_DstRect(RDISet[i].dst_rect[1], j, &RDISet[idx].dst_rect[1]);
-                        find[idx] = FOUND_NOW;
-                        RDISet[idx].depth = depth;
-                        break;
-                    }
-                    case FOUND_NOW:
-                    case HAD_FOUND: {
-                        // renew gate.dst, gate.depth by blockSet[i], j
-                        break;
-                    }
-                    default: break;
-                }
-                TEMPO_GetElemDstRect(roomSet[idx].elem, &RDISet[idx].dst_rects[j][1]);
-                ROOM_Renew_DstRect(RDISet[i].dst_rect[1], j, &RDISet[idx].dst_rects[j][1]);
-                RDISet[idx].depths[j] = depth;
+                TEMPO_GetElemDstRect(roomSet[j].elem, &RDISet[j].dst_rects[gate][1]);
+                ROOM_Renew_DstRect(RDISet[i].dst_rect[1], gate, &RDISet[j].dst_rects[gate][1]);
+                RDISet[j].depths[gate] = depth;
             }
         } // 遍历find
-        need_renew = false;
-        for (int i = 0; i < lenRoomSet; i++) {
-            if (find[i] == FOUND_NOW) {
-                need_renew = true;
-                break;
-            }
-        }
     }
 }
 
@@ -521,7 +459,7 @@ void ROOM_Renew() {
 void ROOM_Draw_BDI() {
     for (int i = 0; i < lenRoomSet; i++) {
         for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            if (RDISet[i].depths[j] < 0) {
+            if (RDISet[i].depths[j] < DEPTH_ILLEGAL) {
                 continue;
             }
             const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rects[j][0], RDISet[i].dst_rects[j][1], rate);
@@ -531,7 +469,7 @@ void ROOM_Draw_BDI() {
     }
     for (int i = 0; i < lenRoomSet; i++) {
         for (int j = 0; j < NUM_DIRECTIONS; j++) {
-            if (RDISet[i].depths[j] < 0) {
+            if (RDISet[i].depths[j] < DEPTH_ILLEGAL) {
                 continue;
             }
             const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rects[j][0], RDISet[i].dst_rects[j][1], rate);
@@ -539,7 +477,7 @@ void ROOM_Draw_BDI() {
         }
     }
     for (int i = 0; i < lenRoomSet; i++) {
-        if (RDISet[i].depth > 0) {
+        if (RDISet[i].depth > DEPTH_ILLEGAL) {
             const SDL_FRect dst_rect = EASE_GetFRect(RDISet[i].dst_rect[0], RDISet[i].dst_rect[1], rate);
             TEMPO_SetElemDstRect(roomSet[i].elem, dst_rect);
             TEMPO_DrawElem(roomSet[i].elem);

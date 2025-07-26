@@ -14,6 +14,7 @@
 
 float EASE_None(const float x);
 float EASE_Sin2(const float x);
+SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const float t);
 
 
 #endif //JASMIN_BASIC_EASE_H
