@@ -129,6 +129,9 @@ SDL_Texture* TXT_LoadTextureWithLines(
 bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
+bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
+    return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
+}
 bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
 }
@@ -161,31 +164,39 @@ void free2DArray(void** array, size_t w) {
     }
     free(array);
 }
-bool loadStringFromSDLColor(char* string, const SDL_Color color) {
-    if (string == NULL) {
-        printf("%s: string is null.\n", __func__);
-        return false;
-    }
-    // 00000000 - FFFFFFFF
-    if (strlen(string) < 8) {
-        printf("%s: string is too short, %lu.\n", __func__, strlen(string));
-        return false;
-    }
-    snprintf(string, 8, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
-    return true;
-}
-void SDL_PrintFRect(const SDL_FRect rect) {
-    printf("[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
-}
+
 char* SDL_GetStringFromSDLColor(const SDL_Color color) {
-    static char string[11];
-    snprintf(string, 10, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
+    static char string[] = "00FF00FF";
+    static size_t len = 0;
+    if (len == 0) {
+        len = sizeof(string);
+    }
+    snprintf(string, len, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
     return string;
 }
 char* SDL_GetStringFromFRect(const SDL_FRect rect) {
     static char string[32];
     snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
     return string;
+}
+bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array) {
+    if (rect == NULL) {
+        printf("%s: rect is null.\n", __func__);
+        return false;
+    }
+    if (array == NULL) {
+        printf("%s: array is null.\n", __func__);
+        return false;
+    }
+    const toml_datum_t x = toml_double_at(array, 0);
+    const toml_datum_t y = toml_double_at(array, 1);
+    const toml_datum_t w = toml_double_at(array, 2);
+    const toml_datum_t h = toml_double_at(array, 3);
+    if (x.ok && y.ok && w.ok && h.ok) {
+        *rect = (SDL_FRect){(float)x.u.d, (float)y.u.d, (float)w.u.d, (float)h.u.d};
+        return true;
+    }
+    return false;
 }
 bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
     if (surface == NULL) {

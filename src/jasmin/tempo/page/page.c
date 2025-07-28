@@ -1,7 +1,8 @@
 #include "page.h"
 
 
-bool PAGE_IfReady(const Page* page) {
+// GET & SET ===========================================================================================================
+bool TEMPO_GetPageOk(const Page* page) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -21,6 +22,7 @@ bool PAGE_IfReady(const Page* page) {
 }
 
 
+// CREATE ==============================================================================================================
 static void PAGE_LoadName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {
@@ -40,7 +42,7 @@ static void PAGE_LoadName(Page* page, const char* name) {
         printf("%s: failed malloc page.name.\n", __func__);
     }
 }
-void PAGE_Load(Page* page, const char* name, const toml_table_t* tomlPage) {
+void TEMPO_CreatePage(Page* page, const char* name, const toml_table_t* tomlPage) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -75,7 +77,10 @@ void PAGE_Load(Page* page, const char* name, const toml_table_t* tomlPage) {
         }
     }
 }
-void PAGE_Unload(Page* page) {
+
+
+// DESTROY =============================================================================================================
+void TEMPO_DestroyPage(Page* page) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -98,7 +103,8 @@ void PAGE_Unload(Page* page) {
 }
 
 
-void PAGE_Renew(Page* page) {
+// RENEW ===============================================================================================================
+void TEMPO_RenewPage(Page* page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);
@@ -112,7 +118,10 @@ void PAGE_Renew(Page* page) {
         }
     }
 }
-void PAGE_Draw(const Page* page) {
+
+
+// DRAW ================================================================================================================
+void TEMPO_DrawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);

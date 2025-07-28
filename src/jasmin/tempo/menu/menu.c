@@ -137,16 +137,16 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
             printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
         }
         else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {
-            PAGE_Load(menu.pageRoot, pageName, tomlPage);
+            TEMPO_CreatePage(menu.pageRoot, pageName, tomlPage);
         }
         else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {
-            PAGE_Load(menu.pageEdge, pageName, tomlPage);
+            TEMPO_CreatePage(menu.pageEdge, pageName, tomlPage);
         }
         else {
             if (menu.pages[pageId] == NULL) {
                 menu.pages[pageId] = malloc(sizeof(Page));
             }
-            PAGE_Load(menu.pages[pageId], pageName, tomlPage);
+            TEMPO_CreatePage(menu.pages[pageId], pageName, tomlPage);
             pageId++;
         }
     }
@@ -170,11 +170,11 @@ static void TEMPO_UnloadMenuTheme() {
     }
 }
 void TEMPO_UnloadMenu() {
-    PAGE_Unload(menu.pageRoot);
-    PAGE_Unload(menu.pageEdge);
+    TEMPO_DestroyPage(menu.pageRoot);
+    TEMPO_DestroyPage(menu.pageEdge);
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            PAGE_Unload(menu.pages[i]);
+            TEMPO_DestroyPage(menu.pages[i]);
         }
     }
     TEMPO_UnloadMenuTheme();
@@ -220,10 +220,10 @@ void TEMPO_RenewMenu(const SDL_FRect bck_rect) {
     static bool need_load = true;
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
-    PAGE_Renew(menu.pageNow);
+    TEMPO_RenewPage(menu.pageNow);
     menu.bck_rect = bck_rect;
 }
 
 void TEMPO_DrawMenu() {
-    PAGE_Draw(menu.pageNow);
+    TEMPO_DrawPage(menu.pageNow);
 }

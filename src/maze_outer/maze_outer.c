@@ -5,7 +5,7 @@ void MAZE_OUTER_Init() {
 }
 void MAZE_OUTER_Deinit() {}
 void MAZE_OUTER_Load() {
-    ZERO_Unload();
+    ZERO_Load();
 }
 void MAZE_OUTER_Unload() {
     ZERO_Unload();

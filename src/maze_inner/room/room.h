@@ -5,34 +5,27 @@
 #include "../gene/gene.h"
 
 
+#define SET_ILLEGAL_INDEX -1
 
 
 typedef struct Room {
     SDL_Color color;
+    char* path;
     SDL_Color gateColors[NUM_DIRECTIONS];
     SDL_Surface* surface;
-
     int w, h;
     bool** wall; // malloc in LOAD
-
-    Elem* elem; // malloc
 } Room;
-
-
 
 
 extern int lenRoomSet;
 extern Room* roomSet;
-// void ROOM_SetNetCenter(const char* para);
 extern Direction** roomNet;
 
 
 void ROOM_Load();
 void ROOM_Unload();
-
-
 void ROOM_Renew();
-void ROOM_Draw_BDI();
 
 
 #endif //MAZE_BLOCK_H

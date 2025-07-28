@@ -28,5 +28,4 @@ void MAZE_INNER_Renew() {
     MONSTER_Renew();
 }
 void MAZE_INNER_Draw() {
-
 }
