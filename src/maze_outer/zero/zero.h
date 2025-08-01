@@ -3,7 +3,8 @@
 
 
 #include "../interface.h"
-
+#include "RDI/RDI.h"
+#include "room/room.h"
 
 void ZERO_Load();
 void ZERO_Unload();

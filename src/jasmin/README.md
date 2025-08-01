@@ -2,8 +2,13 @@
 
 ```mermaid
 graph LR
-    SDL3.h --> BASIC --> MENU --> jasmin.h
-    toml.h --> BASIC --> LO_TRI--> jasmin.h
+    SDL3.h --> interface.h
+    toml.h --> interface.h
+    interface.h --> BASIC
+    BASIC --> TEMPO --> jasmin.h
+    BASIC --> LOPO --> jasmin.h
+
+    
 ```
 
 ## 简介 INTRO

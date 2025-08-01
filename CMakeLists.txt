@@ -93,6 +93,12 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/maze_outer/zero/zero.h
         src/maze_inner/action/action.c
         src/maze_inner/action/action.h
+        src/jasmin/interface.h
+        src/maze_outer/zero/RDI/RDI.c
+        src/maze_outer/zero/RDI/RDI.h
+        src/maze_outer/zero/interface.h
+        src/maze_outer/zero/room/room.c
+        src/maze_outer/zero/room/room.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

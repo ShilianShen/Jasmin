@@ -5,9 +5,7 @@
 #include "../elem/elem.h"
 
 
-// #define PAGE_ELEM_VOLUME 16
-
-
+typedef struct PageInfo PageInfo;
 typedef struct Page {
     bool ok;
     int id; // id < 0 means it's off
