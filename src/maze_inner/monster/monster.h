@@ -5,6 +5,7 @@
 #include "../room/room.h"
 #include "../gene/gene.h"
 #include "../item/item.h"
+#include "../coord/coord.h"
 
 
 typedef struct Monster Monster;
@@ -12,13 +13,13 @@ struct Monster {
     Gene* gene;
     int life;
     int lifeBuffer;
-    Position now;
-    Position start;
+    Coord now;
+    Coord start;
     Monster* target;
     Monster* address;
     Item* item;
 };
-
+extern Monster* you;
 
 extern Monster* monsterSet;
 

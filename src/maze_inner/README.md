@@ -1,7 +1,7 @@
 # Maze
 ```mermaid
 flowchart LR
-    interface.h --> Gene.h --> Room.h --> Monster
+    interface.h --> Gene.h --> Room.h --> Coord --> Monster
     interface.h --> Item --> Monster --> Action --> Inner
 ```
 

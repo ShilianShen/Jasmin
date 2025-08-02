@@ -1,3 +1,9 @@
 # README
 
-现在处于Jasmin的开发阶段, 请移步至[JASMIN.README](./src/jasmin/README.md)
+```mermaid
+flowchart
+    Basic --> Tempo --> MazeOuter
+    Basic --> Lo-Po --> MazeOuter
+    Basic --> MazeInner --> MazeOuter
+    
+```

@@ -1,10 +1,7 @@
 #include "monster.h"
 
 
-Monster* monsterSet;
-int lenMonsterSet;
-
-
+// MONSTER =============================================================================================================
 static void MONSTER_Load_Monster(Monster* monster, Room* block, const int x, const int y, Gene* gene) {
     if (monster == NULL) {
         printf("%s, f.\n", __func__);
@@ -15,17 +12,28 @@ static void MONSTER_Load_Monster(Monster* monster, Room* block, const int x, con
 static void MONSTER_Unload_Monster(Monster* monster) {
 }
 
-static void MONSTER_Load_MonsterSet() {
-    //
+
+// MONSTER SET =========================================================================================================
+Monster* monsterSet = NULL;
+Monster* you = NULL;
+const char youName[] = "You";
+int lenMonsterSet = 0;
+
+
+static void MONSTER_LoadLenMonsterSet() {
+    bool findYou = false;
     for (int i = 0; i < lenRoomSet; i++) {
-        const Room* block = &roomSet[i];
-        for (int x = 2; x < block->w-2; x++) {
-            for (int y = 2; y < block->h-2; y++) {
+        const Room* room = &roomSet[i];
+
+        for (int x = 2; x < room->w-2; x++) {
+            for (int y = 2; y < room->h-2; y++) {
                 SDL_Color color;
-                SDL_ReadSurfaceSDLColor(block->surface, x, y, &color);
+                SDL_ReadSurfaceSDLColor(room->surface, x, y, &color);
                 const Gene* gene = GENE_FindGeneFromColor(color);
-                if (gene == NULL) {
-                    continue;
+                if (gene == NULL) continue;
+                if (strcmp(GENE_GetNameFromGene(gene), youName) == 0) {
+                    if (findYou == false) findYou = true;
+                    else continue;
                 }
                 lenMonsterSet++;
             }
@@ -33,14 +41,18 @@ static void MONSTER_Load_MonsterSet() {
     }
     if (lenMonsterSet == 0) {
         printf("%s, f.\n", __func__);
-        return;
     }
+}
+static void MONSTER_Load_MonsterSet() {
+    //
+    MONSTER_LoadLenMonsterSet();
     monsterSet = malloc(lenMonsterSet * sizeof(Monster)); // malloc
     if (monsterSet == NULL) {
         printf("%s, f.\n", __func__);
         return;
     } // Req Condition
     //
+    bool findYou = false;
     int idx = 0;
     for (int i = 0; i < lenRoomSet; i++) {
         Room* block = &roomSet[i];
@@ -52,8 +64,13 @@ static void MONSTER_Load_MonsterSet() {
                     continue;
                 }
                 Gene* gene = GENE_FindGeneFromColor(color);
-                if (gene == NULL) {
-                    continue;
+                if (gene == NULL) continue;
+                if (strcmp(GENE_GetNameFromGene(gene), youName) == 0) {
+                    if (findYou == false) {
+                        findYou = true;
+                        you = &monsterSet[idx];
+                    }
+                    else continue;
                 }
                 MONSTER_Load_Monster(&monsterSet[idx], block, x, y, gene);
                 idx++;
@@ -73,6 +90,7 @@ static void MONSTER_Unload_MonsterSet() {
 }
 
 
+// ?
 static void MONSTER_Print_MonsterSet() {
     printf("MONSTER SET[%d]:\n", lenMonsterSet);
     for (int i = 0; i < lenMonsterSet; i++) {
@@ -80,6 +98,9 @@ static void MONSTER_Print_MonsterSet() {
         printf("%4d. %s\n", i, GENE_GetNameFromGene(monster.gene));
     }
 }
+
+
+// LOAD & UNLOAD =======================================================================================================
 void MONSTER_Load() {
     MONSTER_Load_MonsterSet();
     MONSTER_Print_MonsterSet();
@@ -89,14 +110,40 @@ void MONSTER_Unload() {
 }
 
 
-void MONSTER_Renew() {
-
-}
-
-void MONSTER_Move(Monster* monster, Direction direction) {
+// OTHER ===============================================================================================================
+void MONSTER_Move(Monster* monster, const Direction direction) {
     if (monster == NULL) {
         printf("%s, f.\n", __func__);
         return;
     }
+    switch (direction) {
+        case DIRECTION_W: {
+            monster->now.y -= 1;
+            break;
+        }
+        case DIRECTION_A: {
+            monster->now.x -= 1;
+            break;
+        }
+        case DIRECTION_S: {
+            monster->now.y += 1;
+            break;
+        }
+        case DIRECTION_D: {
+            monster->now.x += 1;
+            break;
+        }
+        default: break;
+    }
+}
+void MONSTER_Heal(Monster* monster) {
+    if (monster == NULL) {
+        printf("%s, f.\n", __func__);
+        return;
+    }
+}
+
+// RENEW ===============================================================================================================
+void MONSTER_Renew() {
 
 }

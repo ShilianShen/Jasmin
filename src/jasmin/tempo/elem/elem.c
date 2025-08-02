@@ -105,6 +105,7 @@ bool TEMPO_GetElemOk(const Elem* elem) {
 }
 
 
+// ?
 static void TEMPO_CreateElem_CheckOk(Elem* elem) {
     elem->ok = false;
     if (elem->string == NULL) {

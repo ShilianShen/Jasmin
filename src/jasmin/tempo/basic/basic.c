@@ -1,20 +1,25 @@
 #include "basic.h"
 
 
+//
 SDL_Renderer* tempoRenderer;
 TTF_Font* tempoTextFont;
 SDL_FRect tempoBckRect = {0, 0, 0, 0};
 static bool tempoOk = false;
 
 
-bool TEMPO_GetBasicOk() {
-    return tempoOk;
-}
+//
 static void TEMPO_CheckBasicOk() {
     tempoOk = false;
     if (tempoRenderer != NULL && tempoTextFont != NULL) {
         tempoOk = true;
     }
+}
+
+
+// GET & SET ===========================================================================================================
+bool TEMPO_GetBasicOk() {
+    return tempoOk;
 }
 void TEMPO_SetBasicRenderer(SDL_Renderer* renderer) {
     if (renderer == NULL) {

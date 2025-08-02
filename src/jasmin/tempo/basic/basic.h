@@ -10,6 +10,7 @@ extern TTF_Font* tempoTextFont;
 extern SDL_FRect tempoBckRect;
 
 
+
 bool TEMPO_GetBasicOk();
 void TEMPO_SetBasicRenderer(SDL_Renderer*);
 void TEMPO_SetBasicFont(TTF_Font*);

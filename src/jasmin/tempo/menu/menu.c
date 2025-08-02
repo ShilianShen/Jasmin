@@ -5,10 +5,12 @@ const char MENU_ROOT_NAME[] = "Root";
 const char MENU_EDGE_NAME[] = "Edge";
 
 
+// MENU ================================================================================================================
 Menu menu;
 
 
-static Page* TEMPO_getPageFromMenuPathId(const int pathId) {
+// GET & SET ===========================================================================================================
+static Page* TEMPO_GetPageFromMenuPathId(const int pathId) {
     return menu.pages[menu.path[pathId]];
 }
 static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
@@ -16,6 +18,7 @@ static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
 }
 
 
+// INIT & DEINIT =======================================================================================================
 void TEMPO_InitMenu() {
     // Req Condition
     if (tempoRenderer == NULL) {
@@ -67,6 +70,8 @@ void TEMPO_DeinitMenu() {
     }
 }
 
+
+// LOAD & UNLOAD =======================================================================================================
 static void TEMPO_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
     if (menu.theme.font != NULL) {
@@ -137,16 +142,25 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
             printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
         }
         else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {
-            TEMPO_CreatePage(menu.pageRoot, pageName, tomlPage);
+            if (menu.pageRoot != NULL) {
+                TEMPO_DestroyPage(menu.pageRoot);
+                menu.pageRoot = NULL;
+            }
+            menu.pageRoot = TEMPO_CreatePage(pageName, tomlPage);
         }
         else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {
-            TEMPO_CreatePage(menu.pageEdge, pageName, tomlPage);
+            if (menu.pageEdge != NULL) {
+                TEMPO_DestroyPage(menu.pageEdge);
+                menu.pageEdge = NULL;
+            }
+            menu.pageEdge = TEMPO_CreatePage(pageName, tomlPage);
         }
         else {
-            if (menu.pages[pageId] == NULL) {
-                menu.pages[pageId] = malloc(sizeof(Page));
+            if (menu.pages[pageId] != NULL) {
+                TEMPO_DestroyPage(menu.pages[pageId]);
+                menu.pages[pageId] = NULL;
             }
-            TEMPO_CreatePage(menu.pages[pageId], pageName, tomlPage);
+            menu.pages[pageId] = TEMPO_CreatePage(pageName, tomlPage);
             pageId++;
         }
     }
@@ -170,16 +184,18 @@ static void TEMPO_UnloadMenuTheme() {
     }
 }
 void TEMPO_UnloadMenu() {
-    TEMPO_DestroyPage(menu.pageRoot);
-    TEMPO_DestroyPage(menu.pageEdge);
+    TEMPO_UnloadPage(menu.pageRoot);
+    TEMPO_UnloadPage(menu.pageEdge);
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            TEMPO_DestroyPage(menu.pages[i]);
+            TEMPO_UnloadPage(menu.pages[i]);
         }
     }
     TEMPO_UnloadMenuTheme();
 }
 
+
+// RENEW ===============================================================================================================
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
@@ -188,11 +204,11 @@ static void TEMPO_RenewMenuPath() {
         if (need_clear) {
             menu.path[i] = 0;
         }
-        else if (TEMPO_getPageFromMenuPathId(i) == NULL) {
+        else if (TEMPO_GetPageFromMenuPathId(i) == NULL) {
             need_clear = true;
         }
         else {
-            DEBUG_SendMessageL("/%s", TEMPO_getPageFromMenuPathId(i)->name);
+            DEBUG_SendMessageL("/%s", TEMPO_GetPageFromMenuPathId(i)->name);
         }
     }
     if (need_clear == false) {
@@ -202,14 +218,14 @@ static void TEMPO_RenewMenuPath() {
 }
 static void TEMPO_RenewMenuPageNow() {
     // if pageRoot
-    if (TEMPO_getPageFromMenuPathId(0) == NULL) {
+    if (TEMPO_GetPageFromMenuPathId(0) == NULL) {
         menu.pageNow = menu.pageRoot;
         return;
     }
     // else if pageOther
     for (int i = 0; i + 1 < MENU_PATH_VOLUME; i++) {
-        if (TEMPO_getPageFromMenuPathId(i) != NULL && TEMPO_getPageFromMenuPathId(i+1) == NULL) {
-            menu.pageNow = TEMPO_getPageFromMenuPathId(i);
+        if (TEMPO_GetPageFromMenuPathId(i) != NULL && TEMPO_GetPageFromMenuPathId(i+1) == NULL) {
+            menu.pageNow = TEMPO_GetPageFromMenuPathId(i);
             return;
         }
     }
@@ -224,6 +240,8 @@ void TEMPO_RenewMenu(const SDL_FRect bck_rect) {
     menu.bck_rect = bck_rect;
 }
 
+
+// DRAW ================================================================================================================
 void TEMPO_DrawMenu() {
     TEMPO_DrawPage(menu.pageNow);
 }
