@@ -3,21 +3,21 @@
 
 
 #include "../room/room.h"
+#include "../gene/gene.h"
+#include "../item/item.h"
 
 
-typedef struct Position {
-    Room* block;
-    int x, y;
-} Position;
-
-
-typedef struct Monster {
+typedef struct Monster Monster;
+struct Monster {
     Gene* gene;
-    Position posBirth;
-    Position pos;
     int life;
     int lifeBuffer;
-} Monster;
+    Position now;
+    Position start;
+    Monster* target;
+    Monster* address;
+    Item* item;
+};
 
 
 extern Monster* monsterSet;
@@ -28,7 +28,6 @@ void MONSTER_Unload();
 
 
 void MONSTER_Renew();
-void MONSTER_Draw();
 
 
 void MONSTER_Move(Monster* monster, Direction direction);

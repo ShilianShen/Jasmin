@@ -27,9 +27,6 @@ struct ElemInfo {
 };
 
 
-extern const SDL_FRect ELEM_DEFAULT_GID_RECT;
-
-
 void TEMPO_SetElemGidRect(Elem* elem, SDL_FRect gid_rect);
 void TEMPO_SetElemDstRect(Elem* elem, SDL_FRect dst_rect);
 void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect);

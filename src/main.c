@@ -82,7 +82,6 @@ static void RENEW() {
     LOPO_Renew();
     MAZE_INNER_Renew();
     MAZE_OUTER_Renew();
-    //LOTRI_Renew();
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
@@ -99,10 +98,7 @@ static void DRAW() {
     // TEST_Draw();
     MAZE_INNER_Draw();
     MAZE_OUTER_Draw();
-    LOPO_Draw();
-    //LOTRI_Draw();
-
-    //TEMPO_DrawMenu();
+    TEMPO_DrawMenu();
 
 
     // physical draw

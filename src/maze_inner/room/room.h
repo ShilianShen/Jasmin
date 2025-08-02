@@ -18,6 +18,13 @@ typedef struct Room {
 } Room;
 
 
+typedef struct Position {
+    Room* room;
+    int x, y;
+    Direction direction;
+} Position;
+
+
 extern int lenRoomSet;
 extern Room* roomSet;
 extern Direction** roomNet;

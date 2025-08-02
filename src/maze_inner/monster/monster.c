@@ -11,9 +11,6 @@ static void MONSTER_Load_Monster(Monster* monster, Room* block, const int x, con
         return;
     } // Req Condition
     monster->gene = gene;
-    monster->posBirth.block = block;
-    monster->posBirth.x = x;
-    monster->posBirth.y = y;
 }
 static void MONSTER_Unload_Monster(Monster* monster) {
 }
@@ -95,37 +92,11 @@ void MONSTER_Unload() {
 void MONSTER_Renew() {
 
 }
-void MONSTER_Draw() {
-}
 
 void MONSTER_Move(Monster* monster, Direction direction) {
     if (monster == NULL) {
         printf("%s, f.\n", __func__);
         return;
     }
-    int x = monster->pos.x, y = monster->pos.y;
-    int dx = 0, dy = 0;
-    switch (direction) {
-        case DIRECTION_W: {
-            dy = -1;
-            break;
-        }
-        case DIRECTION_A: {
-            dx = -1;
-            break;
-        }
-        case DIRECTION_S: {
-            dy = 1;
-            break;
-        }
-        case DIRECTION_D: {
-            dx = 1;
-            break;
-        }
-        default: break;
-    }
-    if (monster->pos.block->wall[x + dx][y + dy] == false) {
-        monster->pos.x += dx;
-        monster->pos.y += dy;
-    }
+
 }
