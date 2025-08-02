@@ -1,8 +1,8 @@
 #include "menu.h"
 
 
-const char MENU_ROOT_NAME[] = "Root";
-const char MENU_EDGE_NAME[] = "Edge";
+const char* MENU_ROOT_NAME = "Root";
+const char* MENU_EDGE_NAME = "Edge";
 
 
 // MENU ================================================================================================================
@@ -43,28 +43,21 @@ void TEMPO_InitMenu() {
     //
     menu = (Menu){0};
     menu.renderer = tempoRenderer;
-    menu.pageRoot = malloc(sizeof(Page)); // malloc pageRoot
-    menu.pageEdge = malloc(sizeof(Page)); // malloc pageEdge
-    for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] == NULL) {
-            menu.pages[i] = malloc(sizeof(Page)); // malloc pages
-        }
-    }
     tempoRenderer = menu.renderer;
 }
 void TEMPO_DeinitMenu() {
     // Opt Condition
     if (menu.pageRoot != NULL) {
-        free(menu.pageRoot); // free pageRoot
+        TEMPO_DestroyPage(menu.pageRoot);
         menu.pageRoot = NULL;
     }
     if (menu.pageEdge != NULL) {
-        free(menu.pageEdge); // free pageEdge
+        TEMPO_DestroyPage(menu.pageEdge);
         menu.pageEdge = NULL;
     }
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            free(menu.pages[i]); // free pages
+            TEMPO_DestroyPage(menu.pages[i]);
             menu.pages[i] = NULL;
         }
     }
@@ -74,9 +67,6 @@ void TEMPO_DeinitMenu() {
 // LOAD & UNLOAD =======================================================================================================
 static void TEMPO_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
     // Req Condition
-    if (menu.theme.font != NULL) {
-        printf("%s: theme.font not free.\n", __func__); return;
-    }
     if (tomlFontPath.ok == false) {
         printf("%s: tomlFontPath not exists.\n", __func__); return;
     }
@@ -90,25 +80,6 @@ static void TEMPO_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_
         printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);
     }
     TEMPO_SetBasicFont(font);
-    menu.theme.font = font;
-}
-static void TEMPO_LoadMenuThemeColor(const toml_array_t* tomlColor) {
-    // Req Condition
-    if (tomlColor == NULL) {
-        printf("%s: tomlColor not exists.\n", __func__);
-        return;
-    }
-
-    //
-    int color[4] = {};
-    for (int i = 0; i < 4; i++) {
-        const toml_datum_t c = toml_int_at(tomlColor, i);
-        color[i] = c.ok ? (int)c.u.i : 255;
-    }
-    menu.theme.color.r = color[0];
-    menu.theme.color.g = color[1];
-    menu.theme.color.b = color[2];
-    menu.theme.color.a = color[3];
 }
 static void TEMPO_LoadMenuTheme(const char* tomlPath) {
     // Req Condition
@@ -121,9 +92,7 @@ static void TEMPO_LoadMenuTheme(const char* tomlPath) {
     //
     const toml_datum_t tomlFontPath = toml_string_in(tomlMenuTheme, "font_path");
     const toml_datum_t tomlFontSize = toml_double_in(tomlMenuTheme, "font_size");
-    const toml_array_t* tomlColor = toml_array_in(tomlMenuTheme, "font_color");
     TEMPO_LoadMenuThemeFont(tomlFontPath, tomlFontSize);
-    TEMPO_LoadMenuThemeColor(tomlColor);
 
     //
     toml_free(tomlMenuTheme); // free tomlMenuTheme
@@ -168,7 +137,9 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
     //
     toml_free(tomlMenu); // end malloc
 }
-void TEMPO_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
+void TEMPO_LoadMenu() {
+    const char* menuPagesPath = "../config/tempo/menu_pages.toml";
+    const char* menuThemePath = "../config/tempo/menu_theme.toml";
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
@@ -178,17 +149,17 @@ void TEMPO_LoadMenu(const char* menuPagesPath, const char* menuThemePath) {
 }
 
 static void TEMPO_UnloadMenuTheme() {
-    if (menu.theme.font != NULL) {
-        TTF_CloseFont(menu.theme.font);
-        menu.theme.font = NULL;
-    }
+    TEMPO_UnloadBasic();
 }
 void TEMPO_UnloadMenu() {
-    TEMPO_UnloadPage(menu.pageRoot);
-    TEMPO_UnloadPage(menu.pageEdge);
+    TEMPO_DestroyPage(menu.pageRoot);
+    menu.pageRoot = NULL;
+    TEMPO_DestroyPage(menu.pageEdge);
+    menu.pageEdge = NULL;
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            TEMPO_UnloadPage(menu.pages[i]);
+            TEMPO_DestroyPage(menu.pages[i]);
+            menu.pages[i] = NULL;
         }
     }
     TEMPO_UnloadMenuTheme();
@@ -232,12 +203,11 @@ static void TEMPO_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-void TEMPO_RenewMenu(const SDL_FRect bck_rect) {
+void TEMPO_RenewMenu() {
     static bool need_load = true;
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
     TEMPO_RenewPage(menu.pageNow);
-    menu.bck_rect = bck_rect;
 }
 
 

@@ -22,8 +22,8 @@ bool TEMPO_GetPageOk(const Page* page) {
 }
 
 
-// CREATE & DESTROY=====================================================================================================
-static void PAGE_LoadName(Page* page, const char* name) {
+// LOAD & UNLOAD =======================================================================================================
+static void TEMPO_LoadPageName(Page* page, const char* name) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -42,8 +42,7 @@ static void PAGE_LoadName(Page* page, const char* name) {
         printf("%s: failed malloc page.name.\n", __func__);
     }
 }
-
-bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tomlPage) {
+static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tomlPage) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -62,7 +61,7 @@ bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tomlPage) 
     *page = (Page){0};
 
     //
-    PAGE_LoadName(page, name);
+    TEMPO_LoadPageName(page, name);
 
     //
     const toml_array_t* tomlElems = toml_array_in(tomlPage, "elems");
@@ -82,7 +81,7 @@ bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tomlPage) 
     }
     return true;
 }
-void TEMPO_UnloadPage(Page* page) {
+static void TEMPO_UnloadPage(Page* page) {
     // Req Condition
     if (page == NULL) {
         printf("%s: page not exists.\n", __func__);
@@ -104,6 +103,8 @@ void TEMPO_UnloadPage(Page* page) {
     }
 }
 
+
+// CREATE & DESTROY=====================================================================================================
 Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
     Page* page = malloc(sizeof(Page));
     if (page == NULL) {

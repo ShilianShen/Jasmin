@@ -1,9 +1,10 @@
 #include "basic.h"
 
 
-//
-SDL_Renderer* tempoRenderer;
-TTF_Font* tempoTextFont;
+// BASIC ===============================================================================================================
+Basic basic = (Basic){0};
+SDL_Renderer* tempoRenderer = NULL;
+TTF_Font* tempoTextFont = NULL;
 SDL_FRect tempoBckRect = {0, 0, 0, 0};
 static bool tempoOk = false;
 
@@ -40,4 +41,17 @@ void TEMPO_SetBasicFont(TTF_Font* font) {
 void TEMPO_SetBasicBckRect(const SDL_FRect bck_rect) {
     tempoBckRect = bck_rect;
     TEMPO_CheckBasicOk();
+}
+
+
+
+// LOAD & UNLOAD =======================================================================================================
+bool TEMPO_LoadBasic() {
+
+}
+void TEMPO_UnloadBasic() {
+    if (basic.textFont != NULL) {
+        TTF_CloseFont(basic.textFont);
+        basic.textFont = NULL;
+    } // Opt Condition
 }
