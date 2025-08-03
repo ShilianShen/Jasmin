@@ -76,6 +76,7 @@ static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tom
     for (int i = 0; i < page->numElems; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         if (tomlElem != NULL) {
+
             page->elems[i] = TEMPO_CreateElemFromToml(tomlElem); // malloc
         }
     }
@@ -94,7 +95,7 @@ static void TEMPO_UnloadPage(Page* page) {
     if (page->elems != NULL) {
         for (int i = 0; i < page->numElems; i++) {
             if (page->elems[i] != NULL) {
-                TEMPO_DestroyElem(page->elems[i]); // free
+                TEMPO_DeleteElem(page->elems[i]); // free
                 page->elems[i] = NULL;
             }
         }
@@ -133,7 +134,7 @@ void TEMPO_RenewPage(Page* page) {
 
     //
     for (int i = 0; i < page->numElems; i++) {
-        if (TEMPO_GetElemOk(page->elems[i])) {
+        if (page->elems[i] != NULL) {
             TEMPO_RenewElem(page->elems[i]);
         }
     }
@@ -150,7 +151,7 @@ void TEMPO_DrawPage(const Page* page) {
 
     //
     for (int i = 0; i < page->numElems; i++) {
-        if (TEMPO_GetElemOk(page->elems[i])) {
+        if (page->elems[i] != NULL) {
             TEMPO_DrawElem(page->elems[i]);
         }
     }

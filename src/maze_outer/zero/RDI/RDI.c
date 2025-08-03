@@ -104,7 +104,7 @@ void ZERO_UnloadRDI() {
     if (RDIs != NULL) {
         for (int i = 0; i < lenRoomSet; i++) {
             if (RDIs[i].elem != NULL) {
-                TEMPO_DestroyElem(RDIs[i].elem);
+                TEMPO_DeleteElem(RDIs[i].elem);
             }
         }
         free(RDIs);

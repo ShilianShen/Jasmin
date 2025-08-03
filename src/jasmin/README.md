@@ -8,7 +8,7 @@ graph LR
     BASIC --> TEMPO --> jasmin.h
     BASIC --> LOPO --> jasmin.h
 
-    
+  
 ```
 
 ## 简介 INTRO
@@ -43,6 +43,14 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 ### 特别函数标识符
 
 以下为特别函数标识符及其解释:
+
+
+| 返回类型  | 函数名             | 传入参数       |
+| --------- | ------------------ | -------------- |
+| MyStruct* | XX_CreateMyStruct  | ...            |
+| void      | XX_DestroyMyStruct | MyStruct*      |
+| bool      | XX_LoadMyStruct    | MyStruct*, ... |
+| void      | XX_UnloadMyStruct  | MyStruct*      |
 
 * init & deinit: 初始化(deinit前只调用一次)和反初始化(在unload后可反复调用), 通常不会有什么文件参数要求.
 * load & unload: 载入(init后unload前只调用一次)和释放(可反复调用), 通常参数和文件有关.

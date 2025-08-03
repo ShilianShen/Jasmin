@@ -30,12 +30,12 @@ struct ElemInfo {
 void TEMPO_SetElemGidRect(Elem* elem, SDL_FRect gid_rect);
 void TEMPO_SetElemDstRect(Elem* elem, SDL_FRect dst_rect);
 void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect);
-bool TEMPO_GetElemOk(const Elem* elem);
 
 
 Elem* TEMPO_CreateElem(ElemInfo info);
-Elem* TEMPO_CreateElemFromToml(const toml_table_t*);
-void TEMPO_DestroyElem(Elem* elem);
+
+Elem *TEMPO_CreateElemFromToml(const toml_table_t *);
+void TEMPO_DeleteElem(Elem* elem);
 void TEMPO_RenewElem(Elem* elem);
 void TEMPO_DrawElem(Elem *elem);
 

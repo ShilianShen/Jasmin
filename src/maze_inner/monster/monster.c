@@ -103,7 +103,7 @@ static void MONSTER_Print_MonsterSet() {
 // LOAD & UNLOAD =======================================================================================================
 void MONSTER_Load() {
     MONSTER_Load_MonsterSet();
-    MONSTER_Print_MonsterSet();
+    // MONSTER_Print_MonsterSet();
 }
 void MONSTER_Unload() {
     MONSTER_Unload_MonsterSet();

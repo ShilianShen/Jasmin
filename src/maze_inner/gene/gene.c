@@ -115,7 +115,7 @@ static void GENE_Print_GeneSet() {
 void GENE_Load() {
     static const char* path = "../config/maze/geneSet.toml";
     GENE_LoadGeneSet(path);
-    GENE_Print_GeneSet();
+    // GENE_Print_GeneSet();
 }
 void GENE_Unload() {
     GENE_UnloadGeneSet();

@@ -65,7 +65,6 @@ struct Elem {
 
     // create
     SDL_Texture* texture; SDL_FRect src_rect;
-    bool ok; // ok为true意味着可以正常renew和draw
 
     // renew
     SDL_FRect dst_rect;
@@ -95,28 +94,6 @@ void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect) {
         return;
     }
     *dst_rect = elem->dst_rect;
-}
-bool TEMPO_GetElemOk(const Elem* elem) {
-    if (elem == NULL) {
-        printf("%s: elem is null.\n", __func__);
-        return false;
-    }
-    return elem->ok;
-}
-
-
-// ?
-static void TEMPO_CreateElem_CheckOk(Elem* elem) {
-    elem->ok = false;
-    if (elem->string == NULL) {
-        printf("%s: elem.string not exists.\n", __func__);
-        return;
-    }
-    if (elem->texture == NULL) {
-        printf("%s: elem[%s].texture not exists.\n", __func__, elem->string);
-        return;
-    }
-    elem->ok = true;
 }
 
 
@@ -187,9 +164,6 @@ static bool TEMPO_LoadElem(Elem* elem, const ElemInfo info) {
     float w, h;
     SDL_GetTextureSize(elem->texture, &w, &h);
     elem->src_rect = (SDL_FRect){0, 0, w, h};
-
-    // ok
-    TEMPO_CreateElem_CheckOk(elem);
     return true;
 }
 static void TEMPO_UnloadElem(Elem* elem) {
@@ -212,26 +186,35 @@ static void TEMPO_UnloadElem(Elem* elem) {
 }
 
 
-// CREATE & DESTROY ====================================================================================================
-Elem* TEMPO_CreateElem(const ElemInfo info) {
+// CREATE & DELETE =====================================================================================================
+static Elem* TEMPO_CreateElemWithRisk(const ElemInfo info) {
+    // INIT ELEM
     Elem* elem = malloc(sizeof(Elem)); // malloc
     if (elem == NULL) {
         printf("%s: malloc failed\n", __func__);
         return NULL;
     } // Req Condition
     *elem = (Elem){0};
-    if (TEMPO_LoadElem(elem, info) == false) {
-        TEMPO_DestroyElem(elem);
-        elem = NULL;
-    }
+
+    // LOAD ELEM
+    TEMPO_LoadElem(elem, info);
     return elem;
-} // 创建Elem(动态分配), 如果失败返回NULL.
-void TEMPO_DestroyElem(Elem* elem) {
+} // 尝试创建元素, 但任然需要检查
+extern void  TEMPO_DeleteElem(Elem* elem) {
     TEMPO_UnloadElem(elem);
     free(elem); // free
     elem = NULL;
-}
-Elem* TEMPO_CreateElemFromToml(const toml_table_t* tomlInfo) {
+} // 删除元素
+extern Elem* TEMPO_CreateElem(const ElemInfo info) {
+    Elem* elem = TEMPO_CreateElemWithRisk(info);
+    if (elem != NULL && elem->string != NULL && elem->texture != NULL) {
+        return elem;
+    }
+    printf("%s: failed.\n", __func__);
+    TEMPO_DeleteElem(elem);
+    return NULL;
+} // 尝试创建元素, 成功返回elem, 失败返回NULL
+extern Elem *TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
     if (tomlInfo == NULL) {
         printf("%s: tomlElem not exists.\n", __func__);
         return NULL;
@@ -292,7 +275,6 @@ static void TEMPO_RenewElem_State(Elem* elem) {
     const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
     if (elem->state == ELEM_STATE_PRESSED) {
         DEBUG_SendMessageL("elem: %s\n", elem->string);
-        DEBUG_SendMessageL("elem.on: %d\n", elem->ok);
         DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
         if (elem->trig_func != NULL) {
             DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);
@@ -315,10 +297,6 @@ static void TEMPO_RenewElem_State(Elem* elem) {
 }
 void TEMPO_RenewElem(Elem* elem) {
     // Req Condition
-    if (elem->ok != true) {
-        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
-        return;
-    }
     TEMPO_RenewElem_State(elem);
     elem->visible = false;
     TEMPO_RenewElem_DstRect(elem);
@@ -353,10 +331,6 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
 }
 void TEMPO_DrawElem(Elem *elem) {
     // Req Condition
-    if (TEMPO_GetElemOk(elem) != true) {
-        DEBUG_SendMessageR("%s: elem not ready.\n", __func__);
-        return;
-    }
     elem->visible = false;
     if (basic.renderer == NULL) {
         printf("%s: menu.renderer is NULL.\n", __func__);

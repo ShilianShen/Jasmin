@@ -38,7 +38,7 @@ void ITEM_Load() {
         }
     }
     toml_free(file); // free
-    ITEM_PrintItemSet(); //
+    // ITEM_PrintItemSet(); //
 }
 void ITEM_Unload() {
     if (itemSet != NULL) {
