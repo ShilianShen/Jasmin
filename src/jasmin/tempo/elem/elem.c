@@ -121,16 +121,16 @@ static void TEMPO_CreateElem_CheckOk(Elem* elem) {
 
 
 // LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadElem_Texture(Elem* elem, const ElemInfo info) {
+static bool TEMPO_LoadElemTexture(Elem* elem, const ElemInfo info) {
     switch (info.type) {
         case ELEM_TYPE_FILE: {
-            elem->texture = IMG_LoadTexture(tempoRenderer, elem->string); // malloc
+            elem->texture = IMG_LoadTexture(basic.renderer, elem->string); // malloc
             break;
         }
         case ELEM_TYPE_TEXT: {
             elem->texture = TXT_LoadTextureWithLines(
-                tempoRenderer,
-                tempoTextFont,
+                basic.renderer,
+                basic.font,
                 elem->string,
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,
@@ -178,7 +178,7 @@ static bool TEMPO_LoadElem(Elem* elem, const ElemInfo info) {
     } // Opt Condition
 
     // texture
-    if (TEMPO_LoadElem_Texture(elem, info) == false) {
+    if (TEMPO_LoadElemTexture(elem, info) == false) {
         printf("%s: failed from \"%s\".\n", __func__, elem->string);
         return false;
     } // Req Condition
@@ -280,7 +280,7 @@ static void TEMPO_RenewElem_DstRect(Elem* elem) {
         elem->texture,
         &elem->src_rect,
         &elem->gid_rect,
-        &tempoBckRect,
+        &basic.bck_rect,
         elem->anchor
         );
 }
@@ -333,18 +333,18 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
     switch (elem->state) {
         case ELEM_STATE_PRESSED: {
             DEBUG_FillRect(&elem->dst_rect);
-            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+            SDL_RenderTexture(basic.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
             DEBUG_DrawRect(&elem->dst_rect);
             break;
         }
         case ELEM_STATE_RELEASE:
         case ELEM_STATE_INSIDE: {
-            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+            SDL_RenderTexture(basic.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
             DEBUG_DrawRect(&elem->dst_rect);
             break;
         }
         case ELEM_STATE_OUTSIDE: {
-            SDL_RenderTexture(tempoRenderer, elem->texture, &elem->src_rect, &elem->dst_rect);
+            SDL_RenderTexture(basic.renderer, elem->texture, &elem->src_rect, &elem->dst_rect);
             break;
         }
         default: break;
@@ -358,7 +358,7 @@ void TEMPO_DrawElem(Elem *elem) {
         return;
     }
     elem->visible = false;
-    if (tempoRenderer == NULL) {
+    if (basic.renderer == NULL) {
         printf("%s: menu.renderer is NULL.\n", __func__);
         return;
     }

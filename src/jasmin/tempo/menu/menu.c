@@ -21,7 +21,7 @@ static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
 // INIT & DEINIT =======================================================================================================
 void TEMPO_InitMenu() {
     // Req Condition
-    if (tempoRenderer == NULL) {
+    if (basic.renderer == NULL) {
         printf("%s: renderer not exists.\n", __func__);
         return;
     }
@@ -42,8 +42,8 @@ void TEMPO_InitMenu() {
 
     //
     menu = (Menu){0};
-    menu.renderer = tempoRenderer;
-    tempoRenderer = menu.renderer;
+    menu.renderer = basic.renderer;
+    basic.renderer = menu.renderer;
 }
 void TEMPO_DeinitMenu() {
     // Opt Condition
@@ -65,38 +65,6 @@ void TEMPO_DeinitMenu() {
 
 
 // LOAD & UNLOAD =======================================================================================================
-static void TEMPO_LoadMenuThemeFont(const toml_datum_t tomlFontPath, const toml_datum_t tomlFontSize) {
-    // Req Condition
-    if (tomlFontPath.ok == false) {
-        printf("%s: tomlFontPath not exists.\n", __func__); return;
-    }
-    if (tomlFontSize.ok == false) {
-        printf("%s: tomlFontSize not exists.\n", __func__); return;
-    }
-
-    //
-    TTF_Font* font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d);
-    if (font == NULL) {
-        printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);
-    }
-    TEMPO_SetBasicFont(font);
-}
-static void TEMPO_LoadMenuTheme(const char* tomlPath) {
-    // Req Condition
-    toml_table_t* tomlMenuTheme = getToml(tomlPath); // malloc tomlMenuTheme
-    if (tomlMenuTheme == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, tomlPath);
-        return;
-    }
-
-    //
-    const toml_datum_t tomlFontPath = toml_string_in(tomlMenuTheme, "font_path");
-    const toml_datum_t tomlFontSize = toml_double_in(tomlMenuTheme, "font_size");
-    TEMPO_LoadMenuThemeFont(tomlFontPath, tomlFontSize);
-
-    //
-    toml_free(tomlMenuTheme); // free tomlMenuTheme
-}
 static void TEMPO_LoadMenuPages(const char* tomlPath) {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
@@ -139,12 +107,10 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
 }
 void TEMPO_LoadMenu() {
     const char* menuPagesPath = "../config/tempo/menu_pages.toml";
-    const char* menuThemePath = "../config/tempo/menu_theme.toml";
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
     //
-    TEMPO_LoadMenuTheme(menuThemePath);
     TEMPO_LoadMenuPages(menuPagesPath);
 }
 

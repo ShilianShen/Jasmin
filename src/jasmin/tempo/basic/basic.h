@@ -8,18 +8,12 @@
 typedef struct Basic Basic;
 struct Basic {
     SDL_Renderer* renderer;
-    TTF_Font* textFont;
+    TTF_Font* font; // malloc
     SDL_FRect bck_rect;
 };
 extern Basic basic;
 
-extern SDL_Renderer* tempoRenderer;
-extern TTF_Font* tempoTextFont;
-extern SDL_FRect tempoBckRect;
 
-
-
-bool TEMPO_GetBasicOk();
 void TEMPO_SetBasicRenderer(SDL_Renderer*);
 void TEMPO_SetBasicFont(TTF_Font*);
 void TEMPO_SetBasicBckRect(SDL_FRect);

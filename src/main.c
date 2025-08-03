@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
         // SDL_GPUShader* shader = SDL_CreateGPUShader();
         if (oftenReload) {
             TEMPO_UnloadMenu();
-            TEMPO_LoadMenu("../src/menu_pages.toml", "../src/menu_theme.toml");
+            TEMPO_LoadMenu();
         }
     }
     UNLOAD();
