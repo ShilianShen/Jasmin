@@ -98,18 +98,25 @@ void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect) {
 }
 
 
-// LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadElemTexture(Elem* elem, const ElemInfo info) {
+// CHECK ===============================================================================================================
+static bool TEMPO_CheckElem(const Elem* elem) {
+    return elem != NULL && elem->string != NULL && elem->texture != NULL;
+}
+
+
+// CREATE & DELETE =====================================================================================================
+static SDL_Texture* TEMPO_CreateElem_Texture(const ElemInfo info) {
+    SDL_Texture* texture = NULL;
     switch (info.type) {
         case ELEM_TYPE_FILE: {
-            elem->texture = IMG_LoadTexture(basic.renderer, elem->string); // malloc
+            texture = IMG_LoadTexture(basic.renderer, info.string); // malloc
             break;
         }
         case ELEM_TYPE_TEXT: {
-            elem->texture = TXT_LoadTextureWithLines(
+            texture = TXT_LoadTextureWithLines(
                 basic.renderer,
                 basic.font,
-                elem->string,
+                info.string,
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,
                 'C'
@@ -117,105 +124,84 @@ static bool TEMPO_LoadElemTexture(Elem* elem, const ElemInfo info) {
             break;
         }
         default: {
-            elem->texture = NULL;
+            texture = NULL;
             break;
         }
     }
-    if (elem->texture == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, elem->string);
-        return false;
+    if (texture == NULL) {
+        printf("%s: failed from \"%s\".\n", __func__, info.string);
+        return NULL;
     } // Req Condition
-    SDL_SetTextureScaleMode(elem->texture, SDL_SCALEMODE_NEAREST);
-    return true;
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+    return texture;
 }
-static bool TEMPO_LoadElem(Elem* elem, const ElemInfo info) {
-    // others
-    elem->type = info.type;
-    elem->anchor = info.anchor;
-    elem->gid_rect = info.gid_rect != NULL ? *info.gid_rect : ELEM_DEFAULT_GID_RECT;
-    elem->trig_func = info.trig_func;
-
-    // string
-    if (info.string == NULL) {
-        printf("%s: info is null.\n", __func__);
-        return false;
-    } // Req Condition
-    elem->string = strdup(info.string); // malloc
-    if (elem->string == NULL) {
-        printf("%s: failed to malloc from \"%s\".\n", __func__, info.string);
-        return false;
-    } // Req Condition
-
-    // trig_para
-    if (info.trig_para != NULL) {
-        elem->trig_para = strdup(info.trig_para); // malloc
-        if (elem->trig_para == NULL) {
-            printf("%s: failed to malloc from \"%s\".\n", __func__, info.trig_para);
-            return false;
-        } // Req Condition
-    } // Opt Condition
-
-    // texture
-    if (TEMPO_LoadElemTexture(elem, info) == false) {
-        printf("%s: failed from \"%s\".\n", __func__, elem->string);
-        return false;
-    } // Req Condition
-
-    // scr_rect
-    float w, h;
-    SDL_GetTextureSize(elem->texture, &w, &h);
-    elem->src_rect = (SDL_FRect){0, 0, w, h};
-    return true;
-}
-static void TEMPO_UnloadElem(Elem* elem) {
-    if (elem == NULL) {
-        return;
-    } // Opt Condition
-
-    if (elem->string != NULL) {
-        free(elem->string); // free
-        elem->string = NULL;
-    }
-    if (elem->trig_para != NULL) {
-        free(elem->trig_para); // free
-        elem->trig_para = NULL;
-    }
-    if (elem->texture != NULL) {
-        SDL_DestroyTexture(elem->texture); // free
-        elem->texture = NULL;
-    }
-}
-
-
-// CREATE & DELETE =====================================================================================================
-static Elem* TEMPO_CreateElemWithRisk(const ElemInfo info) {
-    // INIT ELEM
+static Elem* TEMPO_CreateElem_(const ElemInfo info) {
+    // 这个函数只负责把info的信息填到elem
     Elem* elem = malloc(sizeof(Elem)); // malloc
     if (elem == NULL) {
         printf("%s: malloc failed\n", __func__);
         return NULL;
     } // Req Condition
-    *elem = (Elem){0};
-
-    // LOAD ELEM
-    TEMPO_LoadElem(elem, info);
+    *elem = (Elem){
+        .type = info.type,
+        .anchor = info.anchor,
+        .trig_func = info.trig_func,
+        .gid_rect = info.gid_rect != NULL ? *info.gid_rect : ELEM_DEFAULT_GID_RECT,
+    };
+    if (info.string != NULL) {
+        elem->string = strdup(info.string); // malloc
+        if (elem->string == NULL) {
+            printf("%s: failed.\n", __func__);
+            return elem;
+        }
+    } // string
+    if (info.trig_para != NULL) {
+        elem->trig_para = strdup(info.trig_para);
+        if (elem->trig_para == NULL) {
+            printf("%s: failed.\n", __func__);
+            return elem;
+        }
+    } // trig para
+    if (info.string != NULL) {
+        elem->texture = TEMPO_CreateElem_Texture(info);
+        float w, h;
+        SDL_GetTextureSize(elem->texture, &w, &h);
+        elem->src_rect = (SDL_FRect){0, 0, w, h};
+    } // texture, src_rect
     return elem;
 }
-extern void  TEMPO_DeleteElem(Elem* elem) {
-    TEMPO_UnloadElem(elem);
+void TEMPO_DeleteElem(Elem* elem) {
+    {
+        if (elem == NULL) {
+            return;
+        } // Opt Condition
+
+        if (elem->string != NULL) {
+            free(elem->string); // free
+            elem->string = NULL;
+        }
+        if (elem->trig_para != NULL) {
+            free(elem->trig_para); // free
+            elem->trig_para = NULL;
+        }
+        if (elem->texture != NULL) {
+            SDL_DestroyTexture(elem->texture); // free
+            elem->texture = NULL;
+        }
+    }
     free(elem); // free
     elem = NULL;
 }
-extern Elem* TEMPO_CreateElem(const ElemInfo info) {
-    Elem* elem = TEMPO_CreateElemWithRisk(info);
-    if (elem != NULL && elem->string != NULL && elem->texture != NULL) {
-        return elem;
+Elem* TEMPO_CreateElem(const ElemInfo info) {
+    Elem* elem = TEMPO_CreateElem_(info);
+    if (TEMPO_CheckElem(elem) == false) {
+        printf("%s: failed.\n", __func__);
+        TEMPO_DeleteElem(elem);
+        elem = NULL;
     }
-    printf("%s: failed.\n", __func__);
-    TEMPO_DeleteElem(elem);
-    return NULL;
+    return elem;
 }
-extern Elem* TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
+Elem* TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
     if (tomlInfo == NULL) {
         printf("%s: tomlElem not exists.\n", __func__);
         return NULL;
@@ -275,7 +261,7 @@ static void TEMPO_RenewElemState(Elem* elem) {
     const bool mouseIn = mouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
     if (elem->state == ELEM_STATE_PRESSED) {
-        DEBUG_SendMessageL("elem: %s\n", elem->string);
+        DEBUG_SendMessageL("elem: %s, %s\n", TEMPO_GetStringFromElemType(elem->type), elem->string);
         DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
         if (elem->trig_func != NULL) {
             DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig_func), elem->trig_para);

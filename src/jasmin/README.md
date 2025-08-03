@@ -49,8 +49,7 @@ Jasmin是基于SDL3的, OolongImPress自用的GUI.
 | --------- | ------------------ | -------------- |
 | MyStruct* | XX_CreateMyStruct  | ...            |
 | void      | XX_DestroyMyStruct | MyStruct*      |
-| bool      | XX_LoadMyStruct    | MyStruct*, ... |
-| void      | XX_UnloadMyStruct  | MyStruct*      |
+
 
 * init & deinit: 初始化(deinit前只调用一次)和反初始化(在unload后可反复调用), 通常不会有什么文件参数要求.
 * load & unload: 载入(init后unload前只调用一次)和释放(可反复调用), 通常参数和文件有关.
