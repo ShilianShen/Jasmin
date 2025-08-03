@@ -226,7 +226,9 @@ Elem* TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
     // gid rect
     const toml_array_t* tomlGidRect = toml_array_in(tomlInfo, "guide");
     SDL_FRect gid_rect = ELEM_DEFAULT_GID_RECT;
-    loadFRectFromTomlArray(&gid_rect, tomlGidRect);
+    if (tomlGidRect != NULL) {
+        loadFRectFromTomlArray(&gid_rect, tomlGidRect);
+    }
 
     // trig func
     const toml_datum_t tomlFuncName = toml_string_in(tomlInfo, "func");

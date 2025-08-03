@@ -24,16 +24,6 @@ bool TEMPO_GetPageOk(const Page* page) {
 
 // LOAD & UNLOAD =======================================================================================================
 static void TEMPO_LoadPageName(Page* page, const char* name) {
-    // Req Condition
-    if (page == NULL) {
-        printf("%s: page not exists.\n", __func__);
-        return;
-    }
-    if (name == NULL) {
-        printf("%s: name not exists.\n", __func__);
-        return;
-    }
-
     //
     page->name = strdup(name); // malloc page.name
 
@@ -69,14 +59,14 @@ static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tom
         printf("%s: tomlElems not exists.\n", __func__);
         return false;
     }
-    page->numElems = toml_array_nelem(tomlElems);
+    page->lenElemSet = toml_array_nelem(tomlElems);
 
     //
-    page->elems = malloc(page->numElems * sizeof(Elem*));
-    for (int i = 0; i < page->numElems; i++) {
+    page->elemSet = malloc(page->lenElemSet * sizeof(Elem*));
+    for (int i = 0; i < page->lenElemSet; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         if (tomlElem != NULL) {
-            page->elems[i] = TEMPO_CreateElemFromToml(tomlElem); // malloc
+            page->elemSet[i] = TEMPO_CreateElemFromToml(tomlElem); // malloc
         }
     }
     return true;
@@ -91,15 +81,15 @@ static void TEMPO_UnloadPage(Page* page) {
         free(page->name);
         page->name = NULL;
     }
-    if (page->elems != NULL) {
-        for (int i = 0; i < page->numElems; i++) {
-            if (page->elems[i] != NULL) {
-                TEMPO_DeleteElem(page->elems[i]); // free
-                page->elems[i] = NULL;
+    if (page->elemSet != NULL) {
+        for (int i = 0; i < page->lenElemSet; i++) {
+            if (page->elemSet[i] != NULL) {
+                TEMPO_DeleteElem(page->elemSet[i]); // free
+                page->elemSet[i] = NULL;
             }
         }
-        free(page->elems);
-        page->elems = NULL;
+        free(page->elemSet);
+        page->elemSet = NULL;
     }
 }
 
@@ -132,9 +122,9 @@ void TEMPO_RenewPage(Page* page) {
     }
 
     //
-    for (int i = 0; i < page->numElems; i++) {
-        if (page->elems[i] != NULL) {
-            TEMPO_RenewElem(page->elems[i]);
+    for (int i = 0; i < page->lenElemSet; i++) {
+        if (page->elemSet[i] != NULL) {
+            TEMPO_RenewElem(page->elemSet[i]);
         }
     }
 }
@@ -149,9 +139,9 @@ void TEMPO_DrawPage(const Page* page) {
     }
 
     //
-    for (int i = 0; i < page->numElems; i++) {
-        if (page->elems[i] != NULL) {
-            TEMPO_DrawElem(page->elems[i]);
+    for (int i = 0; i < page->lenElemSet; i++) {
+        if (page->elemSet[i] != NULL) {
+            TEMPO_DrawElem(page->elemSet[i]);
         }
     }
 }

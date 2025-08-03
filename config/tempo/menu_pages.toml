@@ -1,5 +1,5 @@
-# support *.png
 [Root]
+name = "Root"
 elems = [
     {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../images/491.gif"},
     {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="The dead can be cured."},
@@ -7,17 +7,50 @@ elems = [
     # {anchor=31, guide=[0, 0, 1, 1], string="t THE MAZE"},
 ]
 [Title]
+name = "Title"
 elems = [
     {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<< Root.", func='clear'},
     {anchor=31, guide=[0, 0, 1, 1], type="TEXT", info="THE MAZE"},
     {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="Setting", func='forward', para='Setting'},
+    {anchor=49, guide=[0, 100, 1, 1], type="TEXT", info="Collection", func='forward', para='Collection'},
 ]
 [Setting]
+name = "Setting"
 elems = [
     {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-    {anchor=49, guide=[0, 50, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
+    {anchor=49, guide=[0, 10, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
+]
+[Collection]
+name = "Collection"
+elems = [
+    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+    {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="GeneSet", func='forward', para='GeneSet'},
+    {anchor=49, guide=[0, 100, 1, 1], type="TEXT", info="RoomSet", func='forward', para='RoomSet'},
+    {anchor=49, guide=[0, 200, 1, 1], type="TEXT", info="ItemSet", func='forward', para='ItemSet'},
+    {anchor=49, guide=[0, 300, 1, 1], type="TEXT", info="MonsterSet", func='forward', para='MonsterSet'},
+]
+[GeneSet]
+name = "GeneSet"
+elems = [
+    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+]
+[RoomSet]
+name = "RoomSet"
+elems = [
+    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+]
+[ItemSet]
+name = "ItemSet"
+elems = [
+    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+]
+[MonsterSet]
+name = "MonsterSet"
+elems = [
+    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
 ]
 [Edge]
+name = "Edge"
 elems = [
     {anchor=31, type="TEXT", info="""The edge of menu system, it shouldn't appear.
     If you are watching it, there is a bug need to be fixed."""},

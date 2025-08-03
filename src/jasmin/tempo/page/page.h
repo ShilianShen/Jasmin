@@ -10,8 +10,8 @@ typedef struct Page {
     bool ok;
     int id; // id < 0 means it's off
     char* name; // malloc in LOAD
-    int numElems;
-    Elem** elems;
+    int lenElemSet;
+    Elem** elemSet;
 } Page;
 
 
