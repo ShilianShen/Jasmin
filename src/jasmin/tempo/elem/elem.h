@@ -12,7 +12,7 @@ typedef struct ElemInfo ElemInfo;
 
 
 enum ElemType {
-    ELEM_TYPE_DEFAULT,
+    ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
     ELEM_NUM_TYPES
@@ -33,7 +33,6 @@ void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect);
 
 
 Elem* TEMPO_CreateElem(ElemInfo info);
-
 Elem *TEMPO_CreateElemFromToml(const toml_table_t *);
 void TEMPO_DeleteElem(Elem* elem);
 void TEMPO_RenewElem(Elem* elem);

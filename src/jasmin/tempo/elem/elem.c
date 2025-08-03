@@ -1,6 +1,7 @@
 #include "elem.h"
 
 
+// OTHER ===============================================================================================================
 static const SDL_FRect ELEM_DEFAULT_GID_RECT = {0, 0, 1, 1};
 
 
@@ -32,7 +33,7 @@ static const char* TEMPO_GetStringFromElemState(const ElemState state) {
 
 // ELEM TYPE ===========================================================================================================
 static const char* ELEM_TYPE_STRINGS[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_DEFAULT] = "NULL",
+    [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT"
 };
@@ -42,7 +43,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
             return i;
         }
     }
-    return ELEM_TYPE_DEFAULT;
+    return ELEM_TYPE_NULL;
 }
 static const char* TEMPO_GetStringFromElemType(const ElemType type) {
     if (type >= ELEM_NUM_TYPES) {
@@ -199,12 +200,12 @@ static Elem* TEMPO_CreateElemWithRisk(const ElemInfo info) {
     // LOAD ELEM
     TEMPO_LoadElem(elem, info);
     return elem;
-} // 尝试创建元素, 但任然需要检查
+}
 extern void  TEMPO_DeleteElem(Elem* elem) {
     TEMPO_UnloadElem(elem);
     free(elem); // free
     elem = NULL;
-} // 删除元素
+}
 extern Elem* TEMPO_CreateElem(const ElemInfo info) {
     Elem* elem = TEMPO_CreateElemWithRisk(info);
     if (elem != NULL && elem->string != NULL && elem->texture != NULL) {
@@ -213,8 +214,8 @@ extern Elem* TEMPO_CreateElem(const ElemInfo info) {
     printf("%s: failed.\n", __func__);
     TEMPO_DeleteElem(elem);
     return NULL;
-} // 尝试创建元素, 成功返回elem, 失败返回NULL
-extern Elem *TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
+}
+extern Elem* TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
     if (tomlInfo == NULL) {
         printf("%s: tomlElem not exists.\n", __func__);
         return NULL;
@@ -257,7 +258,7 @@ extern Elem *TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
 
 
 // RENEW ===============================================================================================================
-static void TEMPO_RenewElem_DstRect(Elem* elem) {
+static void TEMPO_RenewElemDstRect(Elem* elem) {
     SDL_LoadDstRectAligned(
         &elem->dst_rect,
         elem->texture,
@@ -267,7 +268,7 @@ static void TEMPO_RenewElem_DstRect(Elem* elem) {
         elem->anchor
         );
 }
-static void TEMPO_RenewElem_State(Elem* elem) {
+static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->visible == false) {
         return;
     }
@@ -297,9 +298,9 @@ static void TEMPO_RenewElem_State(Elem* elem) {
 }
 void TEMPO_RenewElem(Elem* elem) {
     // Req Condition
-    TEMPO_RenewElem_State(elem);
+    TEMPO_RenewElemState(elem);
     elem->visible = false;
-    TEMPO_RenewElem_DstRect(elem);
+    TEMPO_RenewElemDstRect(elem);
 }
 
 
