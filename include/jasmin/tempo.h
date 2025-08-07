@@ -1,4 +1,8 @@
-#ifndef TEMPO_H
-#define TEMPO_H
+#ifndef INCLUDE_JASMIN_TEMPO_H
+#define INCLUDE_JASMIN_TEMPO_H
 
-#endif //TEMPO_H
+
+#include "../../src/tempo/tempo.h"
+
+
+#endif //INCLUDE_JASMIN_TEMPO_H

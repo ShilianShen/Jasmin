@@ -1,4 +1,8 @@
-#ifndef LOPO_H
-#define LOPO_H
+#ifndef INCLUDE_JASMIN_LOPO_H
+#define INCLUDE_JASMIN_LOPO_H
 
-#endif //LOPO_H
+
+#include "../../src/lopo/lopo.h"
+
+
+#endif //INCLUDE_JASMIN_LOPO_H

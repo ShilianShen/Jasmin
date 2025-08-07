@@ -2,7 +2,7 @@
 #define JASMIN_BASIC_INTERFACE_H
 
 
-#include "../../interface.h"
+#include "../interface.h"
 
 
 #endif //JASMIN_BASIC_INTERFACE_H
