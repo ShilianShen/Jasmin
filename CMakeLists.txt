@@ -32,7 +32,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/tempo/trig/trig.h
         src/tempo/elem/elem.h
         src/tempo/page/page.h
-        src/jasmin.h
         src/basic/basic.h
         src/basic/setting/setting.c
         src/basic/debug/debug.c
@@ -77,8 +76,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
 
         src/tempo/basic/basic.c
         src/tempo/basic/basic.h
-
-        src/interface.h
 
         include/jasmin/jasmin.h
         include/jasmin/tempo.h
