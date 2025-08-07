@@ -22,7 +22,13 @@ bool TEMPO_GetPageOk(const Page* page) {
 }
 
 
-// LOAD & UNLOAD =======================================================================================================
+// CHECK ===============================================================================================================
+static bool TEMPO_CheckPage(const Page* page) {
+    return page != NULL;
+}
+
+
+// CREATE & DESTROY=====================================================================================================
 static void TEMPO_LoadPageName(Page* page, const char* name) {
     //
     page->name = strdup(name); // malloc page.name
@@ -92,10 +98,7 @@ static void TEMPO_UnloadPage(Page* page) {
         page->elemSet = NULL;
     }
 }
-
-
-// CREATE & DESTROY=====================================================================================================
-Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
+static Page* TEMPO_CreatePage_(const char* name, const toml_table_t* tomlPage) {
     Page* page = malloc(sizeof(Page));
     if (page == NULL) {
         printf("%s: failed malloc.\n", __func__);
@@ -104,6 +107,7 @@ Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
     TEMPO_LoadPage(page, name, tomlPage);
     return page;
 }
+
 void TEMPO_DestroyPage(Page* page) {
     if (page != NULL) {
         TEMPO_UnloadPage(page);
@@ -111,10 +115,19 @@ void TEMPO_DestroyPage(Page* page) {
         page = NULL;
     }
 }
+Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
+    Page* page = TEMPO_CreatePage_(name, tomlPage);
+    if (TEMPO_CheckPage(page) == false) {
+        printf("%s: failed malloc.\n", __func__);
+        TEMPO_DestroyPage(page);
+        page = NULL;
+    }
+    return page;
+}
 
 
 // RENEW ===============================================================================================================
-void TEMPO_RenewPage(Page* page) {
+void TEMPO_RenewPage(const Page* page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);
