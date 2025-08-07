@@ -22,58 +22,58 @@ find_package(SDL3_image REQUIRED)
 
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        modules/tempo/tempo.h
-        modules/basic/device/device.h
-        modules/basic/debug/debug.h
-        modules/basic/setting/setting.h
+        src/modules/tempo/tempo.h
+        src/modules/basic/device/device.h
+        src/modules/basic/debug/debug.h
+        src/modules/basic/setting/setting.h
 
         # toml/toml.h
         third_party/toml/toml.c
-        modules/tempo/trig/trig.h
-        modules/tempo/elem/elem.h
-        modules/tempo/page/page.h
-        jasmin.h
-        modules/basic/basic.h
-        modules/basic/setting/setting.c
-        modules/basic/debug/debug.c
-        modules/basic/device/device.c
-        modules/basic/ease/ease.c
-        modules/basic/ease/ease.h
-        modules/tempo/elem/elem.c
-        modules/tempo/interface.h
-        modules/tempo/tempo.c
-        modules/tempo/page/page.c
-        modules/tempo/trig/trig.c
-        modules/basic/interface.h
-        modules/lo_tri/lo_tri.h
-        modules/lo_tri/interface.h
-        modules/lo_tri/model/model.c
-        modules/lo_tri/model/model.h
-        modules/lo_tri/camera/camera.c
-        modules/lo_tri/camera/camera.h
-        modules/lo_tri/pipline/pipline.c
-        modules/lo_tri/pipline/pipline.h
-        modules/lo_tri/model/bone/bone.c
-        modules/lo_tri/model/bone/bone.h
-        modules/lo_tri/model/mesh/mesh.c
-        modules/lo_tri/model/interface.h
-        modules/lo_tri/model/mesh/mesh.h
-        modules/lo_tri/math/math.c
-        modules/lo_tri/math/math.h
-        modules/lo_tri/math/interface.h
-        modules/lo_tri/math/mat/mat.c
-        modules/lo_tri/math/mat/mat.h
-        modules/lo_tri/math/vec/vec.c
-        modules/lo_tri/math/vec/vec.h
-        modules/tempo/menu/menu.c
-        modules/tempo/menu/menu.h
-        modules/lo_tri/zbuffer/zbuffer.c
-        modules/lo_tri/zbuffer/zbuffer.h
-        modules/lo_tri/lopo.c
-        modules/lopo/interface.h
-        modules/lopo/lopo.c
-        modules/lopo/lopo.h
-        modules/lopo/shaders/debugShader.cpp
+        src/modules/tempo/trig/trig.h
+        src/modules/tempo/elem/elem.h
+        src/modules/tempo/page/page.h
+        src/jasmin.h
+        src/modules/basic/basic.h
+        src/modules/basic/setting/setting.c
+        src/modules/basic/debug/debug.c
+        src/modules/basic/device/device.c
+        src/modules/basic/ease/ease.c
+        src/modules/basic/ease/ease.h
+        src/modules/tempo/elem/elem.c
+        src/modules/tempo/interface.h
+        src/modules/tempo/tempo.c
+        src/modules/tempo/page/page.c
+        src/modules/tempo/trig/trig.c
+        src/modules/basic/interface.h
+        src/modules/lo_tri/lo_tri.h
+        src/modules/lo_tri/interface.h
+        src/modules/lo_tri/model/model.c
+        src/modules/lo_tri/model/model.h
+        src/modules/lo_tri/camera/camera.c
+        src/modules/lo_tri/camera/camera.h
+        src/modules/lo_tri/pipline/pipline.c
+        src/modules/lo_tri/pipline/pipline.h
+        src/modules/lo_tri/model/bone/bone.c
+        src/modules/lo_tri/model/bone/bone.h
+        src/modules/lo_tri/model/mesh/mesh.c
+        src/modules/lo_tri/model/interface.h
+        src/modules/lo_tri/model/mesh/mesh.h
+        src/modules/lo_tri/math/math.c
+        src/modules/lo_tri/math/math.h
+        src/modules/lo_tri/math/interface.h
+        src/modules/lo_tri/math/mat/mat.c
+        src/modules/lo_tri/math/mat/mat.h
+        src/modules/lo_tri/math/vec/vec.c
+        src/modules/lo_tri/math/vec/vec.h
+        src/modules/tempo/menu/menu.c
+        src/modules/tempo/menu/menu.h
+        src/modules/lo_tri/zbuffer/zbuffer.c
+        src/modules/lo_tri/zbuffer/zbuffer.h
+        src/modules/lo_tri/lopo.c
+        src/modules/lopo/interface.h
+        src/modules/lopo/lopo.c
+        src/modules/lopo/lopo.h
+        src/modules/lopo/shaders/debugShader.cpp
         tests/maze_inner/maze_inner.c
         tests/maze_inner/maze_inner.h
         tests/maze_inner/interface.h
@@ -85,8 +85,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         tests/maze_inner/room/room.h
         tests/maze_inner/basic/basic.c
         tests/maze_inner/basic/basic.h
-        modules/tempo/basic/basic.c
-        modules/tempo/basic/basic.h
+        src/modules/tempo/basic/basic.c
+        src/modules/tempo/basic/basic.h
         tests/maze_outer/interface.h
         tests/maze_outer/maze_outer.c
         tests/maze_outer/maze_outer.h
@@ -94,7 +94,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         tests/maze_outer/zero/zero.h
         tests/maze_inner/action/action.c
         tests/maze_inner/action/action.h
-        interface.h
+        src/interface.h
         tests/maze_outer/zero/RDI/RDI.c
         tests/maze_outer/zero/RDI/RDI.h
         tests/maze_outer/zero/interface.h
@@ -106,6 +106,9 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         tests/maze_inner/coord/coord.h
         tests/maze_outer/zero/you/you.c
         tests/maze_outer/zero/you/you.h
+        include/jasmin/jasmin.h
+        include/jasmin/tempo.h
+        include/jasmin/lopo.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

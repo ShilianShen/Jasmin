@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include "../jasmin.h"
+#include "../src/jasmin.h"
 #include "../tests/maze_inner/maze_inner.h"
 #include "../tests/maze_outer/maze_outer.h"
 

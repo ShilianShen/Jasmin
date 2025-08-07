@@ -2,7 +2,7 @@
 #define MAZE_INTERFACE_H
 
 
-#include "/Users/shilianshen/Documents/OolongImPress/jasmin/jasmin.h"
+#include "/Users/shilianshen/Documents/OolongImPress/jasmin/src/jasmin.h"
 
 
 #endif //MAZE_INTERFACE_H
