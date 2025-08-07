@@ -1,7 +1,7 @@
 [Root]
 name = "Root"
 elems = [
-    {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../images/491.gif"},
+    {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../resources/images/491.gif"},
     {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="The dead can be cured."},
     {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="Title", func='forward', para='Title'},
     # {anchor=31, guide=[0, 0, 1, 1], string="t THE MAZE"},

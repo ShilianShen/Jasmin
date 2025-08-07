@@ -2,9 +2,9 @@
 #define JASMIN_H
 
 
-#include "tempo/tempo.h"
+#include "modules/tempo/tempo.h"
 // #include "lo_tri/lo_tri.h"
-#include "lopo/lopo.h"
+#include "modules/lopo/lopo.h"
 
 
 #endif //JASMIN_H

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include "jasmin/jasmin.h"
-#include "maze_inner/maze_inner.h"
-#include "maze_outer/maze_outer.h"
+#include "../jasmin.h"
+#include "../tests/maze_inner/maze_inner.h"
+#include "../tests/maze_outer/maze_outer.h"
 
 
 SDL_Window *window;

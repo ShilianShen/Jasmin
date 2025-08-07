@@ -28,11 +28,11 @@ void DEBUG_Init(SDL_Renderer* renderer) {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 static void DEBUG_LoadTheme() {
-    debug.theme.font24 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 24);
-    debug.theme.font32 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 32);
-    debug.theme.font64 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 64);
-    debug.theme.font128 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 128);
-    debug.theme.font256 = TTF_OpenFont("../fonts/JetBrainsMono-Regular.ttf", 256);
+    debug.theme.font24 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 24);
+    debug.theme.font32 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 32);
+    debug.theme.font64 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 64);
+    debug.theme.font128 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 128);
+    debug.theme.font256 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 256);
     if (debug.theme.font128 == NULL) {printf("Fail to load font.\n");}
     debug.on = true;
 
