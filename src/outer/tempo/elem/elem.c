@@ -228,12 +228,11 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
     Elem* elem = calloc(1, sizeof(Elem));
     if (elem == NULL) {
         printf("%s: elem == NULL.\n", __func__);
-        return NULL;
+        return elem;
     } // Req Condition
     if (TEMPO_CreateElem_RK(elem, tomlElem) == false || TEMPO_CreateElem_CK(elem) == false) {
         printf("%s: RK or CK == false.\n", __func__);
-        TEMPO_DeleteElem(elem);
-        elem = NULL;
+        elem = TEMPO_DeleteElem(elem);
     } // Req Condition
     return elem;
 }

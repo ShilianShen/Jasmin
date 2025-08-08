@@ -48,17 +48,14 @@ void TEMPO_InitMenu() {
 void TEMPO_DeinitMenu() {
     // Opt Condition
     if (menu.pageRoot != NULL) {
-        TEMPO_DestroyPage(menu.pageRoot);
-        menu.pageRoot = NULL;
+        menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
     }
     if (menu.pageEdge != NULL) {
-        TEMPO_DestroyPage(menu.pageEdge);
-        menu.pageEdge = NULL;
+        menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
     }
     for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            TEMPO_DestroyPage(menu.pages[i]);
-            menu.pages[i] = NULL;
+            menu.pages[i] = TEMPO_DeletePage(menu.pages[i]);
         }
     }
 }
@@ -80,22 +77,19 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
         }
         else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {
             if (menu.pageRoot != NULL) {
-                TEMPO_DestroyPage(menu.pageRoot);
-                menu.pageRoot = NULL;
+                menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
             }
             menu.pageRoot = TEMPO_CreatePage(pageName, tomlPage);
         }
         else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {
             if (menu.pageEdge != NULL) {
-                TEMPO_DestroyPage(menu.pageEdge);
-                menu.pageEdge = NULL;
+                menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
             }
             menu.pageEdge = TEMPO_CreatePage(pageName, tomlPage);
         }
         else {
             if (menu.pages[pageId] != NULL) {
-                TEMPO_DestroyPage(menu.pages[pageId]);
-                menu.pages[pageId] = NULL;
+                menu.pages[pageId] = TEMPO_DeletePage(menu.pages[pageId]);
             }
             menu.pages[pageId] = TEMPO_CreatePage(pageName, tomlPage);
             pageId++;
@@ -118,14 +112,11 @@ static void TEMPO_UnloadMenuTheme() {
     TEMPO_UnloadBasic();
 }
 void TEMPO_UnloadMenu() {
-    TEMPO_DestroyPage(menu.pageRoot);
-    menu.pageRoot = NULL;
-    TEMPO_DestroyPage(menu.pageEdge);
-    menu.pageEdge = NULL;
+    menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
+    menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
     for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
         if (menu.pages[i] != NULL) {
-            TEMPO_DestroyPage(menu.pages[i]);
-            menu.pages[i] = NULL;
+            menu.pages[i] = TEMPO_DeletePage(menu.pages[i]);
         }
     }
     TEMPO_UnloadMenuTheme();

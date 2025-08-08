@@ -23,13 +23,11 @@ bool TEMPO_GetPageOk(const Page* page) {
 
 
 // CHECK ===============================================================================================================
-static bool TEMPO_CheckPage(const Page* page) {
-    return page != NULL;
-}
 
 
-// CREATE & DESTROY=====================================================================================================
-static void TEMPO_LoadPageName(Page* page, const char* name) {
+
+// CREATE & DELETE =====================================================================================================
+static void TEMPO_CreatePageName(Page* page, const char* name) {
     //
     page->name = strdup(name); // malloc page.name
 
@@ -38,26 +36,17 @@ static void TEMPO_LoadPageName(Page* page, const char* name) {
         printf("%s: failed malloc page.name.\n", __func__);
     }
 }
-static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tomlPage) {
-    // Req Condition
-    if (page == NULL) {
-        printf("%s: page not exists.\n", __func__);
-        return false;
-    }
+static bool TEMPO_CreatePage_CK(const Page* page) {
+    return page != NULL;
+}
+static bool TEMPO_CreatePage_RK(Page* page, const char* name, const toml_table_t* tomlPage) {
     if (name == NULL) {
         printf("%s: name not exists.\n", __func__);
         return false;
-    }
-    if (tomlPage == NULL) {
-        printf("%s: tomlPage not exists.\n", __func__);
-        return false;
-    }
-
+    } // Req Condition
+    memset(page, 0, sizeof(Page));
     //
-    *page = (Page){0};
-
-    //
-    TEMPO_LoadPageName(page, name);
+    TEMPO_CreatePageName(page, name);
 
     //
     const toml_array_t* tomlElems = toml_array_in(tomlPage, "elems");
@@ -77,50 +66,48 @@ static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tom
     }
     return true;
 }
-static void TEMPO_UnloadPage(Page* page) {
-    // Req Condition
-    if (page == NULL) {
-        printf("%s: page not exists.\n", __func__);
-        return;
-    }
-    if (page->name != NULL) {
-        free(page->name);
-        page->name = NULL;
-    }
-    if (page->elemSet != NULL) {
-        for (int i = 0; i < page->lenElemSet; i++) {
-            if (page->elemSet[i] != NULL) {
-                TEMPO_DeleteElem(page->elemSet[i]); // free
-                page->elemSet[i] = NULL;
-            }
-        }
-        free(page->elemSet);
-        page->elemSet = NULL;
-    }
-}
-static Page* TEMPO_CreatePage_(const char* name, const toml_table_t* tomlPage) {
-    Page* page = malloc(sizeof(Page));
-    if (page == NULL) {
-        printf("%s: failed malloc.\n", __func__);
-        return NULL;
-    }
-    TEMPO_LoadPage(page, name, tomlPage);
-    return page;
-}
 
-void TEMPO_DestroyPage(Page* page) {
+
+Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
-        TEMPO_UnloadPage(page);
+        if (page == NULL) {
+            printf("%s: page not exists.\n", __func__);
+            return page;
+        } // Req Condition
+        if (page->name != NULL) {
+            free(page->name);
+            page->name = NULL;
+        }
+        if (page->elemSet != NULL) {
+            for (int i = 0; i < page->lenElemSet; i++) {
+                if (page->elemSet[i] != NULL) {
+                    page->elemSet[i] = TEMPO_DeleteElem(page->elemSet[i]); // free
+                }
+            }
+            free(page->elemSet);
+            page->elemSet = NULL;
+        }
+
         free(page);
         page = NULL;
     }
+    return page;
 }
 Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
-    Page* page = TEMPO_CreatePage_(name, tomlPage);
-    if (TEMPO_CheckPage(page) == false) {
+    if (tomlPage == NULL) {
+        printf("%s: tomlPage == NULL.\n", __func__);
+        return NULL;
+    } // Req Condition
+    Page* page = calloc(1, sizeof(Page));
+    if (page == NULL) {
+        printf("%s: page == NULL.\n", __func__);
+        return page;
+    } // Req Condition
+
+    TEMPO_CreatePage_RK(page, name, tomlPage);
+    if (TEMPO_CreatePage_CK(page) == false) {
         printf("%s: failed malloc.\n", __func__);
-        TEMPO_DestroyPage(page);
-        page = NULL;
+        page = TEMPO_DeletePage(page);
     }
     return page;
 }
