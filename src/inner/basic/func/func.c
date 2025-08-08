@@ -201,17 +201,18 @@ bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL
     SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
     return true;
 }
-void SDL_LoadDstRectAligned(
-    SDL_FRect* dst_rect,
-    SDL_Texture* texture,
-    const SDL_FRect* src_rect,
-    const SDL_FRect* gid_rect,
-    const SDL_FRect* bck_rect,
+
+bool SDL_LoadDstRectAligned(
+    SDL_FRect *dst_rect,
+    SDL_Texture *texture,
+    const SDL_FRect *src_rect,
+    const SDL_FRect *gid_rect,
+    const SDL_FRect *bck_rect,
     const int anchor
-    ) {
+) {
     // Req Condition
-    if (dst_rect == NULL) {printf("%s: dst_rect not exists.\n", __func__); return;}
-    if (texture == NULL) {printf("%s: fail to get texture.\n", __func__); return;}
+    if (dst_rect == NULL) {printf("%s: dst_rect not exists.\n", __func__); return false;}
+    if (texture == NULL) {printf("%s: fail to get texture.\n", __func__); return false;}
 
     // load src (Opt Condition)
     SDL_FRect src = {0, 0, 0, 0};
@@ -263,6 +264,7 @@ void SDL_LoadDstRectAligned(
     }
     dst_rect->x = cx + dx + gid.x;
     dst_rect->y = cy + dy + gid.y;
+    return true;
 }
 bool SDL_RenderTextureAligned(
     SDL_Renderer* renderer,

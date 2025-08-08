@@ -197,7 +197,6 @@ static bool TEMPO_CreateElem_CK(const Elem* elem) {
     } // Req Condition
     return true;
 }
-
 Elem *TEMPO_DeleteElem(Elem *elem) {
     {
         if (elem == NULL) {
@@ -241,8 +240,8 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
 
 
 // RENEW ===============================================================================================================
-static void TEMPO_RenewElemDstRect(Elem* elem) {
-    SDL_LoadDstRectAligned(
+static bool TEMPO_RenewElemDstRect(Elem* elem) {
+    return SDL_LoadDstRectAligned(
         &elem->dst_rect,
         elem->texture,
         &elem->src_rect,
@@ -251,9 +250,9 @@ static void TEMPO_RenewElemDstRect(Elem* elem) {
         elem->anchor
         );
 }
-static void TEMPO_RenewElemState(Elem* elem) {
+static bool TEMPO_RenewElemState(Elem* elem) {
     if (elem->visible == false) {
-        return;
+        return true;
     }
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
@@ -278,12 +277,16 @@ static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->state == ELEM_STATE_RELEASE && elem->trig_func != NULL) {
         elem->trig_func(elem->trig_para);
     }
+    return true;
 }
-
 bool TEMPO_RenewElem(Elem *elem) {
-    TEMPO_RenewElemState(elem);
+    if (TEMPO_RenewElemState(elem) == false) {
+        return false;
+    }
     elem->visible = false;
-    TEMPO_RenewElemDstRect(elem);
+    if (TEMPO_RenewElemDstRect(elem) == false) {
+        return false;
+    }
     return true;
 }
 
