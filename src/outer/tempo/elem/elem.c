@@ -250,9 +250,9 @@ static bool TEMPO_RenewElemDstRect(Elem* elem) {
         elem->anchor
         );
 }
-static bool TEMPO_RenewElemState(Elem* elem) {
+static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->visible == false) {
-        return true;
+        return;
     }
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
@@ -277,12 +277,9 @@ static bool TEMPO_RenewElemState(Elem* elem) {
     if (elem->state == ELEM_STATE_RELEASE && elem->trig_func != NULL) {
         elem->trig_func(elem->trig_para);
     }
-    return true;
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (TEMPO_RenewElemState(elem) == false) {
-        return false;
-    }
+    TEMPO_RenewElemState(elem);
     elem->visible = false;
     if (TEMPO_RenewElemDstRect(elem) == false) {
         return false;
