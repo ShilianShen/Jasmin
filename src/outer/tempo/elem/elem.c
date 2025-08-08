@@ -105,18 +105,18 @@ static bool TEMPO_CheckElem(const Elem* elem) {
 
 
 // CREATE & DELETE =====================================================================================================
-static SDL_Texture* TEMPO_CreateElem_Texture(const ElemInfo info) {
+static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* string) {
     SDL_Texture* texture = NULL;
-    switch (info.type) {
+    switch (type) {
         case ELEM_TYPE_FILE: {
-            texture = IMG_LoadTexture(basic.renderer, info.string); // malloc
+            texture = IMG_LoadTexture(basic.renderer, string); // malloc
             break;
         }
         case ELEM_TYPE_TEXT: {
             texture = TXT_LoadTextureWithLines(
                 basic.renderer,
                 basic.font,
-                info.string,
+                string,
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,
                 'C'
@@ -129,46 +129,11 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemInfo info) {
         }
     }
     if (texture == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, info.string);
+        printf("%s: failed from \"%s\".\n", __func__, string);
         return NULL;
     } // Req Condition
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     return texture;
-}
-static Elem* TEMPO_CreateElem_(const ElemInfo info) {
-    // 这个函数只负责把info的信息填到elem
-    Elem* elem = malloc(sizeof(Elem)); // malloc
-    if (elem == NULL) {
-        printf("%s: malloc failed\n", __func__);
-        return NULL;
-    } // Req Condition
-    *elem = (Elem){
-        .type = info.type,
-        .anchor = info.anchor,
-        .trig_func = info.trig_func,
-        .gid_rect = info.gid_rect != NULL ? *info.gid_rect : ELEM_DEFAULT_GID_RECT,
-    };
-    if (info.string != NULL) {
-        elem->string = strdup(info.string); // malloc
-        if (elem->string == NULL) {
-            printf("%s: failed.\n", __func__);
-            return elem;
-        }
-    } // string
-    if (info.trig_para != NULL) {
-        elem->trig_para = strdup(info.trig_para);
-        if (elem->trig_para == NULL) {
-            printf("%s: failed.\n", __func__);
-            return elem;
-        }
-    } // trig para
-    if (info.string != NULL) {
-        elem->texture = TEMPO_CreateElem_Texture(info);
-        float w, h;
-        SDL_GetTextureSize(elem->texture, &w, &h);
-        elem->src_rect = (SDL_FRect){0, 0, w, h};
-    } // texture, src_rect
-    return elem;
 }
 void TEMPO_DeleteElem(Elem* elem) {
     {
@@ -192,55 +157,74 @@ void TEMPO_DeleteElem(Elem* elem) {
     free(elem); // free
     elem = NULL;
 }
-Elem* TEMPO_CreateElem(const ElemInfo info) {
-    Elem* elem = TEMPO_CreateElem_(info);
-    if (TEMPO_CheckElem(elem) == false) {
-        printf("%s: failed.\n", __func__);
+static bool TEMPO_CreateElem_(Elem* elem, const toml_table_t *tomlInfo) {
+    memset(elem, 0, sizeof(Elem));
+
+    const char* key;
+    if (toml_string_in(tomlInfo, key = "type").ok) {
+        elem->type = TEMPO_GetElemTypeFromString(toml_string_in(tomlInfo, key).u.s);
+        if (elem->type == ELEM_TYPE_NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+    } // type
+    if (toml_string_in(tomlInfo, key = "info").ok) {
+        elem->string = strdup(toml_string_in(tomlInfo, key).u.s);
+        if (elem->string == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+    } // string
+    if (toml_int_in(tomlInfo, key = "anchor").ok) {
+        elem->anchor = (int)toml_int_in(tomlInfo, key).u.i;
+    } // anchor
+    if (toml_array_in(tomlInfo, key = "guide") != NULL) {
+        const bool ok = loadFRectFromTomlArray(&elem->gid_rect, toml_array_in(tomlInfo, key));
+        if (ok == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+    } // guide
+    else {
+        elem->gid_rect = ELEM_DEFAULT_GID_RECT;
+    }
+    if (toml_string_in(tomlInfo, key = "func").ok) {
+        elem->trig_func = TRIG_FindFuncFromName(toml_string_in(tomlInfo, key).u.s);
+        if (elem->trig_func == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+    } // trig_func
+    if (toml_string_in(tomlInfo, key = "para").ok) {
+        elem->trig_para = strdup(toml_string_in(tomlInfo, key).u.s);
+        if (elem->trig_para == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+    } // trig_para
+    {
+        elem->texture = TEMPO_CreateElem_Texture(elem->type, elem->string);
+        if (elem->texture == NULL) {
+            printf("%s: failed in %s.\n", __func__, "texture");
+            return false;
+        }
+        float w, h;
+        SDL_GetTextureSize(elem->texture, &w, &h);
+        elem->src_rect = (SDL_FRect){0, 0, w, h};
+    } // texture
+
+    return true;
+}
+Elem* TEMPO_CreateElem(const toml_table_t *tomlInfo) {
+    if (tomlInfo == NULL) {return NULL;}
+
+    Elem* elem = malloc(sizeof(Elem));
+    if (elem == NULL) {return NULL;}
+
+    if (TEMPO_CreateElem_(elem, tomlInfo) == false) {
         TEMPO_DeleteElem(elem);
         elem = NULL;
     }
-    return elem;
-}
-Elem* TEMPO_CreateElemFromToml(const toml_table_t *tomlInfo) {
-    if (tomlInfo == NULL) {
-        printf("%s: tomlElem not exists.\n", __func__);
-        return NULL;
-    }
-
-    // type
-    const toml_datum_t tomlType = toml_string_in(tomlInfo, "type");
-    const ElemType type = TEMPO_GetElemTypeFromString(tomlType.ok ? tomlType.u.s : NULL);
-
-    // info
-    const toml_datum_t tomlString = toml_string_in(tomlInfo, "info");
-    if (!tomlString.ok) {
-        printf("%s: tomlString not exists.\n", __func__);
-        return NULL;
-    }
-    const char* string = tomlString.u.s;
-
-    // anchor
-    const toml_datum_t tomlAnchor = toml_int_in(tomlInfo, "anchor");
-    const int anchor = tomlAnchor.ok ? (int)tomlAnchor.u.i : 0;
-
-    // gid rect
-    const toml_array_t* tomlGidRect = toml_array_in(tomlInfo, "guide");
-    SDL_FRect gid_rect = ELEM_DEFAULT_GID_RECT;
-    if (tomlGidRect != NULL) {
-        loadFRectFromTomlArray(&gid_rect, tomlGidRect);
-    }
-
-    // trig func
-    const toml_datum_t tomlFuncName = toml_string_in(tomlInfo, "func");
-    const TrigFunc trig_func = tomlFuncName.ok ? TRIG_FindFuncFromName(tomlFuncName.u.s) : NULL;
-
-    // trig para
-    const toml_datum_t tomlPara = toml_string_in(tomlInfo, "para");
-    const char* trig_para = tomlPara.ok ? tomlPara.u.s : NULL;
-
-    //
-    const ElemInfo info = {type, string, anchor, &gid_rect, trig_func, trig_para};
-    Elem* elem = TEMPO_CreateElem(info);
     return elem;
 }
 

@@ -32,8 +32,8 @@ void TEMPO_SetElemDstRect(Elem* elem, SDL_FRect dst_rect);
 void TEMPO_GetElemDstRect(const Elem* elem, SDL_FRect* dst_rect);
 
 
-Elem* TEMPO_CreateElem(ElemInfo info);
-Elem *TEMPO_CreateElemFromToml(const toml_table_t *);
+Elem* TEMPO_CreateElem2(ElemInfo info);
+Elem* TEMPO_CreateElem(const toml_table_t *tomlInfo);
 void TEMPO_DeleteElem(Elem* elem);
 void TEMPO_RenewElem(Elem* elem);
 void TEMPO_DrawElem(Elem *elem);

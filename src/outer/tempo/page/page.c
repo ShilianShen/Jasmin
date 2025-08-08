@@ -72,7 +72,7 @@ static bool TEMPO_LoadPage(Page *page, const char *name, const toml_table_t *tom
     for (int i = 0; i < page->lenElemSet; i++) {
         const toml_table_t* tomlElem = toml_table_at(tomlElems, i);
         if (tomlElem != NULL) {
-            page->elemSet[i] = TEMPO_CreateElemFromToml(tomlElem); // malloc
+            page->elemSet[i] = TEMPO_CreateElem(tomlElem); // malloc
         }
     }
     return true;
