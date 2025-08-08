@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdarg.h>
 #include "../include/jasmin/jasmin.h"
-
 
 
 SDL_Window *window;

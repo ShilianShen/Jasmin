@@ -22,66 +22,47 @@ find_package(SDL3_image REQUIRED)
 
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        src/tempo/tempo.h
-        src/basic/device/device.h
-        src/basic/debug/debug.h
-        src/basic/setting/setting.h
+        src/outer/tempo/tempo.h
+        src/inner/device/device.h
+        src/inner/debug/debug.h
+        src/inner/basic/setting/setting.h
 
         # toml/toml.h
-        third_party/toml/toml.c
-        src/tempo/trig/trig.h
-        src/tempo/elem/elem.h
-        src/tempo/page/page.h
-        src/basic/basic.h
-        src/basic/setting/setting.c
-        src/basic/debug/debug.c
-        src/basic/device/device.c
-        src/basic/ease/ease.c
-        src/basic/ease/ease.h
-        src/tempo/elem/elem.c
-        src/tempo/interface.h
-        src/tempo/tempo.c
-        src/tempo/page/page.c
-        src/tempo/trig/trig.c
-        src/basic/interface.h
-        src/lo_tri/lo_tri.h
-        src/lo_tri/interface.h
-        src/lo_tri/model/model.c
-        src/lo_tri/model/model.h
-        src/lo_tri/camera/camera.c
-        src/lo_tri/camera/camera.h
-        src/lo_tri/pipline/pipline.c
-        src/lo_tri/pipline/pipline.h
-        src/lo_tri/model/bone/bone.c
-        src/lo_tri/model/bone/bone.h
-        src/lo_tri/model/mesh/mesh.c
-        src/lo_tri/model/interface.h
-        src/lo_tri/model/mesh/mesh.h
-        src/lo_tri/math/math.c
-        src/lo_tri/math/math.h
-        src/lo_tri/math/interface.h
-        src/lo_tri/math/mat/mat.c
-        src/lo_tri/math/mat/mat.h
-        src/lo_tri/math/vec/vec.c
-        src/lo_tri/math/vec/vec.h
-        src/tempo/menu/menu.c
-        src/tempo/menu/menu.h
-        src/lo_tri/zbuffer/zbuffer.c
-        src/lo_tri/zbuffer/zbuffer.h
-        src/lo_tri/lopo.c
-        src/lopo/interface.h
-        src/lopo/lopo.c
-        src/lopo/lopo.h
-        src/lopo/shaders/debugShader.cpp
+        src/third_party/toml/toml.c
+        src/outer/tempo/trig/trig.h
+        src/outer/tempo/elem/elem.h
+        src/outer/tempo/page/page.h
+        src/inner/basic/basic.h
+        src/inner/basic/setting/setting.c
+        src/inner/debug/debug.c
+        src/inner/device/device.c
+        src/inner/basic/ease/ease.c
+        src/inner/basic/ease/ease.h
+        src/outer/tempo/elem/elem.c
+        src/outer/tempo/interface.h
+        src/outer/tempo/tempo.c
+        src/outer/tempo/page/page.c
+        src/outer/tempo/trig/trig.c
+        src/inner/basic/interface.h
+        src/outer/tempo/menu/menu.c
+        src/outer/tempo/menu/menu.h
+        src/outer/lopo/interface.h
+        src/outer/lopo/lopo.c
+        src/outer/lopo/lopo.h
+        src/outer/lopo/shaders/debugShader.cpp
 
-        src/tempo/basic/basic.c
-        src/tempo/basic/basic.h
+        src/outer/tempo/basic/basic.c
+        src/outer/tempo/basic/basic.h
 
         include/jasmin/jasmin.h
         include/jasmin/tempo.h
         include/jasmin/lopo.h
         include/jasmin/basic.h
-        include/jasmin/lotri.h
+        src/inner/inner.h
+        src/outer/interface.h
+        src/third_party/third_party.h
+        src/inner/interface.h
+        src/outer/outer.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

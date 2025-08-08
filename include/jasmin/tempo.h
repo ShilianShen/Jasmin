@@ -2,7 +2,7 @@
 #define INCLUDE_JASMIN_TEMPO_H
 
 
-#include "../../src/tempo/tempo.h"
+#include "../../src/outer/tempo/tempo.h"
 
 
 #endif //INCLUDE_JASMIN_TEMPO_H

@@ -1,8 +1,0 @@
-#ifndef JASMIN_LOTRI_MODEL_INTERFACE_H
-#define JASMIN_LOTRI_MODEL_INTERFACE_H
-
-
-#include "../math/math.h"
-
-
-#endif // JASMIN_LOTRI_MODEL_INTERFACE_H
