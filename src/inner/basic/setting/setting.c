@@ -1,288 +1,35 @@
 #include "setting.h"
 
 
+
+const char* WINDOW_TITLE = "Test";
+const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
+bool oftenReload = false;
+bool running = true;
+const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+
+
 int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
 
 
-toml_table_t* getToml(const char* tomlPath) {
-    // Req Condition
-    FILE* file = fopen(tomlPath, "r"); // malloc
-    if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
 
-    //
-    toml_table_t* toml = toml_parse_file(file, NULL, 0); // malloc
-    fclose(file); // end malloc
-
-    // Req Condition
-    if (toml == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return NULL;}
-
-    return toml;
+void BASIC_Init() {
+    // SDL
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
+    }
+    if (!TTF_Init()) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
+    }
+    if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
+    }
 }
-void renewScreenParas(SDL_Window* window) {
-    SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
-    scale_x = (float)windowWidth / (float)logical_w;
-    scale_y = (float)windowHeight / (float)logical_h;
-}
-SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
-    // N-Condition
-    if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}
-    if (font == NULL) {printf("%s: font[%p] not exists.\n", __func__, font); return NULL;}
-    if (text == NULL) {printf("%s: text[%p] not exists.\n", __func__, text); return NULL;}
-
-    // getSurface N-Condition
-    SDL_Surface* surface = TTF_RenderText_Blended(font, text, 0, color);
-    if (surface == NULL) {printf("%s: fail to create surface from \"%s\".\n", __func__, text); return NULL;}
-
-    // getTexture N-Condition
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_DestroySurface(surface);
-    if (texture == NULL) {printf("%s: fail to create texture from \"%s\".\n", __func__, text); return NULL;}
-
-    return texture;
-}
-SDL_Texture* TXT_LoadTextureWithLines(
-    SDL_Renderer* renderer,
-    TTF_Font* font,
-    const char* scr_text,
-    const SDL_Color colorText,
-    const SDL_Color colorBack,
-    const char aligned
-    ) {
-    // get text
-    char* text = strdup(scr_text);
-
-    // get num_lines (Opt Condition)
-    if (strlen(scr_text) == 0) { return NULL; }
-    int num_lines = 1;
-    for (int i = 0; text[i+1] != '\0'; i++) {
-        if (text[i] == '\n') { num_lines++; }
-    }
-
-    // get line_offsets
-    int line_offsets[num_lines];
-    line_offsets[0] = 0;
-    for (int i = 0, j = 1; text[i] != '\0'; i++) {
-        // i: index of char, j: index of line
-        if (text[i] == '\n') {
-            line_offsets[j] = i+1;
-            text[i] = '\0';
-            j++;
-        }
-    }
-
-    // get sub_textures (Req Condition)
-    SDL_Texture* sub_textures[num_lines];
-    for (int i = 0; i < num_lines; i++) {
-        sub_textures[i] = TXT_LoadTexture(renderer, font, text + line_offsets[i], colorText);  // malloc
-        if (sub_textures[i] == NULL) {
-            printf("%s: fail to create texture from \"%s\".\n", __func__, text + line_offsets[i]);
-        }
-    }
-
-    // getMainTextureSize
-    const float line_height = (float)TTF_GetFontHeight(font);
-    const int main_texture_height = num_lines * TTF_GetFontHeight(font);
-    float line_widths[num_lines];
-    int main_texture_width = 0;
-    for (int i = 0; i < num_lines; i++) {
-        SDL_GetTextureSize(sub_textures[i], &line_widths[i], NULL);
-        if ((float)main_texture_width < line_widths[i]) {main_texture_width = (int)line_widths[i];}
-    }
-
-    // getTexture N-Condition
-    SDL_Texture* texture = SDL_CreateTexture(
-        renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-        main_texture_width, main_texture_height
-        );
-    if (texture == NULL) {printf("%s: fail to create texture from \"%s\".\n", __func__, text); return NULL;}
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND_PREMULTIPLIED);
-
-    // clearTexture
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    SDL_RenderClear(renderer);
-
-    // updateTexture
-    SDL_SetRenderSDLColor(renderer, colorBack);
-    for (int i = 0; i < num_lines; i++) {
-        SDL_FRect dst_rect = {0, line_height * (float)i, line_widths[i], line_height};
-        switch (aligned) {
-            case 'r': case 'R': {dst_rect.x = (float)main_texture_width - dst_rect.w; break;}
-            case 'c': case 'C': {dst_rect.x = ((float)main_texture_width - dst_rect.w) / 2; break;}
-            case 'l': case 'L': default: {break;}
-        }
-        SDL_RenderFillRect(renderer, &dst_rect);
-        SDL_RenderTexture(renderer, sub_textures[i], NULL, &dst_rect);
-    }
-
-    // end
-    free(text);
-    for (int i = 0; i < num_lines; i++) {SDL_DestroyTexture(sub_textures[i]);}
-    SDL_SetRenderTarget(renderer, NULL);
-
-    return texture;
-}
-bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
-    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-}
-bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
-    return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
-}
-bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
-    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
-}
-
-void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
-    void** array = (void**)malloc(w * sizeof(void*));
-    if (array == NULL) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i < w; i++) {
-        array[i] = malloc(h * elementSize);
-        if (array[i] == NULL) {
-            // 分配失败，释放之前已分配的内存
-            for (size_t j = 0; j < i; j++) {
-                free(array[j]);
-            }
-            free(array);
-            return NULL;
-        }
-    }
-
-    return array;
-}
-void free2DArray(void** array, size_t w) {
-    if (array == NULL) return;
-
-    for (size_t i = 0; i < w; i++) {
-        free(array[i]);
-    }
-    free(array);
-}
-
-char* SDL_GetStringFromSDLColor(const SDL_Color color) {
-    static char string[] = "00FF00FF";
-    static size_t len = 0;
-    if (len == 0) {
-        len = sizeof(string);
-    }
-    snprintf(string, len, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
-    return string;
-}
-char* SDL_GetStringFromFRect(const SDL_FRect rect) {
-    static char string[32];
-    snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
-    return string;
-}
-bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array) {
-    if (rect == NULL) {
-        printf("%s: rect is null.\n", __func__);
-        return false;
-    }
-    if (array == NULL) {
-        printf("%s: array is null.\n", __func__);
-        return false;
-    }
-    const toml_datum_t x = toml_double_at(array, 0);
-    const toml_datum_t y = toml_double_at(array, 1);
-    const toml_datum_t w = toml_double_at(array, 2);
-    const toml_datum_t h = toml_double_at(array, 3);
-    if (x.ok && y.ok && w.ok && h.ok) {
-        *rect = (SDL_FRect){(float)x.u.d, (float)y.u.d, (float)w.u.d, (float)h.u.d};
-        return true;
-    }
-    return false;
-}
-bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
-    if (surface == NULL) {
-        printf("%s: surface is null.\n", __func__);
-        return false;
-    }
-    SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
-    return true;
-}
-void SDL_LoadDstRectAligned(
-    SDL_FRect* dst_rect,
-    SDL_Texture* texture,
-    const SDL_FRect* src_rect,
-    const SDL_FRect* gid_rect,
-    const SDL_FRect* bck_rect,
-    const int anchor
-    ) {
-    // Req Condition
-    if (dst_rect == NULL) {printf("%s: dst_rect not exists.\n", __func__); return;}
-    if (texture == NULL) {printf("%s: fail to get texture.\n", __func__); return;}
-
-    // load src (Opt Condition)
-    SDL_FRect src = {0, 0, 0, 0};
-    if (src_rect != NULL) {
-        src.w = src_rect->w;
-        src.h = src_rect->h;
-    }
-    else {SDL_GetTextureSize(texture, &src.w, &src.h);}
-
-    // load gid (Opt Condition)
-    SDL_FRect gid = {0, 0, 1, 1};
-    if (gid_rect != NULL) {gid = *gid_rect;}
-
-    // load bck (Opt Condition)
-    SDL_FRect bck = {0, 0, (float)windowWidth, (float)windowHeight};
-    if (bck_rect != NULL) {bck = *bck_rect;}
-
-    // load dst_rect -> w, h
-    dst_rect->w = src.w * gid.w;
-    dst_rect->h = src.h * gid.h;
-
-    // load dst_rect -> x, y
-    const int x = anchor % 9;
-    const int y = anchor / 9;
-    float cx = 0, cy = 0, dx = 0, dy = 0;
-    switch (x / 3) {
-        case 0: cx = bck.x            ; break;
-        case 1: cx = bck.x + bck.w / 2; break;
-        case 2: cx = bck.x + bck.w    ; break;
-        default: break;
-    }
-    switch (y / 3) {
-        case 0: cy = bck.y            ; break;
-        case 1: cy = bck.y + bck.h / 2; break;
-        case 2: cy = bck.y + bck.h    ; break;
-        default: break;
-    }
-    switch (x % 3) {
-        case 0: dx = -dst_rect->w    ; break;
-        case 1: dx = -dst_rect->w / 2; break;
-        case 2: dx = 0               ; break;
-        default: break;
-    }
-    switch (y % 3) {
-        case 0: dy = -dst_rect->h    ; break;
-        case 1: dy = -dst_rect->h / 2; break;
-        case 2: dy = 0               ; break;
-        default: break;
-    }
-    dst_rect->x = cx + dx + gid.x;
-    dst_rect->y = cy + dy + gid.y;
-}
-bool SDL_RenderTextureAligned(
-    SDL_Renderer* renderer,
-    SDL_Texture* texture,
-    const SDL_FRect* src_rect,
-    const SDL_FRect* gid_rect,
-    const SDL_FRect* bck_rect,
-    const int anchor
-    ) {
-    // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return false;}
-    if (texture == NULL) {printf("%s: texture  not exists.\n", __func__); return false;}
-
-    //
-    SDL_FRect dst_rect;
-    SDL_LoadDstRectAligned(&dst_rect, texture, src_rect, gid_rect, bck_rect, anchor);
-    return SDL_RenderTexture(renderer, texture, src_rect, &dst_rect);
+void BASIC_Deinit() {
+    SDL_DestroyTexture(background);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }

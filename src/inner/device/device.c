@@ -12,7 +12,7 @@ struct Mouse {
 } mouse;
 
 
-void renewMouse() {
+void DEVICE_RenewMouse() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
     mouse.x *= scale_x;
     mouse.y *= scale_y;
@@ -29,7 +29,7 @@ void renewMouse() {
     mouse.left_pressed = buttons & SDL_BUTTON_LMASK;
     mouse.right_pressed = buttons & SDL_BUTTON_RMASK;
 }
-void drawMouse(SDL_Renderer* renderer) {
+void DEVICE_DrawMouse(SDL_Renderer* renderer) {
     DEBUG_SendMessageL("mouse: %.2f, %.2f\n", mouse.x, mouse.y);
     DEBUG_DrawPoint(mouse.left_x, mouse.left_y);
     DEBUG_DrawPoint(mouse.x, mouse.y);
@@ -37,13 +37,13 @@ void drawMouse(SDL_Renderer* renderer) {
         DEBUG_DrawLine(mouse.x, mouse.y, mouse.left_x, mouse.left_y);
     }
 }
-bool mouseInRect(const SDL_FRect* rect) {
+bool DEVICE_MouseInRect(const SDL_FRect* rect) {
     return (
         rect->x <= mouse.x && mouse.x < rect->x + rect->w &&
         rect->y <= mouse.y && mouse.y < rect->y + rect->h
         );
 }
-bool mouseLeftInRect(const SDL_FRect* rect) {
+bool DEVICE_MouseLeftInRect(const SDL_FRect* rect) {
     return (
         rect->x <= mouse.left_x && mouse.left_x < rect->x + rect->w &&
         rect->y <= mouse.left_y && mouse.left_y < rect->y + rect->h
@@ -54,10 +54,10 @@ bool mouseLeftInRect(const SDL_FRect* rect) {
 struct Keyboard {} keyboard;
 
 
-void renewKeyboard() {
+void DEVICE_RenewKeyboard() {
     //
 }
-bool keyPressed(const SDL_Scancode key) {
+bool DEVICE_KeyPressed(const SDL_Scancode key) {
     const bool* state = SDL_GetKeyboardState(NULL);
     //
     if (state[key]) {

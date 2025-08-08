@@ -63,6 +63,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/third_party/third_party.h
         src/inner/interface.h
         src/outer/outer.h
+        src/inner/basic/func/func.c
+        src/inner/basic/func/func.h
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

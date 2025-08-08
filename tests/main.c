@@ -1,48 +1,16 @@
 #include "../include/jasmin/jasmin.h"
 
 
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Texture* background;
-
-
-const char WINDOW_TITLE[] = "Test";
-const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
-bool oftenReload = false;
-bool running = true;
-const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
-SDL_Event event;
-
-
 static void INIT() {
-    // SDL
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
-    }
-    if (!TTF_Init()) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
-    }
-    if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
-    }
-
-    // Jasmin
+    BASIC_Init();
     DEBUG_Init(renderer);
     LOPO_Init();
     TEMPO_SetBasicRenderer(renderer);
-    //LOTRI_Init(renderer);
-
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
 }
 static void DEINIT() {
-    // Jasmin
     LOPO_Deinit();
-    //LOTRI_Deinit();
-
-    // SDL
-    SDL_DestroyTexture(background);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    BASIC_Deinit();
 }
 
 static void LOAD() {
@@ -58,7 +26,7 @@ static void UNLOAD() {
 static void RENEW() {
     // physical renew
     renewScreenParas(window);
-    renewMouse();
+    DEVICE_RenewMouse();
     DEBUG_Renew();
 
     //
@@ -73,16 +41,11 @@ static void DRAW() {
     const static SDL_Color COLOR_CLEAR = {0, 0, 0, 255};
     SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
     SDL_RenderClear(renderer);
-
-    // logical draw
-    // SDL_RenderTextureAligned(renderer, background, NULL, NULL, NULL, 40);
-    // TEST_Draw();
-    // MAZE_OUTER_Draw();
     TEMPO_Draw();
 
 
     // physical draw
-    drawMouse(renderer);
+    DEVICE_DrawMouse(renderer);
     DEBUG_DrawMessage();
     DEBUG_Intro();
 

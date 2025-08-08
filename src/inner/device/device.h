@@ -5,14 +5,14 @@
 #include "../debug/debug.h"
 
 
-void renewMouse();
-void drawMouse(SDL_Renderer* renderer);
-bool mouseInRect(const SDL_FRect* rect);
-bool mouseLeftInRect(const SDL_FRect* rect);
+void DEVICE_RenewMouse();
+void DEVICE_DrawMouse(SDL_Renderer* renderer);
+bool DEVICE_MouseInRect(const SDL_FRect* rect);
+bool DEVICE_MouseLeftInRect(const SDL_FRect* rect);
 
 
-void renewKeyboard();
-bool keyPressed(SDL_Scancode key);
+void DEVICE_RenewKeyboard();
+bool DEVICE_KeyPressed(SDL_Scancode key);
 
 
 #endif //JASMIN_BASIC_DEVICE_H

@@ -4,6 +4,7 @@
 
 #include "ease/ease.h"
 #include "setting/setting.h"
+#include "func/func.h"
 
 
 #endif //JASMIN_BASIC_H

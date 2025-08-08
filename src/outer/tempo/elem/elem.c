@@ -260,8 +260,8 @@ static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->visible == false) {
         return;
     }
-    const bool mouseIn = mouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = mouseLeftInRect(&elem->dst_rect);
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
     if (elem->state == ELEM_STATE_PRESSED) {
         DEBUG_SendMessageL("elem: %s, %s\n", TEMPO_GetStringFromElemType(elem->type), elem->string);
         DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
