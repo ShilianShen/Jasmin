@@ -100,11 +100,11 @@ Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
 
 
 // RENEW ===============================================================================================================
-void TEMPO_RenewPage(const Page* page) {
+bool TEMPO_RenewPage(const Page *page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);
-        return;
+        return false;
     }
 
     //
@@ -113,15 +113,16 @@ void TEMPO_RenewPage(const Page* page) {
             TEMPO_RenewElem(page->elemSet[i]);
         }
     }
+    return true;
 }
 
 
 // DRAW ================================================================================================================
-void TEMPO_DrawPage(const Page* page) {
+bool TEMPO_DrawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);
-        return;
+        return false;
     }
 
     //
@@ -130,4 +131,5 @@ void TEMPO_DrawPage(const Page* page) {
             TEMPO_DrawElem(page->elemSet[i]);
         }
     }
+    return true;
 }
