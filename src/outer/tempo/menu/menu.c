@@ -3,7 +3,7 @@
 
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
-static const char* tomlPath = "../config/tempo/menu_pages.toml";
+static const char* tomlPath = "../config/menu.toml";
 
 
 // MENU ================================================================================================================
@@ -53,41 +53,12 @@ static void TEMPO_LoadMenuPageSet() {
         } // Req Condition
         const char* name = tomlName.u.s;
 
-        menu.pageSet[i] = TEMPO_CreatePage(name, tomlPage);
+        menu.pageSet[i] = TEMPO_CreatePage(tomlPage);
         if (strcmp(name, MENU_ROOT_NAME) == 0) {
             menu.pageRoot = menu.pageSet[i];
         }
         if (strcmp(name, MENU_EDGE_NAME) == 0) {
             menu.pageEdge = menu.pageSet[i];
-        }
-    }
-    // getPageName
-    int pageId = 1;
-    for (int i = 0; toml_key_in(tomlMenu, i) != NULL; i++) {
-        break;
-        const char* pageName = toml_key_in(tomlMenu, i);
-        const toml_table_t* tomlPage = toml_table_in(tomlMenu, pageName);
-        if (tomlPage == NULL) {
-            printf("%s: failed to get \"%s\" from tomlMenu[%p].\n", __func__, pageName, tomlMenu);
-        }
-        else if (strcmp(pageName, MENU_ROOT_NAME) == 0) {
-            if (menu.pageRoot != NULL) {
-                menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
-            }
-            menu.pageRoot = TEMPO_CreatePage(pageName, tomlPage);
-        }
-        else if (strcmp(pageName, MENU_EDGE_NAME) == 0) {
-            if (menu.pageEdge != NULL) {
-                menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
-            }
-            menu.pageEdge = TEMPO_CreatePage(pageName, tomlPage);
-        }
-        else {
-            if (menu.pageSet[pageId] != NULL) {
-                menu.pageSet[pageId] = TEMPO_DeletePage(menu.pageSet[pageId]);
-            }
-            menu.pageSet[pageId] = TEMPO_CreatePage(pageName, tomlPage);
-            pageId++;
         }
     }
 
@@ -110,7 +81,7 @@ void TEMPO_UnloadMenu() {
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("tempo.path: /%s", menu.pageRoot->name);
+    DEBUG_SendMessageL("tempo.path: /%s", TEMPO_GetPageName(menu.pageRoot));
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear) {
             menu.path[i] = 0;
@@ -119,11 +90,11 @@ static void TEMPO_RenewMenuPath() {
             need_clear = true;
         }
         else {
-            DEBUG_SendMessageL("/%s", TEMPO_GetPageFromMenuPathId(i)->name);
+            DEBUG_SendMessageL("/%s", TEMPO_GetPageName(TEMPO_GetPageFromMenuPathId(i)));
         }
     }
     if (need_clear == false) {
-        DEBUG_SendMessageL("/%s", menu.pageEdge->name);
+        DEBUG_SendMessageL("/%s", TEMPO_GetPageName(menu.pageEdge));
     }
     DEBUG_SendMessageL("\n");
 }

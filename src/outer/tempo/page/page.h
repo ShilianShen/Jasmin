@@ -5,14 +5,14 @@
 #include "../elem/elem.h"
 
 
-typedef struct Page {
-    char* name; // malloc in LOAD
-    int lenElemSet;
-    Elem** elemSet;
-} Page;
+typedef struct Page Page;
 
 
-Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage);
+
+const char* TEMPO_GetPageName(const Page* page);
+
+
+Page* TEMPO_CreatePage(const toml_table_t* tomlPage);
 Page *TEMPO_DeletePage(Page *page);
 
 bool TEMPO_RenewPage(const Page *page);

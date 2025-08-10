@@ -16,7 +16,7 @@ void TRIG_FUNC_Forward(const char* pageName) {
     int pageId = 0;
     for (int i = 0; i < LEN_PAGE_SET; i++) {
         if (menu.pageSet[i] == NULL) {continue;}
-        if (strcmp(menu.pageSet[i]->name, pageName) == 0) {pageId = i;}
+        if (strcmp(TEMPO_GetPageName(menu.pageSet[i]), pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 

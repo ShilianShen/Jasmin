@@ -1,26 +1,35 @@
 #include "page.h"
 
+// PAGE ================================================================================================================
+struct Page {
+    char* name;
+    int lenElemSet;
+    Elem** elemSet;
+};
+
 
 // GET & SET ===========================================================================================================
-//
+const char* TEMPO_GetPageName(const Page* page) {
+    if (page == NULL) {
+        printf("%s: page == NULL", __func__);
+        return NULL;
+    }
+    return page->name;
+}
+
 
 // CREATE & DELETE =====================================================================================================
-static bool TEMPO_CreatePage_RK(Page* page, const char* name, const toml_table_t* tomlPage) {
+static bool TEMPO_CreatePage_RK(Page* page, const toml_table_t* tomlPage) {
     memset(page, 0, sizeof(Page));
 
-    if (name != NULL) {
-        page->name = strdup(name);
+    const char* key;
+    if (toml_string_in(tomlPage, key = "name").ok) {
+        page->name = strdup(toml_string_in(tomlPage, key).u.s);
         if (page->name == NULL) {
-            printf("%s: failed malloc page.name.\n", __func__);
+            printf("%s: failed malloc page.name, %s.\n", __func__, key);
             return false;
         }
     } // name
-    else {
-        printf("%s: name == NULL.\n", __func__);
-        return false;
-    }
-
-    const char* key;
     if (toml_array_in(tomlPage, key = "elemSet") != NULL) {
         const toml_array_t* tomlElemSet = toml_array_in(tomlPage, key);
         if (tomlElemSet == NULL) {
@@ -61,11 +70,6 @@ static bool TEMPO_CreatePage_CK(const Page* page) {
     }
     return true;
 }
-
-
-
-
-
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
         if (page->name != NULL) {
@@ -86,7 +90,7 @@ Page* TEMPO_DeletePage(Page* page) {
     }
     return page;
 }
-Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
+Page* TEMPO_CreatePage(const toml_table_t* tomlPage) {
     if (tomlPage == NULL) {
         printf("%s: tomlPage == NULL.\n", __func__);
         return NULL;
@@ -96,7 +100,7 @@ Page* TEMPO_CreatePage(const char* name, const toml_table_t* tomlPage) {
         printf("%s: page == NULL.\n", __func__);
         return page;
     } // Req Condition
-    if (TEMPO_CreatePage_RK(page, name, tomlPage) == false || TEMPO_CreatePage_CK(page) == false) {
+    if (TEMPO_CreatePage_RK(page, tomlPage) == false || TEMPO_CreatePage_CK(page) == false) {
         printf("%s: RK or CK == false.\n", __func__);
         page = TEMPO_DeletePage(page);
     } // Req Condition
