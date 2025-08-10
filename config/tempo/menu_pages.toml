@@ -1,49 +1,21 @@
-[Root]
-elems = [
-    {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../resources/images/491.gif"},
-    {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="The dead can be cured."},
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="Title", func='forward', para='Title'},
-    # {anchor=31, guide=[0, 0, 1, 1], string="t THE MAZE"},
-]
-[Edge]
-elems = [
-    {anchor=31, type="TEXT", info="""The edge of menu system, it shouldn't appear.
-    If you are watching it, there is a bug need to be fixed."""},
-    {anchor=49, type="TEXT", info="[R2R]", func='clear'}
-]
-[Title]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<< Root.", func='clear'},
-    {anchor=31, guide=[0, 0, 1, 1], type="TEXT", info="THE MAZE"},
-    {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="Setting", func='forward', para='Setting'},
-    {anchor=49, guide=[0, 100, 1, 1], type="TEXT", info="Collection", func='forward', para='Collection'},
-]
-[Setting]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-    {anchor=49, guide=[0, 10, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
-]
-[Collection]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-    {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="GeneSet", func='forward', para='GeneSet'},
-    {anchor=49, guide=[0, 100, 1, 1], type="TEXT", info="RoomSet", func='forward', para='RoomSet'},
-    {anchor=49, guide=[0, 200, 1, 1], type="TEXT", info="ItemSet", func='forward', para='ItemSet'},
-    {anchor=49, guide=[0, 300, 1, 1], type="TEXT", info="MonsterSet", func='forward', para='MonsterSet'},
-]
-[GeneSet]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-]
-[RoomSet]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-]
-[ItemSet]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-]
-[MonsterSet]
-elems = [
-    {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+pageSet = [
+    {name='Root', elemSet=[
+        {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../resources/images/491.gif"},
+        {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="The dead can be cured."},
+        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="Title", func='forward', para='Title'},
+    ]},
+    {name='Edge', elemSet=[
+        {anchor=31, type="TEXT", info="""The edge of menu system, it shouldn't appear.
+        If you are watching it, there is a bug need to be fixed."""},
+        {anchor=49, type="TEXT", info="[R2R]", func='clear'}
+    ]},
+    {name='Title', elemSet=[
+        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<< Root.", func='clear'},
+        {anchor=31, guide=[0, 0, 1, 1], type="TEXT", info="THE MAZE"},
+        {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="Setting", func='forward', para='Setting'},
+    ]},
+    {name='Setting', elemSet = [
+        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
+        {anchor=49, guide=[0, 10, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
+    ]},
 ]

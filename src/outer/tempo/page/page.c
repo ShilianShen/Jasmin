@@ -21,7 +21,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const char* name, const toml_table_t
     }
 
     const char* key;
-    if (toml_array_in(tomlPage, key = "elems") != NULL) {
+    if (toml_array_in(tomlPage, key = "elemSet") != NULL) {
         const toml_array_t* tomlElemSet = toml_array_in(tomlPage, key);
         if (tomlElemSet == NULL) {
             printf("%s: tomlElems not exists, %s.\n", __func__, key);
@@ -61,6 +61,11 @@ static bool TEMPO_CreatePage_CK(const Page* page) {
     }
     return true;
 }
+
+
+
+
+
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
         if (page->name != NULL) {

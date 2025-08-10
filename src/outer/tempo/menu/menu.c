@@ -23,15 +23,48 @@ static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
 static void TEMPO_LoadMenuPageSet() {
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, tomlPath);
+        printf("%s: tomlMenu == NULL.\n", __func__);
         return;
     } // Req Condition
 
-    // menu.lenPageSet = toml_array_nelem();
+    const toml_array_t* tomlPageSet = toml_array_in(tomlMenu, "pageSet");
+    if (tomlPageSet == NULL) {
+        printf("%s: tomlPageSet == NULL.\n", __func__);
+        return;
+    } // Req Condition
 
+    menu.lenPageSet = toml_array_nelem(tomlPageSet);
+    if (menu.lenPageSet == 0) {
+        printf("%s: menu.lenPageSet == 0.\n", __func__);
+        return;
+    } // Req Condition
+
+    for (int i = 0; i < menu.lenPageSet; i++) {
+        const toml_table_t* tomlPage = toml_table_at(tomlPageSet, i);
+        if (tomlPage == NULL) {
+            printf("%s: tomlPage == NULL.\n", __func__);
+            return;
+        } // Req Condition
+
+        const toml_datum_t tomlName = toml_string_in(tomlPage, "name");
+        if (tomlName.ok == false) {
+            printf("%s: tomlName.ok == false.\n", __func__);
+            return;
+        } // Req Condition
+        const char* name = tomlName.u.s;
+
+        menu.pageSet[i] = TEMPO_CreatePage(name, tomlPage);
+        if (strcmp(name, MENU_ROOT_NAME) == 0) {
+            menu.pageRoot = menu.pageSet[i];
+        }
+        if (strcmp(name, MENU_EDGE_NAME) == 0) {
+            menu.pageEdge = menu.pageSet[i];
+        }
+    }
     // getPageName
     int pageId = 1;
     for (int i = 0; toml_key_in(tomlMenu, i) != NULL; i++) {
+        break;
         const char* pageName = toml_key_in(tomlMenu, i);
         const toml_table_t* tomlPage = toml_table_in(tomlMenu, pageName);
         if (tomlPage == NULL) {
@@ -65,9 +98,7 @@ void TEMPO_LoadMenu() {
     TEMPO_LoadMenuPageSet();
 }
 void TEMPO_UnloadMenu() {
-    menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
-    menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
-    for (int i = 0; i < LEN_PAGE_SET; i++) {
+    for (int i = 0; i < menu.lenPageSet; i++) {
         if (menu.pageSet[i] != NULL) {
             menu.pageSet[i] = TEMPO_DeletePage(menu.pageSet[i]);
         }
