@@ -7,7 +7,7 @@ static const char* tomlPath = "../config/tempo/menu_pages.toml";
 
 
 // MENU ================================================================================================================
-Menu menu;
+Menu menu = (Menu){0};
 
 
 // GET & SET ===========================================================================================================
@@ -19,51 +19,8 @@ static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
 }
 
 
-// INIT & DEINIT =======================================================================================================
-void TEMPO_InitMenu() {
-    // Req Condition
-    if (basic.renderer == NULL) {
-        printf("%s: renderer not exists.\n", __func__);
-        return;
-    }
-    if (menu.pageRoot != NULL) {
-        printf("%s: tempo.pageRoot shouldn't exist.\n", __func__);
-        return;
-    }
-    if (menu.pageEdge != NULL) {
-        printf("%s: tempo.pageEdge shouldn't exist.\n", __func__);
-        return;
-    }
-    for (int i = 1; i < LEN_PAGE_SET; i++) {
-        if (menu.pageSet[i] != NULL) {
-            printf("%s: tempo.pages[%d] shouldn't exist.\n", __func__, i);
-            return;
-        }
-    }
-
-    //
-    menu = (Menu){0};
-    menu.renderer = basic.renderer;
-    basic.renderer = menu.renderer;
-}
-void TEMPO_DeinitMenu() {
-    // Opt Condition
-    if (menu.pageRoot != NULL) {
-        menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
-    }
-    if (menu.pageEdge != NULL) {
-        menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
-    }
-    for (int i = 1; i < LEN_PAGE_SET; i++) {
-        if (menu.pageSet[i] != NULL) {
-            menu.pageSet[i] = TEMPO_DeletePage(menu.pageSet[i]);
-        }
-    }
-}
-
-
 // LOAD & UNLOAD =======================================================================================================
-static void TEMPO_LoadMenuPages() {
+static void TEMPO_LoadMenuPageSet() {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
@@ -102,10 +59,9 @@ static void TEMPO_LoadMenuPages() {
 }
 void TEMPO_LoadMenu() {
     // Req Condition
-    if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
     //
-    TEMPO_LoadMenuPages();
+    TEMPO_LoadMenuPageSet();
 }
 void TEMPO_UnloadMenu() {
     menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);

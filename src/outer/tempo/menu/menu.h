@@ -10,10 +10,8 @@
 
 
 struct Menu {
-    // given in INIT
-    SDL_Renderer* renderer;
-
     // malloc in INIT
+    int lenPageSet;
     Page* pageRoot;
     Page* pageEdge;
     Page* pageSet[LEN_PAGE_SET];
@@ -28,8 +26,6 @@ typedef struct Menu Menu;
 extern Menu menu;
 
 
-void TEMPO_InitMenu();
-void TEMPO_DeinitMenu();
 void TEMPO_LoadMenu();
 void TEMPO_UnloadMenu();
 void TEMPO_RenewMenu();

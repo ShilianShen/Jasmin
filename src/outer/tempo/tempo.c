@@ -2,7 +2,6 @@
 
 
 bool TEMPO_Load() {
-    TEMPO_InitMenu();
     TEMPO_LoadBasic();
     TEMPO_LoadMenu();
     return true;
@@ -10,7 +9,6 @@ bool TEMPO_Load() {
 void TEMPO_Unload() {
     TEMPO_UnloadMenu();
     TEMPO_UnloadBasic();
-    TEMPO_DeinitMenu();
 }
 void TEMPO_Renew() {
     TEMPO_RenewMenu();
