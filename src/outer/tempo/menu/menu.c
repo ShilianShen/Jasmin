@@ -21,9 +21,13 @@ static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
 
 // LOAD & UNLOAD =======================================================================================================
 static void TEMPO_LoadMenuPageSet() {
-    // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
-    if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
+    if (tomlMenu == NULL) {
+        printf("%s: failed from \"%s\".\n", __func__, tomlPath);
+        return;
+    } // Req Condition
+
+    // menu.lenPageSet = toml_array_nelem();
 
     // getPageName
     int pageId = 1;
@@ -58,9 +62,6 @@ static void TEMPO_LoadMenuPageSet() {
     toml_free(tomlMenu); // end malloc
 }
 void TEMPO_LoadMenu() {
-    // Req Condition
-
-    //
     TEMPO_LoadMenuPageSet();
 }
 void TEMPO_UnloadMenu() {
