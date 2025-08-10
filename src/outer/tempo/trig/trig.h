@@ -23,9 +23,13 @@
 
 // datatype
 typedef void (*TrigFunc)(const char*);
-typedef struct Trig {
+typedef struct Trig2 {
     char* name;
     const TrigFunc func;
+} Trig2;
+typedef struct Trig {
+    TrigFunc func;
+    char* para;
 } Trig;
 
 
@@ -35,7 +39,7 @@ void TRIG_FUNC_Backward(const char*);
 void TRIG_FUNC_Clear(const char*);
 
 
-extern Trig trig_set[];
+extern Trig2 trig_set[];
 
 
 TrigFunc TRIG_FindFuncFromName(const char* name);

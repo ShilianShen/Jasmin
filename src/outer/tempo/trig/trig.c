@@ -1,7 +1,7 @@
 #include "../menu/menu.h"
 
 
-Trig trig_set[] = {
+Trig2 trig_set[] = {
     {"pass", TRIG_FUNC_Pass},
     {"forward", TRIG_FUNC_Forward},
     {"backward", TRIG_FUNC_Backward},
@@ -12,20 +12,18 @@ Trig trig_set[] = {
 
 void TRIG_FUNC_Pass(const char* para) {}
 void TRIG_FUNC_Forward(const char* pageName) {
-    // ma_engine_play_sound(&maEngine, "../sound effects/ring01.wav", NULL);
-
     // getPageId
     int pageId = 0;
-    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] == NULL) {continue;}
-        if (strcmp(menu.pages[i]->name, pageName) == 0) {pageId = i;}
+    for (int i = 0; i < LEN_PAGE_SET; i++) {
+        if (menu.pageSet[i] == NULL) {continue;}
+        if (strcmp(menu.pageSet[i]->name, pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 
     // forward
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (menu.path[i] == 0) {
-            menu.path[i] = pageId;
+            menu.path[i] = menu.pageSet[pageId];
             break;
         }
     }

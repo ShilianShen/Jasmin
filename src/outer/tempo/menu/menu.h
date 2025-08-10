@@ -5,7 +5,7 @@
 #include "../page/page.h"
 
 
-#define MENU_PAGE_VOLUME 16
+#define LEN_PAGE_SET 16
 #define MENU_PATH_VOLUME 6
 
 
@@ -16,11 +16,12 @@ struct Menu {
     // malloc in INIT
     Page* pageRoot;
     Page* pageEdge;
-    Page* pages[MENU_PAGE_VOLUME];
+    Page* pageSet[LEN_PAGE_SET];
+    const char* pageNameSet[LEN_PAGE_SET];
 
     // other
     SDL_FRect bck_rect;
-    int path[MENU_PATH_VOLUME];
+    Page* path[MENU_PATH_VOLUME];
     Page* pageNow;
 };
 typedef struct Menu Menu;

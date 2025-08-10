@@ -3,6 +3,7 @@
 
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
+static const char* tomlPath = "../config/tempo/menu_pages.toml";
 
 
 // MENU ================================================================================================================
@@ -11,10 +12,10 @@ Menu menu;
 
 // GET & SET ===========================================================================================================
 static Page* TEMPO_GetPageFromMenuPathId(const int pathId) {
-    return menu.pages[menu.path[pathId]];
+    return menu.path[pathId];
 }
 static Page* TEMPO_GetPageFromMenuPageId(const int pageId) {
-    return menu.pages[pageId];
+    return menu.pageSet[pageId];
 }
 
 
@@ -33,8 +34,8 @@ void TEMPO_InitMenu() {
         printf("%s: tempo.pageEdge shouldn't exist.\n", __func__);
         return;
     }
-    for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] != NULL) {
+    for (int i = 1; i < LEN_PAGE_SET; i++) {
+        if (menu.pageSet[i] != NULL) {
             printf("%s: tempo.pages[%d] shouldn't exist.\n", __func__, i);
             return;
         }
@@ -53,16 +54,16 @@ void TEMPO_DeinitMenu() {
     if (menu.pageEdge != NULL) {
         menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
     }
-    for (int i = 1; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] != NULL) {
-            menu.pages[i] = TEMPO_DeletePage(menu.pages[i]);
+    for (int i = 1; i < LEN_PAGE_SET; i++) {
+        if (menu.pageSet[i] != NULL) {
+            menu.pageSet[i] = TEMPO_DeletePage(menu.pageSet[i]);
         }
     }
 }
 
 
 // LOAD & UNLOAD =======================================================================================================
-static void TEMPO_LoadMenuPages(const char* tomlPath) {
+static void TEMPO_LoadMenuPages() {
     // Req Condition
     toml_table_t* tomlMenu = getToml(tomlPath);
     if (tomlMenu == NULL) {printf("%s: failed from \"%s\".\n", __func__, tomlPath); return;}
@@ -88,10 +89,10 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
             menu.pageEdge = TEMPO_CreatePage(pageName, tomlPage);
         }
         else {
-            if (menu.pages[pageId] != NULL) {
-                menu.pages[pageId] = TEMPO_DeletePage(menu.pages[pageId]);
+            if (menu.pageSet[pageId] != NULL) {
+                menu.pageSet[pageId] = TEMPO_DeletePage(menu.pageSet[pageId]);
             }
-            menu.pages[pageId] = TEMPO_CreatePage(pageName, tomlPage);
+            menu.pageSet[pageId] = TEMPO_CreatePage(pageName, tomlPage);
             pageId++;
         }
     }
@@ -100,26 +101,20 @@ static void TEMPO_LoadMenuPages(const char* tomlPath) {
     toml_free(tomlMenu); // end malloc
 }
 void TEMPO_LoadMenu() {
-    const char* menuPagesPath = "../config/tempo/menu_pages.toml";
     // Req Condition
     if (menu.renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
 
     //
-    TEMPO_LoadMenuPages(menuPagesPath);
-}
-
-static void TEMPO_UnloadMenuTheme() {
-    TEMPO_UnloadBasic();
+    TEMPO_LoadMenuPages();
 }
 void TEMPO_UnloadMenu() {
     menu.pageRoot = TEMPO_DeletePage(menu.pageRoot);
     menu.pageEdge = TEMPO_DeletePage(menu.pageEdge);
-    for (int i = 0; i < MENU_PAGE_VOLUME; i++) {
-        if (menu.pages[i] != NULL) {
-            menu.pages[i] = TEMPO_DeletePage(menu.pages[i]);
+    for (int i = 0; i < LEN_PAGE_SET; i++) {
+        if (menu.pageSet[i] != NULL) {
+            menu.pageSet[i] = TEMPO_DeletePage(menu.pageSet[i]);
         }
     }
-    TEMPO_UnloadMenuTheme();
 }
 
 
