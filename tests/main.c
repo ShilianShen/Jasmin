@@ -4,22 +4,18 @@
 static void INIT() {
     BASIC_Init();
     DEBUG_Init(renderer);
-    LOPO_Init();
     TEMPO_SetBasicRenderer(renderer);
     background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
 }
 static void DEINIT() {
-    LOPO_Deinit();
     BASIC_Deinit();
 }
 
 static void LOAD() {
     DEBUG_Load();
-    LOPO_Load();
     TEMPO_Load();
 }
 static void UNLOAD() {
-    LOPO_Unload();
     TEMPO_Unload();
 }
 
@@ -28,9 +24,6 @@ static void RENEW() {
     renewScreenParas(window);
     DEVICE_RenewMouse();
     DEBUG_Renew();
-
-    //
-    LOPO_Renew();
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};

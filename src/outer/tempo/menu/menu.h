@@ -5,7 +5,6 @@
 #include "../page/page.h"
 
 
-#define LEN_PAGE_SET 16
 #define MENU_PATH_VOLUME 6
 
 
@@ -14,11 +13,9 @@ struct Menu {
     int lenPageSet;
     Page* pageRoot;
     Page* pageEdge;
-    Page* pageSet[LEN_PAGE_SET];
-    const char* pageNameSet[LEN_PAGE_SET];
+    Page** pageSet;
 
-    // other
-    SDL_FRect bck_rect;
+    // path
     Page* path[MENU_PATH_VOLUME];
     Page* pageNow;
 };

@@ -5,8 +5,10 @@ pageSet = [
         {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="Title", func='forward', para='Title'},
     ]},
     {name='Edge', elemSet=[
-        {anchor=31, type="TEXT", info="""The edge of menu system, it shouldn't appear.
-        If you are watching it, there is a bug need to be fixed."""},
+        {anchor=31, type="TEXT", info="""
+        The edge of menu system, it shouldn't appear.
+        If you are watching it, there is a bug need to be fixed.
+        """},
         {anchor=49, type="TEXT", info="[R2R]", func='clear'}
     ]},
     {name='Title', elemSet=[

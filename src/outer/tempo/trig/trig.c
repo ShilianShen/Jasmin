@@ -14,7 +14,7 @@ void TRIG_FUNC_Pass(const char* para) {}
 void TRIG_FUNC_Forward(const char* pageName) {
     // getPageId
     int pageId = 0;
-    for (int i = 0; i < LEN_PAGE_SET; i++) {
+    for (int i = 0; i < menu.lenPageSet; i++) {
         if (menu.pageSet[i] == NULL) {continue;}
         if (strcmp(TEMPO_GetPageName(menu.pageSet[i]), pageName) == 0) {pageId = i;}
     }
