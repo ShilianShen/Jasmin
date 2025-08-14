@@ -212,7 +212,7 @@ bool SDL_LoadDstRectAligned(
 ) {
     // Req Condition
     if (dst_rect == NULL) {printf("%s: dst_rect not exists.\n", __func__); return false;}
-    if (texture == NULL) {printf("%s: fail to get texture.\n", __func__); return false;}
+    if (texture == NULL && src_rect == NULL) {printf("%s: fail to get texture.\n", __func__); return false;}
 
     // load src (Opt Condition)
     SDL_FRect src = {0, 0, 0, 0};
