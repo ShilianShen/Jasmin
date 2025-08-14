@@ -1,6 +1,14 @@
 #include "elem.h"
 
 
+// ELEM INFO ===========================================================================================================
+union ElemInfo {
+    char* string;
+    struct {} knob;
+    struct {int min, max, now;} slid;
+};
+
+
 // ELEM STATE ==========================================================================================================
 enum ElemState {
     ELEM_STATE_OUTSIDE,
@@ -47,16 +55,16 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 struct Elem {
     // read
     ElemType type;
-    char* info;
+    ElemInfo info;
 
     int anchor;
-    SDL_FRect* gid_rect;
-    SDL_FRect src_rect;
+    SDL_FRect gid;
+    SDL_FRect src;
 
     Trig* trig;
 
     // renew
-    SDL_FRect dst_rect;
+    SDL_FRect dst;
     ElemState state;
     bool visible;
 };
@@ -68,7 +76,7 @@ bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
         printf("%s: elem is null.\n", __func__);
         return false;
     }
-    elem->dst_rect = dst_rect;
+    elem->dst = dst_rect;
     return true;
 }
 bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
@@ -76,7 +84,7 @@ bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
         printf("%s: elem is null.\n", __func__);
         return false;
     }
-    *dst_rect = elem->dst_rect;
+    *dst_rect = elem->dst;
     return true;
 }
 
@@ -129,52 +137,80 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             return false;
         }
     } // type
-    if (toml_string_in(tomlElem, key = "info").ok) {
-        elem->info = strdup(toml_string_in(tomlElem, key).u.s);
-        if (elem->info == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
+    key = "info";
+    switch (elem->type) {
+        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_FILE: {
+            if (toml_string_in(tomlElem, key).ok == false) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            } // Req Condition
+            elem->info.string = strdup(toml_string_in(tomlElem, key).u.s);
+            if (elem->info.string == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            } // Req Condition
+            break;
+        } // string
+        case ELEM_TYPE_SLID: {
+            const toml_table_t* tomlInfo = toml_table_in(tomlElem, key);
+            if (tomlInfo == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            } // Req Condition
+            const toml_datum_t min = toml_int_in(tomlInfo, "min");
+            const toml_datum_t max = toml_int_in(tomlInfo, "max");
+            const toml_datum_t now = toml_int_in(tomlInfo, "now");
+            if (min.ok && max.ok && now.ok) {
+                elem->info.slid.min = (int)min.u.i;
+                elem->info.slid.max = (int)max.u.i;
+                elem->info.slid.now = (int)now.u.i;
+            }
+            else {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
         }
-    } // string
+        default: break;
+    }
     if (toml_int_in(tomlElem, key = "anchor").ok) {
         elem->anchor = (int)toml_int_in(tomlElem, key).u.i;
     } // anchor
     if (toml_array_in(tomlElem, key = "gid") != NULL) {
-        elem->gid_rect = malloc(sizeof(SDL_FRect));
-        if (elem->gid_rect == NULL) {
-            printf("%s: elem->gid_rect == NULL in %s.\n", __func__, key);
-            return false;
-        } // Req Condition
-
-        const bool ok = loadFRectFromTomlArray(elem->gid_rect, toml_array_in(tomlElem, key));
+        const bool ok = loadFRectFromTomlArray(&elem->gid, toml_array_in(tomlElem, key));
         if (ok == false) {
             printf("%s: ok == false in %s.\n", __func__, key);
             return false;
         } // Req Condition
-    } // guide
+    } // gid
+    else {
+        elem->gid = (SDL_FRect){0, 0, 1, 1};
+    }
     if (toml_string_in(tomlElem, key = "func").ok) {
         elem->trig = TEMPO_CreateTrig(tomlElem);
         if (elem->trig == NULL) {
-            printf("%s: elem->trig == NULL.\n", __func__);
+            printf("%s: elem->trig == NULL, %s.\n", __func__, key);
             return false;
         }
     }
     if (toml_array_in(tomlElem, key = "src") != NULL) {
-        const bool ok = loadFRectFromTomlArray(&elem->src_rect, toml_array_in(tomlElem, key));
+        const bool ok = loadFRectFromTomlArray(&elem->src, toml_array_in(tomlElem, key));
         if (ok == false) {
             printf("%s: ok == false in %s.\n", __func__, key);
             return false;
         } // Req Condition
     } // src
-    else if (elem->type == ELEM_TYPE_FILE || elem->type == ELEM_TYPE_TEXT) {
-        SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info);
-        SDL_GetTextureSize(texture, &elem->src_rect.w, &elem->src_rect.h);
+    else if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
+        SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
+        SDL_GetTextureSize(texture, &elem->src.w, &elem->src.h);
+        SDL_DestroyTexture(texture);
+        texture = NULL;
     }
 
     return true;
 }
 static bool TEMPO_CreateElem_CK(const Elem* elem) {
-    if (elem->info == NULL) {
+    if ((elem->type == ELEM_TYPE_FILE || elem->type == ELEM_TYPE_TEXT) && elem->info.string == NULL) {
         printf("%s: info == NULL.\n", __func__);
         return false;
     } // Req Condition
@@ -184,16 +220,19 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     if (elem == NULL) {
         return elem;
     } // Opt Condition
-    if (elem->info != NULL) {
-        free(elem->info); // free
-        elem->info = NULL;
+    switch (elem->type) {
+        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_FILE: {
+            if (elem->info.string != NULL) {
+                free(elem->info.string); // free
+                elem->info.string = NULL;
+            }
+            break;
+        }
+        default: break;
     }
     if (elem->trig != NULL) {
         elem->trig = TEMPO_DeleteTrig(elem->trig);
-    }
-    if (elem->gid_rect != NULL) {
-        free(elem->gid_rect);
-        elem->gid_rect = NULL;
     }
     free(elem); // free
     elem = NULL;
@@ -218,19 +257,9 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElemDstRect(Elem* elem) {
-    return SDL_LoadDstRectAligned(
-        &elem->dst_rect,
-        NULL,
-        &elem->src_rect,
-        elem->gid_rect,
-        &basic.bck_rect,
-        elem->anchor
-        );
-}
 static void TEMPO_RenewElemState(Elem* elem) {
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
     if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
         elem->state = ELEM_STATE_RELEASE;
     }
@@ -245,10 +274,11 @@ static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->state == ELEM_STATE_RELEASE && elem->trig != NULL) {
         elem->trig->func(elem->trig->para);
     }
+
     if (elem->state == ELEM_STATE_PRESSED) {
         DEBUG_SendMessageL("Elem:\n");
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
-        DEBUG_SendMessageL("    info: %s\n", elem->info);
+        // DEBUG_SendMessageL("    info: %s\n", elem->info);
         DEBUG_SendMessageL("    state: %s\n", ELEM_STATE_STRING_SET[elem->state]);
         if (elem->trig != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
@@ -256,11 +286,8 @@ static void TEMPO_RenewElemState(Elem* elem) {
     }
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (TEMPO_RenewElemDstRect(elem) == false) {
-        return false;
-    }
     if (elem->visible == false) {
-        return false;
+        // return false;
     }
     TEMPO_RenewElemState(elem);
     return true;
@@ -268,27 +295,78 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 
 // DRAW ================================================================================================================
-static bool TEMPO_DrawElem_(const Elem *elem) {
+static bool TEMPO_DrawElem_DstRect(Elem *elem) {
+    return SDL_LoadDstRectAligned(
+        &elem->dst,
+        NULL,
+        &elem->src,
+        &elem->gid,
+        &basic.bck,
+        elem->anchor
+        );
+}
+static bool TEMPO_DrawElem_(Elem* elem) {
     switch (elem->state) {
         case ELEM_STATE_PRESSED: {
-            DEBUG_FillRect(&elem->dst_rect);
+            DEBUG_FillRect(&elem->dst);
             break;
         }
         default: break;
     }
+    switch (elem->type) {
+        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_FILE: {
+            SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
+            if (texture == NULL) {
+                return false;
+            }
+            TEMPO_DrawElem_DstRect(elem);
+            SDL_RenderTexture(basic.renderer, texture, &elem->src, &elem->dst);
+            SDL_DestroyTexture(texture);
+            break;
+        }
+        case ELEM_TYPE_SLID: {
+            const float A = 4, B = 4, C = 36, D = 64;
+            const float M = (float)(elem->info.slid.max - elem->info.slid.min);
+            const int N = elem->info.slid.now - elem->info.slid.min;
+            elem->src.x = elem->src.y = 0;
+            const float W = elem->src.w = 2 * A + (M + 1) * B + M * C;
+            const float H = elem->src.h = 2 * A + 2 * B + D;
+            elem->gid.w = elem->gid.h = 1;
+            TEMPO_DrawElem_DstRect(elem);
+            const float X = elem->dst.x, Y = elem->dst.y;
+            SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+            const SDL_FRect frame[4] = {
+                (SDL_FRect){X, Y, W, A},
+                (SDL_FRect){X, Y, A, H},
+                (SDL_FRect){X, Y + H - A, W, A},
+                (SDL_FRect){X + W - A, Y, A, H},
+            };
+            SDL_RenderFillRects(basic.renderer, frame, 4);
+            SDL_FRect rects[N];
+            for (int i = 0; i < N; i++) {
+                rects[i].x = X + A + (float)(i + 1) * B + (float)i * C;
+                rects[i].y = Y + A + B;
+                rects[i].w = C;
+                rects[i].h = D;
+            }
+            SDL_RenderFillRects(basic.renderer, rects, N);
+            break;
+        }
+        case ELEM_TYPE_KNOB: {
+            const float A = 4, B = 4, C = 36;
+            elem->src = (SDL_FRect){0, 0, 2 * C, 2 * C};
+            TEMPO_DrawElem_DstRect(elem);
+            const float X = elem->dst.x, Y = elem->dst.y;
 
-    SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info);
-    if (texture == NULL) {
-        return false;
+        }
+        default: break;
     }
-    SDL_RenderTexture(basic.renderer, texture, &elem->src_rect, &elem->dst_rect);
-    SDL_DestroyTexture(texture);
-
     switch (elem->state) {
         case ELEM_STATE_PRESSED:
         case ELEM_STATE_RELEASE:
         case ELEM_STATE_INSIDE: {
-            DEBUG_DrawRect(&elem->dst_rect);
+            DEBUG_DrawRect(&elem->dst);
             break;
         }
         default: break;

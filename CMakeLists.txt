@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.30)
 project(jasmin C)
 
 
-
-
 # 设置C标准
 set(CMAKE_C_STANDARD 99)
 
@@ -16,6 +14,7 @@ file(GLOB SCR_FILES
 )
 
 # 查找库
+find_package(Lua REQUIRED)
 find_package(SDL3 REQUIRED)
 find_package(SDL3_ttf REQUIRED)
 find_package(SDL3_image REQUIRED)
@@ -26,8 +25,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/device/device.h
         src/inner/debug/debug.h
         src/inner/basic/setting/setting.h
-
-        # toml/toml.h
         src/third_party/toml/toml.c
         src/outer/tempo/trig/trig.h
         src/outer/tempo/elem/elem.h
@@ -50,10 +47,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/outer/lopo/lopo.c
         src/outer/lopo/lopo.h
         src/outer/lopo/shaders/debugShader.cpp
-
         src/outer/tempo/basic/basic.c
         src/outer/tempo/basic/basic.h
-
         include/jasmin/jasmin.h
         include/jasmin/tempo.h
         include/jasmin/lopo.h
@@ -66,9 +61,10 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/func/func.c
         src/inner/basic/func/func.h
 )
-
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf
         SDL3_image::SDL3_image
+        ${LUA_INCLUDE_DIR}
 )

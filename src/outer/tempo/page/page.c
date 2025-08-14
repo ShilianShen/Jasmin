@@ -11,7 +11,7 @@ struct Page {
 // GET & SET ===========================================================================================================
 const char* TEMPO_GetPageName(const Page* page) {
     if (page == NULL) {
-        printf("%s: page == NULL", __func__);
+        printf("%s: page == NULL.\n", __func__);
         return NULL;
     }
     return page->name;

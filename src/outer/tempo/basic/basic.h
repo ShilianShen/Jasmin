@@ -9,7 +9,7 @@ typedef struct Basic Basic;
 struct Basic {
     SDL_Renderer* renderer;
     TTF_Font* font; // malloc
-    SDL_FRect bck_rect;
+    SDL_FRect bck;
 };
 extern Basic basic;
 

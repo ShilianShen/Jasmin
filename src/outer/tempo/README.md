@@ -1,4 +1,5 @@
 # Tempo
+
 ```mermaid
 erDiagram 
     Basic {
@@ -27,7 +28,7 @@ erDiagram
     Trig ||--|| Elem: "Trig is Elem.trig"
     Elem }|--|| Page: "Elem in Page.elemSet"
     Page }|--|| Menu: "Page in Menu.pageSet"
-    
+  
 ```
 
 ```mermaid
@@ -44,6 +45,17 @@ graph LR
 ## 介绍
 
 Menu为Jasmin的子模块, 承担Mouse和屏幕交互的主要功能.
+
+
+| ElemType | TrigType    |
+|----------|-------------|
+| NULL     | NULL        |
+| FILE     | MENU, OTHER |
+| TEXT     | MENU, OTHER |
+| SLID     | SLID        |
+| KNOB     | KNOB        |
+
+
 
 ## 功能
 

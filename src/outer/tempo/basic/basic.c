@@ -22,7 +22,7 @@ void TEMPO_SetBasicFont(TTF_Font* font) {
     basic.font = basic.font = font;
 }
 void TEMPO_SetBasicBckRect(const SDL_FRect bck_rect) {
-    basic.bck_rect = basic.bck_rect = bck_rect;
+    basic.bck = basic.bck = bck_rect;
 }
 
 

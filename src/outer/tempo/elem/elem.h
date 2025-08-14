@@ -8,6 +8,7 @@
 typedef struct Elem Elem;
 typedef enum ElemState ElemState;
 typedef enum ElemType ElemType;
+typedef union ElemInfo ElemInfo;
 
 
 
