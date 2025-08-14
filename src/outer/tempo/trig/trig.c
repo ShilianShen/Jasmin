@@ -1,67 +1,114 @@
-#include "../menu/menu.h"
+#include "../trig/trig.h"
 
 
-Trig2 trig_set[] = {
-    {"pass", TRIG_FUNC_Pass},
-    {"forward", TRIG_FUNC_Forward},
-    {"backward", TRIG_FUNC_Backward},
-    {"clear", TRIG_FUNC_Clear},
-    {NULL, NULL}
+struct {const char* name; TrigFunc func;} TRIG_INFO_SET[TRIG_NUM_TYPES] = {
+    [TRIG_TYPE_PASS] = {"pass", TRIG_FUNC_Pass},
+    [TRIG_TYPE_FORWARD] = {"forward", TRIG_FUNC_Forward},
+    [TRIG_TYPE_BACKWARD] = {"backward", TRIG_FUNC_Backward},
+    [TRIG_TYPE_CLEAR] = {"clear", TRIG_FUNC_Clear},
+    [TRIG_TYPE_KNOB] = {"knob", NULL},
 };
 
 
-void TRIG_FUNC_Pass(const char* para) {}
-void TRIG_FUNC_Forward(const char* pageName) {
-    // getPageId
-    int pageId = 0;
-    for (int i = 0; i < menu.lenPageSet; i++) {
-        if (menu.pageSet[i] == NULL) {continue;}
-        if (strcmp(TEMPO_GetPageName(menu.pageSet[i]), pageName) == 0) {pageId = i;}
-    }
-    if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
-
-    // forward
-    for (int i = 0; i < MENU_PATH_VOLUME; i++) {
-        if (menu.path[i] == 0) {
-            menu.path[i] = menu.pageSet[pageId];
-            break;
-        }
-    }
-}
-void TRIG_FUNC_Backward(const char* para) {
-    for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
-        if (menu.path[i] != 0) {
-            menu.path[i] = 0;
-            break;
-        }
-    }
-}
-void TRIG_FUNC_Clear(const char* para) {
-    for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
-}
-
-
-TrigFunc TRIG_FindFuncFromName(const char* name) {
+// GET & SET ===========================================================================================================
+TrigFunc TRIG_GetFuncFromName(const char* name) {
     // Req Condition
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
 
-    //
-    for (int i = 0; trig_set[i].name != NULL; i++) {
-        if (strcmp(trig_set[i].name, name) == 0) {
-            return trig_set[i].func;
+    for (int i = 0; i < TRIG_NUM_TYPES; i++) {
+        if (strcmp(name, TRIG_INFO_SET[i].name) == 0) {
+            return TRIG_INFO_SET[i].func;
         }
     }
     return NULL;
 }
-char* TRIG_FindNameFromFunc(const TrigFunc func) {
+const char* TRIG_GetNameFromFunc(const TrigFunc func) {
     // Req Condition
     if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
 
-    //
-    for (int i = 0; trig_set[i].func != NULL; i++) {
-        if (trig_set[i].func == func) {
-            return trig_set[i].name;
+    for (int i = 0; i < TRIG_NUM_TYPES; i++) {
+        if (TRIG_INFO_SET[i].func == func) {
+            return TRIG_INFO_SET[i].name;
         }
     }
     return NULL;
+}
+TrigFuncType TRIG_GetTypeFromName(const char* name) {
+    for (int i = 0; i < TRIG_NUM_TYPES; i++) {
+        if (strcmp(name, TRIG_INFO_SET[i].name) == 0) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+
+
+// CREATE & DELETE =====================================================================================================
+static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
+    const toml_datum_t tomlFuncName = toml_string_in(tomlTrig, "func");
+    if (tomlFuncName.ok == false) {
+        printf("%s: tomlFuncName.ok == false.\n", __func__);
+        return false;
+    } // Req Condition
+
+    trig->type = TRIG_GetTypeFromName(tomlFuncName.u.s);
+    trig->func = TRIG_INFO_SET[trig->type].func;
+    if (trig->func == NULL) {
+        printf("%s: func == NULL.\n", __func__);
+        return false;
+    } // Req Condition
+
+    switch (trig->type) {
+        case TRIG_TYPE_PASS: {break;}
+        case TRIG_TYPE_FORWARD: {
+            const toml_datum_t tomlPara = toml_string_in(tomlTrig, "para");
+            if (tomlPara.ok == false) {
+                printf("%s: tomlPara.ok == false.\n", __func__);
+                return false;
+            } // Req Condition
+
+            trig->para = strdup(tomlPara.u.s);
+            if (trig->para == NULL) {
+                printf("%s: para == NULL.\n", __func__);
+                return false;
+            } // Req Condition
+
+            return true;
+        }
+        default: {break;}
+    }
+    return true;
+}
+Trig* TEMPO_DeleteTrig(Trig* trig) {
+    if (trig != NULL) {
+        switch (trig->type) {
+            case TRIG_TYPE_FORWARD: {
+                if (trig->para != NULL) {
+                    free(trig->para);
+                    trig->para = NULL;
+                }
+            }
+            default: {break;}
+        }
+        trig->func = NULL;
+    }
+    free(trig);
+    return NULL;
+}
+Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig) {
+    if (tomlTrig == NULL) {
+        printf("%s: tomlTrig == NULL.\n", __func__);
+        return NULL;
+    } // Req Condition
+    Trig* trig = calloc(1, sizeof(Trig));
+    if (trig == NULL) {
+        printf("%s: trig == NULL.\n", __func__);
+        return NULL;
+    } // Req Condition
+    if (TEMPO_CreateTrig_RK(trig, tomlTrig) == false) {
+        printf("%s: TEMPO_CreateTrig_RK failed.\n", __func__);
+        trig = TEMPO_DeleteTrig(trig);
+    } // Req Condition
+    return trig;
 }

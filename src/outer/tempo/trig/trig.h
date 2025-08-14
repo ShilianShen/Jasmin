@@ -23,27 +23,51 @@
 
 // datatype
 typedef void (*TrigFunc)(const char*);
-typedef struct Trig2 {
-    char* name;
-    const TrigFunc func;
-} Trig2;
+enum TrigFuncType {
+    TRIG_TYPE_PASS,
+    TRIG_TYPE_FORWARD,
+    TRIG_TYPE_BACKWARD,
+    TRIG_TYPE_CLEAR,
+    TRIG_TYPE_KNOB,
+    TRIG_NUM_TYPES
+};
+typedef enum TrigFuncType TrigFuncType;
 typedef struct Trig {
+    TrigFuncType type;
     TrigFunc func;
     char* para;
 } Trig;
+
+
+// ???????? ===========================================================================================================
+union TrigPara {
+    struct {
+        void* page;
+    } pageTurner;
+    struct {
+        float min, max, now;
+    } knob;
+    struct {
+        int min, max, step, now;
+    } slider;
+};
+
+
 
 
 void TRIG_FUNC_Pass(const char*);
 void TRIG_FUNC_Forward(const char*);
 void TRIG_FUNC_Backward(const char*);
 void TRIG_FUNC_Clear(const char*);
+void TRIG_FUNC_Knob(const char*);
 
 
-extern Trig2 trig_set[];
 
+TrigFunc TRIG_GetFuncFromName(const char* name);
+const char* TRIG_GetNameFromFunc(TrigFunc func);
 
-TrigFunc TRIG_FindFuncFromName(const char* name);
-char* TRIG_FindNameFromFunc(TrigFunc func);
+Trig* TEMPO_DeleteTrig(Trig* trig);
+Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig);
 
 
 #endif //JASMIN_MENU_STRUCT_TRIG_H

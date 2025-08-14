@@ -61,7 +61,7 @@ struct Elem {
     char* string;
     int anchor;
     SDL_FRect gid_rect;
-    Trig trig;
+    Trig* trig;
 
     // create
     SDL_Texture* texture; SDL_FRect src_rect;
@@ -163,19 +163,12 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
         elem->gid_rect = ELEM_DEFAULT_GID_RECT;
     }
     if (toml_string_in(tomlElem, key = "func").ok) {
-        elem->trig.func = TRIG_FindFuncFromName(toml_string_in(tomlElem, key).u.s);
-        if (elem->trig.func == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
+        elem->trig = TEMPO_CreateTrig(tomlElem);
+        if (elem->trig == NULL) {
+            printf("%s: elem->trig == NULL.\n", __func__);
             return false;
         }
-    } // trig_func
-    if (toml_string_in(tomlElem, key = "para").ok) {
-        elem->trig.para = strdup(toml_string_in(tomlElem, key).u.s);
-        if (elem->trig.para == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
-    } // trig_para
+    }
     {
         elem->texture = TEMPO_CreateElem_Texture(elem->type, elem->string);
         if (elem->texture == NULL) {
@@ -196,7 +189,7 @@ static bool TEMPO_CreateElem_CK(const Elem* elem) {
     } // Req Condition
     return true;
 }
-Elem *TEMPO_DeleteElem(Elem *elem) {
+Elem* TEMPO_DeleteElem(Elem *elem) {
     {
         if (elem == NULL) {
             return elem;
@@ -206,9 +199,8 @@ Elem *TEMPO_DeleteElem(Elem *elem) {
             free(elem->string); // free
             elem->string = NULL;
         }
-        if (elem->trig.para != NULL) {
-            free(elem->trig.para); // free
-            elem->trig.para = NULL;
+        if (elem->trig != NULL) {
+            elem->trig = TEMPO_DeleteTrig(elem->trig);
         }
         if (elem->texture != NULL) {
             SDL_DestroyTexture(elem->texture); // free
@@ -257,8 +249,8 @@ static void TEMPO_RenewElemState(Elem* elem) {
     if (elem->state == ELEM_STATE_PRESSED) {
         DEBUG_SendMessageL("elem: %s, %s\n", TEMPO_GetStringFromElemType(elem->type), elem->string);
         DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
-        if (elem->trig.func != NULL) {
-            DEBUG_SendMessageL("elem.trig: %s, %s\n", TRIG_FindNameFromFunc(elem->trig.func), elem->trig.para);
+        if (elem->trig != NULL) {
+            DEBUG_SendMessageL("elem.trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
         }
     }
     if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
@@ -272,8 +264,8 @@ static void TEMPO_RenewElemState(Elem* elem) {
             elem->state = ELEM_STATE_OUTSIDE;
         }
     }
-    if (elem->state == ELEM_STATE_RELEASE && elem->trig.func != NULL) {
-        elem->trig.func(elem->trig.para);
+    if (elem->state == ELEM_STATE_RELEASE && elem->trig != NULL) {
+        elem->trig->func(elem->trig->para);
     }
 }
 bool TEMPO_RenewElem(Elem *elem) {
