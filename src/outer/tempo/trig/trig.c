@@ -2,10 +2,10 @@
 
 
 struct {const char* name; TrigFunc func;} TRIG_INFO_SET[TRIG_NUM_TYPES] = {
-    [TRIG_TYPE_PASS] = {"pass", TRIG_FUNC_Pass},
-    [TRIG_TYPE_FORWARD] = {"forward", TRIG_FUNC_Forward},
-    [TRIG_TYPE_BACKWARD] = {"backward", TRIG_FUNC_Backward},
-    [TRIG_TYPE_CLEAR] = {"clear", TRIG_FUNC_Clear},
+    [TRIG_TYPE_PASS] = {"pass", TEMPO_TrigFuncPass},
+    [TRIG_TYPE_FORWARD] = {"forward", TEMPO_TrigFuncForward},
+    [TRIG_TYPE_BACKWARD] = {"backward", TEMPO_TrigFuncBackward},
+    [TRIG_TYPE_CLEAR] = {"clear", TEMPO_TrigFuncClear},
     [TRIG_TYPE_KNOB] = {"knob", NULL},
 };
 
@@ -33,7 +33,7 @@ const char* TRIG_GetNameFromFunc(const TrigFunc func) {
     }
     return NULL;
 }
-TrigFuncType TRIG_GetTypeFromName(const char* name) {
+TrigType TRIG_GetTypeFromName(const char* name) {
     for (int i = 0; i < TRIG_NUM_TYPES; i++) {
         if (strcmp(name, TRIG_INFO_SET[i].name) == 0) {
             return i;
@@ -67,8 +67,8 @@ static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
                 return false;
             } // Req Condition
 
-            trig->para.pageTurner.string = strdup(tomlPara.u.s);
-            if (trig->para.pageTurner.string == NULL) {
+            trig->para.pageName = strdup(tomlPara.u.s);
+            if (trig->para.pageName == NULL) {
                 printf("%s: para == NULL.\n", __func__);
                 return false;
             } // Req Condition
@@ -83,9 +83,9 @@ Trig* TEMPO_DeleteTrig(Trig* trig) {
     if (trig != NULL) {
         switch (trig->type) {
             case TRIG_TYPE_FORWARD: {
-                if (trig->para.pageTurner.string != NULL) {
-                    free(trig->para.pageTurner.string);
-                    trig->para.pageTurner.string = NULL;
+                if (trig->para.pageName != NULL) {
+                    free(trig->para.pageName);
+                    trig->para.pageName = NULL;
                 }
             }
             default: {break;}

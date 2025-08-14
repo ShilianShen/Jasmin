@@ -141,9 +141,9 @@ void TEMPO_DrawMenu() {
 
 
 // TRIG ================================================================================================================
-void TRIG_FUNC_Pass(TrigPara para) {}
-void TRIG_FUNC_Forward(TrigPara para) {
-    const char* pageName = para.pageTurner.string;
+void TEMPO_TrigFuncPass(TrigPara para) {}
+void TEMPO_TrigFuncForward(TrigPara para) {
+    const char* pageName = para.pageName;
     // getPageId
     int pageId = 0;
     for (int i = 0; i < menu.lenPageSet; i++) {
@@ -160,7 +160,7 @@ void TRIG_FUNC_Forward(TrigPara para) {
         }
     }
 }
-void TRIG_FUNC_Backward(TrigPara para) {
+void TEMPO_TrigFuncBackward(TrigPara para) {
     for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -168,6 +168,9 @@ void TRIG_FUNC_Backward(TrigPara para) {
         }
     }
 }
-void TRIG_FUNC_Clear(TrigPara para) {
+void TEMPO_TrigFuncClear(TrigPara para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
+void TEMPO_TrigFuncKnob(TrigPara) {}
+
+

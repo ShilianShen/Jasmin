@@ -28,6 +28,7 @@ static void RENEW() {
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
     TEMPO_SetBasicBckRect(bck_rect);
+
     TEMPO_Renew();
 }
 static void DRAW() {
@@ -44,6 +45,11 @@ static void DRAW() {
 
     //
     SDL_RenderPresent(renderer);
+    static bool reload = !true;
+    if (reload == true) {
+        TEMPO_Unload();
+        TEMPO_Load();
+    }
 }
 
 
@@ -65,10 +71,6 @@ int main(int argc, char *argv[]) {
         RENEW();
         DRAW();
         // SDL_GPUShader* shader = SDL_CreateGPUShader();
-        if (oftenReload) {
-            TEMPO_UnloadMenu();
-            TEMPO_LoadMenu();
-        }
     }
     UNLOAD();
     DEINIT();

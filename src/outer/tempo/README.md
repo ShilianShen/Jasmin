@@ -2,18 +2,19 @@
 ```mermaid
 erDiagram 
     Basic {
-        FFT_Font_ptr font
+        FFT_Font font
     }
     Trig {
-        TirgFunc_ptr func
-        void_ptr para
+        TrigType type
+        TirgFunc func
+        TrigPara para
     }
     Elem {
         ElemType type
         char[] string
         int anchor
         Trig trig
-        SDL_Texture_ptr texture
+        SDL_Texture texture
         SDL_FRect gid_rect
         SDL_FRect src_rect
     }

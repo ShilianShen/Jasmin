@@ -1,8 +1,9 @@
 pageSet = [
     {name='Root', elemSet=[
-        {anchor=31, guide=[0, 0, 2, 2], type="FILE", info="../resources/images/491.gif"},
-        {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="The dead can be cured."},
-        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="Title", func='forward', para='Title'},
+        {anchor=31, gid=[0, 0, 2, 2], type="FILE", info="../resources/images/491.gif"},
+        {anchor=49, type="TEXT", info="The dead can be cured."},
+        {anchor=20, type="TEXT", info="Title", func='forward', para='Title'},
+        # {anchor=49, type='SLID', info="Life", min=0, max=100, step=1, now=50}
     ]},
     {name='Edge', elemSet=[
         {anchor=31, type="TEXT", info="""
@@ -12,12 +13,12 @@ pageSet = [
         {anchor=49, type="TEXT", info="[R2R]", func='clear'}
     ]},
     {name='Title', elemSet=[
-        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<< Root.", func='clear'},
-        {anchor=31, guide=[0, 0, 1, 1], type="TEXT", info="THE MAZE"},
-        {anchor=49, guide=[0, 0, 1, 1], type="TEXT", info="Setting", func='forward', para='Setting'},
+        {anchor=20, type="TEXT", info="<<< Root.", func='clear'},
+        {anchor=31, type="TEXT", info="THE MAZE"},
+        {anchor=49, type="TEXT", info="Setting", func='forward', para='Setting'},
     ]},
     {name='Setting', elemSet = [
-        {anchor=20, guide=[0, 0, 1, 1], type="TEXT", info="<<<", func='backward'},
-        {anchor=49, guide=[0, 10, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
+        {anchor=20, type="TEXT", info="<<<", func='backward'},
+        {anchor=49, gid=[0, 10, 1, 1], type="TEXT", info="Go Test?.", func='forward', para='Setting'},
     ]},
 ]
