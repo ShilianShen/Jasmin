@@ -22,7 +22,18 @@
 
 
 // datatype
-typedef const char* TrigPara;
+union TrigPara {
+    struct {
+        char* string;
+    } pageTurner;
+    struct {
+        float min, max, now;
+    } knob;
+    struct {
+        int min, max, step, now;
+    } slider;
+};
+typedef union TrigPara TrigPara;
 typedef void (*TrigFunc)(TrigPara);
 enum TrigFuncType {
     TRIG_TYPE_PASS,
@@ -36,22 +47,8 @@ typedef enum TrigFuncType TrigFuncType;
 typedef struct Trig {
     TrigFuncType type;
     TrigFunc func;
-    char* para;
+    TrigPara para;
 } Trig;
-
-
-// ???????? ===========================================================================================================
-union TrigPara2 {
-    struct {
-        void* page;
-    } pageTurner;
-    struct {
-        float min, max, now;
-    } knob;
-    struct {
-        int min, max, step, now;
-    } slider;
-};
 
 
 

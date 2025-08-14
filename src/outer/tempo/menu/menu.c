@@ -142,7 +142,8 @@ void TEMPO_DrawMenu() {
 
 // TRIG ================================================================================================================
 void TRIG_FUNC_Pass(TrigPara para) {}
-void TRIG_FUNC_Forward(TrigPara pageName) {
+void TRIG_FUNC_Forward(TrigPara para) {
+    const char* pageName = para.pageTurner.string;
     // getPageId
     int pageId = 0;
     for (int i = 0; i < menu.lenPageSet; i++) {

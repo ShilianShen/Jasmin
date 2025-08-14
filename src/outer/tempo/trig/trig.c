@@ -67,8 +67,8 @@ static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
                 return false;
             } // Req Condition
 
-            trig->para = strdup(tomlPara.u.s);
-            if (trig->para == NULL) {
+            trig->para.pageTurner.string = strdup(tomlPara.u.s);
+            if (trig->para.pageTurner.string == NULL) {
                 printf("%s: para == NULL.\n", __func__);
                 return false;
             } // Req Condition
@@ -83,9 +83,9 @@ Trig* TEMPO_DeleteTrig(Trig* trig) {
     if (trig != NULL) {
         switch (trig->type) {
             case TRIG_TYPE_FORWARD: {
-                if (trig->para != NULL) {
-                    free(trig->para);
-                    trig->para = NULL;
+                if (trig->para.pageTurner.string != NULL) {
+                    free(trig->para.pageTurner.string);
+                    trig->para.pageTurner.string = NULL;
                 }
             }
             default: {break;}
