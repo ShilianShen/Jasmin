@@ -22,7 +22,8 @@
 
 
 // datatype
-typedef void (*TrigFunc)(const char*);
+typedef const char* TrigPara;
+typedef void (*TrigFunc)(TrigPara);
 enum TrigFuncType {
     TRIG_TYPE_PASS,
     TRIG_TYPE_FORWARD,
@@ -40,7 +41,7 @@ typedef struct Trig {
 
 
 // ???????? ===========================================================================================================
-union TrigPara {
+union TrigPara2 {
     struct {
         void* page;
     } pageTurner;
@@ -55,11 +56,11 @@ union TrigPara {
 
 
 
-void TRIG_FUNC_Pass(const char*);
-void TRIG_FUNC_Forward(const char*);
-void TRIG_FUNC_Backward(const char*);
-void TRIG_FUNC_Clear(const char*);
-void TRIG_FUNC_Knob(const char*);
+void TRIG_FUNC_Pass(TrigPara);
+void TRIG_FUNC_Forward(TrigPara);
+void TRIG_FUNC_Backward(TrigPara);
+void TRIG_FUNC_Clear(TrigPara);
+void TRIG_FUNC_Knob(TrigPara);
 
 
 

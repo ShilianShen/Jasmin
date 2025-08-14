@@ -13,7 +13,7 @@ enum ElemState {
     ELEM_STATE_RELEASE,
     ELEM_NUM_STATES
 };
-static const char* ELEM_STATE_STRINGS[ELEM_NUM_STATES] = {
+static const char* ELEM_STATE_STRING_SET[ELEM_NUM_STATES] = {
     [ELEM_STATE_OUTSIDE] = "OUTSIDE",
     [ELEM_STATE_INSIDE] = "INSIDE",
     [ELEM_STATE_PRESSED] = "PRESSED",
@@ -27,19 +27,19 @@ static const char* TEMPO_GetStringFromElemState(const ElemState state) {
     }
 
     //
-    return ELEM_STATE_STRINGS[state];
+    return ELEM_STATE_STRING_SET[state];
 }
 
 
 // ELEM TYPE ===========================================================================================================
-static const char* ELEM_TYPE_STRINGS[ELEM_NUM_TYPES] = {
+static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT"
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
-        if (strcmp(string, ELEM_TYPE_STRINGS[i]) == 0) {
+        if (strcmp(string, ELEM_TYPE_STRING_SET[i]) == 0) {
             return i;
         }
     }
@@ -50,7 +50,7 @@ static const char* TEMPO_GetStringFromElemType(const ElemType type) {
         printf("%s: type is illegal.\n", __func__);
         return NULL;
     }
-    return ELEM_TYPE_STRINGS[type];
+    return ELEM_TYPE_STRING_SET[type];
 }
 
 

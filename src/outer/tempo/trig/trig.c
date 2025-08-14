@@ -43,7 +43,6 @@ TrigFuncType TRIG_GetTypeFromName(const char* name) {
 }
 
 
-
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
     const toml_datum_t tomlFuncName = toml_string_in(tomlTrig, "func");
