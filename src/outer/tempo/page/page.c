@@ -120,7 +120,7 @@ bool TEMPO_RenewPage(const Page *page) {
     for (int i = 0; i < page->lenElemSet; i++) {
         const bool renew = TEMPO_RenewElem(page->elemSet[i]);
         if (renew == false) {
-            printf("%s: renew == false.\n", __func__);
+            DEBUG_SendMessageR("%s: renew == false.\n", __func__);
             return false;
         }
     }
@@ -140,7 +140,7 @@ bool TEMPO_DrawPage(const Page* page) {
     for (int i = 0; i < page->lenElemSet; i++) {
         const bool draw = TEMPO_DrawElem(page->elemSet[i]);
         if (draw == false) {
-            printf("%s: draw == false.\n", __func__);
+            DEBUG_SendMessageR("%s: draw[%d] == false.\n", __func__, i);
             return false;
         }
     }

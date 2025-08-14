@@ -68,18 +68,18 @@ static const char* TEMPO_GetStringFromElemType(const ElemType type) {
 struct Elem {
     // read
     ElemType type;
-    char* string;
+    char* info;
+
     int anchor;
     SDL_FRect* gid_rect;
     SDL_FRect* src_rect;
-    Trig* trig;
 
-    // create
-    SDL_Texture* texture;
+    Trig* trig;
 
     // renew
     SDL_FRect dst_rect;
     ElemState state;
+    bool visible;
 };
 
 
@@ -151,8 +151,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
         }
     } // type
     if (toml_string_in(tomlElem, key = "info").ok) {
-        elem->string = strdup(toml_string_in(tomlElem, key).u.s);
-        if (elem->string == NULL) {
+        elem->info = strdup(toml_string_in(tomlElem, key).u.s);
+        if (elem->info == NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
@@ -193,15 +193,12 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             return false;
         } // Req Condition
     } // guide
-    {
-        elem->texture = TEMPO_CreateElem_Texture(elem->type, elem->string);
-    } // texture
 
     return true;
 }
 static bool TEMPO_CreateElem_CK(const Elem* elem) {
-    if (elem->string == NULL) {
-        printf("%s: string == NULL.\n", __func__);
+    if (elem->info == NULL) {
+        printf("%s: info == NULL.\n", __func__);
         return false;
     } // Req Condition
     return true;
@@ -212,9 +209,9 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
             return elem;
         } // Opt Condition
 
-        if (elem->string != NULL) {
-            free(elem->string); // free
-            elem->string = NULL;
+        if (elem->info != NULL) {
+            free(elem->info); // free
+            elem->info = NULL;
         }
         if (elem->trig != NULL) {
             elem->trig = TEMPO_DeleteTrig(elem->trig);
@@ -222,10 +219,6 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         if (elem->gid_rect != NULL) {
             free(elem->gid_rect);
             elem->gid_rect = NULL;
-        }
-        if (elem->texture != NULL) {
-            SDL_DestroyTexture(elem->texture); // free
-            elem->texture = NULL;
         }
     }
     free(elem); // free
@@ -251,16 +244,6 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElemDstRect(Elem* elem) {
-    return SDL_LoadDstRectAligned(
-        &elem->dst_rect,
-        elem->texture,
-        elem->src_rect,
-        elem->gid_rect,
-        &basic.bck_rect,
-        elem->anchor
-        );
-}
 static void TEMPO_RenewElemState(Elem* elem) {
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
@@ -279,16 +262,18 @@ static void TEMPO_RenewElemState(Elem* elem) {
         elem->trig->func(elem->trig->para);
     }
     if (elem->state == ELEM_STATE_PRESSED) {
-        DEBUG_SendMessageL("elem: %s, %s\n", TEMPO_GetStringFromElemType(elem->type), elem->string);
-        DEBUG_SendMessageL("elem.state: %s\n", TEMPO_GetStringFromElemState(elem->state));
+        DEBUG_SendMessageL("Elem:\n");
+        DEBUG_SendMessageL("    type: %s\n", TEMPO_GetStringFromElemType(elem->type));
+        DEBUG_SendMessageL("    info: %s\n", elem->info);
+        DEBUG_SendMessageL("    state: %s\n", TEMPO_GetStringFromElemState(elem->state));
         if (elem->trig != NULL) {
-            DEBUG_SendMessageL("elem.trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
+            DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
         }
     }
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (TEMPO_RenewElemDstRect(elem) == false) {
-        return false;
+    if (elem->visible == false) {
+        return true;
     }
     TEMPO_RenewElemState(elem);
     return true;
@@ -296,36 +281,49 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 
 // DRAW ================================================================================================================
-static bool TEMPO_DrawElem_(const Elem* elem) {
+static bool TEMPO_DrawElem_(Elem *elem) {
     // Req Condition
-
-    //
+    SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info);
+    if (texture == NULL) {
+        return false;
+    }
+    const bool ok = SDL_LoadDstRectAligned(
+        &elem->dst_rect,
+        texture,
+        elem->src_rect,
+        elem->gid_rect,
+        &basic.bck_rect,
+        elem->anchor
+        );
+    if (ok == false) {
+        SDL_DestroyTexture(texture);
+        return false;
+    }
     switch (elem->state) {
         case ELEM_STATE_PRESSED: {
             DEBUG_FillRect(&elem->dst_rect);
-            SDL_RenderTexture(basic.renderer, elem->texture, elem->src_rect, &elem->dst_rect);
-            DEBUG_DrawRect(&elem->dst_rect);
-            break;
-        }
-        case ELEM_STATE_RELEASE:
-        case ELEM_STATE_INSIDE: {
-            SDL_RenderTexture(basic.renderer, elem->texture, elem->src_rect, &elem->dst_rect);
-            DEBUG_DrawRect(&elem->dst_rect);
-            break;
-        }
-        case ELEM_STATE_OUTSIDE: {
-            SDL_RenderTexture(basic.renderer, elem->texture, elem->src_rect, &elem->dst_rect);
             break;
         }
         default: break;
     }
+    SDL_RenderTexture(basic.renderer, texture, elem->src_rect, &elem->dst_rect);
+    switch (elem->state) {
+        case ELEM_STATE_PRESSED:
+        case ELEM_STATE_RELEASE:
+        case ELEM_STATE_INSIDE: {
+            DEBUG_DrawRect(&elem->dst_rect);
+            break;
+        }
+        default: break;
+    }
+    SDL_DestroyTexture(texture);
     return true;
 }
-bool TEMPO_DrawElem(const Elem *elem) {
+bool TEMPO_DrawElem(Elem *elem) {
     // Req Condition
     if (basic.renderer == NULL) {
-        printf("%s: menu.renderer is NULL.\n", __func__);
+        DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
-    return TEMPO_DrawElem_(elem);
+    return elem->visible = TEMPO_DrawElem_(elem);
 }
