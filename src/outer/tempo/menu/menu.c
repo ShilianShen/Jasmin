@@ -171,6 +171,8 @@ void TEMPO_TrigFuncBackward(TrigPara para) {
 void TEMPO_TrigFuncClear(TrigPara para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
-void TEMPO_TrigFuncKnob(TrigPara) {}
+void TEMPO_TrigFuncKnob(TrigPara para) {
+
+}
 
 

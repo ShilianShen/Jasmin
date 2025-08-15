@@ -73,41 +73,49 @@ static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
                 return false;
             } // Req Condition
 
-            return true;
+            break;
         }
-        default: {break;}
+        default: break;
     }
     return true;
 }
 Trig* TEMPO_DeleteTrig(Trig* trig) {
-    if (trig != NULL) {
-        switch (trig->type) {
-            case TRIG_TYPE_FORWARD: {
-                if (trig->para.pageName != NULL) {
-                    free(trig->para.pageName);
-                    trig->para.pageName = NULL;
-                }
-            }
-            default: {break;}
+    if (trig == NULL) {
+        return trig;
+    } // Opt Condition
+
+    switch (trig->type) {
+        case TRIG_TYPE_FORWARD: {
+            if (trig->para.pageName != NULL) {
+                free(trig->para.pageName);
+                trig->para.pageName = NULL;
+            } // Opt Condition
+            break;
         }
-        trig->func = NULL;
+        default: break;
     }
+
+    trig->func = NULL;
     free(trig);
-    return NULL;
+    trig = NULL;
+    return trig;
 }
 Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig) {
+
     if (tomlTrig == NULL) {
         printf("%s: tomlTrig == NULL.\n", __func__);
         return NULL;
     } // Req Condition
-    Trig* trig = calloc(1, sizeof(Trig));
+
+    Trig* trig = calloc(1, sizeof(Trig)); // alloc
     if (trig == NULL) {
         printf("%s: trig == NULL.\n", __func__);
         return NULL;
     } // Req Condition
+
     if (TEMPO_CreateTrig_RK(trig, tomlTrig) == false) {
         printf("%s: TEMPO_CreateTrig_RK failed.\n", __func__);
-        trig = TEMPO_DeleteTrig(trig);
+        trig = TEMPO_DeleteTrig(trig); // free
     } // Req Condition
     return trig;
 }

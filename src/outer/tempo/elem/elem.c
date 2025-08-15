@@ -6,6 +6,7 @@ union ElemInfo {
     char* string;
     struct {int min, max, now;} slidI;
     struct {float min, max, now;} slidF;
+    struct {bool now;} switch_;
 };
 
 
@@ -32,6 +33,7 @@ enum ElemType {
     ELEM_TYPE_TEXT,
     ELEM_TYPE_SLID_F,
     ELEM_TYPE_SLID_I,
+    ELEM_TYPE_SWITCH,
     ELEM_NUM_TYPES,
 };
 static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
@@ -40,6 +42,7 @@ static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_TEXT] = "TEXT",
     [ELEM_TYPE_SLID_F] = "SLID_F",
     [ELEM_TYPE_SLID_I] = "SLID_I",
+    [ELEM_TYPE_SWITCH] = "SWITCH",
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
@@ -193,8 +196,16 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             }
             break;
         }
+        case ELEM_TYPE_SWITCH: {
+            if (toml_bool_in(tomlElem, key).ok == false) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
+            elem->info.switch_.now = toml_bool_in(tomlElem, key).u.b;
+            break;
+        }
         default: break;
-    }
+    } // info
     if (toml_int_in(tomlElem, key = "anchor").ok) {
         elem->anchor = (int)toml_int_in(tomlElem, key).u.i;
     } // anchor
@@ -228,7 +239,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
         SDL_DestroyTexture(texture);
         texture = NULL;
     }
-
     return true;
 }
 static bool TEMPO_CreateElem_CK(const Elem* elem) {
@@ -375,6 +385,34 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             const float A = 4, B = 4, C = 8, D = 48;
             const float M = elem->info.slidF.max - elem->info.slidF.min;
             const float N = elem->info.slidF.now - elem->info.slidF.min;
+            const float W = 2 * A + (M + 1) * B + M * C;
+            const float H = 2 * A + 2 * B + D;
+            elem->src = (SDL_FRect){0, 0, W, H};
+            elem->gid.w = elem->gid.h = 1;
+            elem->tex = SDL_CreateTexture(
+                basic.renderer,
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_TARGET,
+                (int)W, (int)H);
+            SDL_SetRenderTarget(basic.renderer, elem->tex);
+            {
+                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+                const SDL_FRect frame[5] = {
+                    (SDL_FRect){0, 0, W, A},
+                    (SDL_FRect){0, 0, A, H},
+                    (SDL_FRect){0, H - A, W, A},
+                    (SDL_FRect){W - A, 0, A, H},
+                    (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
+                };
+                SDL_RenderFillRects(basic.renderer, frame, 5);
+            }
+            SDL_SetRenderTarget(basic.renderer, NULL);
+            break;
+        }
+        case ELEM_TYPE_SWITCH: {
+            const float A = 4, B = 4, C = 48, D = 48;
+            const float M = 1;
+            const float N = elem->info.switch_.now;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
             elem->src = (SDL_FRect){0, 0, W, H};
