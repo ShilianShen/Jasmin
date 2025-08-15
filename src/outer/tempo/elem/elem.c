@@ -4,9 +4,9 @@
 // ELEM INFO ===========================================================================================================
 union ElemInfo {
     char* string;
-    struct {int min, max, now;} slidI;
-    struct {float min, max, now;} slidF;
-    struct {bool now;} switch_;
+    struct SlidI {int min, max, now;} slidI;
+    struct SlidF {float min, max, now;} slidF;
+    struct Switch {bool now;} switch_;
 };
 
 
@@ -98,7 +98,7 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
     SDL_Texture* texture = NULL;
     switch (type) {
         case ELEM_TYPE_FILE: {
-            texture = IMG_LoadTexture(basic.renderer, string); // malloc
+            texture = IMG_LoadTexture(basic.renderer, string);
 
             if (texture == NULL) {
                 printf("%s: failed from \"%s\".\n", __func__, string);
@@ -115,7 +115,7 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,
                 'C'
-                ); // malloc
+                );
             if (texture == NULL) {
                 printf("%s: failed from \"%s\".\n", __func__, string);
                 return NULL;
@@ -256,7 +256,7 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         case ELEM_TYPE_TEXT: {}
         case ELEM_TYPE_FILE: {
             if (elem->info.string != NULL) {
-                free(elem->info.string); // free
+                free(elem->info.string);
                 elem->info.string = NULL;
             }
             break;
@@ -270,7 +270,7 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
     }
-    free(elem); // free
+    free(elem);
     elem = NULL;
     return elem;
 }

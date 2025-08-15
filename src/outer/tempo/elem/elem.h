@@ -11,7 +11,6 @@ typedef enum ElemType ElemType;
 typedef union ElemInfo ElemInfo;
 
 
-
 bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);
 bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect);
 
