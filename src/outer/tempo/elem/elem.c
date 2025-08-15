@@ -4,8 +4,8 @@
 // ELEM INFO ===========================================================================================================
 union ElemInfo {
     char* string;
-    struct {} knob;
-    struct {int min, max, now;} slid;
+    struct {int min, max, now;} slidI;
+    struct {float min, max, now;} slidF;
 };
 
 
@@ -30,16 +30,16 @@ enum ElemType {
     ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
-    ELEM_TYPE_KNOB,
-    ELEM_TYPE_SLID,
+    ELEM_TYPE_SLID_F,
+    ELEM_TYPE_SLID_I,
     ELEM_NUM_TYPES,
 };
 static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT",
-    [ELEM_TYPE_KNOB] = "KNOB",
-    [ELEM_TYPE_SLID] = "SLID",
+    [ELEM_TYPE_SLID_F] = "SLID_F",
+    [ELEM_TYPE_SLID_I] = "SLID_I",
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
@@ -152,7 +152,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             } // Req Condition
             break;
         } // string
-        case ELEM_TYPE_SLID: {
+        case ELEM_TYPE_SLID_I: {
             const toml_table_t* tomlInfo = toml_table_in(tomlElem, key);
             if (tomlInfo == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -162,9 +162,9 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             const toml_datum_t max = toml_int_in(tomlInfo, "max");
             const toml_datum_t now = toml_int_in(tomlInfo, "now");
             if (min.ok && max.ok && now.ok) {
-                elem->info.slid.min = (int)min.u.i;
-                elem->info.slid.max = (int)max.u.i;
-                elem->info.slid.now = (int)now.u.i;
+                elem->info.slidI.min = (int)min.u.i;
+                elem->info.slidI.max = (int)max.u.i;
+                elem->info.slidI.now = (int)now.u.i;
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -325,10 +325,10 @@ static bool TEMPO_DrawElem_(Elem* elem) {
             SDL_DestroyTexture(texture);
             break;
         }
-        case ELEM_TYPE_SLID: {
+        case ELEM_TYPE_SLID_I: {
             const float A = 4, B = 4, C = 36, D = 64;
-            const float M = (float)(elem->info.slid.max - elem->info.slid.min);
-            const int N = elem->info.slid.now - elem->info.slid.min;
+            const float M = (float)(elem->info.slidI.max - elem->info.slidI.min);
+            const int N = elem->info.slidI.now - elem->info.slidI.min;
             elem->src.x = elem->src.y = 0;
             const float W = elem->src.w = 2 * A + (M + 1) * B + M * C;
             const float H = elem->src.h = 2 * A + 2 * B + D;
@@ -353,7 +353,7 @@ static bool TEMPO_DrawElem_(Elem* elem) {
             SDL_RenderFillRects(basic.renderer, rects, N);
             break;
         }
-        case ELEM_TYPE_KNOB: {
+        case ELEM_TYPE_SLID_F: {
             const float A = 4, B = 4, C = 36;
             elem->src = (SDL_FRect){0, 0, 2 * C, 2 * C};
             TEMPO_DrawElem_DstRect(elem);
