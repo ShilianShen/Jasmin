@@ -45,7 +45,7 @@ static void DRAW() {
 
     //
     SDL_RenderPresent(renderer);
-    static bool reload = !true;
+    static bool reload = true;
     if (reload == true) {
         TEMPO_Unload();
         TEMPO_Load();

@@ -63,10 +63,11 @@ struct Elem {
 
     Trig* trig;
 
+    SDL_Texture* tex;
+
     // renew
     SDL_FRect dst;
     ElemState state;
-    bool visible;
 };
 
 
@@ -170,6 +171,27 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
+            break;
+        }
+        case ELEM_TYPE_SLID_F: {
+            const toml_table_t* tomlInfo = toml_table_in(tomlElem, key);
+            if (tomlInfo == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            } // Req Condition
+            const toml_datum_t min = toml_double_in(tomlInfo, "min");
+            const toml_datum_t max = toml_double_in(tomlInfo, "max");
+            const toml_datum_t now = toml_double_in(tomlInfo, "now");
+            if (min.ok && max.ok && now.ok) {
+                elem->info.slidF.min = (float)min.u.d;
+                elem->info.slidF.max = (float)max.u.d;
+                elem->info.slidF.now = (float)now.u.d;
+            }
+            else {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
+            break;
         }
         default: break;
     }
@@ -234,6 +256,10 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     if (elem->trig != NULL) {
         elem->trig = TEMPO_DeleteTrig(elem->trig);
     }
+    if (elem->tex != NULL) {
+        SDL_DestroyTexture(elem->tex);
+        elem->tex = NULL;
+    }
     free(elem); // free
     elem = NULL;
     return elem;
@@ -257,7 +283,17 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
 
 
 // RENEW ===============================================================================================================
-static void TEMPO_RenewElemState(Elem* elem) {
+static bool TEMPO_RenewElemDstRect(Elem *elem) {
+    return SDL_LoadDstRectAligned(
+        &elem->dst,
+        elem->tex,
+        &elem->src,
+        &elem->gid,
+        &basic.bck,
+        elem->anchor
+        );
+}
+static bool TEMPO_RenewElemState(Elem* elem) {
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
     if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
@@ -284,28 +320,105 @@ static void TEMPO_RenewElemState(Elem* elem) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
         }
     }
+    return true;
+}
+static bool TEMPO_RenewElemTex(Elem* elem) {
+    if (elem->tex != NULL) {
+        SDL_DestroyTexture(elem->tex);
+        elem->tex = NULL;
+    }
+    switch (elem->type) {
+        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_FILE: {
+            elem->tex = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
+            if (elem->tex == NULL) {
+                return false;
+            }
+            break;
+        }
+        case ELEM_TYPE_SLID_I: {
+            const float A = 4, B = 4, C = 8, D = 48;
+            const float M = (float)(elem->info.slidI.max - elem->info.slidI.min);
+            const int N = elem->info.slidI.now - elem->info.slidI.min;
+            const float W = 2 * A + (M + 1) * B + M * C;
+            const float H = 2 * A + 2 * B + D;
+            elem->src = (SDL_FRect){0, 0, W, H};
+            elem->gid.w = elem->gid.h = 1;
+            elem->tex = SDL_CreateTexture(
+                basic.renderer,
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_TARGET,
+                (int)W, (int)H);
+            SDL_SetRenderTarget(basic.renderer, elem->tex);
+            {
+                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+                const SDL_FRect frame[4] = {
+                    (SDL_FRect){0, 0, W, A},
+                    (SDL_FRect){0, 0, A, H},
+                    (SDL_FRect){0, H - A, W, A},
+                    (SDL_FRect){W - A, 0, A, H},
+                };
+                SDL_RenderFillRects(basic.renderer, frame, 4);
+                SDL_FRect rects[N];
+                for (int i = 0; i < N; i++) {
+                    rects[i].x = A + (float)(i + 1) * B + (float)i * C;
+                    rects[i].y = A + B;
+                    rects[i].w = C;
+                    rects[i].h = D;
+                }
+                SDL_RenderFillRects(basic.renderer, rects, N);
+            }
+            SDL_SetRenderTarget(basic.renderer, NULL);
+            break;
+        }
+        case ELEM_TYPE_SLID_F: {
+            const float A = 4, B = 4, C = 8, D = 48;
+            const float M = elem->info.slidF.max - elem->info.slidF.min;
+            const float N = elem->info.slidF.now - elem->info.slidF.min;
+            const float W = 2 * A + (M + 1) * B + M * C;
+            const float H = 2 * A + 2 * B + D;
+            elem->src = (SDL_FRect){0, 0, W, H};
+            elem->gid.w = elem->gid.h = 1;
+            elem->tex = SDL_CreateTexture(
+                basic.renderer,
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_TARGET,
+                (int)W, (int)H);
+            SDL_SetRenderTarget(basic.renderer, elem->tex);
+            {
+                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+                const SDL_FRect frame[5] = {
+                    (SDL_FRect){0, 0, W, A},
+                    (SDL_FRect){0, 0, A, H},
+                    (SDL_FRect){0, H - A, W, A},
+                    (SDL_FRect){W - A, 0, A, H},
+                    (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
+                };
+                SDL_RenderFillRects(basic.renderer, frame, 5);
+            }
+            SDL_SetRenderTarget(basic.renderer, NULL);
+            break;
+        }
+        default: break;
+    }
+    return true;
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (elem->visible == false) {
-        // return false;
+    if (TEMPO_RenewElemTex(elem) == false) {
+        return false;
     }
-    TEMPO_RenewElemState(elem);
+    if (TEMPO_RenewElemDstRect(elem) == false) {
+        return false;
+    }
+    if (TEMPO_RenewElemState(elem) == false) {
+        return false;
+    }
     return true;
 }
 
 
 // DRAW ================================================================================================================
-static bool TEMPO_DrawElem_DstRect(Elem *elem) {
-    return SDL_LoadDstRectAligned(
-        &elem->dst,
-        NULL,
-        &elem->src,
-        &elem->gid,
-        &basic.bck,
-        elem->anchor
-        );
-}
-static bool TEMPO_DrawElem_(Elem* elem) {
+static bool TEMPO_DrawElem_(const Elem* elem) {
     switch (elem->state) {
         case ELEM_STATE_PRESSED: {
             DEBUG_FillRect(&elem->dst);
@@ -313,55 +426,7 @@ static bool TEMPO_DrawElem_(Elem* elem) {
         }
         default: break;
     }
-    switch (elem->type) {
-        case ELEM_TYPE_TEXT: {}
-        case ELEM_TYPE_FILE: {
-            SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
-            if (texture == NULL) {
-                return false;
-            }
-            TEMPO_DrawElem_DstRect(elem);
-            SDL_RenderTexture(basic.renderer, texture, &elem->src, &elem->dst);
-            SDL_DestroyTexture(texture);
-            break;
-        }
-        case ELEM_TYPE_SLID_I: {
-            const float A = 4, B = 4, C = 36, D = 64;
-            const float M = (float)(elem->info.slidI.max - elem->info.slidI.min);
-            const int N = elem->info.slidI.now - elem->info.slidI.min;
-            elem->src.x = elem->src.y = 0;
-            const float W = elem->src.w = 2 * A + (M + 1) * B + M * C;
-            const float H = elem->src.h = 2 * A + 2 * B + D;
-            elem->gid.w = elem->gid.h = 1;
-            TEMPO_DrawElem_DstRect(elem);
-            const float X = elem->dst.x, Y = elem->dst.y;
-            SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
-            const SDL_FRect frame[4] = {
-                (SDL_FRect){X, Y, W, A},
-                (SDL_FRect){X, Y, A, H},
-                (SDL_FRect){X, Y + H - A, W, A},
-                (SDL_FRect){X + W - A, Y, A, H},
-            };
-            SDL_RenderFillRects(basic.renderer, frame, 4);
-            SDL_FRect rects[N];
-            for (int i = 0; i < N; i++) {
-                rects[i].x = X + A + (float)(i + 1) * B + (float)i * C;
-                rects[i].y = Y + A + B;
-                rects[i].w = C;
-                rects[i].h = D;
-            }
-            SDL_RenderFillRects(basic.renderer, rects, N);
-            break;
-        }
-        case ELEM_TYPE_SLID_F: {
-            const float A = 4, B = 4, C = 36;
-            elem->src = (SDL_FRect){0, 0, 2 * C, 2 * C};
-            TEMPO_DrawElem_DstRect(elem);
-            const float X = elem->dst.x, Y = elem->dst.y;
-
-        }
-        default: break;
-    }
+    SDL_RenderTexture(basic.renderer, elem->tex, &elem->src, &elem->dst);
     switch (elem->state) {
         case ELEM_STATE_PRESSED:
         case ELEM_STATE_RELEASE:
@@ -373,11 +438,11 @@ static bool TEMPO_DrawElem_(Elem* elem) {
     }
     return true;
 }
-bool TEMPO_DrawElem(Elem *elem) {
+bool TEMPO_DrawElem(const Elem *elem) {
     // Req Condition
     if (basic.renderer == NULL) {
         DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
-    return elem->visible = TEMPO_DrawElem_(elem);
+    return TEMPO_DrawElem_(elem);
 }

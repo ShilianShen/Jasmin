@@ -3,8 +3,9 @@ pageSet = [
         {type="FILE", info="../resources/images/491.gif", anchor=31, gid=[0, 0, 2, 2]},
         {type="TEXT", info="The dead can be cured.", anchor=49},
         {type="TEXT", info="Title", anchor=20, func='forward', para='Title'},
-        {type='SLID_I', info={min=0, max=10, now=9}, anchor=29, gid=[70, 0, 1, 1]},
-        {type='SLID_F', info={min=0, max=10, now=9}, anchor=29, gid=[70, 0, 1, 1]},
+        {type='SLID_I', info={min=0, max=10, now=55}, anchor=29, gid=[70, 100, 1, 1]},
+        {type='SLID_I', info={min=0, max=1000, now=15}, anchor=29, gid=[70, 0, 1, 1]},
+        {type='SLID_F', info={min=0, max=100, now=55}, anchor=29, gid=[70, -100, 1, 1]},
     ]},
     {name='Edge', elemSet=[
         {type="TEXT", info="The edge of menu system, it shouldn't appear.\nIf you are watching it, there is a bug need to be fixed.", anchor=31},
