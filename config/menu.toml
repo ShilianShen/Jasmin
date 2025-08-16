@@ -16,7 +16,7 @@ pageSet = [
         {type="TEXT", info="THE MAZE", anchor=31},
         {type="TEXT", info="Setting", anchor=49, func='forward', para='Setting'},
     ]},
-    {name='Setting', elemSet = [
+    {name='Setting', elemSet=[
         {type="TEXT", info="<<<", anchor=20, func='backward'},
         {type="TEXT", info="Go Test?.", anchor=49, gid=[0, 10, 1, 1], func='forward', para='Setting'},
     ]},
