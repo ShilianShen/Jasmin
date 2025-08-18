@@ -1,10 +1,7 @@
 # Tempo
 
 ```mermaid
-erDiagram 
-    Basic {
-        FFT_Font font
-    }
+erDiagram
     Trig {
         TrigType type
         TirgFunc func
@@ -12,14 +9,15 @@ erDiagram
     }
     Elem {
         ElemType type
-        char[] string
+        ElemInfo info
         int anchor
         Trig trig
-        SDL_Texture texture
-        SDL_FRect gid_rect
-        SDL_FRect src_rect
+        SDL_Texture tex
+        SDL_FRect gid
+        SDL_FRect src
     }
     Page {
+        char[] name
         Elem[] elemSet
     }
     Menu {
@@ -64,10 +62,3 @@ Menu为Jasmin的子模块, 承担Mouse和屏幕交互的主要功能.
 * 按钮事件
 * 界面跳转
 
-## Ok
-
-ok意味着可以renew和draw
-
-renew和draw需要检查对象的ok和依赖的ok
-
-例如RenewElem的ok依赖于elem.ok和basic.ok, RenewPage的ok依赖于page.ok, elem.ok, basic.ok.

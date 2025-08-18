@@ -4,8 +4,8 @@ pageSet = [
         {type="TEXT", info="The dead can be cured.", anchor=49},
         {type="TEXT", info="Title", anchor=20, func='forward', para='Title'},
         {type='SWITCH', info=false, anchor=29, gid=[70, 100, 1, 1]},
-        {type='SLID_I', info={min=0, max=100, now=50}, anchor=29, gid=[70, 0, 1, 1]},
-        {type='SLID_F', info={min=0, max=100, now=55}, anchor=29, gid=[70, -100, 1, 1]},
+        {type='SLID_I', info={min=0, max=100, now="test_int"}, anchor=29, gid=[70, 0, 1, 1]},
+        {type='SLID_F', info={min=0, max=100, now="test_float"}, anchor=29, gid=[70, -100, 1, 1]},
     ]},
     {name='Edge', elemSet=[
         {type="TEXT", info="The edge of menu system, it shouldn't appear.\nIf you are watching it, there is a bug need to be fixed.", anchor=31},

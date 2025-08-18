@@ -4,8 +4,8 @@
 // ELEM INFO ===========================================================================================================
 union ElemInfo {
     char* string;
-    struct SlidI {int min, max, now;} slidI;
-    struct SlidF {float min, max, now;} slidF;
+    struct SlidI {int min, max, *now;} slidI;
+    struct SlidF {float min, max, *now;} slidF;
     struct Switch {bool now;} switch_;
 };
 
@@ -164,11 +164,11 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             } // Req Condition
             const toml_datum_t min = toml_int_in(tomlInfo, "min");
             const toml_datum_t max = toml_int_in(tomlInfo, "max");
-            const toml_datum_t now = toml_int_in(tomlInfo, "now");
+            const toml_datum_t now = toml_string_in(tomlInfo, "now");
             if (min.ok && max.ok && now.ok) {
                 elem->info.slidI.min = (int)min.u.i;
                 elem->info.slidI.max = (int)max.u.i;
-                elem->info.slidI.now = (int)now.u.i;
+                elem->info.slidI.now = BASIC_GetIntFromTable(TEMPO_TABLE_I, now.u.s);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -184,11 +184,11 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             } // Req Condition
             const toml_datum_t min = toml_double_in(tomlInfo, "min");
             const toml_datum_t max = toml_double_in(tomlInfo, "max");
-            const toml_datum_t now = toml_double_in(tomlInfo, "now");
+            const toml_datum_t now = toml_string_in(tomlInfo, "now");
             if (min.ok && max.ok && now.ok) {
                 elem->info.slidF.min = (float)min.u.d;
                 elem->info.slidF.max = (float)max.u.d;
-                elem->info.slidF.now = (float)now.u.d;
+                elem->info.slidF.now = BASIC_GetFloatFromTable(TEMPO_TABLE_F, now.u.s);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -293,52 +293,15 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElemDstRect(Elem *elem) {
-    return SDL_LoadDstRectAligned(
-        &elem->dst,
-        elem->tex,
-        &elem->src,
-        &elem->gid,
-        &basic.bck,
-        elem->anchor
-        );
-}
-static bool TEMPO_RenewElemState(Elem* elem) {
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
-    if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
-        elem->state = ELEM_STATE_RELEASE;
-    }
-    else {
-        if (mouseIn == true) {
-            elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
-        }
-        else {
-            elem->state = ELEM_STATE_OUTSIDE;
-        }
-    }
-    if (elem->state == ELEM_STATE_RELEASE && elem->trig != NULL) {
-        elem->trig->func(elem->trig->para);
-    }
+const float A = 4, B = 4, C = 8, D = 48;
 
-    if (elem->state == ELEM_STATE_PRESSED) {
-        DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
-        // DEBUG_SendMessageL("    info: %s\n", elem->info);
-        DEBUG_SendMessageL("    state: %s\n", ELEM_STATE_STRING_SET[elem->state]);
-        if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
-        }
-    }
-    return true;
-}
 static bool TEMPO_RenewElemTex(Elem* elem) {
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
     }
     switch (elem->type) {
-        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_TEXT:
         case ELEM_TYPE_FILE: {
             elem->tex = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
             if (elem->tex == NULL) {
@@ -346,10 +309,11 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             }
             break;
         }
-        case ELEM_TYPE_SLID_I: {
-            const float A = 4, B = 4, C = 8, D = 48;
-            const float M = (float)(elem->info.slidI.max - elem->info.slidI.min);
-            const int N = elem->info.slidI.now - elem->info.slidI.min;
+        case ELEM_TYPE_SLID_I:
+        case ELEM_TYPE_SLID_F: {
+            const float M = elem->type == ELEM_TYPE_SLID_I
+                    ? (float)(elem->info.slidI.max - elem->info.slidI.min)
+                    : elem->info.slidF.max - elem->info.slidF.min;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
             elem->src = (SDL_FRect){0, 0, W, H};
@@ -369,42 +333,34 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
                     (SDL_FRect){W - A, 0, A, H},
                 };
                 SDL_RenderFillRects(basic.renderer, frame, 4);
-                SDL_FRect rects[N];
-                for (int i = 0; i < N; i++) {
-                    rects[i].x = A + (float)(i + 1) * B + (float)i * C;
-                    rects[i].y = A + B;
-                    rects[i].w = C;
-                    rects[i].h = D;
-                }
-                SDL_RenderFillRects(basic.renderer, rects, N);
             }
-            SDL_SetRenderTarget(basic.renderer, NULL);
-            break;
-        }
-        case ELEM_TYPE_SLID_F: {
-            const float A = 4, B = 4, C = 8, D = 48;
-            const float M = elem->info.slidF.max - elem->info.slidF.min;
-            const float N = elem->info.slidF.now - elem->info.slidF.min;
-            const float W = 2 * A + (M + 1) * B + M * C;
-            const float H = 2 * A + 2 * B + D;
-            elem->src = (SDL_FRect){0, 0, W, H};
-            elem->gid.w = elem->gid.h = 1;
-            elem->tex = SDL_CreateTexture(
-                basic.renderer,
-                SDL_PIXELFORMAT_RGBA8888,
-                SDL_TEXTUREACCESS_TARGET,
-                (int)W, (int)H);
-            SDL_SetRenderTarget(basic.renderer, elem->tex);
-            {
-                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
-                const SDL_FRect frame[5] = {
-                    (SDL_FRect){0, 0, W, A},
-                    (SDL_FRect){0, 0, A, H},
-                    (SDL_FRect){0, H - A, W, A},
-                    (SDL_FRect){W - A, 0, A, H},
-                    (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
-                };
-                SDL_RenderFillRects(basic.renderer, frame, 5);
+            if (elem->type == ELEM_TYPE_SLID_I) {
+                if (elem->info.slidI.now != NULL) {
+                    const int N = *elem->info.slidI.now - elem->info.slidI.min;
+                    SDL_FRect rects[N];
+                    for (int i = 0; i < N; i++) {
+                        rects[i].x = A + (float)(i + 1) * B + (float)i * C;
+                        rects[i].y = A + B;
+                        rects[i].w = C;
+                        rects[i].h = D;
+                    }
+                    SDL_RenderFillRects(basic.renderer, rects, N);
+                }
+                else {
+                    SDL_RenderLine(basic.renderer, 0, 0, W, H);
+                    SDL_RenderLine(basic.renderer, W, 0, 0, H);
+                }
+            }
+            if (elem->type == ELEM_TYPE_SLID_F) {
+                if (elem->info.slidF.now != NULL) {
+                    const float N = *elem->info.slidF.now - elem->info.slidF.min;
+                    const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
+                    SDL_RenderFillRect(basic.renderer, &rect);
+                }
+                else {
+                    SDL_RenderLine(basic.renderer, 0, 0, W, H);
+                    SDL_RenderLine(basic.renderer, W, 0, 0, H);
+                }
             }
             SDL_SetRenderTarget(basic.renderer, NULL);
             break;
@@ -441,6 +397,63 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
     }
     return true;
 }
+static bool TEMPO_RenewElemDstRect(Elem *elem) {
+    return SDL_LoadDstRectAligned(
+        &elem->dst,
+        elem->tex,
+        &elem->src,
+        &elem->gid,
+        &basic.bck,
+        elem->anchor
+        );
+}
+static bool TEMPO_RenewElemState(Elem* elem) {
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
+    if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
+        elem->state = ELEM_STATE_RELEASE;
+    }
+    else {
+        if (mouseIn == true) {
+            elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
+        }
+        else {
+            elem->state = ELEM_STATE_OUTSIDE;
+        }
+    }
+    if (elem->state == ELEM_STATE_RELEASE && elem->trig != NULL) {
+        elem->trig->func(elem->trig->para);
+    }
+    if (elem->state == ELEM_STATE_PRESSED) {
+        DEBUG_SendMessageL("Elem:\n");
+        DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
+        // DEBUG_SendMessageL("    info: %s\n", elem->info);
+        DEBUG_SendMessageL("    state: %s\n", ELEM_STATE_STRING_SET[elem->state]);
+        if (elem->trig != NULL) {
+            DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
+        }
+    }
+    if (elem->state == ELEM_STATE_PRESSED) {
+        const float min = elem->dst.x + A + B;
+        const float max = elem->dst.x + elem->dst.w - A - B;
+        const float now = DEVICE_GetMousePos().x;
+        if (elem->type == ELEM_TYPE_SLID_F) {
+            if (now <= min)
+                *elem->info.slidF.now = elem->info.slidF.min;
+            else if (now >= max)
+                *elem->info.slidF.now = elem->info.slidF.max;
+            else
+                *elem->info.slidF.now = elem->info.slidF.min + (elem->info.slidF.max - elem->info.slidF.min) * (now - min) / (max - min);
+        }
+        if (elem->type == ELEM_TYPE_SLID_I) {
+            *elem->info.slidI.now = (int)((now - min) / (B + C));
+        }
+    }
+    return true;
+}
+static bool TEMPO_RenewElemInfo(Elem* elem) {
+    return true;
+}
 bool TEMPO_RenewElem(Elem *elem) {
     if (TEMPO_RenewElemTex(elem) == false) {
         return false;
@@ -449,6 +462,9 @@ bool TEMPO_RenewElem(Elem *elem) {
         return false;
     }
     if (TEMPO_RenewElemState(elem) == false) {
+        return false;
+    }
+    if (TEMPO_RenewElemInfo(elem) == false) {
         return false;
     }
     return true;

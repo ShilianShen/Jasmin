@@ -1,6 +1,18 @@
 #include "../include/jasmin/jasmin.h"
 
 
+int test_int = 10;
+float test_float = 10.5f;
+const KeyValI TEMPO_TABLE_I[] = {
+    {"test_int", &test_int},
+    {NULL, NULL}
+};
+const KeyValF TEMPO_TABLE_F[] = {
+    {"test_float", &test_float},
+    {NULL, NULL}
+};
+
+
 static void INIT() {
     BASIC_Init();
     DEBUG_Init(renderer);
@@ -10,15 +22,14 @@ static void INIT() {
 static void DEINIT() {
     BASIC_Deinit();
 }
-
 static void LOAD() {
+
     DEBUG_Load();
     TEMPO_Load();
 }
 static void UNLOAD() {
     TEMPO_Unload();
 }
-
 static void RENEW() {
     // physical renew
     renewScreenParas(window);
@@ -45,14 +56,7 @@ static void DRAW() {
 
     //
     SDL_RenderPresent(renderer);
-    static bool reload = true;
-    if (reload == true) {
-        TEMPO_Unload();
-        TEMPO_Load();
-    }
 }
-
-
 int main(int argc, char *argv[]) {
     // window & renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -69,6 +73,7 @@ int main(int argc, char *argv[]) {
             }
         }
         RENEW();
+        DEBUG_SendMessageR("%d, %f\n", test_int, test_float);
         DRAW();
         // SDL_GPUShader* shader = SDL_CreateGPUShader();
     }

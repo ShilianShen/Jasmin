@@ -1,7 +1,7 @@
 #include "../trig/trig.h"
 
 
-struct {const char* name; TrigFunc func;} TRIG_INFO_SET[TRIG_NUM_TYPES] = {
+KeyValT TEMPO_MANU_TRIG_SET[TRIG_NUM_TYPES] = {
     [TRIG_TYPE_PASS] = {"pass", TEMPO_TrigFuncPass},
     [TRIG_TYPE_FORWARD] = {"forward", TEMPO_TrigFuncForward},
     [TRIG_TYPE_BACKWARD] = {"backward", TEMPO_TrigFuncBackward},
@@ -16,8 +16,8 @@ TrigFunc TRIG_GetFuncFromName(const char* name) {
     if (name == NULL) {printf("%s: name not exists.\n", __func__); return NULL;}
 
     for (int i = 0; i < TRIG_NUM_TYPES; i++) {
-        if (strcmp(name, TRIG_INFO_SET[i].name) == 0) {
-            return TRIG_INFO_SET[i].func;
+        if (strcmp(name, TEMPO_MANU_TRIG_SET[i].name) == 0) {
+            return TEMPO_MANU_TRIG_SET[i].func;
         }
     }
     return NULL;
@@ -27,15 +27,15 @@ const char* TRIG_GetNameFromFunc(const TrigFunc func) {
     if (func == NULL) {printf("%s: func not exists.\n", __func__); return NULL;}
 
     for (int i = 0; i < TRIG_NUM_TYPES; i++) {
-        if (TRIG_INFO_SET[i].func == func) {
-            return TRIG_INFO_SET[i].name;
+        if (TEMPO_MANU_TRIG_SET[i].func == func) {
+            return TEMPO_MANU_TRIG_SET[i].name;
         }
     }
     return NULL;
 }
 TrigType TRIG_GetTypeFromName(const char* name) {
     for (int i = 0; i < TRIG_NUM_TYPES; i++) {
-        if (strcmp(name, TRIG_INFO_SET[i].name) == 0) {
+        if (strcmp(name, TEMPO_MANU_TRIG_SET[i].name) == 0) {
             return i;
         }
     }
@@ -52,7 +52,7 @@ static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
     } // Req Condition
 
     trig->type = TRIG_GetTypeFromName(tomlFuncName.u.s);
-    trig->func = TRIG_INFO_SET[trig->type].func;
+    trig->func = TEMPO_MANU_TRIG_SET[trig->type].func;
     if (trig->func == NULL) {
         printf("%s: func == NULL.\n", __func__);
         return false;

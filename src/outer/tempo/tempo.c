@@ -15,4 +15,10 @@ void TEMPO_Renew() {
 }
 void TEMPO_Draw() {
     TEMPO_DrawMenu();
+    static bool reload = !true;
+    if (reload == true) {
+        DEBUG_SendMessageL("reload = true\n");
+        TEMPO_Unload();
+        TEMPO_Load();
+    }
 }

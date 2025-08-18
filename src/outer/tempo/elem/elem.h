@@ -3,6 +3,7 @@
 
 
 #include "../trig/trig.h"
+#include "../basic/basic.h"
 
 
 typedef struct Elem Elem;

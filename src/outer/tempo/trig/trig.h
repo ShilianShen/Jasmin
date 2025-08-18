@@ -2,7 +2,8 @@
 #define JASMIN_MENU_STRUCT_TRIG_H
 
 
-#include "../basic/basic.h"
+// #include "../basic/basic.h"
+#include "../interface.h"
 
 
 // datatype
@@ -33,13 +34,16 @@ struct Trig {
 };
 typedef struct Trig Trig;
 
+typedef struct KeyValT {const char* name; TrigFunc func;} KeyValT;
+
+
+///////////////////////////
 
 void TEMPO_TrigFuncPass(TrigPara);
 void TEMPO_TrigFuncForward(TrigPara);
 void TEMPO_TrigFuncBackward(TrigPara);
 void TEMPO_TrigFuncClear(TrigPara);
 void TEMPO_TrigFuncKnob(TrigPara);
-
 
 
 TrigFunc TRIG_GetFuncFromName(const char* name);

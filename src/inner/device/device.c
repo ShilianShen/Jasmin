@@ -9,6 +9,8 @@ struct Mouse {
     // right
     bool right_pressed;
     float right_x, right_y;
+
+
 } mouse;
 
 
@@ -48,6 +50,10 @@ bool DEVICE_MouseLeftInRect(const SDL_FRect* rect) {
         rect->x <= mouse.left_x && mouse.left_x < rect->x + rect->w &&
         rect->y <= mouse.left_y && mouse.left_y < rect->y + rect->h
         );
+}
+SDL_FPoint DEVICE_GetMousePos() {
+    const SDL_FPoint point = {mouse.x, mouse.y};
+    return point;
 }
 
 
