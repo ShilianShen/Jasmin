@@ -32,19 +32,15 @@ Menu menu;
 
 // LOAD & UNLOAD =======================================================================================================
 static void TEMPO_LoadMenuPageSet() {
-    toml_table_t* tomlMenu = getToml(tomlPath);
-    if (tomlMenu == NULL) {
+    toml_table_t* tomlPageSet = getToml(tomlPath);
+    if (tomlPageSet == NULL) {
         printf("%s: tomlMenu == NULL.\n", __func__);
         return;
     } // Req Condition
 
-    const toml_array_t* tomlPageSet = toml_array_in(tomlMenu, "pageSet");
-    if (tomlPageSet == NULL) {
-        printf("%s: tomlPageSet == NULL.\n", __func__);
-        return;
-    } // Req Condition
-
-    menu.lenPageSet = toml_array_nelem(tomlPageSet);
+    for (int i = 0; toml_key_in(tomlPageSet, i) != NULL; i++) {
+        menu.lenPageSet = i;
+    }
     if (menu.lenPageSet == 0) {
         printf("%s: menu.lenPageSet == 0.\n", __func__);
         return;
@@ -57,30 +53,25 @@ static void TEMPO_LoadMenuPageSet() {
     }
 
     for (int i = 0; i < menu.lenPageSet; i++) {
-        const toml_table_t* tomlPage = toml_table_at(tomlPageSet, i);
+        const char* key = toml_key_in(tomlPageSet, i);
+        const toml_table_t* tomlPage = toml_table_in(tomlPageSet, key);
         if (tomlPage == NULL) {
             printf("%s: tomlPage == NULL.\n", __func__);
             return;
         } // Req Condition
 
-        const toml_datum_t tomlName = toml_string_in(tomlPage, "name");
-        if (tomlName.ok == false) {
-            printf("%s: tomlName.ok == false.\n", __func__);
-            return;
-        } // Req Condition
-        const char* name = tomlName.u.s;
 
-        menu.pageSet[i] = TEMPO_CreatePage(tomlPage);
-        if (strcmp(name, MENU_ROOT_NAME) == 0) {
+        menu.pageSet[i] = TEMPO_CreatePage(key, tomlPage);
+        if (strcmp(key, MENU_ROOT_NAME) == 0) {
             menu.pageRoot = menu.pageSet[i];
         }
-        if (strcmp(name, MENU_EDGE_NAME) == 0) {
+        if (strcmp(key, MENU_EDGE_NAME) == 0) {
             menu.pageEdge = menu.pageSet[i];
         }
     }
 
     //
-    toml_free(tomlMenu); // end malloc
+    toml_free(tomlPageSet); // end malloc
 }
 void TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));

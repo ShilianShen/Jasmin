@@ -11,7 +11,7 @@ typedef struct Page Page;
 const char* TEMPO_GetPageName(const Page* page);
 
 
-Page* TEMPO_CreatePage(const toml_table_t* tomlPage);
+Page* TEMPO_CreatePage(const char *name, const toml_table_t* tomlPage);
 Page *TEMPO_DeletePage(Page *page);
 bool TEMPO_RenewPage(const Page *page);
 bool TEMPO_DrawPage(const Page *page);
