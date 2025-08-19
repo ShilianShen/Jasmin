@@ -174,5 +174,3 @@ void TEMPO_TrigFuncClear(TrigPara para) {
 void TEMPO_TrigFuncKnob(TrigPara para) {
 
 }
-
-

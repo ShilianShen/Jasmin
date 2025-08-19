@@ -7,7 +7,7 @@
 
 extern const KeyVal TEMPO_TABLE_INT[];
 extern const KeyVal TEMPO_TABLE_FLOAT[];
-extern const KeyVal TEMPO_TABLE_TRIGGER[];
+extern const KeyVal TEMPO_TABLE_PAGE[];
 
 
 #endif //JASMIN_MENU_INTERFACE_H

@@ -11,6 +11,8 @@ typedef enum ElemState ElemState;
 typedef enum ElemType ElemType;
 typedef union ElemInfo ElemInfo;
 
+extern const char* ELEM_TYPE_STRING_SET[];
+ElemType TEMPO_GetElemTypeFromString(const char* string);
 
 bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);
 bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect);

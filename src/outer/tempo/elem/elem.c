@@ -36,7 +36,7 @@ enum ElemType {
     ELEM_TYPE_SWITCH,
     ELEM_NUM_TYPES,
 };
-static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
+const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT",
@@ -44,7 +44,7 @@ static const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_SLID_I] = "SLID_I",
     [ELEM_TYPE_SWITCH] = "SWITCH",
 };
-static ElemType TEMPO_GetElemTypeFromString(const char* string) {
+ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
         if (strcmp(string, ELEM_TYPE_STRING_SET[i]) == 0) {
             return i;
