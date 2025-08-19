@@ -1,24 +1,18 @@
 #include "table.h"
 
 
-int* BASIC_GetIntFromTable(const KeyValI table[], const char* key) {
-    if (table == NULL) {
-        return NULL;
-    }
-    for (int i = 0; table[i].key != NULL; i++) {
-        if (strcmp(key, table[i].key) == 0) {
-            return table[i].value;
+void* BASIC_GetValByKey(const KeyVal table[], const char* key) {
+    for (int idx = 0; table[idx].key != NULL; idx++) {
+        if (strcmp(key, table[idx].key) == 0) {
+            return table[idx].val;
         }
     }
     return NULL;
 }
-float* BASIC_GetFloatFromTable(const KeyValF table[], const char* key) {
-    if (table == NULL) {
-        return NULL;
-    }
-    for (int i = 0; table[i].key != NULL; i++) {
-        if (strcmp(key, table[i].key) == 0) {
-            return table[i].value;
+const char* BASIC_GetKeyByVal(const KeyVal table[], const void* val) {
+    for (int idx = 0; table[idx].key != NULL; idx++) {
+        if (table[idx].val == val) {
+            return table[idx].key;
         }
     }
     return NULL;

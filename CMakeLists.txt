@@ -62,8 +62,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/func/func.h
         src/inner/basic/table/table.c
         src/inner/basic/table/table.h
-        src/inner/basic/trig/trig.c
-        src/inner/basic/trig/trig.h
+        src/inner/basic/trigger/trigger.c
+        src/inner/basic/trigger/trigger.h
 )
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

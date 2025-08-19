@@ -6,7 +6,7 @@
 #include "setting/setting.h"
 #include "func/func.h"
 #include "table/table.h"
-#include "trig/trig.h"
+#include "trigger/trigger.h"
 
 
 #endif //JASMIN_BASIC_H

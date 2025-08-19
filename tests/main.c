@@ -3,11 +3,11 @@
 
 int test_int = 10;
 float test_float = 10.5f;
-const KeyValI TEMPO_TABLE_I[] = {
+const KeyVal TEMPO_TABLE_INT[] = {
     {"test_int", &test_int},
     {NULL, NULL}
 };
-const KeyValF TEMPO_TABLE_F[] = {
+const KeyVal TEMPO_TABLE_FLOAT[] = {
     {"test_float", &test_float},
     {NULL, NULL}
 };

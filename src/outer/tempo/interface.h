@@ -5,9 +5,9 @@
 #include "../interface.h"
 
 
-extern const KeyValI TEMPO_TABLE_I[];
-extern const KeyValF TEMPO_TABLE_F[];
-
+extern const KeyVal TEMPO_TABLE_INT[];
+extern const KeyVal TEMPO_TABLE_FLOAT[];
+extern const KeyVal TEMPO_TABLE_TRIGGER[];
 
 
 #endif //JASMIN_MENU_INTERFACE_H

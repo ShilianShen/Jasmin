@@ -168,7 +168,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             if (min.ok && max.ok && now.ok) {
                 elem->info.slidI.min = (int)min.u.i;
                 elem->info.slidI.max = (int)max.u.i;
-                elem->info.slidI.now = BASIC_GetIntFromTable(TEMPO_TABLE_I, now.u.s);
+                elem->info.slidI.now = BASIC_GetValByKey(TEMPO_TABLE_INT, now.u.s);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -188,7 +188,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             if (min.ok && max.ok && now.ok) {
                 elem->info.slidF.min = (float)min.u.d;
                 elem->info.slidF.max = (float)max.u.d;
-                elem->info.slidF.now = BASIC_GetFloatFromTable(TEMPO_TABLE_F, now.u.s);
+                elem->info.slidF.now = BASIC_GetValByKey(TEMPO_TABLE_FLOAT, now.u.s);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -430,7 +430,7 @@ static bool TEMPO_RenewElemState(Elem* elem) {
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
         DEBUG_SendMessageL("    state: %s\n", ELEM_STATE_STRING_SET[elem->state]);
         if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", TRIG_GetNameFromFunc(elem->trig->func), elem->trig->para);
+            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
         }
     }
     if (elem->state == ELEM_STATE_PRESSED) {
