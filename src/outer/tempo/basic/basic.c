@@ -19,10 +19,10 @@ void TEMPO_SetBasicFont(TTF_Font* font) {
         printf("%s: font not exists.\n", __func__);
         return;
     } // Req Condition
-    basic.font = basic.font = font;
+    basic.font = font;
 }
 void TEMPO_SetBasicBckRect(const SDL_FRect bck_rect) {
-    basic.bck = basic.bck = bck_rect;
+    basic.bck = bck_rect;
 }
 
 
@@ -33,7 +33,7 @@ bool TEMPO_LoadBasic() {
         return false;
     } // Req Condition
 
-    toml_table_t* tomlMenuTheme = getToml(BASIC_TOML); // malloc
+    toml_table_t* tomlMenuTheme = getToml(BASIC_TOML); // alloc
     if (tomlMenuTheme == NULL) {
         printf("%s: failed from \"%s\".\n", __func__, BASIC_TOML);
         return false;
@@ -43,7 +43,7 @@ bool TEMPO_LoadBasic() {
     const toml_datum_t tomlFontSize = toml_double_in(tomlMenuTheme, "font_size");
 
     if (tomlFontPath.ok == true && tomlFontSize.ok == true) {
-        basic.font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d); // malloc
+        basic.font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d); // alloc
         if (basic.font == NULL) {
             printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);
         } // Req Condition

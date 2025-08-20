@@ -5,7 +5,7 @@ typedef struct Debug Debug;
 struct Debug {
     bool on;
     SDL_Renderer* renderer;
-    struct DebugTheme {
+    struct {
         TTF_Font *font24, *font32, *font64, *font128, *font256;
         SDL_Color point, rect, face, text, dark, light;
         SDL_Color darkPoint, darkRect, darkFace, darkText;

@@ -6,7 +6,7 @@
 #include "../interface.h"
 
 
-KeyVal TEMPO_MENU_TRIG_SET[];
+extern KeyVal TEMPO_MENU_TRIG_SET[];
 void TEMPO_TrigFuncPass(char*);
 void TEMPO_TrigFuncForward(char*);
 void TEMPO_TrigFuncBackward(char*);
