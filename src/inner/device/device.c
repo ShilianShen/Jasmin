@@ -6,16 +6,23 @@ struct Mouse {
     // left
     bool left_pressed;
     float left_x, left_y;
+    const Trig* left_trig;
     // right
     bool right_pressed;
     float right_x, right_y;
-
-
 } mouse;
 
 
 void DEVICE_RenewMouse() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
+
+
+    if (mouse.left_trig != NULL && mouse.left_pressed == true && (buttons & SDL_BUTTON_LMASK) == false) {
+        PullTrig(mouse.left_trig);
+    }
+    mouse.left_trig = NULL;
+
+
     mouse.x *= scale_x;
     mouse.y *= scale_y;
     if (!mouse.left_pressed && buttons & SDL_BUTTON_LMASK) {
@@ -33,6 +40,9 @@ void DEVICE_RenewMouse() {
 }
 void DEVICE_DrawMouse(SDL_Renderer* renderer) {
     DEBUG_SendMessageL("mouse: %.2f, %.2f\n", mouse.x, mouse.y);
+    if (mouse.left_trig != NULL) {
+        DEBUG_SendMessageL("mouse.left_trig != NULL\n");
+    }
     DEBUG_DrawPoint(mouse.left_x, mouse.left_y);
     DEBUG_DrawPoint(mouse.x, mouse.y);
     if (mouse.left_pressed) {
@@ -50,6 +60,9 @@ bool DEVICE_MouseLeftInRect(const SDL_FRect* rect) {
         rect->x <= mouse.left_x && mouse.left_x < rect->x + rect->w &&
         rect->y <= mouse.left_y && mouse.left_y < rect->y + rect->h
         );
+}
+void DEVICE_SetMouseLeftTrig(const Trig* trig) {
+    mouse.left_trig = trig;
 }
 SDL_FPoint DEVICE_GetMousePos() {
     const SDL_FPoint point = {mouse.x, mouse.y};

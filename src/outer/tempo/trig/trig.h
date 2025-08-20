@@ -14,7 +14,4 @@ void TEMPO_TrigFuncClear(char*);
 void TEMPO_TrigFuncKnob(char*);
 
 
-
-
-
 #endif //JASMIN_MENU_STRUCT_TRIG_H

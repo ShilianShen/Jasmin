@@ -31,11 +31,11 @@ Menu menu;
 
 
 // LOAD & UNLOAD =======================================================================================================
-static void TEMPO_LoadMenuPageSet() {
-    toml_table_t* tomlPageSet = getToml(tomlPath);
+static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
+
     if (tomlPageSet == NULL) {
         printf("%s: tomlMenu == NULL.\n", __func__);
-        return;
+        return false;
     } // Req Condition
 
     for (int i = 0; toml_key_in(tomlPageSet, i) != NULL; i++) {
@@ -43,20 +43,20 @@ static void TEMPO_LoadMenuPageSet() {
     }
     if (menu.lenPageTable == 0) {
         printf("%s: menu.lenPageSet == 0.\n", __func__);
-        return;
+        return false;
     } // Req Condition
 
     menu.pageTable = calloc(menu.lenPageTable, sizeof(KeyVal));
     if (menu.pageTable == NULL) {
         printf("%s: menu.pageSet == NULL.\n", __func__);
-        return;
+        return false;
     }
 
     for (int i = 0; i < menu.lenPageTable; i++) {
         const char* key = toml_key_in(tomlPageSet, i);
         menu.pageTable[i].key = strdup(key);
         if (menu.pageTable[i].key == NULL) {
-            return;
+            return false;
         }
     }
 
@@ -65,7 +65,7 @@ static void TEMPO_LoadMenuPageSet() {
         const toml_table_t* tomlPage = toml_table_in(tomlPageSet, key);
         if (tomlPage == NULL) {
             printf("%s: tomlPage == NULL.\n", __func__);
-            return;
+            return false;
         } // Req Condition
 
         menu.pageTable[i].val = TEMPO_CreatePage(key, tomlPage);
@@ -77,12 +77,14 @@ static void TEMPO_LoadMenuPageSet() {
         }
     }
 
-    //
-    toml_free(tomlPageSet); // end malloc
+
+    return true;
 }
 void TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
-    TEMPO_LoadMenuPageSet();
+    toml_table_t* tomlPageSet = getToml(tomlPath);
+    TEMPO_LoadMenuPageSet(tomlPageSet);
+    toml_free(tomlPageSet); // end malloc
 }
 void TEMPO_UnloadMenu() {
     for (int i = 0; i < menu.lenPageTable; i++) {

@@ -10,8 +10,8 @@ struct Trig {
 typedef struct Trig Trig;
 
 
-Trig* TEMPO_DeleteTrig(Trig* trig);
-Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig);
+
+void PullTrig(const Trig* trig);
 
 
 #endif //TRIG_H

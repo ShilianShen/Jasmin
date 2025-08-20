@@ -10,22 +10,6 @@ union ElemInfo {
 };
 
 
-// ELEM STATE ==========================================================================================================
-enum ElemState {
-    ELEM_STATE_OUTSIDE,
-    ELEM_STATE_INSIDE,
-    ELEM_STATE_PRESSED,
-    ELEM_STATE_RELEASE,
-    ELEM_NUM_STATES
-};
-static const char* ELEM_STATE_STRING_SET[ELEM_NUM_STATES] = {
-    [ELEM_STATE_OUTSIDE] = "OUTSIDE",
-    [ELEM_STATE_INSIDE] = "INSIDE",
-    [ELEM_STATE_PRESSED] = "PRESSED",
-    [ELEM_STATE_RELEASE] = "RELEASE",
-};
-
-
 // ELEM TYPE ===========================================================================================================
 enum ElemType {
     ELEM_TYPE_NULL,
@@ -64,13 +48,12 @@ struct Elem {
     SDL_FRect gid;
     SDL_FRect src;
 
-    Trig* trig;
+    Trig trig;
 
     SDL_Texture* tex;
 
     // renew
     SDL_FRect dst;
-    ElemState state;
 };
 
 
@@ -220,9 +203,16 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
         elem->gid = (SDL_FRect){0, 0, 1, 1};
     }
     if (toml_string_in(tomlElem, key = "func").ok) {
-        elem->trig = TEMPO_CreateTrig(tomlElem);
-        if (elem->trig == NULL) {
-            printf("%s: elem->trig == NULL, %s.\n", __func__, key);
+        elem->trig.func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, toml_string_in(tomlElem, key).u.s);
+        if (elem->trig.func == NULL) {
+            printf("%s: elem->trig.func == NULL, %s.\n", __func__, key);
+            return false;
+        }
+    } // func
+    if (toml_string_in(tomlElem, key = "para").ok) {
+        elem->trig.para = strdup(toml_string_in(tomlElem, key).u.s);
+        if (elem->trig.para == NULL) {
+            printf("%s: elem->trig.para == NULL, %s.\n", __func__, key);
             return false;
         }
     }
@@ -263,8 +253,9 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         }
         default: break;
     }
-    if (elem->trig != NULL) {
-        elem->trig = TEMPO_DeleteTrig(elem->trig);
+    if (elem->trig.para != NULL) {
+        free(elem->trig.para);
+        elem->trig.para = NULL;
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -398,7 +389,7 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
     return true;
 }
 static bool TEMPO_RenewElemDstRect(Elem *elem) {
-    return SDL_LoadDstRectAligned(
+    const bool result = SDL_LoadDstRectAligned(
         &elem->dst,
         elem->tex,
         &elem->src,
@@ -406,34 +397,24 @@ static bool TEMPO_RenewElemDstRect(Elem *elem) {
         &basic.bck,
         elem->anchor
         );
+    return result;
 }
-static bool TEMPO_RenewElemState(Elem* elem) {
+static bool TEMPO_RenewElemState(const Elem* elem) {
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
-    if (elem->state == ELEM_STATE_PRESSED && mouseIn == true && mouseLeftIn == false) {
-        elem->state = ELEM_STATE_RELEASE;
+
+    if (mouseLeftIn && mouseIn) {
+        DEVICE_SetMouseLeftTrig(&elem->trig);
     }
-    else {
-        if (mouseIn == true) {
-            elem->state = mouseLeftIn ? ELEM_STATE_PRESSED : ELEM_STATE_INSIDE;
-        }
-        else {
-            elem->state = ELEM_STATE_OUTSIDE;
-        }
-    }
-    if (elem->state == ELEM_STATE_RELEASE && elem->trig != NULL) {
-        elem->trig->func(elem->trig->para);
-    }
-    if (elem->state == ELEM_STATE_PRESSED) {
+    if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
-        DEBUG_SendMessageL("    state: %s\n", ELEM_STATE_STRING_SET[elem->state]);
-        if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
+        if (elem->trig.func != NULL) {
+            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig.func), elem->trig.para);
         }
     }
-    if (elem->state == ELEM_STATE_PRESSED) {
+    if (mouseLeftIn) {
         const float min = elem->dst.x + A + B;
         const float max = elem->dst.x + elem->dst.w - A - B;
         const float now = DEVICE_GetMousePos().x;
@@ -446,7 +427,12 @@ static bool TEMPO_RenewElemState(Elem* elem) {
                 *elem->info.slidF.now = elem->info.slidF.min + (elem->info.slidF.max - elem->info.slidF.min) * (now - min) / (max - min);
         }
         if (elem->type == ELEM_TYPE_SLID_I) {
-            *elem->info.slidI.now = (int)((now - min) / (B + C));
+            if (now <= min)
+                *elem->info.slidI.now = elem->info.slidI.min;
+            else if (now >= max)
+                *elem->info.slidI.now = elem->info.slidI.max;
+            else
+                *elem->info.slidI.now = (int)((now - min) / (B + C));
         }
     }
     return true;
@@ -456,9 +442,11 @@ static bool TEMPO_RenewElemInfo(Elem* elem) {
 }
 bool TEMPO_RenewElem(Elem *elem) {
     if (TEMPO_RenewElemTex(elem) == false) {
+        printf("%s: TEMPO_RenewElemTex(elem) == false\n", __func__);
         return false;
     }
     if (TEMPO_RenewElemDstRect(elem) == false) {
+        printf("%s: TEMPO_RenewElemDstRect(elem) == false\n", __func__);
         return false;
     }
     if (TEMPO_RenewElemState(elem) == false) {
@@ -473,22 +461,14 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 // DRAW ================================================================================================================
 static bool TEMPO_DrawElem_(const Elem* elem) {
-    switch (elem->state) {
-        case ELEM_STATE_PRESSED: {
-            DEBUG_FillRect(&elem->dst);
-            break;
-        }
-        default: break;
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
+    if (mouseLeftIn) {
+        DEBUG_FillRect(&elem->dst);
     }
     SDL_RenderTexture(basic.renderer, elem->tex, &elem->src, &elem->dst);
-    switch (elem->state) {
-        case ELEM_STATE_PRESSED:
-        case ELEM_STATE_RELEASE:
-        case ELEM_STATE_INSIDE: {
-            DEBUG_DrawRect(&elem->dst);
-            break;
-        }
-        default: break;
+    if (mouseIn || mouseLeftIn) {
+        DEBUG_DrawRect(&elem->dst);
     }
     return true;
 }
@@ -498,5 +478,9 @@ bool TEMPO_DrawElem(const Elem *elem) {
         DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
-    return TEMPO_DrawElem_(elem);
+    if (TEMPO_DrawElem_(elem) == false) {
+        DEBUG_SendMessageR("%s: ???.\n", __func__);
+        return false;
+    }
+    return true;
 }

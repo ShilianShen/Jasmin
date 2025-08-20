@@ -23,7 +23,6 @@ static void DEINIT() {
     BASIC_Deinit();
 }
 static void LOAD() {
-
     DEBUG_Load();
     TEMPO_Load();
 }
