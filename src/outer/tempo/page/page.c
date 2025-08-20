@@ -8,16 +8,6 @@ struct Page {
 };
 
 
-// GET & SET ===========================================================================================================
-const char* TEMPO_GetPageName(const Page* page) {
-    if (page == NULL) {
-        printf("%s: page == NULL.\n", __func__);
-        return NULL;
-    }
-    return page->name;
-}
-
-
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreatePage_RK(Page* page, const char *name, const toml_table_t* tomlPage) {
     memset(page, 0, sizeof(Page));

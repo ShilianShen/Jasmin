@@ -10,10 +10,10 @@
 
 struct Menu {
     // malloc in INIT
-    int lenPageSet;
+    int lenPageTable;
+    KeyVal* pageTable;
     Page* pageRoot;
     Page* pageEdge;
-    Page** pageSet;
 
     // path
     Page* path[MENU_PATH_VOLUME];

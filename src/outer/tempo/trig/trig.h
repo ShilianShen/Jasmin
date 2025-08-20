@@ -6,16 +6,15 @@
 #include "../interface.h"
 
 
-KeyVal TEMPO_MENU_TRIG_SET[TRIG_NUM_TYPES];
-void TEMPO_TrigFuncPass(TrigPara);
-void TEMPO_TrigFuncForward(TrigPara);
-void TEMPO_TrigFuncBackward(TrigPara);
-void TEMPO_TrigFuncClear(TrigPara);
-void TEMPO_TrigFuncKnob(TrigPara);
+KeyVal TEMPO_MENU_TRIG_SET[];
+void TEMPO_TrigFuncPass(char*);
+void TEMPO_TrigFuncForward(char*);
+void TEMPO_TrigFuncBackward(char*);
+void TEMPO_TrigFuncClear(char*);
+void TEMPO_TrigFuncKnob(char*);
 
 
-Trig* TEMPO_DeleteTrig(Trig* trig);
-Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig);
+
 
 
 #endif //JASMIN_MENU_STRUCT_TRIG_H

@@ -5,7 +5,7 @@
 #include "../func/func.h"
 
 
-typedef struct KeyVal {const char* key; void* val;} KeyVal;
+typedef struct KeyVal {char* key; void* val;} KeyVal;
 
 
 void* BASIC_GetValByKey(const KeyVal table[], const char* key);

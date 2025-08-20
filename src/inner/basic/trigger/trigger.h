@@ -1,27 +1,17 @@
 #ifndef TRIG_H
 #define TRIG_H
 
-
-union TrigPara {
-    char* pageName;
-};
-enum TrigType {
-    TRIG_TYPE_PASS,
-    TRIG_TYPE_FORWARD,
-    TRIG_TYPE_BACKWARD,
-    TRIG_TYPE_CLEAR,
-    TRIG_TYPE_KNOB,
-    TRIG_NUM_TYPES
-};
-typedef enum TrigType TrigType;
-typedef union TrigPara TrigPara;
-typedef void (*TrigFunc)(TrigPara);
+#include "../setting/setting.h"
+typedef void (*TrigFunc)(char*);
 struct Trig {
-    TrigType type;
     TrigFunc func;
-    TrigPara para;
+    char* para;
 };
 typedef struct Trig Trig;
+
+
+Trig* TEMPO_DeleteTrig(Trig* trig);
+Trig* TEMPO_CreateTrig(const toml_table_t* tomlTrig);
 
 
 #endif //TRIG_H

@@ -1,60 +1,46 @@
 #include "../trig/trig.h"
 
 
-KeyVal TEMPO_MENU_TRIG_SET[TRIG_NUM_TYPES] = {
-    [TRIG_TYPE_PASS] = {"pass", TEMPO_TrigFuncPass},
-    [TRIG_TYPE_FORWARD] = {"forward", TEMPO_TrigFuncForward},
-    [TRIG_TYPE_BACKWARD] = {"backward", TEMPO_TrigFuncBackward},
-    [TRIG_TYPE_CLEAR] = {"clear", TEMPO_TrigFuncClear},
-    [TRIG_TYPE_KNOB] = {"knob", NULL},
+KeyVal TEMPO_MENU_TRIG_SET[] = {
+    {"pass", TEMPO_TrigFuncPass},
+    {"forward", TEMPO_TrigFuncForward},
+    {"backward", TEMPO_TrigFuncBackward},
+    {"clear", TEMPO_TrigFuncClear},
+    {"knob", NULL},
+    {NULL, NULL}
 };
-
-
-TrigType TRIG_GetTypeFromName(const char* name) {
-    for (int i = 0; i < TRIG_NUM_TYPES; i++) {
-        if (strcmp(name, TEMPO_MENU_TRIG_SET[i].key) == 0) {
-            return i;
-        }
-    }
-    return 0;
-}
-
 
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateTrig_RK(Trig* trig, const toml_table_t* tomlTrig) {
+    memset(trig, 0, sizeof(Trig));
+
     const toml_datum_t tomlFuncName = toml_string_in(tomlTrig, "func");
     if (tomlFuncName.ok == false) {
         printf("%s: tomlFuncName.ok == false.\n", __func__);
         return false;
     } // Req Condition
 
-    trig->type = TRIG_GetTypeFromName(tomlFuncName.u.s);
-    trig->func = TEMPO_MENU_TRIG_SET[trig->type].val;
+    trig->func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, tomlFuncName.u.s);
     if (trig->func == NULL) {
         printf("%s: func == NULL.\n", __func__);
         return false;
     } // Req Condition
 
-    switch (trig->type) {
-        case TRIG_TYPE_PASS: {break;}
-        case TRIG_TYPE_FORWARD: {
-            const toml_datum_t tomlPara = toml_string_in(tomlTrig, "para");
-            if (tomlPara.ok == false) {
-                printf("%s: tomlPara.ok == false.\n", __func__);
-                return false;
-            } // Req Condition
+    if (toml_string_in(tomlTrig, "para").ok) {
+        const toml_datum_t tomlPara = toml_string_in(tomlTrig, "para");
+        if (tomlPara.ok == false) {
+            printf("%s: tomlPara.ok == false.\n", __func__);
+            return false;
+        } // Req Condition
 
-            trig->para.pageName = strdup(tomlPara.u.s);
-            if (trig->para.pageName == NULL) {
-                printf("%s: para == NULL.\n", __func__);
-                return false;
-            } // Req Condition
-
-            break;
-        }
-        default: break;
+        trig->para = strdup(tomlPara.u.s);
+        if (trig->para == NULL) {
+            printf("%s: para == NULL.\n", __func__);
+            return false;
+        } // Req Condition
     }
+
     return true;
 }
 Trig* TEMPO_DeleteTrig(Trig* trig) {
@@ -62,16 +48,10 @@ Trig* TEMPO_DeleteTrig(Trig* trig) {
         return trig;
     } // Opt Condition
 
-    switch (trig->type) {
-        case TRIG_TYPE_FORWARD: {
-            if (trig->para.pageName != NULL) {
-                free(trig->para.pageName);
-                trig->para.pageName = NULL;
-            } // Opt Condition
-            break;
-        }
-        default: break;
-    }
+    if (trig->para != NULL) {
+        free(trig->para);
+        trig->para = NULL;
+    } // Opt Condition
 
     trig->func = NULL;
     free(trig);

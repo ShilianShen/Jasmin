@@ -39,20 +39,28 @@ static void TEMPO_LoadMenuPageSet() {
     } // Req Condition
 
     for (int i = 0; toml_key_in(tomlPageSet, i) != NULL; i++) {
-        menu.lenPageSet = i;
+        menu.lenPageTable = i + 1;
     }
-    if (menu.lenPageSet == 0) {
+    if (menu.lenPageTable == 0) {
         printf("%s: menu.lenPageSet == 0.\n", __func__);
         return;
     } // Req Condition
 
-    menu.pageSet = calloc(menu.lenPageSet, sizeof(Page*));
-    if (menu.pageSet == NULL) {
+    menu.pageTable = calloc(menu.lenPageTable, sizeof(KeyVal));
+    if (menu.pageTable == NULL) {
         printf("%s: menu.pageSet == NULL.\n", __func__);
         return;
     }
 
-    for (int i = 0; i < menu.lenPageSet; i++) {
+    for (int i = 0; i < menu.lenPageTable; i++) {
+        const char* key = toml_key_in(tomlPageSet, i);
+        menu.pageTable[i].key = strdup(key);
+        if (menu.pageTable[i].key == NULL) {
+            return;
+        }
+    }
+
+    for (int i = 0; i < menu.lenPageTable; i++) {
         const char* key = toml_key_in(tomlPageSet, i);
         const toml_table_t* tomlPage = toml_table_in(tomlPageSet, key);
         if (tomlPage == NULL) {
@@ -60,13 +68,12 @@ static void TEMPO_LoadMenuPageSet() {
             return;
         } // Req Condition
 
-
-        menu.pageSet[i] = TEMPO_CreatePage(key, tomlPage);
+        menu.pageTable[i].val = TEMPO_CreatePage(key, tomlPage);
         if (strcmp(key, MENU_ROOT_NAME) == 0) {
-            menu.pageRoot = menu.pageSet[i];
+            menu.pageRoot = menu.pageTable[i].val;
         }
         if (strcmp(key, MENU_EDGE_NAME) == 0) {
-            menu.pageEdge = menu.pageSet[i];
+            menu.pageEdge = menu.pageTable[i].val;
         }
     }
 
@@ -78,8 +85,10 @@ void TEMPO_LoadMenu() {
     TEMPO_LoadMenuPageSet();
 }
 void TEMPO_UnloadMenu() {
-    for (int i = 0; i < menu.lenPageSet; i++) {
-        menu.pageSet[i] = TEMPO_DeletePage(menu.pageSet[i]);
+    for (int i = 0; i < menu.lenPageTable; i++) {
+        free(menu.pageTable[i].key);
+        menu.pageTable[i].key = NULL;
+        menu.pageTable[i].val = TEMPO_DeletePage(menu.pageTable[i].val);
     }
 }
 
@@ -88,17 +97,17 @@ void TEMPO_UnloadMenu() {
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("tempo.path: /%s", TEMPO_GetPageName(menu.pageRoot));
+    DEBUG_SendMessageL("tempo.path: /%s", BASIC_GetKeyByVal(menu.pageTable, menu.pageRoot));
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear)
             menu.path[i] = NULL;
         else if (menu.path[i] == NULL)
             need_clear = true;
         else
-            DEBUG_SendMessageL("/%s", TEMPO_GetPageName(menu.path[i]));
+            DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.pageTable, menu.path[i]));
     }
     if (need_clear == false) {
-        DEBUG_SendMessageL("/%s", TEMPO_GetPageName(menu.pageEdge));
+        DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.pageTable, menu.pageEdge));
     }
     DEBUG_SendMessageL("\n");
 }
@@ -132,26 +141,26 @@ void TEMPO_DrawMenu() {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncPass(TrigPara para) {}
-void TEMPO_TrigFuncForward(TrigPara para) {
-    const char* pageName = para.pageName;
+void TEMPO_TrigFuncPass(char* para) {}
+void TEMPO_TrigFuncForward(char* para) {
+    const char* pageName = para;
     // getPageId
     int pageId = 0;
-    for (int i = 0; i < menu.lenPageSet; i++) {
-        if (menu.pageSet[i] == NULL) {continue;}
-        if (strcmp(TEMPO_GetPageName(menu.pageSet[i]), pageName) == 0) {pageId = i;}
+    for (int i = 0; i < menu.lenPageTable; i++) {
+        if (menu.pageTable[i].val == NULL) {continue;}
+        if (strcmp(menu.pageTable[i].key, pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 
     // forward
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (menu.path[i] == 0) {
-            menu.path[i] = menu.pageSet[pageId];
+            menu.path[i] = menu.pageTable[pageId].val;
             break;
         }
     }
 }
-void TEMPO_TrigFuncBackward(TrigPara para) {
+void TEMPO_TrigFuncBackward(char* para) {
     for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -159,9 +168,9 @@ void TEMPO_TrigFuncBackward(TrigPara para) {
         }
     }
 }
-void TEMPO_TrigFuncClear(TrigPara para) {
+void TEMPO_TrigFuncClear(char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
-void TEMPO_TrigFuncKnob(TrigPara para) {
+void TEMPO_TrigFuncKnob(char* para) {
 
 }
