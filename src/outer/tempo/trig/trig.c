@@ -6,6 +6,6 @@ KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"forward", TEMPO_TrigFuncForward},
     {"backward", TEMPO_TrigFuncBackward},
     {"clear", TEMPO_TrigFuncClear},
-    {"knob", NULL},
+    {"switch", TEMPO_TrigFuncSwitch},
     {NULL, NULL}
 };

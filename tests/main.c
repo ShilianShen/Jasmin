@@ -3,12 +3,19 @@
 
 int test_int = 10;
 float test_float = 10.5f;
+bool test_bool = true;
+
+
 const KeyVal TEMPO_TABLE_INT[] = {
     {"test_int", &test_int},
     {NULL, NULL}
 };
 const KeyVal TEMPO_TABLE_FLOAT[] = {
     {"test_float", &test_float},
+    {NULL, NULL}
+};
+const KeyVal TEMPO_TABLE_BOOL[] = {
+    {"test_bool", &test_bool},
     {NULL, NULL}
 };
 
@@ -72,7 +79,7 @@ int main(int argc, char *argv[]) {
             }
         }
         RENEW();
-        DEBUG_SendMessageR("%d, %f\n", test_int, test_float);
+        DEBUG_SendMessageR("%d, %f, %d\n", test_int, test_float, test_bool);
         DRAW();
         // SDL_GPUShader* shader = SDL_CreateGPUShader();
     }

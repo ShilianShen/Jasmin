@@ -11,7 +11,7 @@ void TEMPO_Unload() {
     TEMPO_UnloadBasic();
 }
 void TEMPO_Renew() {
-    static bool reload = true;
+    static bool reload = !true;
     if (reload == true) {
         DEBUG_SendMessageL("reload = true\n");
         TEMPO_Unload();

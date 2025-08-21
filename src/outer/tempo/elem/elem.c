@@ -6,7 +6,7 @@ union ElemInfo {
     char* string;
     struct SlidI {int min, max, *now;} slidI;
     struct SlidF {float min, max, *now;} slidF;
-    struct Switch {bool now;} switch_;
+    struct Switch {bool* now;} switch_;
 };
 
 
@@ -180,11 +180,17 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             break;
         }
         case ELEM_TYPE_SWITCH: {
-            if (toml_bool_in(tomlElem, key).ok == false) {
+            if (toml_string_in(tomlElem, key).ok == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-            elem->info.switch_.now = toml_bool_in(tomlElem, key).u.b;
+            elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, toml_string_in(tomlElem, key).u.s);
+            const TrigFunc func = TEMPO_TrigFuncSwitch;
+            elem->trig = CreateTrig(func, toml_string_in(tomlElem, key).u.s);
+            if (elem->trig == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
             break;
         }
         default: break;
@@ -369,7 +375,7 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
         case ELEM_TYPE_SWITCH: {
             const float A = 4, B = 4, C = 48, D = 48;
             const float M = 1;
-            const float N = elem->info.switch_.now;
+            const float N = *elem->info.switch_.now;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
             elem->src = (SDL_FRect){0, 0, W, H};
@@ -493,4 +499,12 @@ bool TEMPO_DrawElem(const Elem *elem) {
         return false;
     }
     return true;
+}
+
+
+void TEMPO_TrigFuncSwitch(const char* key) {
+    bool* val = BASIC_GetValByKey(TEMPO_TABLE_BOOL, key);
+    if (val != NULL) {
+        *val = !*val;
+    }
 }

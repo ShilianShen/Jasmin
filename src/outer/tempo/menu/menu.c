@@ -143,7 +143,7 @@ void TEMPO_DrawMenu() {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncPass(char* para) {}
+void TEMPO_TrigFuncPass(const char* para) {}
 void TEMPO_TrigFuncForward(const char* para) {
     if (para == NULL) {
         printf("%s: para == NULL.\n", __func__);
@@ -166,7 +166,7 @@ void TEMPO_TrigFuncForward(const char* para) {
         }
     }
 }
-void TEMPO_TrigFuncBackward(char* para) {
+void TEMPO_TrigFuncBackward(const char* para) {
     for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -174,9 +174,6 @@ void TEMPO_TrigFuncBackward(char* para) {
         }
     }
 }
-void TEMPO_TrigFuncClear(char* para) {
+void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
-}
-void TEMPO_TrigFuncKnob(char* para) {
-
 }

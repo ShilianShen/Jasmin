@@ -2,7 +2,7 @@
 #define TRIG_H
 
 #include "../setting/setting.h"
-typedef void (*TrigFunc)(char*);
+typedef void (*TrigFunc)(const char*);
 struct Trig {
     TrigFunc func;
     char* para;
@@ -12,7 +12,7 @@ typedef struct Trig Trig;
 
 
 void PullTrig(const Trig* trig);
-Trig* CreateTrig(const TrigFunc func, const char* para);
+Trig* CreateTrig(TrigFunc func, const char* para);
 Trig* DeleteTrig(Trig *trig);
 
 
