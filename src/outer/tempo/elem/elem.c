@@ -48,7 +48,7 @@ struct Elem {
     SDL_FRect gid;
     SDL_FRect src;
 
-    Trig trig;
+    Trig* trig;
 
     SDL_Texture* tex;
 
@@ -202,18 +202,29 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
     else {
         elem->gid = (SDL_FRect){0, 0, 1, 1};
     }
-    if (toml_string_in(tomlElem, key = "func").ok) {
-        elem->trig.func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, toml_string_in(tomlElem, key).u.s);
-        if (elem->trig.func == NULL) {
-            printf("%s: elem->trig.func == NULL, %s.\n", __func__, key);
-            return false;
+    {
+        TrigFunc func = NULL;
+        const char* para = NULL;
+        if (toml_string_in(tomlElem, key = "func").ok) {
+            func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, toml_string_in(tomlElem, key).u.s);
+            if (func == NULL) {
+                printf("%s: func == NULL, %s.\n", __func__, key);
+                return false;
+            }
+        } // func
+        if (toml_string_in(tomlElem, key = "para").ok) {
+            para = toml_string_in(tomlElem, key).u.s;
+            if (para == NULL) {
+                printf("%s: para == NULL, %s.\n", __func__, key);
+                return false;
+            }
         }
-    } // func
-    if (toml_string_in(tomlElem, key = "para").ok) {
-        elem->trig.para = strdup(toml_string_in(tomlElem, key).u.s);
-        if (elem->trig.para == NULL) {
-            printf("%s: elem->trig.para == NULL, %s.\n", __func__, key);
-            return false;
+        if (func != NULL) {
+            elem->trig = CreateTrig(func, para);
+            if (elem->trig == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
         }
     }
     if (toml_array_in(tomlElem, key = "src") != NULL) {
@@ -253,9 +264,8 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         }
         default: break;
     }
-    if (elem->trig.para != NULL) {
-        free(elem->trig.para);
-        elem->trig.para = NULL;
+    if (elem->trig != NULL) {
+        elem->trig = DeleteTrig(elem->trig);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -404,14 +414,14 @@ static bool TEMPO_RenewElemState(const Elem* elem) {
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
 
     if (mouseLeftIn && mouseIn) {
-        DEVICE_SetMouseLeftTrig(&elem->trig);
+        DEVICE_SetMouseLeftTrig(elem->trig);
     }
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
-        if (elem->trig.func != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig.func), elem->trig.para);
+        if (elem->trig != NULL) {
+            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
         }
     }
     if (mouseLeftIn) {

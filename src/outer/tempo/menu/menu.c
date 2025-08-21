@@ -144,7 +144,11 @@ void TEMPO_DrawMenu() {
 
 // TRIG ================================================================================================================
 void TEMPO_TrigFuncPass(char* para) {}
-void TEMPO_TrigFuncForward(char* para) {
+void TEMPO_TrigFuncForward(const char* para) {
+    if (para == NULL) {
+        printf("%s: para == NULL.\n", __func__);
+        return;
+    }
     const char* pageName = para;
     // getPageId
     int pageId = 0;

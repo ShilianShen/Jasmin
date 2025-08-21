@@ -8,7 +8,7 @@
 
 extern KeyVal TEMPO_MENU_TRIG_SET[];
 void TEMPO_TrigFuncPass(char*);
-void TEMPO_TrigFuncForward(char*);
+void TEMPO_TrigFuncForward(const char*);
 void TEMPO_TrigFuncBackward(char*);
 void TEMPO_TrigFuncClear(char*);
 void TEMPO_TrigFuncKnob(char*);

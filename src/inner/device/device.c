@@ -6,11 +6,12 @@ struct Mouse {
     // left
     bool left_pressed;
     float left_x, left_y;
-    const Trig* left_trig;
+    Trig* left_trig;
     // right
     bool right_pressed;
     float right_x, right_y;
-} mouse;
+};
+struct Mouse mouse = {0};
 
 
 void DEVICE_RenewMouse() {
@@ -61,8 +62,14 @@ bool DEVICE_MouseLeftInRect(const SDL_FRect* rect) {
         rect->y <= mouse.left_y && mouse.left_y < rect->y + rect->h
         );
 }
-void DEVICE_SetMouseLeftTrig(const Trig* trig) {
-    mouse.left_trig = trig;
+void DEVICE_SetMouseLeftTrig(const Trig *trig) {
+    if (trig == NULL) {
+        return;
+    }
+    if (mouse.left_trig != NULL) {
+        mouse.left_trig = DeleteTrig(mouse.left_trig);
+    }
+    mouse.left_trig = CreateTrig(trig->func, trig->para);
 }
 SDL_FPoint DEVICE_GetMousePos() {
     const SDL_FPoint point = {mouse.x, mouse.y};

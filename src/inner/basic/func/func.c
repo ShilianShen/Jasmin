@@ -27,6 +27,7 @@ SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char*
     if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}
     if (font == NULL) {printf("%s: font[%p] not exists.\n", __func__, font); return NULL;}
     if (text == NULL) {printf("%s: text[%p] not exists.\n", __func__, text); return NULL;}
+    if (strlen(text) == 0) {return NULL;} // Opt
 
     // getSurface N-Condition
     SDL_Surface* surface = TTF_RenderText_Blended(font, text, 0, color);
@@ -47,34 +48,37 @@ SDL_Texture* TXT_LoadTextureWithLines(
     const SDL_Color colorBack,
     const char aligned
     ) {
-    // get text
-    char* text = strdup(scr_text);
 
-    // get num_lines (Opt Condition)
-    if (strlen(scr_text) == 0) { return NULL; }
+    if (strlen(scr_text) == 0) return NULL; // Opt Condition
+    int size_text = (int)strlen(scr_text) + 1;
+    char text[size_text];
+    strcpy(text, scr_text);
+
     int num_lines = 1;
-    for (int i = 0; text[i+1] != '\0'; i++) {
-        if (text[i] == '\n') { num_lines++; }
+    for (int i = 0; text[i] != '\0'; i++) {
+        if (text[i] == '\n') {
+            num_lines++;
+        }
     }
 
-    // get line_offsets
     int line_offsets[num_lines];
     line_offsets[0] = 0;
     for (int i = 0, j = 1; text[i] != '\0'; i++) {
         // i: index of char, j: index of line
         if (text[i] == '\n') {
-            line_offsets[j] = i+1;
+            line_offsets[j] = i + 1;
             text[i] = '\0';
             j++;
         }
     }
 
-    // get sub_textures (Req Condition)
     SDL_Texture* sub_textures[num_lines];
     for (int i = 0; i < num_lines; i++) {
-        sub_textures[i] = TXT_LoadTexture(renderer, font, text + line_offsets[i], colorText);  // malloc
+        const char* sub_text = text + line_offsets[i];
+        if (strlen(sub_text) == 0) continue;
+        sub_textures[i] = TXT_LoadTexture(renderer, font, sub_text, colorText);  // alloc
         if (sub_textures[i] == NULL) {
-            printf("%s: fail to create texture from \"%s\".\n", __func__, text + line_offsets[i]);
+            printf("%s: fail to create texture from \"%s\".\n", __func__, sub_text);
         }
     }
 
@@ -115,7 +119,6 @@ SDL_Texture* TXT_LoadTextureWithLines(
     }
 
     // end
-    free(text);
     for (int i = 0; i < num_lines; i++) {SDL_DestroyTexture(sub_textures[i]);}
     SDL_SetRenderTarget(renderer, NULL);
 
