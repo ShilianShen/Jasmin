@@ -2,21 +2,10 @@
 #define JASMIN_MENU_STRUCT_ELEM_H
 
 
-#include "../trig/trig.h"
 #include "../basic/basic.h"
 
 
 typedef struct Elem Elem;
-typedef enum ElemType ElemType;
-typedef union ElemInfo ElemInfo;
-
-extern const char* ELEM_TYPE_STRING_SET[];
-ElemType TEMPO_GetElemTypeFromString(const char* string);
-
-
-
-bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);
-bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect);
 
 
 Elem* TEMPO_CreateElem(const toml_table_t *tomlElem);

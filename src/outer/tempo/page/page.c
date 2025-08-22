@@ -2,24 +2,16 @@
 
 // PAGE ================================================================================================================
 struct Page {
-    char* name;
     int lenElemSet;
     Elem** elemSet;
 };
 
 
 // CREATE & DELETE =====================================================================================================
-static bool TEMPO_CreatePage_RK(Page* page, const char *name, const toml_table_t* tomlPage) {
+static bool TEMPO_CreatePage_RK(Page* page, const toml_table_t* tomlPage) {
     memset(page, 0, sizeof(Page));
 
     const char* key;
-    if (name != NULL) {
-        page->name = strdup(name);
-        if (page->name == NULL) {
-            printf("%s: failed malloc page.name, %s.\n", __func__, name);
-            return false;
-        }
-    } // name
     if (toml_array_in(tomlPage, key = "elemSet") != NULL) {
         const toml_array_t* tomlElemSet = toml_array_in(tomlPage, key);
         if (tomlElemSet == NULL) {
@@ -62,10 +54,6 @@ static bool TEMPO_CreatePage_CK(const Page* page) {
 }
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
-        if (page->name != NULL) {
-            free(page->name);
-            page->name = NULL;
-        }
         if (page->elemSet != NULL) {
             for (int i = 0; i < page->lenElemSet; i++) {
                 if (page->elemSet[i] != NULL) {
@@ -80,7 +68,7 @@ Page* TEMPO_DeletePage(Page* page) {
     }
     return page;
 }
-Page* TEMPO_CreatePage(const char *name, const toml_table_t* tomlPage) {
+Page* TEMPO_CreatePage(const toml_table_t* tomlPage) {
     if (tomlPage == NULL) {
         printf("%s: tomlPage == NULL.\n", __func__);
         return NULL;
@@ -90,7 +78,7 @@ Page* TEMPO_CreatePage(const char *name, const toml_table_t* tomlPage) {
         printf("%s: page == NULL.\n", __func__);
         return page;
     } // Req Condition
-    if (TEMPO_CreatePage_RK(page, name, tomlPage) == false || TEMPO_CreatePage_CK(page) == false) {
+    if (TEMPO_CreatePage_RK(page, tomlPage) == false || TEMPO_CreatePage_CK(page) == false) {
         printf("%s: RK or CK == false.\n", __func__);
         page = TEMPO_DeletePage(page);
     } // Req Condition
@@ -127,6 +115,8 @@ bool TEMPO_DrawPage(const Page* page) {
     }
 
     //
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
+    SDL_RenderClear(renderer);
     for (int i = 0; i < page->lenElemSet; i++) {
         const bool draw = TEMPO_DrawElem(page->elemSet[i]);
         if (draw == false) {

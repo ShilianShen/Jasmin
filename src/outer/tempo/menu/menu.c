@@ -3,7 +3,19 @@
 
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
-static const char* tomlPath = "../config/menu.toml";
+#define MENU_PATH_VOLUME 6
+struct Menu {
+    // malloc in INIT
+    int lenPageTable;
+    KeyVal* pageTable;
+    Page* pageRoot;
+    Page* pageEdge;
+
+    // path
+    Page* path[MENU_PATH_VOLUME];
+    Page* pageNow;
+};
+typedef struct Menu Menu;
 
 
 // MENU TRIG TYPE ======================================================================================================
@@ -68,7 +80,7 @@ static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
             return false;
         } // Req Condition
 
-        menu.pageTable[i].val = TEMPO_CreatePage(key, tomlPage);
+        menu.pageTable[i].val = TEMPO_CreatePage(tomlPage);
         if (strcmp(key, MENU_ROOT_NAME) == 0) {
             menu.pageRoot = menu.pageTable[i].val;
         }
@@ -82,7 +94,7 @@ static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
 }
 void TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
-    toml_table_t* tomlPageSet = getToml(tomlPath);
+    toml_table_t* tomlPageSet = getToml(MENU_TOML);
     TEMPO_LoadMenuPageSet(tomlPageSet);
     toml_free(tomlPageSet); // end malloc
 }
@@ -132,13 +144,35 @@ static void TEMPO_RenewMenuPageNow() {
 void TEMPO_RenewMenu() {
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
-    TEMPO_RenewPage(menu.pageNow);
+
+    if (menu.path[0] == NULL) {
+        TEMPO_RenewPage(menu.pageRoot);
+    }
+    else if (menu.path[MENU_PATH_VOLUME-1] != NULL) {
+        TEMPO_RenewPage(menu.pageEdge);
+    }
+    else {
+        for (int i = 0; menu.path[i] != NULL; i++) {
+            TEMPO_RenewPage(menu.path[i]);
+        }
+    }
 }
 
 
 // DRAW ================================================================================================================
 void TEMPO_DrawMenu() {
-    TEMPO_DrawPage(menu.pageNow);
+
+    if (menu.path[0] == NULL) {
+        TEMPO_DrawPage(menu.pageRoot);
+    }
+    else if (menu.path[MENU_PATH_VOLUME-1] != NULL) {
+        TEMPO_DrawPage(menu.pageEdge);
+    }
+    else {
+        for (int i = 0; menu.path[i] != NULL; i++) {
+            TEMPO_DrawPage(menu.path[i]);
+        }
+    }
 }
 
 

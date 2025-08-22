@@ -1,5 +1,7 @@
 #include "elem.h"
 
+typedef enum ElemType ElemType;
+typedef union ElemInfo ElemInfo;
 
 // ELEM INFO ===========================================================================================================
 union ElemInfo {
@@ -28,7 +30,7 @@ const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_SLID_I] = "SLID_I",
     [ELEM_TYPE_SWITCH] = "SWITCH",
 };
-ElemType TEMPO_GetElemTypeFromString(const char* string) {
+static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
         if (strcmp(string, ELEM_TYPE_STRING_SET[i]) == 0) {
             return i;
@@ -58,7 +60,7 @@ struct Elem {
 
 
 // SET & GET ===========================================================================================================
-bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
+static bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return false;
@@ -66,7 +68,7 @@ bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
     elem->dst = dst_rect;
     return true;
 }
-bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
+static bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return false;
@@ -410,7 +412,7 @@ static bool TEMPO_RenewElemDstRect(Elem *elem) {
         elem->tex,
         &elem->src,
         &elem->gid,
-        &basic.bck,
+        NULL,
         elem->anchor
         );
     return result;

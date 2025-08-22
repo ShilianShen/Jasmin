@@ -6,21 +6,26 @@
 
 
 typedef struct Basic Basic;
-struct Basic {
+extern struct Basic {
     SDL_Renderer* renderer;
     TTF_Font* font; // malloc
-    SDL_FRect bck;
-};
-extern Basic basic;
+} basic;
 
 
 void TEMPO_SetBasicRenderer(SDL_Renderer*);
 void TEMPO_SetBasicFont(TTF_Font*);
-void TEMPO_SetBasicBckRect(SDL_FRect);
 
 
 bool TEMPO_LoadBasic();
 void TEMPO_UnloadBasic();
+
+
+extern KeyVal TEMPO_MENU_TRIG_SET[];
+void TEMPO_TrigFuncPass(const char*);
+void TEMPO_TrigFuncForward(const char*);
+void TEMPO_TrigFuncBackward(const char*);
+void TEMPO_TrigFuncClear(const char*);
+void TEMPO_TrigFuncSwitch(const char*);
 
 
 #endif //TEMPO_BASIC_H

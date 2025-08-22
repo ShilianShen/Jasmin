@@ -3,7 +3,6 @@
 
 // BASIC ===============================================================================================================
 Basic basic = (Basic){0};
-static const char* BASIC_TOML = "../config/tempo_basic.toml";
 
 
 // GET & SET ===========================================================================================================
@@ -20,9 +19,6 @@ void TEMPO_SetBasicFont(TTF_Font* font) {
         return;
     } // Req Condition
     basic.font = font;
-}
-void TEMPO_SetBasicBckRect(const SDL_FRect bck_rect) {
-    basic.bck = bck_rect;
 }
 
 
@@ -57,3 +53,13 @@ void TEMPO_UnloadBasic() {
         basic.font = NULL;
     } // Opt Condition
 }
+
+
+KeyVal TEMPO_MENU_TRIG_SET[] = {
+    {"pass", TEMPO_TrigFuncPass},
+    {"forward", TEMPO_TrigFuncForward},
+    {"backward", TEMPO_TrigFuncBackward},
+    {"clear", TEMPO_TrigFuncClear},
+    {"switch", TEMPO_TrigFuncSwitch},
+    {NULL, NULL}
+};

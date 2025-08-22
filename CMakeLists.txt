@@ -24,7 +24,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/debug/debug.h
         src/inner/basic/setting/setting.h
         src/third_party/toml/toml.c
-        src/outer/tempo/trig/trig.h
         src/outer/tempo/elem/elem.h
         src/outer/tempo/page/page.h
         src/inner/basic/basic.h
@@ -37,7 +36,6 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/outer/tempo/interface.h
         src/outer/tempo/tempo.c
         src/outer/tempo/page/page.c
-        src/outer/tempo/trig/trig.c
         src/inner/basic/interface.h
         src/outer/tempo/menu/menu.c
         src/outer/tempo/menu/menu.h

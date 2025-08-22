@@ -6,6 +6,7 @@ float test_float = 10.5f;
 bool test_bool = true;
 
 
+
 const KeyVal TEMPO_TABLE_INT[] = {
     {"test_int", &test_int},
     {NULL, NULL}
@@ -44,7 +45,6 @@ static void RENEW() {
 
     // logical renew
     const SDL_FRect bck_rect = {0, 0, (float)windowWidth, (float)windowHeight};
-    TEMPO_SetBasicBckRect(bck_rect);
 
     TEMPO_Renew();
 }
@@ -53,7 +53,6 @@ static void DRAW() {
     SDL_SetRenderSDLColor(renderer, COLOR_CLEAR);
     SDL_RenderClear(renderer);
     TEMPO_Draw();
-
 
     // physical draw
     DEVICE_DrawMouse(renderer);

@@ -1,6 +1,7 @@
 #include "device.h"
 
 
+
 struct Mouse {
     float x, y;
     // left
@@ -17,12 +18,10 @@ struct Mouse mouse = {0};
 void DEVICE_RenewMouse() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
 
-
     if (mouse.left_trig != NULL && mouse.left_pressed == true && (buttons & SDL_BUTTON_LMASK) == false) {
         PullTrig(mouse.left_trig);
     }
     mouse.left_trig = NULL;
-
 
     mouse.x *= scale_x;
     mouse.y *= scale_y;
@@ -71,10 +70,15 @@ void DEVICE_SetMouseLeftTrig(const Trig *trig) {
     }
     mouse.left_trig = CreateTrig(trig->func, trig->para);
 }
+
+
+
 SDL_FPoint DEVICE_GetMousePos() {
     const SDL_FPoint point = {mouse.x, mouse.y};
     return point;
 }
+
+
 
 
 struct Keyboard {} keyboard;

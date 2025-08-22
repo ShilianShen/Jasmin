@@ -5,24 +5,6 @@
 #include "../page/page.h"
 
 
-#define MENU_PATH_VOLUME 6
-
-
-struct Menu {
-    // malloc in INIT
-    int lenPageTable;
-    KeyVal* pageTable;
-    Page* pageRoot;
-    Page* pageEdge;
-
-    // path
-    Page* path[MENU_PATH_VOLUME];
-    Page* pageNow;
-};
-typedef struct Menu Menu;
-extern Menu menu;
-
-
 void TEMPO_LoadMenu();
 void TEMPO_UnloadMenu();
 void TEMPO_RenewMenu();
