@@ -6,7 +6,6 @@ float test_float = 10.5f;
 bool test_bool = true;
 
 
-
 const KeyVal TEMPO_TABLE_INT[] = {
     {"test_int", &test_int},
     {NULL, NULL}
@@ -25,7 +24,7 @@ static void INIT() {
     BASIC_Init();
     DEBUG_Init(renderer);
     TEMPO_SetBasicRenderer(renderer);
-    background = IMG_LoadTexture(renderer, "../images/Webb's_First_Deep_Field.jpg");
+
 }
 static void DEINIT() {
     BASIC_Deinit();

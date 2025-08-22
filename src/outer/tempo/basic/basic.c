@@ -11,7 +11,6 @@ void TEMPO_SetBasicRenderer(SDL_Renderer* renderer) {
         printf("%s: renderer not exists.\n", __func__);
         return;
     } // Req Condition
-    basic.renderer = basic.renderer = renderer;
 }
 void TEMPO_SetBasicFont(TTF_Font* font) {
     if (font == NULL) {
@@ -24,7 +23,7 @@ void TEMPO_SetBasicFont(TTF_Font* font) {
 
 // LOAD & UNLOAD =======================================================================================================
 bool TEMPO_LoadBasic() {
-    if (basic.renderer == NULL) {
+    if (renderer == NULL) {
         printf("%s: renderer not exists.\n", __func__);
         return false;
     } // Req Condition

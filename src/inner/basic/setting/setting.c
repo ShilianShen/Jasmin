@@ -1,6 +1,9 @@
 #include "setting.h"
 
 
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+
 
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
@@ -29,7 +32,6 @@ void BASIC_Init() {
     }
 }
 void BASIC_Deinit() {
-    SDL_DestroyTexture(background);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }

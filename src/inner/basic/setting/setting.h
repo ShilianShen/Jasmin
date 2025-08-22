@@ -6,9 +6,8 @@
 #include "../interface.h"
 
 
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Texture* background;
+extern SDL_Window* window;
+extern SDL_Renderer* renderer;
 
 
 extern const char* WINDOW_TITLE;

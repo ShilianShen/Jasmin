@@ -7,7 +7,6 @@
 
 typedef struct Basic Basic;
 extern struct Basic {
-    SDL_Renderer* renderer;
     TTF_Font* font; // malloc
 } basic;
 

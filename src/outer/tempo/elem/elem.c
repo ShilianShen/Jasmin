@@ -83,7 +83,7 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
     SDL_Texture* texture = NULL;
     switch (type) {
         case ELEM_TYPE_FILE: {
-            texture = IMG_LoadTexture(basic.renderer, string);
+            texture = IMG_LoadTexture(renderer, string);
 
             if (texture == NULL) {
                 printf("%s: failed from \"%s\".\n", __func__, string);
@@ -94,7 +94,7 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
         }
         case ELEM_TYPE_TEXT: {
             texture = TXT_LoadTextureWithLines(
-                basic.renderer,
+                renderer,
                 basic.font,
                 string,
                 (SDL_Color){255, 255, 255, 255},
@@ -328,20 +328,20 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             elem->src = (SDL_FRect){0, 0, W, H};
             elem->gid.w = elem->gid.h = 1;
             elem->tex = SDL_CreateTexture(
-                basic.renderer,
+                renderer,
                 SDL_PIXELFORMAT_RGBA8888,
                 SDL_TEXTUREACCESS_TARGET,
                 (int)W, (int)H);
-            SDL_SetRenderTarget(basic.renderer, elem->tex);
+            SDL_SetRenderTarget(renderer, elem->tex);
             {
-                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
                 const SDL_FRect frame[4] = {
                     (SDL_FRect){0, 0, W, A},
                     (SDL_FRect){0, 0, A, H},
                     (SDL_FRect){0, H - A, W, A},
                     (SDL_FRect){W - A, 0, A, H},
                 };
-                SDL_RenderFillRects(basic.renderer, frame, 4);
+                SDL_RenderFillRects(renderer, frame, 4);
             }
             if (elem->type == ELEM_TYPE_SLID_I) {
                 if (elem->info.slidI.now != NULL) {
@@ -353,25 +353,25 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
                         rects[i].w = C;
                         rects[i].h = D;
                     }
-                    SDL_RenderFillRects(basic.renderer, rects, N);
+                    SDL_RenderFillRects(renderer, rects, N);
                 }
                 else {
-                    SDL_RenderLine(basic.renderer, 0, 0, W, H);
-                    SDL_RenderLine(basic.renderer, W, 0, 0, H);
+                    SDL_RenderLine(renderer, 0, 0, W, H);
+                    SDL_RenderLine(renderer, W, 0, 0, H);
                 }
             }
             if (elem->type == ELEM_TYPE_SLID_F) {
                 if (elem->info.slidF.now != NULL) {
                     const float N = *elem->info.slidF.now - elem->info.slidF.min;
                     const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
-                    SDL_RenderFillRect(basic.renderer, &rect);
+                    SDL_RenderFillRect(renderer, &rect);
                 }
                 else {
-                    SDL_RenderLine(basic.renderer, 0, 0, W, H);
-                    SDL_RenderLine(basic.renderer, W, 0, 0, H);
+                    SDL_RenderLine(renderer, 0, 0, W, H);
+                    SDL_RenderLine(renderer, W, 0, 0, H);
                 }
             }
-            SDL_SetRenderTarget(basic.renderer, NULL);
+            SDL_SetRenderTarget(renderer, NULL);
             break;
         }
         case ELEM_TYPE_SWITCH: {
@@ -383,13 +383,13 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             elem->src = (SDL_FRect){0, 0, W, H};
             elem->gid.w = elem->gid.h = 1;
             elem->tex = SDL_CreateTexture(
-                basic.renderer,
+                renderer,
                 SDL_PIXELFORMAT_RGBA8888,
                 SDL_TEXTUREACCESS_TARGET,
                 (int)W, (int)H);
-            SDL_SetRenderTarget(basic.renderer, elem->tex);
+            SDL_SetRenderTarget(renderer, elem->tex);
             {
-                SDL_SetRenderDrawColor(basic.renderer, 255, 255, 200, 255);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
                 const SDL_FRect frame[5] = {
                     (SDL_FRect){0, 0, W, A},
                     (SDL_FRect){0, 0, A, H},
@@ -397,9 +397,9 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
                     (SDL_FRect){W - A, 0, A, H},
                     (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
                 };
-                SDL_RenderFillRects(basic.renderer, frame, 5);
+                SDL_RenderFillRects(renderer, frame, 5);
             }
-            SDL_SetRenderTarget(basic.renderer, NULL);
+            SDL_SetRenderTarget(renderer, NULL);
             break;
         }
         default: break;
@@ -484,7 +484,7 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
     if (mouseLeftIn) {
         DEBUG_FillRect(&elem->dst);
     }
-    SDL_RenderTexture(basic.renderer, elem->tex, &elem->src, &elem->dst);
+    SDL_RenderTexture(renderer, elem->tex, &elem->src, &elem->dst);
     if (mouseIn || mouseLeftIn) {
         DEBUG_DrawRect(&elem->dst);
     }
@@ -492,7 +492,7 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
 }
 bool TEMPO_DrawElem(const Elem *elem) {
     // Req Condition
-    if (basic.renderer == NULL) {
+    if (renderer == NULL) {
         DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
@@ -504,6 +504,7 @@ bool TEMPO_DrawElem(const Elem *elem) {
 }
 
 
+// TRIG ================================================================================================================
 void TEMPO_TrigFuncSwitch(const char* key) {
     bool* val = BASIC_GetValByKey(TEMPO_TABLE_BOOL, key);
     if (val != NULL) {
