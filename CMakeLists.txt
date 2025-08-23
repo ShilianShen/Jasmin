@@ -39,8 +39,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/interface.h
         src/outer/tempo/menu/menu.c
         src/outer/tempo/menu/menu.h
-        src/outer/tempo/basic/basic.c
-        src/outer/tempo/basic/basic.h
+        src/outer/tempo/theme/theme.c
+        src/outer/tempo/theme/theme.h
         include/jasmin/jasmin.h
         include/jasmin/tempo.h
         include/jasmin/basic.h

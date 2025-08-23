@@ -23,8 +23,6 @@ const KeyVal TEMPO_TABLE_BOOL[] = {
 static void INIT() {
     BASIC_Init();
     DEBUG_Init(renderer);
-    TEMPO_SetBasicRenderer(renderer);
-
 }
 static void DEINIT() {
     BASIC_Deinit();

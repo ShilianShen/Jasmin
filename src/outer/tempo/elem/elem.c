@@ -95,7 +95,7 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
         case ELEM_TYPE_TEXT: {
             texture = TXT_LoadTextureWithLines(
                 renderer,
-                basic.font,
+                theme.font,
                 string,
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,

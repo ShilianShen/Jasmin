@@ -1,14 +1,15 @@
+#include "menu/menu.h"
 #include "tempo.h"
 
 
 bool TEMPO_Load() {
-    TEMPO_LoadBasic();
+    TEMPO_LoadTheme();
     TEMPO_LoadMenu();
     return true;
 }
 void TEMPO_Unload() {
     TEMPO_UnloadMenu();
-    TEMPO_UnloadBasic();
+    TEMPO_UnloadTheme();
 }
 void TEMPO_Renew() {
     static bool reload = !true;

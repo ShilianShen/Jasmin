@@ -94,7 +94,7 @@ static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
 }
 void TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
-    toml_table_t* tomlPageSet = getToml(MENU_TOML);
+    toml_table_t* tomlPageSet = getToml(TEMPO_MENU_TOML);
     TEMPO_LoadMenuPageSet(tomlPageSet);
     toml_free(tomlPageSet); // end malloc
 }
@@ -177,8 +177,8 @@ void TEMPO_DrawMenu() {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncPass(const char* para) {}
-void TEMPO_TrigFuncForward(const char* para) {
+static void TEMPO_TrigFuncPass(const char* para) {}
+static void TEMPO_TrigFuncForward(const char* para) {
     if (para == NULL) {
         printf("%s: para == NULL.\n", __func__);
         return;
@@ -200,7 +200,7 @@ void TEMPO_TrigFuncForward(const char* para) {
         }
     }
 }
-void TEMPO_TrigFuncBackward(const char* para) {
+static void TEMPO_TrigFuncBackward(const char* para) {
     for (int i = MENU_PATH_VOLUME - 1; i >= 0; i--) {
         if (menu.path[i] != 0) {
             menu.path[i] = 0;
@@ -208,6 +208,14 @@ void TEMPO_TrigFuncBackward(const char* para) {
         }
     }
 }
-void TEMPO_TrigFuncClear(const char* para) {
+static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
+const KeyVal TEMPO_MENU_TRIG_SET[] = {
+    {"pass", TEMPO_TrigFuncPass},
+    {"forward", TEMPO_TrigFuncForward},
+    {"backward", TEMPO_TrigFuncBackward},
+    {"clear", TEMPO_TrigFuncClear},
+    {"switch", TEMPO_TrigFuncSwitch},
+    {NULL, NULL}
+};
