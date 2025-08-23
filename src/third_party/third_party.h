@@ -3,6 +3,7 @@
 
 
 #include "toml/toml.h"
+#include "cJSON-1.7.18/cJSON.h"
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>

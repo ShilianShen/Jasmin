@@ -6,6 +6,12 @@ project(jasmin C)
 set(CMAKE_C_STANDARD 99)
 
 
+# 强制设置编译标志，覆盖任何外部设置
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+
+
+
 # 添加可执行文件
 file(GLOB SCR_FILES
         "${PROJECT_SOURCE_DIR}/tests/*.h"

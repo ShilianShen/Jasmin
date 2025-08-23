@@ -1,0 +1,69 @@
+{
+  "pageSet": {
+    "Root": {
+      "elemSet": [
+        {"type": "FILE", "info": "../resources/images/491.gif", "anchor": 31, "gid": [0, 0, 2, 2]},
+        {"type": "TEXT", "info": "The dead can be cured.", "anchor": 49},
+        {"type": "TEXT", "info": "Title", "anchor": 20, "func": "forward", "para": "Title"},
+        {"type": "SWITCH", "info": "test_bool", "anchor": 29, "gid": [70, 100, 1, 1]},
+        {"type": "SLID_I", "info": {"min": 0, "max": 100, "now": "test_int"}, "anchor": 29, "gid": [70, 0, 1, 1]},
+        {"type": "SLID_F", "info": {"min": 0, "max": 100, "now": "test_float"}, "anchor": 29, "gid": [70, -100, 1, 1]}
+      ]
+    },
+    "Edge": {
+      "elemSet": [
+        {
+          "type": "TEXT",
+          "info": "The edge of menu system, it shouldn't appear.\nIf you are watching it, there is a bug need to be fixed.",
+          "anchor": 31
+        },
+        {
+          "type": "TEXT",
+          "info": "[R2R]",
+          "anchor": 49,
+          "func": "clear"
+        }
+      ]
+    },
+    "Title": {
+      "elemSet": [
+        {
+          "type": "TEXT",
+          "info": "<<< Root.",
+          "anchor": 20,
+          "func": "clear"
+        },
+        {
+          "type": "TEXT",
+          "info": "THE MAZE",
+          "anchor": 31
+        },
+        {
+          "type": "TEXT",
+          "info": "Setting",
+          "anchor": 49,
+          "func": "forward",
+          "para": "Setting"
+        }
+      ]
+    },
+    "Setting": {
+      "elemSet": [
+        {
+          "type": "TEXT",
+          "info": "<<<",
+          "anchor": 20,
+          "func": "backward"
+        },
+        {
+          "type": "TEXT",
+          "info": "Go Test?.",
+          "anchor": 49,
+          "gid": [0, 10, 1, 1],
+          "func": "forward",
+          "para": "Setting"
+        }
+      ]
+    }
+}
+}
