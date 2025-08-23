@@ -27,6 +27,7 @@ bool SDL_RenderTextureAligned(SDL_Renderer* renderer, SDL_Texture* texture, cons
 
 
 cJSON* getJson(const char* path);
+bool cJSON_Load(const cJSON* object, const char* key, JSM_DATA_TYPE type, void* target);
 // toml扩展
 toml_table_t* getToml(const char* tomlPath);
 bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array);

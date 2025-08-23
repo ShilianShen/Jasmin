@@ -6,6 +6,9 @@
 #include "../interface.h"
 
 
+typedef enum JSM_DATA_TYPE {
+    INT, FLOAT, STRING, BOOL, RECT,
+} JSM_DATA_TYPE;
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 

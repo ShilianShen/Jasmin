@@ -119,6 +119,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
 
     const char* key;
+
+    // object, key: string -> int
     const cJSON* type_json = cJSON_GetObjectItem(elem_json, key = "type");
     if (type_json != NULL && cJSON_IsString(type_json)) {
         elem->type = TEMPO_GetElemTypeFromString(type_json->valuestring);
@@ -127,6 +129,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             return false;
         } // Req Condition
     } // type
+
     key = "info";
     switch (elem->type) {
         case ELEM_TYPE_TEXT: {}
@@ -199,11 +202,13 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
         default: break;
     } // info
-    const cJSON* anchor_json = cJSON_GetObjectItem(elem_json, key = "anchor");
-    if (anchor_json != NULL && cJSON_IsNumber(anchor_json)) {
-        elem->anchor = anchor_json->valueint;
-    } // anchor
 
+   if (cJSON_Load(elem_json, key = "anchor", INT, &elem->anchor) == false) {
+       printf("%s: failed in %s.\n", __func__, key);
+       return false;
+   } // Req Condition
+
+    // object, key: array -> array
     const cJSON* gid_json = cJSON_GetObjectItem(elem_json, key = "gid");
     if (gid_json != NULL && cJSON_IsArray(gid_json)) {
         const cJSON* x_json = cJSON_GetArrayItem(gid_json, 0);
@@ -218,6 +223,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     else {
         elem->gid = (SDL_FRect){0, 0, 1, 1};
     }
+
+    // object, key: string -> ptr
     {
         TrigFunc func = NULL;
         const char* para = NULL;
@@ -247,6 +254,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
     }
+
     /*if (toml_array_in(elem_json, key = "src") != NULL) {
         const bool ok = loadFRectFromTomlArray(&elem->src, toml_array_in(elem_json, key));
         if (ok == false) {

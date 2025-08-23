@@ -32,6 +32,56 @@ cJSON* getJson(const char* path) {
 
     return json;
 }
+bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, void* target) {
+    // 这个函数的任务是: 若(object[key]存在), 则(赋值给target)
+
+    if (object == NULL || key == NULL) return true; // Opt Condition
+    const cJSON* val = cJSON_GetObjectItem(object, key);
+    if (val == NULL) return true; // Opt Condition
+
+    if (target == NULL) return false; // Opt Condition
+
+    switch (type) {
+        case INT: {
+            if (cJSON_IsNumber(val)) {
+                *(int*)target = val->valueint;
+                return true;
+            }
+            return false;
+        }
+        case FLOAT: {
+            if (cJSON_IsNumber(val)) {
+                *(float*)target = (float)val->valuedouble;
+                return true;
+            }
+            return false;
+        }
+        case RECT: {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* rect_json[4];
+            for (int i = 0; i < 4; i++) {
+                rect_json[i] = cJSON_GetArrayItem(val, i);
+                if (rect_json[i] == NULL || cJSON_IsNumber(rect_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_FRect rect = {
+                (float)rect_json[0]->valuedouble,
+                (float)rect_json[1]->valuedouble,
+                (float)rect_json[2]->valuedouble,
+                (float)rect_json[3]->valuedouble,
+            };
+            *(SDL_FRect*)target = rect;
+            return true;
+        }
+        default: return false;
+    }
+}
+
+
+
 toml_table_t* getToml(const char* tomlPath) {
     // Req Condition
     FILE* file = fopen(tomlPath, "r"); // malloc
