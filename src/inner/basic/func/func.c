@@ -76,6 +76,13 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, 
             *(SDL_FRect*)target = rect;
             return true;
         }
+        case STRING: {
+            if (cJSON_IsString(val) == false) {
+                return false;
+            }
+            *(char**)target = strdup(val->valuestring); // alloc
+            return true;
+        }
         default: return false;
     }
 }
