@@ -8,37 +8,37 @@ struct Page {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool TEMPO_CreatePage_RK(Page* page, const toml_table_t* tomlPage) {
+static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
 
     const char* key;
-    if (toml_array_in(tomlPage, key = "elemSet") != NULL) {
-        const toml_array_t* tomlElemSet = toml_array_in(tomlPage, key);
-        if (tomlElemSet == NULL) {
+    if (cJSON_GetObjectItem(page_json, key = "elemSet") != NULL) {
+        const cJSON* elemSet_json = cJSON_GetObjectItem(page_json, key);
+        if (elemSet_json == NULL) {
             printf("%s: tomlElems not exists, %s.\n", __func__, key);
             return false;
         } // Req Condition
 
-        page->lenElemSet = toml_array_nelem(tomlElemSet);
+        page->lenElemSet = cJSON_GetArraySize(elemSet_json);
         if (page->lenElemSet == 0) {
             printf("%s: failed malloc page.lenElemSet.\n", __func__);
             return false;
         } // Req Condition
 
-        page->elemSet = malloc(page->lenElemSet * sizeof(Elem*));
+        page->elemSet = calloc(page->lenElemSet, sizeof(Elem*));
         if (page->elemSet == NULL) {
             printf("%s: failed malloc page.elemSet.\n", __func__);
             return false;
         } // Req Condition
 
         for (int i = 0; i < page->lenElemSet; i++) {
-            const toml_table_t* tomlElem = toml_table_at(tomlElemSet, i);
-            if (tomlElem == NULL) {
+            const cJSON* elem_json = cJSON_GetArrayItem(elemSet_json, i);
+            if (elem_json == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
 
-            page->elemSet[i] = TEMPO_CreateElem(tomlElem); // malloc
+            page->elemSet[i] = TEMPO_CreateElem(elem_json); // malloc
         }
     } // lenElemSet, elemSet
     return true;
@@ -68,8 +68,8 @@ Page* TEMPO_DeletePage(Page* page) {
     }
     return page;
 }
-Page* TEMPO_CreatePage(const toml_table_t* tomlPage) {
-    if (tomlPage == NULL) {
+Page* TEMPO_CreatePage(const cJSON* page_json) {
+    if (page_json == NULL) {
         printf("%s: tomlPage == NULL.\n", __func__);
         return NULL;
     } // Req Condition
@@ -78,7 +78,7 @@ Page* TEMPO_CreatePage(const toml_table_t* tomlPage) {
         printf("%s: page == NULL.\n", __func__);
         return page;
     } // Req Condition
-    if (TEMPO_CreatePage_RK(page, tomlPage) == false || TEMPO_CreatePage_CK(page) == false) {
+    if (TEMPO_CreatePage_RK(page, page_json) == false || TEMPO_CreatePage_CK(page) == false) {
         printf("%s: RK or CK == false.\n", __func__);
         page = TEMPO_DeletePage(page);
     } // Req Condition

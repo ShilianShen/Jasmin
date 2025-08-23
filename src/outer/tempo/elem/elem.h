@@ -8,7 +8,7 @@
 typedef struct Elem Elem;
 
 
-Elem* TEMPO_CreateElem(const toml_table_t *tomlElem);
+Elem* TEMPO_CreateElem(const cJSON *elem_json);
 Elem* TEMPO_DeleteElem(Elem* elem);
 bool TEMPO_RenewElem(Elem* elem);
 bool TEMPO_DrawElem(const Elem* elem);

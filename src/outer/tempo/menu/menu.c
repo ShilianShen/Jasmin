@@ -43,16 +43,13 @@ Menu menu;
 
 
 // LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
-
-    if (tomlPageSet == NULL) {
+static bool TEMPO_LoadMenuPageSet(const cJSON* pageSet_json) {
+    if (pageSet_json == NULL) {
         printf("%s: tomlMenu == NULL.\n", __func__);
         return false;
     } // Req Condition
 
-    for (int i = 0; toml_key_in(tomlPageSet, i) != NULL; i++) {
-        menu.lenPageTable = i + 1;
-    }
+    menu.lenPageTable = cJSON_GetArraySize(pageSet_json);
     if (menu.lenPageTable == 0) {
         printf("%s: menu.lenPageSet == 0.\n", __func__);
         return false;
@@ -62,31 +59,41 @@ static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
     if (menu.pageTable == NULL) {
         printf("%s: menu.pageSet == NULL.\n", __func__);
         return false;
-    }
+    } // Req Condition
 
     for (int i = 0; i < menu.lenPageTable; i++) {
-        const char* key = toml_key_in(tomlPageSet, i);
-        menu.pageTable[i].key = strdup(key);
-        if (menu.pageTable[i].key == NULL) {
+        const cJSON *item = cJSON_GetArrayItem(pageSet_json, i);
+        if (item == NULL) {
+            printf("%s: item == NULL.\n", __func__);
             return false;
-        }
+        } // Req Condition
+        menu.pageTable[i].key = strdup(item->string);
+        if (menu.pageTable[i].key == NULL) {
+            printf("%s: menu.pageTable[i].key == NULL.\n", __func__);
+            return false;
+        } // Req Condition
     }
 
     for (int i = 0; i < menu.lenPageTable; i++) {
-        const char* key = toml_key_in(tomlPageSet, i);
-        const toml_table_t* tomlPage = toml_table_in(tomlPageSet, key);
-        if (tomlPage == NULL) {
+        const cJSON *item = cJSON_GetArrayItem(pageSet_json, i);
+        if (item == NULL) {
+            printf("%s: item == NULL.\n", __func__);
+            return false;
+        } // Req Condition
+        const char* key = item->string;
+        const cJSON* page_json = cJSON_GetObjectItem(pageSet_json, key);
+        if (page_json == NULL) {
             printf("%s: tomlPage == NULL.\n", __func__);
             return false;
         } // Req Condition
 
-        menu.pageTable[i].val = TEMPO_CreatePage(tomlPage);
+        menu.pageTable[i].val = TEMPO_CreatePage(page_json);
         if (strcmp(key, MENU_ROOT_NAME) == 0) {
             menu.pageRoot = menu.pageTable[i].val;
-        }
+        } // Opt Condition
         if (strcmp(key, MENU_EDGE_NAME) == 0) {
             menu.pageEdge = menu.pageTable[i].val;
-        }
+        } // Opt Condition
     }
 
 
@@ -104,11 +111,8 @@ void TEMPO_LoadMenu() {
     if (pageSet_json == NULL) {
         printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
     } // Req Condition
+    TEMPO_LoadMenuPageSet(pageSet_json);
     cJSON_Delete(menu_json);
-
-    toml_table_t* tomlPageSet = getToml(TEMPO_MENU_TOML);
-    TEMPO_LoadMenuPageSet(tomlPageSet);
-    toml_free(tomlPageSet); // end malloc
 }
 void TEMPO_UnloadMenu() {
     for (int i = 0; i < menu.lenPageTable; i++) {

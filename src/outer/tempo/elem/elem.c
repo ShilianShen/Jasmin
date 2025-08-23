@@ -115,26 +115,28 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
     }
     return texture;
 }
-static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
+static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
 
     const char* key;
-    if (toml_string_in(tomlElem, key = "type").ok) {
-        elem->type = TEMPO_GetElemTypeFromString(toml_string_in(tomlElem, key).u.s);
+    const cJSON* type_json = cJSON_GetObjectItem(elem_json, key = "type");
+    if (type_json != NULL && cJSON_IsString(type_json)) {
+        elem->type = TEMPO_GetElemTypeFromString(type_json->valuestring);
         if (elem->type == ELEM_TYPE_NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
-        }
+        } // Req Condition
     } // type
     key = "info";
     switch (elem->type) {
         case ELEM_TYPE_TEXT: {}
         case ELEM_TYPE_FILE: {
-            if (toml_string_in(tomlElem, key).ok == false) {
+            const cJSON* info_json = cJSON_GetObjectItem(elem_json, key = "info");
+            if (info_json == NULL || cJSON_IsString(info_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             } // Req Condition
-            elem->info.string = strdup(toml_string_in(tomlElem, key).u.s);
+            elem->info.string = strdup(info_json->valuestring);
             if (elem->info.string == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -142,18 +144,18 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             break;
         } // string
         case ELEM_TYPE_SLID_I: {
-            const toml_table_t* tomlInfo = toml_table_in(tomlElem, key);
-            if (tomlInfo == NULL) {
+            const cJSON* info_json = cJSON_GetObjectItem(elem_json, key="info");
+            if (info_json == NULL || cJSON_IsObject(info_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             } // Req Condition
-            const toml_datum_t min = toml_int_in(tomlInfo, "min");
-            const toml_datum_t max = toml_int_in(tomlInfo, "max");
-            const toml_datum_t now = toml_string_in(tomlInfo, "now");
-            if (min.ok && max.ok && now.ok) {
-                elem->info.slidI.min = (int)min.u.i;
-                elem->info.slidI.max = (int)max.u.i;
-                elem->info.slidI.now = BASIC_GetValByKey(TEMPO_TABLE_INT, now.u.s);
+            const cJSON* min_json = cJSON_GetObjectItem(info_json, "min");
+            const cJSON* max_json = cJSON_GetObjectItem(info_json, "max");
+            const cJSON* now_json = cJSON_GetObjectItem(info_json, "now");
+            if (cJSON_IsNumber(min_json) && cJSON_IsNumber(max_json) && cJSON_IsString(now_json)) {
+                elem->info.slidI.min = min_json->valueint;
+                elem->info.slidI.max = max_json->valueint;
+                elem->info.slidI.now = BASIC_GetValByKey(TEMPO_TABLE_INT, now_json->valuestring);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -162,18 +164,18 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             break;
         }
         case ELEM_TYPE_SLID_F: {
-            const toml_table_t* tomlInfo = toml_table_in(tomlElem, key);
-            if (tomlInfo == NULL) {
+            const cJSON* info_json = cJSON_GetObjectItem(elem_json, key="info");
+            if (info_json == NULL || cJSON_IsObject(info_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             } // Req Condition
-            const toml_datum_t min = toml_double_in(tomlInfo, "min");
-            const toml_datum_t max = toml_double_in(tomlInfo, "max");
-            const toml_datum_t now = toml_string_in(tomlInfo, "now");
-            if (min.ok && max.ok && now.ok) {
-                elem->info.slidF.min = (float)min.u.d;
-                elem->info.slidF.max = (float)max.u.d;
-                elem->info.slidF.now = BASIC_GetValByKey(TEMPO_TABLE_FLOAT, now.u.s);
+            const cJSON* min_json = cJSON_GetObjectItem(info_json, "min");
+            const cJSON* max_json = cJSON_GetObjectItem(info_json, "max");
+            const cJSON* now_json = cJSON_GetObjectItem(info_json, "now");
+            if (cJSON_IsNumber(min_json) && cJSON_IsNumber(max_json) && cJSON_IsString(now_json)) {
+                elem->info.slidF.min = (float)min_json->valuedouble;
+                elem->info.slidF.max = (float)max_json->valuedouble;
+                elem->info.slidF.now = BASIC_GetValByKey(TEMPO_TABLE_FLOAT, now_json->valuestring);
             }
             else {
                 printf("%s: failed in %s.\n", __func__, key);
@@ -182,13 +184,13 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             break;
         }
         case ELEM_TYPE_SWITCH: {
-            if (toml_string_in(tomlElem, key).ok == false) {
+            const cJSON* info_json = cJSON_GetObjectItem(elem_json, "info");
+            if (info_json == NULL || cJSON_IsString(info_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
-            }
-            elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, toml_string_in(tomlElem, key).u.s);
-            const TrigFunc func = TEMPO_TrigFuncSwitch;
-            elem->trig = CreateTrig(func, toml_string_in(tomlElem, key).u.s);
+            } // Req Condition
+            elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, info_json->valuestring);
+            elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -197,15 +199,21 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
         }
         default: break;
     } // info
-    if (toml_int_in(tomlElem, key = "anchor").ok) {
-        elem->anchor = (int)toml_int_in(tomlElem, key).u.i;
+    const cJSON* anchor_json = cJSON_GetObjectItem(elem_json, key = "anchor");
+    if (anchor_json != NULL && cJSON_IsNumber(anchor_json)) {
+        elem->anchor = anchor_json->valueint;
     } // anchor
-    if (toml_array_in(tomlElem, key = "gid") != NULL) {
-        const bool ok = loadFRectFromTomlArray(&elem->gid, toml_array_in(tomlElem, key));
-        if (ok == false) {
-            printf("%s: ok == false in %s.\n", __func__, key);
-            return false;
-        } // Req Condition
+
+    const cJSON* gid_json = cJSON_GetObjectItem(elem_json, key = "gid");
+    if (gid_json != NULL && cJSON_IsArray(gid_json)) {
+        const cJSON* x_json = cJSON_GetArrayItem(gid_json, 0);
+        const cJSON* y_json = cJSON_GetArrayItem(gid_json, 1);
+        const cJSON* w_json = cJSON_GetArrayItem(gid_json, 2);
+        const cJSON* h_json = cJSON_GetArrayItem(gid_json, 3);
+        elem->gid.x = x_json != NULL ? (float)x_json->valuedouble: 0;
+        elem->gid.y = y_json != NULL ? (float)y_json->valuedouble: 0;
+        elem->gid.w = w_json != NULL ? (float)w_json->valuedouble: 0;
+        elem->gid.h = h_json != NULL ? (float)h_json->valuedouble: 0;
     } // gid
     else {
         elem->gid = (SDL_FRect){0, 0, 1, 1};
@@ -213,15 +221,19 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
     {
         TrigFunc func = NULL;
         const char* para = NULL;
-        if (toml_string_in(tomlElem, key = "func").ok) {
-            func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, toml_string_in(tomlElem, key).u.s);
+
+        const cJSON* func_json = cJSON_GetObjectItem(elem_json, "func");
+        if (func_json != NULL && cJSON_IsString(func_json)) {
+            func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, func_json->valuestring);
             if (func == NULL) {
                 printf("%s: func == NULL, %s.\n", __func__, key);
                 return false;
             }
         } // func
-        if (toml_string_in(tomlElem, key = "para").ok) {
-            para = toml_string_in(tomlElem, key).u.s;
+
+        const cJSON* para_json = cJSON_GetObjectItem(elem_json, "para");
+        if (para_json != NULL && cJSON_IsString(para_json)) {
+            para = para_json->valuestring;
             if (para == NULL) {
                 printf("%s: para == NULL, %s.\n", __func__, key);
                 return false;
@@ -235,14 +247,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const toml_table_t *tomlElem) {
             }
         }
     }
-    if (toml_array_in(tomlElem, key = "src") != NULL) {
-        const bool ok = loadFRectFromTomlArray(&elem->src, toml_array_in(tomlElem, key));
+    /*if (toml_array_in(elem_json, key = "src") != NULL) {
+        const bool ok = loadFRectFromTomlArray(&elem->src, toml_array_in(elem_json, key));
         if (ok == false) {
             printf("%s: ok == false in %s.\n", __func__, key);
             return false;
         } // Req Condition
-    } // src
-    else if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
+    } // src*/
+    if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
         SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
         SDL_GetTextureSize(texture, &elem->src.w, &elem->src.h);
         SDL_DestroyTexture(texture);
@@ -283,8 +295,8 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     elem = NULL;
     return elem;
 }
-Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
-    if (tomlElem == NULL) {
+Elem* TEMPO_CreateElem(const cJSON *elem_json) {
+    if (elem_json == NULL) {
         printf("%s: tomlElem == NULL\n", __func__);
         return NULL;
     } // Req Condition
@@ -293,7 +305,7 @@ Elem* TEMPO_CreateElem(const toml_table_t *tomlElem) {
         printf("%s: elem == NULL.\n", __func__);
         return elem;
     } // Req Condition
-    if (TEMPO_CreateElem_RK(elem, tomlElem) == false || TEMPO_CreateElem_CK(elem) == false) {
+    if (TEMPO_CreateElem_RK(elem, elem_json) == false || TEMPO_CreateElem_CK(elem) == false) {
         printf("%s: RK or CK == false.\n", __func__);
         elem = TEMPO_DeleteElem(elem);
     } // Req Condition
