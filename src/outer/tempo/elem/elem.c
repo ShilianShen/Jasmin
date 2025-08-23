@@ -120,15 +120,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 
     const char* key;
 
-    // object, key: string -> int
-    const cJSON* type_json = cJSON_GetObjectItem(elem_json, key = "type");
-    if (type_json != NULL && cJSON_IsString(type_json)) {
-        elem->type = TEMPO_GetElemTypeFromString(type_json->valuestring);
+    char* type_json = NULL;
+    if (cJSON_Load(elem_json, key = "type", JSM_STRING, &type_json) && type_json != NULL) {
+        elem->type = TEMPO_GetElemTypeFromString(type_json);
         if (elem->type == ELEM_TYPE_NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         } // Req Condition
-    } // type
+    }
 
     const cJSON* info_json = cJSON_GetObjectItem(elem_json, key="info");
     if (info_json == NULL) {
@@ -136,45 +135,55 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         return false;
     } // Req Condition
     switch (elem->type) {
-        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_TEXT:
         case ELEM_TYPE_FILE: {
-            if (cJSON_Load(elem_json, "info", STRING, &elem->info.string) == false) {
+            char* string_json;
+            if (cJSON_Load(elem_json, "info", JSM_STRING, &string_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             } // Req Condition
+            if (string_json != NULL) {
+                elem->info.string = strdup(string_json);
+                if (elem->info.string == NULL) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+            } // Req Condition
             break;
         }
-        case ELEM_TYPE_SLID_I: {}
+        case ELEM_TYPE_SLID_I: {
+            if (cJSON_IsObject(info_json) == false) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
+            const bool min = cJSON_Load(info_json, "min", JSM_INT, &elem->info.slidI.min);
+            const bool max = cJSON_Load(info_json, "max", JSM_INT, &elem->info.slidI.max);
+            const bool now = cJSON_LoadFromTable(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT);
+            if ((min && max && now) == false) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
+            break;
+        }
         case ELEM_TYPE_SLID_F: {
             if (cJSON_IsObject(info_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-            // cJSON_Load(info_json, "min", INT, &elem->info.slidI.min);
-            const cJSON* min_json = cJSON_GetObjectItem(info_json, "min");
-            const cJSON* max_json = cJSON_GetObjectItem(info_json, "max");
-            const cJSON* now_json = cJSON_GetObjectItem(info_json, "now");
-            if (cJSON_IsNumber(min_json) && cJSON_IsNumber(max_json) && cJSON_IsString(now_json)) {
-                if (elem->type == ELEM_TYPE_SLID_I) {
-                    elem->info.slidI.min = min_json->valueint;
-                    elem->info.slidI.max = max_json->valueint;
-                    elem->info.slidI.now = BASIC_GetValByKey(TEMPO_TABLE_INT, now_json->valuestring);
-                }
-                else if (elem->type == ELEM_TYPE_SLID_F) {
-                    elem->info.slidF.min = (float)min_json->valuedouble;
-                    elem->info.slidF.max = (float)max_json->valuedouble;
-                    elem->info.slidF.now = BASIC_GetValByKey(TEMPO_TABLE_FLOAT, now_json->valuestring);
-                }
-            }
-            else {
+            const bool min = cJSON_Load(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
+            const bool max = cJSON_Load(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
+            const bool now = cJSON_LoadFromTable(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT);
+            if ((min && max && now) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-
-
             break;
         }
         case ELEM_TYPE_SWITCH: {
+            if (cJSON_IsString(info_json) == false) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
             elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, info_json->valuestring);
             elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
             if (elem->trig == NULL) {
@@ -184,56 +193,41 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             break;
         }
         default: break;
-    } // info
+    }
 
-    if (cJSON_Load(elem_json, key = "anchor", INT, &elem->anchor) == false) {
+    elem->gid = (SDL_FRect){0, 0, 1, 1};
+    if (cJSON_Load(elem_json, key = "anchor", JSM_INT, &elem->anchor) == false) {
        printf("%s: failed in %s.\n", __func__, key);
        return false;
    } // Req Condition
-    elem->gid = (SDL_FRect){0, 0, 1, 1};
-    if (cJSON_Load(elem_json, key = "gid", RECT, &elem->gid) == false) {
+    if (cJSON_Load(elem_json, key = "gid", JSM_RECT, &elem->gid) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     } // Req Condition
 
     // object, key: string -> ptr
-    {
-        TrigFunc func = NULL;
-        const char* para = NULL;
 
-        const cJSON* func_json = cJSON_GetObjectItem(elem_json, "func");
-        if (func_json != NULL && cJSON_IsString(func_json)) {
-            func = BASIC_GetValByKey(TEMPO_MENU_TRIG_SET, func_json->valuestring);
-            if (func == NULL) {
-                printf("%s: func == NULL, %s.\n", __func__, key);
-                return false;
-            }
-        } // func
+    TrigFunc func = NULL;
+    if (cJSON_LoadFromTable(elem_json, "func", (void**)&func, TEMPO_MENU_TRIG_SET) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
 
-        const cJSON* para_json = cJSON_GetObjectItem(elem_json, "para");
-        if (para_json != NULL && cJSON_IsString(para_json)) {
-            para = para_json->valuestring;
-            if (para == NULL) {
-                printf("%s: para == NULL, %s.\n", __func__, key);
-                return false;
-            }
-        }
-        if (func != NULL) {
-            elem->trig = CreateTrig(func, para);
-            if (elem->trig == NULL) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
+    const char* para = NULL;
+    if (cJSON_Load(elem_json, "para", JSM_STRING, &para) == false) {
+        printf("%s: para == NULL, %s.\n", __func__, key);
+        return false;
+    }
+
+    if (func != NULL) {
+        elem->trig = CreateTrig(func, para);
+        if (elem->trig == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
         }
     }
 
-    /*if (toml_array_in(elem_json, key = "src") != NULL) {
-        const bool ok = loadFRectFromTomlArray(&elem->src, toml_array_in(elem_json, key));
-        if (ok == false) {
-            printf("%s: ok == false in %s.\n", __func__, key);
-            return false;
-        } // Req Condition
-    } // src*/
+
     if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
         SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
         SDL_GetTextureSize(texture, &elem->src.w, &elem->src.h);

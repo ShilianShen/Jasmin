@@ -42,21 +42,21 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, 
     if (target == NULL) return false; // Opt Condition
 
     switch (type) {
-        case INT: {
+        case JSM_INT: {
             if (cJSON_IsNumber(val)) {
                 *(int*)target = val->valueint;
                 return true;
             }
             return false;
         }
-        case FLOAT: {
+        case JSM_FLOAT: {
             if (cJSON_IsNumber(val)) {
                 *(float*)target = (float)val->valuedouble;
                 return true;
             }
             return false;
         }
-        case RECT: {
+        case JSM_RECT: {
             if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
                 return false;
             }
@@ -76,17 +76,27 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, 
             *(SDL_FRect*)target = rect;
             return true;
         }
-        case STRING: {
+        case JSM_STRING: {
             if (cJSON_IsString(val) == false) {
                 return false;
             }
-            *(char**)target = strdup(val->valuestring); // alloc
+            *(char**)target = val->valuestring;
             return true;
         }
         default: return false;
     }
 }
+bool cJSON_LoadFromTable(const cJSON* object, const char* key, void** target, const KeyVal* table) {
+    if (object == NULL || key == NULL) return true;
+    const cJSON* val = cJSON_GetObjectItem(object, key);
+    if (val == NULL || cJSON_IsString(val) == false) return true;
 
+    if (target == NULL || table == NULL) return false;
+
+    *target = BASIC_GetValByKey(table, val->valuestring);
+    if (*target == NULL) return false;
+    return true;
+}
 
 
 toml_table_t* getToml(const char* tomlPath) {
