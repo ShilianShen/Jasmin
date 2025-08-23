@@ -42,19 +42,14 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 
 // ELEM ================================================================================================================
 struct Elem {
-    // read
     ElemType type;
     ElemInfo info;
-
     int anchor;
     SDL_FRect gid;
     SDL_FRect src;
-
     Trig* trig;
 
     SDL_Texture* tex;
-
-    // renew
     SDL_FRect dst;
 };
 
@@ -117,11 +112,34 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
 }
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
+    char* type_json = NULL;
+    elem->gid = (SDL_FRect){0, 0, 1, 1};
+    TrigFunc func = NULL;
+    const char* para = NULL;
 
     const char* key;
+    if (cJSON_LoadFromObj(elem_json, key = "type"  , JSM_STRING, &type_json   ) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
+    if (cJSON_LoadFromObj(elem_json, key = "anchor", JSM_INT   , &elem->anchor) == false) {
+       printf("%s: failed in %s.\n", __func__, key);
+       return false;
+   }
+    if (cJSON_LoadFromObj(elem_json, key = "gid"   , JSM_RECT  , &elem->gid   ) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
+    if (cJSON_LoadFromObj(elem_json, key = "para"  , JSM_STRING, &para        ) == false) {
+        printf("%s: para == NULL, %s.\n", __func__, key);
+        return false;
+    }
+    if (cJSON_LoadFromTab(elem_json, key = "func", (void**)&func, TEMPO_MENU_TRIG_SET) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
 
-    char* type_json = NULL;
-    if (cJSON_Load(elem_json, key = "type", JSM_STRING, &type_json) && type_json != NULL) {
+    if (type_json != NULL) {
         elem->type = TEMPO_GetElemTypeFromString(type_json);
         if (elem->type == ELEM_TYPE_NULL) {
             printf("%s: failed in %s.\n", __func__, key);
@@ -138,7 +156,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         case ELEM_TYPE_TEXT:
         case ELEM_TYPE_FILE: {
             char* string_json;
-            if (cJSON_Load(elem_json, "info", JSM_STRING, &string_json) == false) {
+            if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             } // Req Condition
@@ -156,9 +174,9 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-            const bool min = cJSON_Load(info_json, "min", JSM_INT, &elem->info.slidI.min);
-            const bool max = cJSON_Load(info_json, "max", JSM_INT, &elem->info.slidI.max);
-            const bool now = cJSON_LoadFromTable(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT);
+            const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
+            const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
+            const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT);
             if ((min && max && now) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -170,9 +188,9 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-            const bool min = cJSON_Load(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
-            const bool max = cJSON_Load(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
-            const bool now = cJSON_LoadFromTable(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT);
+            const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
+            const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
+            const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT);
             if ((min && max && now) == false) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -195,31 +213,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         default: break;
     }
 
-    elem->gid = (SDL_FRect){0, 0, 1, 1};
-    if (cJSON_Load(elem_json, key = "anchor", JSM_INT, &elem->anchor) == false) {
-       printf("%s: failed in %s.\n", __func__, key);
-       return false;
-   } // Req Condition
-    if (cJSON_Load(elem_json, key = "gid", JSM_RECT, &elem->gid) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    } // Req Condition
-
-    // object, key: string -> ptr
-
-    TrigFunc func = NULL;
-    if (cJSON_LoadFromTable(elem_json, "func", (void**)&func, TEMPO_MENU_TRIG_SET) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-
-    const char* para = NULL;
-    if (cJSON_Load(elem_json, "para", JSM_STRING, &para) == false) {
-        printf("%s: para == NULL, %s.\n", __func__, key);
-        return false;
-    }
-
-    if (func != NULL) {
+    if (func != NULL && elem->trig == NULL) {
         elem->trig = CreateTrig(func, para);
         if (elem->trig == NULL) {
             printf("%s: failed in %s.\n", __func__, key);
@@ -227,13 +221,13 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
     }
 
-
     if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
         SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
         SDL_GetTextureSize(texture, &elem->src.w, &elem->src.h);
         SDL_DestroyTexture(texture);
         texture = NULL;
     }
+
     return true;
 }
 static bool TEMPO_CreateElem_CK(const Elem* elem) {

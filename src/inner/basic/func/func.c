@@ -32,7 +32,7 @@ cJSON* getJson(const char* path) {
 
     return json;
 }
-bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, void* target) {
+bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE type, void* target) {
     // 这个函数的任务是: 若(object[key]存在), 则(赋值给target)
 
     if (object == NULL || key == NULL) return true; // Opt Condition
@@ -86,7 +86,7 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DATA_TYPE type, 
         default: return false;
     }
 }
-bool cJSON_LoadFromTable(const cJSON* object, const char* key, void** target, const KeyVal* table) {
+bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, const KeyVal* table) {
     if (object == NULL || key == NULL) return true;
     const cJSON* val = cJSON_GetObjectItem(object, key);
     if (val == NULL || cJSON_IsString(val) == false) return true;
