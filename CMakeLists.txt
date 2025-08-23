@@ -30,6 +30,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/debug/debug.h
         src/inner/basic/setting/setting.h
         src/third_party/toml/toml.c
+        src/third_party/cJSON-1.7.18/cJSON.c
+        src/third_party/cJSON-1.7.18/cJSON.h
         src/outer/tempo/elem/elem.h
         src/outer/tempo/page/page.h
         src/inner/basic/basic.h

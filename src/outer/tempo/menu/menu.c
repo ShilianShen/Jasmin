@@ -94,6 +94,18 @@ static bool TEMPO_LoadMenuPageSet(const toml_table_t* tomlPageSet) {
 }
 void TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
+
+    cJSON* menu_json = getJson(TEMPO_MENU_JSON);
+    if (menu_json == NULL) {
+        printf("%s: getJson == NULL.\n", __func__);
+        return;
+    } // Req Condition
+    const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, "pageSet");
+    if (pageSet_json == NULL) {
+        printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
+    } // Req Condition
+    cJSON_Delete(menu_json);
+
     toml_table_t* tomlPageSet = getToml(TEMPO_MENU_TOML);
     TEMPO_LoadMenuPageSet(tomlPageSet);
     toml_free(tomlPageSet); // end malloc

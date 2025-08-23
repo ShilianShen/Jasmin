@@ -7,6 +7,7 @@
 
 #define TEMPO_THEME_TOML "../config/tempo_theme.toml"
 #define TEMPO_MENU_TOML "../config/tempo_menu.toml"
+#define TEMPO_MENU_JSON "../config/tempo_menu.json"
 
 
 extern const KeyVal TEMPO_TABLE_INT[];

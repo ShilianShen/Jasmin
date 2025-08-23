@@ -2,6 +2,36 @@
 
 
 
+cJSON* getJson(const char* path) {
+    FILE* file = fopen(path, "r");
+    if (!file) {
+        perror("无法打开文件");
+        return NULL;
+    }
+
+    // 获取文件大小
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // 分配内存
+    char* buffer = (char*)malloc(size + 1);
+    if (!buffer) {
+        fclose(file);
+        return NULL;
+    }
+
+    // 读取文件内容
+    const size_t read_size = fread(buffer, 1, size, file);
+    buffer[read_size] = '\0';
+    fclose(file);
+
+    // 解析 JSON
+    cJSON* json = cJSON_Parse(buffer);
+    free(buffer);
+
+    return json;
+}
 toml_table_t* getToml(const char* tomlPath) {
     // Req Condition
     FILE* file = fopen(tomlPath, "r"); // malloc

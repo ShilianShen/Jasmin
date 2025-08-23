@@ -25,6 +25,8 @@ bool SDL_LoadDstRectAligned(SDL_FRect *dst_rect, SDL_Texture *texture, const SDL
 bool SDL_RenderTextureAligned(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_FRect* src_rect, const SDL_FRect* gid_rect, const SDL_FRect* bck_rect, int anchor);
 
 
+
+cJSON* getJson(const char* path);
 // toml扩展
 toml_table_t* getToml(const char* tomlPath);
 bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array);
