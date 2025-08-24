@@ -2,7 +2,7 @@
 
 
 // ELEM PARA ===========================================================================================================
-const float A = 4, B = 4, C = 8, D = 48;
+const float A = 4, B = 4, C = 6, D = 36;
 
 
 // ELEM INFO ===========================================================================================================
@@ -360,10 +360,9 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             break;
         }
         case ELEM_TYPE_SWITCH: {
-            const float A = 4, B = 4, C = 48, D = 48;
             const float M = 1;
             const float N = *elem->info.switch_.now;
-            const float W = 2 * A + (M + 1) * B + M * C;
+            const float W = 2 * A + (M + 1) * B + M * D;
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
             elem->gid_rect.w = elem->gid_rect.h = 1;

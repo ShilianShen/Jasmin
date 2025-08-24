@@ -107,7 +107,7 @@ void TEMPO_LoadMenu() {
         printf("%s: getJson == NULL.\n", __func__);
         return;
     } // Req Condition
-    const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, "pageSet");
+    const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, "pageTable");
     if (pageSet_json == NULL) {
         printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
     } // Req Condition

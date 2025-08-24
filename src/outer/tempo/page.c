@@ -12,7 +12,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
 
     const char* key;
-    if (cJSON_GetObjectItem(page_json, key = "elemSet") != NULL) {
+    if (cJSON_ExistKey(page_json, key = "elemTable")) {
         const cJSON* elemTable_json = cJSON_GetObjectItem(page_json, key);
         if (elemTable_json == NULL) {
             printf("%s: tomlElems not exists, %s.\n", __func__, key);
@@ -48,7 +48,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
                 return false;
             } // Req Condition
         }
-    } // lenElemSet, elemSet
+    }
     return true;
 }
 static bool TEMPO_CreatePage_CK(const Page* page) {

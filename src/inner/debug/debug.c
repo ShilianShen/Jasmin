@@ -220,7 +220,7 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
 
     //
-    const int anchor = aligned == 'R' ? 60 : 20;
+    const int anchor = aligned == 'R' ? 20 : -20;
     SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }

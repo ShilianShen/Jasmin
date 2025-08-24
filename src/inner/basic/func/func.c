@@ -310,7 +310,7 @@ bool SDL_LoadDstRectAligned(
     const SDL_FRect *src_rect,
     const SDL_FRect *gid_rect,
     const SDL_FRect *bck_rect,
-    const int anchor
+    int anchor
 ) {
     // Req Condition
     if (dst_rect == NULL) {printf("%s: dst_rect not exists.\n", __func__); return false;}
@@ -337,6 +337,7 @@ bool SDL_LoadDstRectAligned(
     dst_rect->h = src.h * gid.h;
 
     // load dst_rect -> x, y
+    anchor += 40;
     const int x = anchor % 9;
     const int y = anchor / 9;
     float cx = 0, cy = 0, dx = 0, dy = 0;
