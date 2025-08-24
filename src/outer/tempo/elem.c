@@ -198,8 +198,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-    } else {
-        elem->anchor = 40;
     }
     if (cJSON_ExistKey(elem_json, key = "gid")) {
         if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->gid_rect) == false) {
@@ -207,8 +205,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             return false;
         }
         elem->gid = &elem->gid_rect;
-    } else {
-        elem->gid_rect = (SDL_FRect){0, 0, 1, 1};
     }
     if (cJSON_ExistKey(elem_json, key = "src")) {
         if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->src_rect) == false) {
@@ -216,12 +212,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             return false;
         }
         elem->src = &elem->src_rect;
-    }
-    else if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
-        SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
-        SDL_GetTextureSize(texture, &elem->src_rect.w, &elem->src_rect.h);
-        SDL_DestroyTexture(texture);
-        texture = NULL;
     }
     if (cJSON_ExistKey(elem_json, key = "func")) {
         TrigFunc func = NULL; const char* para = NULL;
@@ -478,7 +468,7 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
     if (mouseLeftIn) {
         DEBUG_FillRect(&elem->dst_rect);
     }
-    SDL_RenderTexture(renderer, elem->tex, &elem->src_rect, &elem->dst_rect);
+    SDL_RenderTexture(renderer, elem->tex, elem->src, &elem->dst_rect);
     if (mouseIn || mouseLeftIn) {
         DEBUG_DrawRect(&elem->dst_rect);
     }
