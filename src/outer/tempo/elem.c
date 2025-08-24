@@ -46,18 +46,19 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 struct Elem {
     ElemType type;
     ElemInfo info;
+
     int anchor;
+    SDL_Texture* tex;
     SDL_FRect gid_rect, *gid;
     SDL_FRect src_rect, *src;
-    Trig* trig;
+    SDL_FRect dst_rect, *bck;
 
-    SDL_Texture* tex;
-    SDL_FRect dst_rect;
+    Trig* trig;
 };
 
 
 // SET & GET ===========================================================================================================
-static bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
+bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return false;
@@ -65,7 +66,7 @@ static bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
     elem->dst_rect = dst_rect;
     return true;
 }
-static bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
+bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return false;
@@ -401,47 +402,6 @@ static bool TEMPO_RenewElemDstRect(Elem *elem) {
         );
     return result;
 }
-static bool TEMPO_RenewElemState(const Elem* elem) {
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
-
-    if (mouseLeftIn && mouseIn) {
-        DEVICE_SetMouseLeftTrig(elem->trig);
-    }
-    if (mouseLeftIn) {
-        DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
-        // DEBUG_SendMessageL("    info: %s\n", elem->info);
-        if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
-        }
-    }
-    if (mouseLeftIn) {
-        const float min = elem->dst_rect.x + A + B;
-        const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
-        const float now = DEVICE_GetMousePos().x;
-        if (elem->type == ELEM_TYPE_SLID_F) {
-            if (now <= min)
-                *elem->info.slidF.now = elem->info.slidF.min;
-            else if (now >= max)
-                *elem->info.slidF.now = elem->info.slidF.max;
-            else
-                *elem->info.slidF.now = elem->info.slidF.min + (elem->info.slidF.max - elem->info.slidF.min) * (now - min) / (max - min);
-        }
-        if (elem->type == ELEM_TYPE_SLID_I) {
-            if (now <= min)
-                *elem->info.slidI.now = elem->info.slidI.min;
-            else if (now >= max)
-                *elem->info.slidI.now = elem->info.slidI.max;
-            else
-                *elem->info.slidI.now = (int)((now - min) / (B + C));
-        }
-    }
-    return true;
-}
-static bool TEMPO_RenewElemInfo(Elem* elem) {
-    return true;
-}
 bool TEMPO_RenewElem(Elem *elem) {
     if (TEMPO_RenewElemTex(elem) == false) {
         printf("%s: TEMPO_RenewElemTex(elem) == false\n", __func__);
@@ -451,18 +411,67 @@ bool TEMPO_RenewElem(Elem *elem) {
         printf("%s: TEMPO_RenewElemDstRect(elem) == false\n", __func__);
         return false;
     }
-    if (TEMPO_RenewElemState(elem) == false) {
-        return false;
+
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
+
+    if (mouseLeftIn) {
+        DEBUG_SendMessageL("Elem:\n");
+        DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
+        // DEBUG_SendMessageL("    info: %s\n", elem->info);
+        if (elem->trig != NULL) {
+            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
+        }
     }
-    if (TEMPO_RenewElemInfo(elem) == false) {
-        return false;
+
+    switch (elem->type) {
+        case ELEM_TYPE_FILE:
+        case ELEM_TYPE_TEXT:
+        case ELEM_TYPE_SWITCH: {
+            if (mouseLeftIn && mouseIn) {
+                DEVICE_SetMouseLeftTrig(elem->trig);
+            }
+            break;
+        }
+        case ELEM_TYPE_SLID_I:
+        case ELEM_TYPE_SLID_F: {
+            if (mouseLeftIn == false) {
+                break;
+            }
+            const float min = elem->dst_rect.x + A + B;
+            const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
+            const float now = DEVICE_GetMousePos().x;
+            if (elem->type == ELEM_TYPE_SLID_F) {
+                if (now <= min)
+                    *elem->info.slidF.now = elem->info.slidF.min;
+                else if (now >= max)
+                    *elem->info.slidF.now = elem->info.slidF.max;
+                else
+                    *elem->info.slidF.now = elem->info.slidF.min + (elem->info.slidF.max - elem->info.slidF.min) * (now - min) / (max - min);
+            }
+            if (elem->type == ELEM_TYPE_SLID_I) {
+                if (now <= min)
+                    *elem->info.slidI.now = elem->info.slidI.min;
+                else if (now >= max)
+                    *elem->info.slidI.now = elem->info.slidI.max;
+                else
+                    *elem->info.slidI.now = (int)((now - min) / (B + C));
+            }
+            break;
+        }
+        default: break;
     }
     return true;
 }
 
 
 // DRAW ================================================================================================================
-static bool TEMPO_DrawElem_(const Elem* elem) {
+bool TEMPO_DrawElem(const Elem *elem) {
+    // Req Condition
+    if (renderer == NULL) {
+        DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
+        return false;
+    }
     const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
     const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
     if (mouseLeftIn) {
@@ -471,18 +480,6 @@ static bool TEMPO_DrawElem_(const Elem* elem) {
     SDL_RenderTexture(renderer, elem->tex, elem->src, &elem->dst_rect);
     if (mouseIn || mouseLeftIn) {
         DEBUG_DrawRect(&elem->dst_rect);
-    }
-    return true;
-}
-bool TEMPO_DrawElem(const Elem *elem) {
-    // Req Condition
-    if (renderer == NULL) {
-        DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
-        return false;
-    }
-    if (TEMPO_DrawElem_(elem) == false) {
-        DEBUG_SendMessageR("%s: ???.\n", __func__);
-        return false;
     }
     return true;
 }

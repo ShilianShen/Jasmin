@@ -26,3 +26,11 @@ Menu为Jasmin的子模块, 承担Mouse和屏幕交互的主要功能.
 * 按钮事件
 * 界面跳转
 
+## 位置计算
+* src_rect
+* dst_rect
+* gid_rect
+* bck_rect
+* anchor
+* texture
+
