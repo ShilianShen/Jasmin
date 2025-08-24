@@ -1,16 +1,20 @@
 #include "page.h"
 
+
 // PAGE ================================================================================================================
 struct Page {
     int lenElemTable;
     KeyVal* elemTable;
+
+    int anchor;
+    SDL_FRect src_rect, *src;
+    SDL_FRect dst_rect, *bck;
 };
 
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
-
     const char* key;
     if (cJSON_ExistKey(page_json, key = "elemTable")) {
         const cJSON* elemTable_json = cJSON_GetObjectItem(page_json, key);
@@ -47,6 +51,21 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
+        }
+    }
+    if (cJSON_ExistKey(page_json, key = "anchor")) {
+        if (cJSON_LoadFromObj(page_json, key, JSM_INT, &page->anchor) == false) {
+            printf("%s: failed malloc page.anchor.\n", __func__);
+            return false;
+        }
+    }
+    if (cJSON_ExistKey(page_json, key = "src")) {
+        if (cJSON_LoadFromObj(page_json, key, JSM_RECT, &page->src_rect) == true) {
+            page->src = &page->src_rect;
+        }
+        else {
+            printf("%s: failed malloc page.src.\n", __func__);
+            return false;
         }
     }
     return true;
@@ -99,10 +118,25 @@ Page* TEMPO_CreatePage(const cJSON* page_json) {
 
 
 // RENEW ===============================================================================================================
-bool TEMPO_RenewPage(const Page *page) {
+static bool TEMPO_RenewPage_DstRect(Page* page) {
+    return SDL_LoadDstRectAligned(
+        &page->dst_rect,
+        NULL,
+        page->src,
+        NULL,
+        NULL,
+        page->anchor
+    );
+}
+bool TEMPO_RenewPage(Page *page) {
     // Req Condition
     if (page == NULL) {
         DEBUG_SendMessageR("%s: page not exists.\n", __func__);
+        return false;
+    }
+
+    if (TEMPO_RenewPage_DstRect(page) == false) {
+        DEBUG_SendMessageR("%s: TEMPO_RenewPage_DstRect(page) == false.\n", __func__);
         return false;
     }
 

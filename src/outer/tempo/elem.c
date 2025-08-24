@@ -77,7 +77,7 @@ bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
 
 
 // CREATE & DELETE =====================================================================================================
-static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* string) {
+static SDL_Texture* TEMPO_CreateElem_Tex(const ElemType type, const char* string) {
     SDL_Texture* texture = NULL;
     switch (type) {
         case ELEM_TYPE_FILE: {
@@ -289,7 +289,7 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElemTex(Elem* elem) {
+static bool TEMPO_RenewElem_Tex(Elem* elem) {
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
@@ -297,7 +297,7 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
     switch (elem->type) {
         case ELEM_TYPE_TEXT:
         case ELEM_TYPE_FILE: {
-            elem->tex = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
+            elem->tex = TEMPO_CreateElem_Tex(elem->type, elem->info.string);
             if (elem->tex == NULL) {
                 return false;
             }
@@ -390,7 +390,7 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
     }
     return true;
 }
-static bool TEMPO_RenewElemDstRect(Elem *elem) {
+static bool TEMPO_RenewElem_DstRect(Elem *elem) {
     const bool result = SDL_LoadDstRectAligned(
         &elem->dst_rect,
         elem->tex,
@@ -402,11 +402,11 @@ static bool TEMPO_RenewElemDstRect(Elem *elem) {
     return result;
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (TEMPO_RenewElemTex(elem) == false) {
+    if (TEMPO_RenewElem_Tex(elem) == false) {
         printf("%s: TEMPO_RenewElemTex(elem) == false\n", __func__);
         return false;
     }
-    if (TEMPO_RenewElemDstRect(elem) == false) {
+    if (TEMPO_RenewElem_DstRect(elem) == false) {
         printf("%s: TEMPO_RenewElemDstRect(elem) == false\n", __func__);
         return false;
     }
