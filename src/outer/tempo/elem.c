@@ -1,19 +1,21 @@
-#include "elem.h"
+#include "menu.h"
 
-typedef enum ElemType ElemType;
-typedef union ElemInfo ElemInfo;
+
+// ELEM PARA ===========================================================================================================
+const float A = 4, B = 4, C = 8, D = 48;
+
 
 // ELEM INFO ===========================================================================================================
-union ElemInfo {
+typedef union ElemInfo {
     char* string;
     struct SlidI {int min, max, *now;} slidI;
     struct SlidF {float min, max, *now;} slidF;
     struct Switch {bool* now;} switch_;
-};
+} ElemInfo;
 
 
 // ELEM TYPE ===========================================================================================================
-enum ElemType {
+typedef enum ElemType {
     ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
@@ -21,7 +23,7 @@ enum ElemType {
     ELEM_TYPE_SLID_I,
     ELEM_TYPE_SWITCH,
     ELEM_NUM_TYPES,
-};
+} ElemType;
 const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
@@ -45,12 +47,12 @@ struct Elem {
     ElemType type;
     ElemInfo info;
     int anchor;
-    SDL_FRect gid;
-    SDL_FRect src;
+    SDL_FRect gid_rect, *gid;
+    SDL_FRect src_rect, *src;
     Trig* trig;
 
     SDL_Texture* tex;
-    SDL_FRect dst;
+    SDL_FRect dst_rect;
 };
 
 
@@ -60,7 +62,7 @@ static bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
         printf("%s: elem is null.\n", __func__);
         return false;
     }
-    elem->dst = dst_rect;
+    elem->dst_rect = dst_rect;
     return true;
 }
 static bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
@@ -68,7 +70,7 @@ static bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
         printf("%s: elem is null.\n", __func__);
         return false;
     }
-    *dst_rect = elem->dst;
+    *dst_rect = elem->dst_rect;
     return true;
 }
 
@@ -112,120 +114,134 @@ static SDL_Texture* TEMPO_CreateElem_Texture(const ElemType type, const char* st
 }
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
-    char* type_json = NULL;
-    elem->gid = (SDL_FRect){0, 0, 1, 1};
-    TrigFunc func = NULL;
-    const char* para = NULL;
 
     const char* key;
-    if (cJSON_LoadFromObj(elem_json, key = "type"  , JSM_STRING, &type_json   ) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(elem_json, key = "anchor", JSM_INT   , &elem->anchor) == false) {
-       printf("%s: failed in %s.\n", __func__, key);
-       return false;
-   }
-    if (cJSON_LoadFromObj(elem_json, key = "gid"   , JSM_RECT  , &elem->gid   ) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(elem_json, key = "para"  , JSM_STRING, &para        ) == false) {
-        printf("%s: para == NULL, %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromTab(elem_json, key = "func", (void**)&func, TEMPO_MENU_TRIG_SET) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-
-    if (type_json != NULL) {
-        elem->type = TEMPO_GetElemTypeFromString(type_json);
+    if (cJSON_ExistKey(elem_json, key = "type")) {
+        char* type_json = NULL;
+        if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &type_json) == true) {
+            elem->type = TEMPO_GetElemTypeFromString(type_json);
+        }
         if (elem->type == ELEM_TYPE_NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         } // Req Condition
     }
-
-    const cJSON* info_json = cJSON_GetObjectItem(elem_json, key="info");
-    if (info_json == NULL) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    } // Req Condition
-    switch (elem->type) {
-        case ELEM_TYPE_TEXT:
-        case ELEM_TYPE_FILE: {
-            char* string_json;
-            if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            } // Req Condition
-            if (string_json != NULL) {
-                elem->info.string = strdup(string_json);
-                if (elem->info.string == NULL) {
+    if (cJSON_ExistKey(elem_json, key = "info")) {
+        const cJSON* info_json = cJSON_GetObjectItem(elem_json, key);
+        if (info_json == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        } // Req Condition
+        switch (elem->type) {
+            case ELEM_TYPE_TEXT:
+            case ELEM_TYPE_FILE: {
+                char* string_json;
+                if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                } // Req Condition
+                if (string_json != NULL) {
+                    elem->info.string = strdup(string_json);
+                    if (elem->info.string == NULL) {
+                        printf("%s: failed in %s.\n", __func__, key);
+                        return false;
+                    }
+                } // Req Condition
+                break;
+            }
+            case ELEM_TYPE_SLID_I: {
+                if (cJSON_IsObject(info_json) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-            } // Req Condition
-            break;
+                const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
+                const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT);
+                if ((min && max && now) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+                break;
+            }
+            case ELEM_TYPE_SLID_F: {
+                if (cJSON_IsObject(info_json) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+                const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
+                const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT);
+                if ((min && max && now) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+                break;
+            }
+            case ELEM_TYPE_SWITCH: {
+                if (cJSON_IsString(info_json) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+                elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, info_json->valuestring);
+                elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
+                if (elem->trig == NULL) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                }
+                break;
+            }
+            default: break;
         }
-        case ELEM_TYPE_SLID_I: {
-            if (cJSON_IsObject(info_json) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
-            const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
-            const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
-            const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT);
-            if ((min && max && now) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
-            break;
+    }
+    if (cJSON_ExistKey(elem_json, key = "anchor")) {
+        if (cJSON_LoadFromObj(elem_json, key, JSM_INT, &elem->anchor) == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
         }
-        case ELEM_TYPE_SLID_F: {
-            if (cJSON_IsObject(info_json) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
-            const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
-            const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
-            const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT);
-            if ((min && max && now) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
-            break;
+    } else {
+        elem->anchor = 40;
+    }
+    if (cJSON_ExistKey(elem_json, key = "gid")) {
+        if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->gid_rect) == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
         }
-        case ELEM_TYPE_SWITCH: {
-            if (cJSON_IsString(info_json) == false) {
-                printf("%s: failed in %s.\n", __func__, key);
+        elem->gid = &elem->gid_rect;
+    } else {
+        elem->gid_rect = (SDL_FRect){0, 0, 1, 1};
+    }
+    if (cJSON_ExistKey(elem_json, key = "src")) {
+        if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->src_rect) == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+        elem->src = &elem->src_rect;
+    }
+    else if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
+        SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
+        SDL_GetTextureSize(texture, &elem->src_rect.w, &elem->src_rect.h);
+        SDL_DestroyTexture(texture);
+        texture = NULL;
+    }
+    if (cJSON_ExistKey(elem_json, key = "func")) {
+        TrigFunc func = NULL; const char* para = NULL;
+        if (cJSON_LoadFromTab(elem_json, key, (void**)&func, TEMPO_MENU_TRIG_SET) == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+        if (cJSON_ExistKey(elem_json, "para")) {
+            if (cJSON_LoadFromObj(elem_json, "para", JSM_STRING, &para) == false) {
+                printf("%s: para == NULL, %s.\n", __func__, key);
                 return false;
             }
-            elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL, info_json->valuestring);
-            elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
+        }
+        if (func != NULL && elem->trig == NULL) {
+            elem->trig = CreateTrig(func, para);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
             }
-            break;
         }
-        default: break;
-    }
-
-    if (func != NULL && elem->trig == NULL) {
-        elem->trig = CreateTrig(func, para);
-        if (elem->trig == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
-    }
-
-    if (elem->type == ELEM_TYPE_TEXT || elem->type == ELEM_TYPE_FILE) {
-        SDL_Texture* texture = TEMPO_CreateElem_Texture(elem->type, elem->info.string);
-        SDL_GetTextureSize(texture, &elem->src.w, &elem->src.h);
-        SDL_DestroyTexture(texture);
-        texture = NULL;
     }
 
     return true;
@@ -282,8 +298,6 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
 
 
 // RENEW ===============================================================================================================
-const float A = 4, B = 4, C = 8, D = 48;
-
 static bool TEMPO_RenewElemTex(Elem* elem) {
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -305,8 +319,8 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
                     : elem->info.slidF.max - elem->info.slidF.min;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
-            elem->src = (SDL_FRect){0, 0, W, H};
-            elem->gid.w = elem->gid.h = 1;
+            elem->src_rect = (SDL_FRect){0, 0, W, H};
+            elem->gid_rect.w = elem->gid_rect.h = 1;
             elem->tex = SDL_CreateTexture(
                 renderer,
                 SDL_PIXELFORMAT_RGBA8888,
@@ -360,8 +374,8 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
             const float N = *elem->info.switch_.now;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
-            elem->src = (SDL_FRect){0, 0, W, H};
-            elem->gid.w = elem->gid.h = 1;
+            elem->src_rect = (SDL_FRect){0, 0, W, H};
+            elem->gid_rect.w = elem->gid_rect.h = 1;
             elem->tex = SDL_CreateTexture(
                 renderer,
                 SDL_PIXELFORMAT_RGBA8888,
@@ -388,18 +402,18 @@ static bool TEMPO_RenewElemTex(Elem* elem) {
 }
 static bool TEMPO_RenewElemDstRect(Elem *elem) {
     const bool result = SDL_LoadDstRectAligned(
-        &elem->dst,
+        &elem->dst_rect,
         elem->tex,
-        &elem->src,
-        &elem->gid,
+        elem->src,
+        elem->gid,
         NULL,
         elem->anchor
         );
     return result;
 }
 static bool TEMPO_RenewElemState(const Elem* elem) {
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
 
     if (mouseLeftIn && mouseIn) {
         DEVICE_SetMouseLeftTrig(elem->trig);
@@ -413,8 +427,8 @@ static bool TEMPO_RenewElemState(const Elem* elem) {
         }
     }
     if (mouseLeftIn) {
-        const float min = elem->dst.x + A + B;
-        const float max = elem->dst.x + elem->dst.w - A - B;
+        const float min = elem->dst_rect.x + A + B;
+        const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
         const float now = DEVICE_GetMousePos().x;
         if (elem->type == ELEM_TYPE_SLID_F) {
             if (now <= min)
@@ -459,14 +473,14 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 // DRAW ================================================================================================================
 static bool TEMPO_DrawElem_(const Elem* elem) {
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst);
+    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
     if (mouseLeftIn) {
-        DEBUG_FillRect(&elem->dst);
+        DEBUG_FillRect(&elem->dst_rect);
     }
-    SDL_RenderTexture(renderer, elem->tex, &elem->src, &elem->dst);
+    SDL_RenderTexture(renderer, elem->tex, &elem->src_rect, &elem->dst_rect);
     if (mouseIn || mouseLeftIn) {
-        DEBUG_DrawRect(&elem->dst);
+        DEBUG_DrawRect(&elem->dst_rect);
     }
     return true;
 }

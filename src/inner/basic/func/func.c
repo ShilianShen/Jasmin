@@ -32,15 +32,17 @@ cJSON* getJson(const char* path) {
 
     return json;
 }
-bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE type, void* target) {
-    // 这个函数的任务是: 若(object[key]存在), 则(赋值给target)
-
-    if (object == NULL || key == NULL) return true; // Opt Condition
+bool cJSON_ExistKey(const cJSON* object, const char* key) {
+    if (object == NULL || key == NULL) return false; // Req Condition
     const cJSON* val = cJSON_GetObjectItem(object, key);
-    if (val == NULL) return true; // Opt Condition
-
-    if (target == NULL) return false; // Opt Condition
-
+    if (val == NULL) return false; // Req Condition
+    return true;
+}
+bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE type, void* target) {
+    // 这个函数的任务是: object[key]暴露给target, 不涉及alloc
+    if (object == NULL || key == NULL || target == NULL) return false; // Req Condition
+    const cJSON* val = cJSON_GetObjectItem(object, key);
+    if (val == NULL) return false; // Req Condition
     switch (type) {
         case JSM_INT: {
             if (cJSON_IsNumber(val)) {

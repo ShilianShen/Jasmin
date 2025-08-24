@@ -2,8 +2,8 @@
 
 // PAGE ================================================================================================================
 struct Page {
-    int lenElemSet;
-    Elem** elemSet;
+    int lenElemTable;
+    KeyVal* elemTable;
 };
 
 
@@ -13,39 +13,47 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
 
     const char* key;
     if (cJSON_GetObjectItem(page_json, key = "elemSet") != NULL) {
-        const cJSON* elemSet_json = cJSON_GetObjectItem(page_json, key);
-        if (elemSet_json == NULL) {
+        const cJSON* elemTable_json = cJSON_GetObjectItem(page_json, key);
+        if (elemTable_json == NULL) {
             printf("%s: tomlElems not exists, %s.\n", __func__, key);
             return false;
         } // Req Condition
 
-        page->lenElemSet = cJSON_GetArraySize(elemSet_json);
-        if (page->lenElemSet == 0) {
+        page->lenElemTable = cJSON_GetArraySize(elemTable_json);
+        if (page->lenElemTable == 0) {
             printf("%s: failed malloc page.lenElemSet.\n", __func__);
             return false;
         } // Req Condition
 
-        page->elemSet = calloc(page->lenElemSet, sizeof(Elem*));
-        if (page->elemSet == NULL) {
+        page->elemTable = calloc(page->lenElemTable, sizeof(KeyVal));
+        if (page->elemTable == NULL) {
             printf("%s: failed malloc page.elemSet.\n", __func__);
             return false;
         } // Req Condition
 
-        for (int i = 0; i < page->lenElemSet; i++) {
-            const cJSON* elem_json = cJSON_GetArrayItem(elemSet_json, i);
+        for (int i = 0; i < page->lenElemTable; i++) {
+            const cJSON* elem_json = cJSON_GetArrayItem(elemTable_json, i);
             if (elem_json == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
-
-            page->elemSet[i] = TEMPO_CreateElem(elem_json); // malloc
+            page->elemTable[i].key = strdup(elem_json->string);
+            if (page->elemTable[i].key == NULL) {
+                printf("%s: failed malloc page.elemSet.\n", __func__);
+                return false;
+            } // Req Condition
+            page->elemTable[i].val = TEMPO_CreateElem(elem_json); // malloc
+            if (page->elemTable[i].val == NULL) {
+                printf("%s: failed malloc page.elemSet.\n", __func__);
+                return false;
+            } // Req Condition
         }
     } // lenElemSet, elemSet
     return true;
 }
 static bool TEMPO_CreatePage_CK(const Page* page) {
-    for (int i = 0; i < page->lenElemSet; i++) {
-        if (page->elemSet[i] == NULL) {
+    for (int i = 0; i < page->lenElemTable; i++) {
+        if (page->elemTable[i].key == NULL || page->elemTable[i].val == NULL) {
             printf("%s: elemSet[%d] == NULL.\n", __func__, i);
             return false;
         }
@@ -54,14 +62,18 @@ static bool TEMPO_CreatePage_CK(const Page* page) {
 }
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
-        if (page->elemSet != NULL) {
-            for (int i = 0; i < page->lenElemSet; i++) {
-                if (page->elemSet[i] != NULL) {
-                    page->elemSet[i] = TEMPO_DeleteElem(page->elemSet[i]); // free
+        if (page->elemTable != NULL) {
+            for (int i = 0; i < page->lenElemTable; i++) {
+                if (page->elemTable[i].key != NULL) {
+                    free(page->elemTable[i].key); // free
+                    page->elemTable[i].key = NULL;
+                }
+                if (page->elemTable[i].val != NULL) {
+                    page->elemTable[i].val = TEMPO_DeleteElem(page->elemTable[i].val); // free
                 }
             }
-            free(page->elemSet);
-            page->elemSet = NULL;
+            free(page->elemTable);
+            page->elemTable = NULL;
         }
         free(page);
         page = NULL;
@@ -95,8 +107,8 @@ bool TEMPO_RenewPage(const Page *page) {
     }
 
     //
-    for (int i = 0; i < page->lenElemSet; i++) {
-        const bool renew = TEMPO_RenewElem(page->elemSet[i]);
+    for (int i = 0; i < page->lenElemTable; i++) {
+        const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
         if (renew == false) {
             DEBUG_SendMessageR("%s: renew == false.\n", __func__);
             return false;
@@ -117,8 +129,8 @@ bool TEMPO_DrawPage(const Page* page) {
     //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
     SDL_RenderClear(renderer);
-    for (int i = 0; i < page->lenElemSet; i++) {
-        const bool draw = TEMPO_DrawElem(page->elemSet[i]);
+    for (int i = 0; i < page->lenElemTable; i++) {
+        const bool draw = TEMPO_DrawElem(page->elemTable[i].val);
         if (draw == false) {
             DEBUG_SendMessageR("%s: draw[%d] == false.\n", __func__, i);
             return false;

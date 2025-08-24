@@ -2,7 +2,7 @@
 #define JASMIN_MENU_STRUCT_PAGE_H
 
 
-#include "../elem/elem.h"
+#include "elem.h"
 
 
 typedef struct Page Page;

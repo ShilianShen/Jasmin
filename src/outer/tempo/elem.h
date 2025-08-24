@@ -2,7 +2,7 @@
 #define JASMIN_MENU_STRUCT_ELEM_H
 
 
-#include "../theme/theme.h"
+#include "theme.h"
 
 
 typedef struct Elem Elem;

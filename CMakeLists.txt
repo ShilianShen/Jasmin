@@ -32,23 +32,23 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/third_party/toml/toml.c
         src/third_party/cJSON-1.7.18/cJSON.c
         src/third_party/cJSON-1.7.18/cJSON.h
-        src/outer/tempo/elem/elem.h
-        src/outer/tempo/page/page.h
+        src/outer/tempo/elem.h
+        src/outer/tempo/page.h
         src/inner/basic/basic.h
         src/inner/basic/setting/setting.c
         src/inner/debug/debug.c
         src/inner/device/device.c
         src/inner/basic/ease/ease.c
         src/inner/basic/ease/ease.h
-        src/outer/tempo/elem/elem.c
+        src/outer/tempo/elem.c
         src/outer/tempo/interface.h
         src/outer/tempo/tempo.c
-        src/outer/tempo/page/page.c
+        src/outer/tempo/page.c
         src/inner/basic/interface.h
-        src/outer/tempo/menu/menu.c
-        src/outer/tempo/menu/menu.h
-        src/outer/tempo/theme/theme.c
-        src/outer/tempo/theme/theme.h
+        src/outer/tempo/menu.c
+        src/outer/tempo/menu.h
+        src/outer/tempo/theme.c
+        src/outer/tempo/theme.h
         include/jasmin/jasmin.h
         include/jasmin/tempo.h
         include/jasmin/basic.h

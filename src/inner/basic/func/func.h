@@ -26,6 +26,7 @@ bool SDL_RenderTextureAligned(SDL_Renderer* renderer, SDL_Texture* texture, cons
 
 
 cJSON* getJson(const char* path);
+bool cJSON_ExistKey(const cJSON* object, const char* key);
 bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DATA_TYPE type, void* target);
 bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, const KeyVal* table);
 // toml扩展

@@ -2,7 +2,7 @@
 #define JASMIN_MENU_MENU_H
 
 
-#include "../page/page.h"
+#include "page.h"
 
 
 void TEMPO_LoadMenu();

@@ -2,7 +2,7 @@
 #define TEMPO_BASIC_H
 
 
-#include "../interface.h"
+#include "interface.h"
 
 
 typedef struct Theme Theme;
