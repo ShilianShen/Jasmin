@@ -8,6 +8,7 @@ Theme theme = (Theme){0};
 // LOAD & UNLOAD =======================================================================================================
 bool TEMPO_LoadTheme() {
     memset(&theme, 0, sizeof(theme));
+
     toml_table_t* tomlMenuTheme = getToml(TEMPO_THEME_TOML); // alloc
     if (tomlMenuTheme == NULL) {
         printf("%s: failed from \"%s\".\n", __func__, TEMPO_THEME_TOML);

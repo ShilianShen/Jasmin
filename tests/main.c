@@ -70,8 +70,9 @@ int main(int argc, char *argv[]) {
     while (running) {
         //
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
-                running = false;
+            switch (event.type) {
+                case SDL_EVENT_QUIT: running = false; break;
+                default: break;
             }
         }
         RENEW();

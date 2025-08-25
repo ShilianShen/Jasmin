@@ -6,10 +6,10 @@ SDL_Renderer* renderer = NULL;
 
 
 const char* WINDOW_TITLE = "Test";
-const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 800;
+const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
 bool oftenReload = false;
 bool running = true;
-const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY; //  | SDL_WINDOW_RESIZABLE
 
 
 int logical_w, logical_h;
@@ -30,6 +30,9 @@ void BASIC_Init() {
     if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
     }
+
+    // 或者在创建渲染器时指定
+    // SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 }
 void BASIC_Deinit() {
     SDL_DestroyWindow(window);
