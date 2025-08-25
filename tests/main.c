@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
     INIT();
     LOAD();
     while (running) {
+        const char* myString = strdup("123");
         //
         while (SDL_PollEvent(&event)) {
             switch (event.type) {

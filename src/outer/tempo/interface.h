@@ -5,7 +5,6 @@
 #include "../interface.h"
 
 
-#define TEMPO_THEME_TOML "../config/tempo_theme.toml"
 #define TEMPO_MENU_JSON "../config/tempo_menu.json"
 #define TEMPO_THEME_JSON "../config/tempo_theme.json"
 

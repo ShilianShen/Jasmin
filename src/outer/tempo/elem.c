@@ -103,42 +103,6 @@ bool TEMPO_SetElemPublicTable(const int N, const KeyVal* table) {
 
 
 // CREATE & DELETE =====================================================================================================
-static SDL_Texture* TEMPO_CreateElem_Tex(const ElemType type, const char* string) {
-    SDL_Texture* texture = NULL;
-    switch (type) {
-        case ELEM_TYPE_FILE: {
-            texture = IMG_LoadTexture(renderer, string);
-
-            if (texture == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, string);
-                return NULL;
-            } // Req Condition
-            SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
-            break;
-        }
-        case ELEM_TYPE_TEXT: {
-            texture = TXT_LoadTextureWithLines(
-                renderer,
-                theme.font,
-                string,
-                (SDL_Color){255, 255, 255, 255},
-                EMPTY,
-                'C'
-                );
-            if (texture == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, string);
-                return NULL;
-            } // Req Condition
-            SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
-            break;
-        }
-        default: {
-            texture = NULL;
-            break;
-        }
-    }
-    return texture;
-}
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
     const char* key;
@@ -329,16 +293,33 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
 
 // RENEW ===============================================================================================================
 static bool TEMPO_RenewElem_Tex(Elem* elem) {
-    if (elem->tex != NULL) {
-        SDL_DestroyTexture(elem->tex);
-        elem->tex = NULL;
-    }
     switch (elem->type) {
-        case ELEM_TYPE_TEXT:
         case ELEM_TYPE_FILE: {
-            elem->tex = TEMPO_CreateElem_Tex(elem->type, elem->info.string);
             if (elem->tex == NULL) {
-                return false;
+                elem->tex = IMG_LoadTexture(renderer, elem->info.string);
+                if (elem->tex == NULL) {
+                    printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                    return NULL;
+                } // Req Condition
+                SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
+            }
+            break;
+        }
+        case ELEM_TYPE_TEXT: {
+            if (elem->tex == NULL) {
+                elem->tex = TXT_LoadTextureWithLines(
+                    renderer,
+                    theme.font,
+                    elem->info.string,
+                    (SDL_Color){255, 255, 255, 255},
+                    EMPTY,
+                    'C'
+                    );
+                if (elem->tex == NULL) {
+                    printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                    return NULL;
+                } // Req Condition
+                SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
             }
             break;
         }
@@ -351,22 +332,23 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
             elem->gid_rect.w = elem->gid_rect.h = 1;
-            elem->tex = SDL_CreateTexture(
+            if (elem->tex == NULL) {
+                elem->tex = SDL_CreateTexture(
                 renderer,
                 SDL_PIXELFORMAT_RGBA8888,
                 SDL_TEXTUREACCESS_TARGET,
-                (int)W, (int)H);
-            SDL_SetRenderTarget(renderer, elem->tex);
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
-                const SDL_FRect frame[4] = {
-                    (SDL_FRect){0, 0, W, A},
-                    (SDL_FRect){0, 0, A, H},
-                    (SDL_FRect){0, H - A, W, A},
-                    (SDL_FRect){W - A, 0, A, H},
-                };
-                SDL_RenderFillRects(renderer, frame, 4);
+                (int)W, (int)H
+                );
             }
+            SDL_SetRenderTarget(renderer, elem->tex);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
+            const SDL_FRect frame[4] = {
+                (SDL_FRect){0, 0, W, A},
+                (SDL_FRect){0, 0, A, H},
+                (SDL_FRect){0, H - A, W, A},
+                (SDL_FRect){W - A, 0, A, H},
+            };
+            SDL_RenderFillRects(renderer, frame, 4);
             if (elem->type == ELEM_TYPE_SLID_I) {
                 if (elem->info.slidI.now != NULL) {
                     const int N = *elem->info.slidI.now - elem->info.slidI.min;
@@ -405,23 +387,24 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
             elem->gid_rect.w = elem->gid_rect.h = 1;
-            elem->tex = SDL_CreateTexture(
-                renderer,
-                SDL_PIXELFORMAT_RGBA8888,
-                SDL_TEXTUREACCESS_TARGET,
-                (int)W, (int)H);
-            SDL_SetRenderTarget(renderer, elem->tex);
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
-                const SDL_FRect frame[5] = {
-                    (SDL_FRect){0, 0, W, A},
-                    (SDL_FRect){0, 0, A, H},
-                    (SDL_FRect){0, H - A, W, A},
-                    (SDL_FRect){W - A, 0, A, H},
-                    (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
-                };
-                SDL_RenderFillRects(renderer, frame, 5);
+            if (elem->tex == NULL) {
+                elem->tex = SDL_CreateTexture(
+                   renderer,
+                   SDL_PIXELFORMAT_RGBA8888,
+                   SDL_TEXTUREACCESS_TARGET,
+                   (int)W, (int)H
+                   );
             }
+            SDL_SetRenderTarget(renderer, elem->tex);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
+            const SDL_FRect frame[5] = {
+                (SDL_FRect){0, 0, W, A},
+                (SDL_FRect){0, 0, A, H},
+                (SDL_FRect){0, H - A, W, A},
+                (SDL_FRect){W - A, 0, A, H},
+                (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
+            };
+            SDL_RenderFillRects(renderer, frame, 5);
             SDL_SetRenderTarget(renderer, NULL);
             break;
         }
