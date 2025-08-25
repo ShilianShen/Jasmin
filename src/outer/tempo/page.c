@@ -39,6 +39,8 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
             return false;
         } // Req Condition
 
+        TEMPO_SetElemPublicTable(page->lenElemTable, page->elemTable);
+
         for (int i = 0; i < page->lenElemTable; i++) {
             const cJSON* elem_json = cJSON_GetArrayItem(elemTable_json, i);
             if (elem_json == NULL) {
@@ -56,6 +58,8 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
                 return false;
             } // Req Condition
         }
+
+        TEMPO_SetElemPublicTable(0, NULL);
     }
     if (cJSON_ExistKey(page_json, key = "anchor")) {
         if (cJSON_LoadFromObj(page_json, key, JSM_INT, &page->anchor) == false) {
@@ -152,14 +156,17 @@ bool TEMPO_RenewPage(Page *page) {
 
     //
     TEMPO_SetElemPublicBck(&page->dst_rect);
-    DEVICE_SetMouseLeftTrig(NULL);
-    for (int i = 0; i < page->lenElemTable; i++) {
-        const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
-        if (renew == false) {
-            DEBUG_SendMessageR("%s: renew == false.\n", __func__);
-            return false;
+    {
+        DEVICE_SetMouseLeftTrig(NULL);
+        for (int i = 0; i < page->lenElemTable; i++) {
+            const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
+            if (renew == false) {
+                DEBUG_SendMessageR("%s: renew == false.\n", __func__);
+                return false;
+            }
         }
     }
+    TEMPO_SetElemPublicBck(NULL);
     return true;
 }
 

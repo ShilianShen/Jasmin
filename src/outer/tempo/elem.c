@@ -4,6 +4,8 @@
 // ELEM PARA ===========================================================================================================
 const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* public_bck = NULL;
+static const KeyVal* public_elem_table = NULL;
+static int public_lenElemTable = 0;
 
 
 // ELEM INFO ===========================================================================================================
@@ -82,6 +84,20 @@ bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
     public_bck = bck;
     return true;
 }
+bool TEMPO_SetElemPublicTable(const int N, const KeyVal* table) {
+    if (table == NULL) {
+        public_elem_table = NULL;
+        public_lenElemTable = 0;
+    }
+    else if (N > 0){
+        public_elem_table = table;
+        public_lenElemTable = N;
+    }
+    else {
+        return false;
+    }
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================
@@ -123,7 +139,6 @@ static SDL_Texture* TEMPO_CreateElem_Tex(const ElemType type, const char* string
 }
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     memset(elem, 0, sizeof(Elem));
-
     const char* key;
     if (cJSON_ExistKey(elem_json, key = "type")) {
         char* type_json = NULL;
@@ -239,6 +254,23 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
+            }
+        }
+    }
+    if (cJSON_ExistKey(elem_json, key = "bck")) {
+        const char* bck_json = NULL;
+        if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &bck_json) == false) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+        printf("%s: %s, %d.\n", __func__, bck_json, public_lenElemTable);
+        for (int i = 0; i < public_lenElemTable; i++) {
+            const char* subkey = public_elem_table[i].key;
+            printf("%s: %s.\n", __func__, subkey);
+            if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
+                Elem* other = public_elem_table[i].val;
+                elem->bck = &other->dst_rect;
+                break;
             }
         }
     }
