@@ -317,13 +317,13 @@ bool SDL_LoadDstRectAligned(
 
     // load src (Opt Condition)
     SDL_FRect src = {0, 0, 0, 0};
-    if (src_rect != NULL) {
-        src.w = src_rect->w;
-        src.h = src_rect->h;
-    }
     if (texture == NULL && src_rect == NULL) {
         src.w = (float)windowWidth;
         src.h = (float)windowHeight;
+    }
+    else if (src_rect != NULL) {
+        src.w = src_rect->w;
+        src.h = src_rect->h;
     }
     else {SDL_GetTextureSize(texture, &src.w, &src.h);}
 

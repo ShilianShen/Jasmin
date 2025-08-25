@@ -141,6 +141,7 @@ bool TEMPO_RenewPage(Page *page) {
     }
 
     //
+    TEMPO_SetElemPublicBck(&page->dst_rect);
     for (int i = 0; i < page->lenElemTable; i++) {
         const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
         if (renew == false) {
@@ -163,6 +164,14 @@ bool TEMPO_DrawPage(const Page* page) {
     //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
     SDL_RenderClear(renderer);
+    {
+        SDL_SetRenderTarget(renderer, NULL);
+        DEBUG_SendMessageR("%s: dst = %s.\n", __func__, SDL_GetStringFromFRect(page->dst_rect));
+        SDL_SetRenderDrawColor(renderer, 64, 0, 0, 255);
+        // DEBUG_FillRect(&page->dst_rect);
+        bool ok = SDL_RenderFillRect(renderer, &page->dst_rect);
+        DEBUG_SendMessageR("%s: dst = %s.\n", __func__, SDL_GetStringFromFRect(page->dst_rect));
+    }
     for (int i = 0; i < page->lenElemTable; i++) {
         const bool draw = TEMPO_DrawElem(page->elemTable[i].val);
         if (draw == false) {

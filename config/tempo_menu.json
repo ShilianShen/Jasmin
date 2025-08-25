@@ -10,7 +10,7 @@
         "0005": {"type": "SLID_I", "info": {"min": 0, "max": 100, "now": "test_int"}, "anchor": -11, "gid": [70, 0, 1, 1]},
         "0006": {"type": "SLID_F", "info": {"min": 0, "max": 100, "now": "test_float"}, "anchor": -11, "gid": [70, -100, 1, 1]}
       },
-      "src": [0, 0, 250, 250],
+      "src": [0, 0, 1200, 1200],
       "anchor": 0,
       "bck": null
     },
@@ -22,20 +22,29 @@
           "anchor": -9
         },
         "0001": {"type": "TEXT", "info": "[R2R]", "anchor": 9, "func": "clear"}
-      }
+      },
+      "src": [0, 0, 1100, 1100],
+      "anchor": 0,
+      "bck": null
     },
     "Title": {
       "elemTable": {
         "0000": {"type": "TEXT", "info": "<<< Root.", "anchor": -20, "func": "clear"},
         "0001": {"type": "TEXT", "info": "THE MAZE", "anchor": -9},
         "0002": {"type": "TEXT", "info": "Setting", "anchor": 9, "func": "forward", "para": "Setting"}
-      }
+      },
+      "src": [0, 0, 900, 900],
+      "anchor": -20,
+      "bck": null
     },
     "Setting": {
       "elemTable": {
         "0000": {"type": "TEXT", "info": "<<<", "anchor": -20, "func": "backward"},
         "0001": {"type": "TEXT", "info": "Go Test?.", "anchor": 9, "gid": [0, 10, 1, 1], "func": "forward", "para": "Setting"}
-      }
+      },
+      "src": [0, 0, 800, 800],
+      "anchor": 0,
+      "bck": null
     }
   }
 }

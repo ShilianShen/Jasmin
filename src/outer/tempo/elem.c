@@ -3,6 +3,7 @@
 
 // ELEM PARA ===========================================================================================================
 const float A = 4, B = 4, C = 6, D = 36;
+static const SDL_FRect* public_bck = NULL;
 
 
 // ELEM INFO ===========================================================================================================
@@ -72,6 +73,13 @@ bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
         return false;
     }
     *dst_rect = elem->dst_rect;
+    return true;
+}
+bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
+    if (bck == NULL) {
+        return false;
+    }
+    public_bck = bck;
     return true;
 }
 
@@ -396,7 +404,7 @@ static bool TEMPO_RenewElem_DstRect(Elem *elem) {
         elem->tex,
         elem->src,
         elem->gid,
-        NULL,
+        elem->bck != NULL ? elem->bck : public_bck,
         elem->anchor
         );
     return result;
