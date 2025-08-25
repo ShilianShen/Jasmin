@@ -1,8 +1,6 @@
 # Tempo
 
 要且未实现的东西:
-* page.src, anchor的读取, 影响
-* elem.bck的读取, 影响
 
 ## 介绍
 

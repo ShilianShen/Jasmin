@@ -1,15 +1,7 @@
 # JASMIN
-
-```mermaid
-graph LR
-    SDL3.h --> interface.h
-    toml.h --> interface.h
-    interface.h --> BASIC
-    BASIC --> TEMPO --> jasmin.h
-    BASIC --> LOPO --> jasmin.h
-```
-## 简介 INTRO
-
+![](docs/icon/icon_256.png)
+## INTRO
+Jasmin
 Jasmin是基于SDL3的, OolongImPress自用的GUI.
 
 关于此文档可能任然有模糊之处, 可以直接联系我:)
