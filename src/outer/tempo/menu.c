@@ -43,7 +43,7 @@ Menu menu;
 
 
 // LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadMenuPageSet(const cJSON* pageSet_json) {
+static bool TEMPO_LoadMenu_PageSet(const cJSON* pageSet_json) {
     if (pageSet_json == NULL) {
         printf("%s: tomlMenu == NULL.\n", __func__);
         return false;
@@ -99,20 +99,37 @@ static bool TEMPO_LoadMenuPageSet(const cJSON* pageSet_json) {
 
     return true;
 }
-void TEMPO_LoadMenu() {
-    memset(&menu, 0, sizeof(Menu));
-
-    cJSON* menu_json = getJson(TEMPO_MENU_JSON);
-    if (menu_json == NULL) {
-        printf("%s: getJson == NULL.\n", __func__);
-        return;
-    } // Req Condition
+static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
     const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, "pageTable");
     if (pageSet_json == NULL) {
         printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
+        return false;
     } // Req Condition
-    TEMPO_LoadMenuPageSet(pageSet_json);
+
+    if (TEMPO_LoadMenu_PageSet(pageSet_json) == false) {
+        printf("%s: TEMPO_LoadMenu_PageSet == false.\n", __func__);
+        return false;
+    } // Req Condition
+
+    return true;
+}
+
+bool TEMPO_LoadMenu() {
+    memset(&menu, 0, sizeof(Menu));
+    cJSON* menu_json = getJson(TEMPO_MENU_JSON);
+    if (menu_json == NULL) {
+        printf("%s: getJson == NULL.\n", __func__);
+        return false;
+    } // Req Condition
+
+    const bool rk = TEMPO_LoadMenu_RK(menu_json);
     cJSON_Delete(menu_json);
+
+    if (rk == false) {
+        TEMPO_UnloadMenu();
+        return false;
+    }
+    return true;
 }
 void TEMPO_UnloadMenu() {
     for (int i = 0; i < menu.lenPageTable; i++) {

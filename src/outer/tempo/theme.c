@@ -6,26 +6,55 @@ Theme theme = (Theme){0};
 
 
 // LOAD & UNLOAD =======================================================================================================
+static bool TEMPO_LoadTheme_RK(const cJSON* theme_json) {
+    const char* key = NULL;
+    const char* font_path = NULL;
+    float font_size = 0;
+    SDL_Color font_color = {0};
+    if (cJSON_ExistKey(theme_json, key = "font_path")) {
+        if (cJSON_LoadFromObj(theme_json, key, JSM_STRING, &font_path) == false) {
+            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (cJSON_ExistKey(theme_json, key = "font_size")) {
+        if (cJSON_LoadFromObj(theme_json, key, JSM_FLOAT, &font_size) == false) {
+            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (cJSON_ExistKey(theme_json, key = "font_color")) {
+        if (cJSON_LoadFromObj(theme_json, key, JSM_COLOR, &font_color) == false) {
+            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (font_path != NULL && font_size > 0) {
+        theme.font = TTF_OpenFont(font_path, font_size); // alloc
+        if (theme.font == NULL) {
+            printf("%s: failed from.\n", __func__);
+        } // Req Condition
+    }
+    return true;
+}
 bool TEMPO_LoadTheme() {
     memset(&theme, 0, sizeof(theme));
 
-    toml_table_t* tomlMenuTheme = getToml(TEMPO_THEME_TOML); // alloc
-    if (tomlMenuTheme == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, TEMPO_THEME_TOML);
+    cJSON* theme_json = getJson(TEMPO_THEME_JSON);
+    if (theme_json == NULL) {
+        printf("%s: getJson == NULL.\n", __func__);
         return false;
     } // Req Condition
 
-    const toml_datum_t tomlFontPath = toml_string_in(tomlMenuTheme, "font_path");
-    const toml_datum_t tomlFontSize = toml_double_in(tomlMenuTheme, "font_size");
+    const bool rk = TEMPO_LoadTheme_RK(theme_json);
+    cJSON_Delete(theme_json);
 
-    if (tomlFontPath.ok == true && tomlFontSize.ok == true) {
-        theme.font = TTF_OpenFont(tomlFontPath.u.s, (float)tomlFontSize.u.d); // alloc
-        if (theme.font == NULL) {
-            printf("%s: failed from %s.\n", __func__, tomlFontPath.u.s);
-        } // Req Condition
+    if (rk == false) {
+        printf("%s: TEMPO_LoadTheme_RK failed.\n", __func__);
+        TEMPO_UnloadTheme();
+        return false;
     }
-    toml_free(tomlMenuTheme); // free
-    return tomlFontPath.ok == true && tomlFontSize.ok == true && theme.font != NULL;
+    return true;
 }
 void TEMPO_UnloadTheme() {
     if (theme.font != NULL) {
