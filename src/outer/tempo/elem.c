@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "menu.h"
 
 
@@ -263,10 +265,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        printf("%s: %s, %d.\n", __func__, bck_json, public_lenElemTable);
         for (int i = 0; i < public_lenElemTable; i++) {
             const char* subkey = public_elem_table[i].key;
-            printf("%s: %s.\n", __func__, subkey);
             if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
                 Elem* other = public_elem_table[i].val;
                 elem->bck = &other->dst_rect;
@@ -274,7 +274,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
     }
-
     return true;
 }
 static bool TEMPO_CreateElem_CK(const Elem* elem) {
@@ -461,6 +460,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         if (elem->trig != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
         }
+        DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
 
     switch (elem->type) {
@@ -516,7 +516,13 @@ bool TEMPO_DrawElem(const Elem *elem) {
     if (mouseLeftIn) {
         DEBUG_FillRect(&elem->dst_rect);
     }
-    SDL_RenderTexture(renderer, elem->tex, elem->src, &elem->dst_rect);
+    const SDL_FRect dst = {
+        roundf(elem->dst_rect.x),
+        roundf(elem->dst_rect.y),
+        roundf(elem->dst_rect.w),
+        roundf(elem->dst_rect.h),
+    };
+    SDL_RenderTexture(renderer, elem->tex, elem->src, &dst);
     if (mouseIn || mouseLeftIn) {
         DEBUG_DrawRect(&elem->dst_rect);
     }

@@ -2,13 +2,18 @@
   "pageTable": {
     "Root": {
       "elemTable": {
-        "0000": {"type": "FILE", "info": "../resources/images/491.gif", "anchor": -9, "gid": [0, 0, 2, 2]},
+        "0000": {"type": "FILE", "info": "../resources/images/491.gif", "anchor": -10, "gid": [0, 0, 2, 2]},
+        "0005": {
+          "type": "TEXT",
+          "info": "The dead can be cured.",
+          "anchor": 4,
+          "bck": "0000"
+        },
         "0001": {"type": "TEXT", "info": "The dead can be cured.", "anchor": 9},
-        "0002": {"type": "TEXT", "info": "The dead can be cured.", "anchor": 37, "bck": "0001"},
-        "0003": {"type": "TEXT", "info": "Title", "anchor": -20, "func": "forward", "para": "Title"},
-        "0004": {"type": "SWITCH", "info": "test_bool", "anchor": -11, "gid": [70, 100, 1, 1]},
-        "0005": {"type": "SLID_I", "info": {"min": 0, "max": 100, "now": "test_int"}, "anchor": -11, "gid": [70, 0, 1, 1]},
-        "0006": {"type": "SLID_F", "info": {"min": 0, "max": 100, "now": "test_float"}, "anchor": -11, "gid": [70, -100, 1, 1]}
+        "0002": {"type": "TEXT", "info": "Title", "anchor": -20, "func": "forward", "para": "Title"},
+        "0003": {"type": "SLID_I", "info": {"min": 0, "max": 100, "now": "test_int"}, "anchor": -11, "gid": [70, 0, 1, 1]},
+        "0004": {"type": "SLID_F", "info": {"min": 0, "max": 100, "now": "test_float"}, "anchor": -11, "gid": [70, -100, 1, 1]},
+        "0006": {"type": "SWITCH", "info": "test_bool", "anchor": -11, "gid": [70, 100, 1, 1]}
       },
       "src": [0, 0, 1200, 1200],
       "anchor": -2,
