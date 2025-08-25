@@ -7,7 +7,7 @@
 
 #define TEMPO_MENU_JSON "../config/tempo_menu.json"
 #define TEMPO_THEME_JSON "../config/tempo_theme.json"
-
+#define TEMPO_OFEN_RELOAD 0
 
 extern const KeyVal TEMPO_TABLE_INT[];
 extern const KeyVal TEMPO_TABLE_FLOAT[];

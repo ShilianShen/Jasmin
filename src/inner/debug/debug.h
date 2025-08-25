@@ -3,7 +3,7 @@
 
 
 /*
- * Debug是同来简化Debug的, 尤其是显示的部分.
+ * Debug是简化Debug的, 尤其是显示的部分.
  * 所以Debug函数在Debug.on = false时都不会做任何事情.
  */
 
@@ -11,12 +11,11 @@
 #include "../basic/basic.h"
 
 
+#define DEBUG_ON 1
+
 void DEBUG_Init(SDL_Renderer* renderer);
 void DEBUG_Load();
 void DEBUG_Renew();
-
-
-void DEBUG_Intro();
 
 
 void DEBUG_DrawPoint(Sint16 x, Sint16 y);

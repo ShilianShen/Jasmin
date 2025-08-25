@@ -3,7 +3,6 @@
 
 typedef struct Debug Debug;
 struct Debug {
-    bool on;
     SDL_Renderer* renderer;
     struct {
         TTF_Font *font24, *font32, *font64, *font128, *font256;
@@ -34,7 +33,7 @@ static void DEBUG_LoadTheme() {
     debug.theme.font128 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 128);
     debug.theme.font256 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 256);
     if (debug.theme.font128 == NULL) {printf("Fail to load font.\n");}
-    debug.on = true;
+    // debug.on = true;
 
     // color
     debug.theme.point = (SDL_Color){246, 202, 124, 255};
@@ -63,7 +62,7 @@ void DEBUG_Load() {
 }
 void DEBUG_Renew() {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     //
     for (int i = 0; i < 2; i++) {
@@ -81,56 +80,9 @@ void DEBUG_Renew() {
 }
 
 
-void DEBUG_Intro() {
-    // Pre Condition
-    if (!debug.on) {return;}
-
-    static const Uint64 T1 = 1000, T2 = 2000, T3 = 2500, T4 = 3000;
-    static SDL_Texture *textureDark = NULL, *textureLight = NULL;
-    static float darkWidth, darkHeight, lightWidth, lightHeight;
-
-    const Uint64 nowTime = SDL_GetTicks();
-    if (nowTime < T4) {
-        if (textureDark == NULL) {
-            textureDark = TXT_LoadTexture(debug.renderer, debug.theme.font128, "[DEBUG:]", debug.theme.dark);
-            SDL_GetTextureSize(textureDark, &darkWidth, &darkHeight);
-        }
-        if (textureLight == NULL) {
-            textureLight = TXT_LoadTexture(debug.renderer, debug.theme.font256, "ON", debug.theme.light);
-            SDL_GetTextureSize(textureLight, &lightWidth, &lightHeight);
-        }
-    }
-    else {
-        SDL_DestroyTexture(textureLight);
-        SDL_DestroyTexture(textureDark);
-        textureLight = NULL;
-        textureDark = NULL;
-    }
-    if (T1 <= nowTime && nowTime < T4) {
-        const SDL_Color colors[] = {debug.theme.point, debug.theme.rect, debug.theme.face, debug.theme.text};
-        const int num_colors = sizeof(colors) / sizeof(SDL_Color);
-        SDL_FRect rect = {((float)windowWidth - darkWidth) / 2, ((float)windowHeight - darkHeight) / 2, 0, darkHeight};
-        for (int i = 0; i < num_colors; i++) {
-            rect.w = darkWidth * (float)(4 - i) / (float)num_colors * EASE_Sin2((float)(nowTime - T1) / (float)(T2 - T1));
-            SDL_SetRenderSDLColor(debug.renderer, colors[3 - i]);
-            SDL_RenderFillRect(debug.renderer, &rect);
-        }
-        rect.w = darkWidth;
-        SDL_RenderTexture(debug.renderer, textureDark, NULL, &rect);
-    }
-    if (T1 <= nowTime && nowTime < T4) {
-        SDL_FRect src_rect = {0, 0, lightWidth, 0};
-        SDL_FRect dst_rect = {((float)windowWidth - lightWidth) / 2, ((float)windowHeight - lightHeight) / 2, lightWidth, 0};
-        src_rect.h = dst_rect.h = lightHeight * EASE_Sin2((float)(nowTime - T1) / (float)(T3 - T1));
-        dst_rect.y += lightHeight - dst_rect.h;
-        SDL_RenderTexture(debug.renderer, textureLight, &src_rect, &dst_rect);
-    }
-}
-
-
 void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // point
     const float w = 8;
@@ -142,7 +94,7 @@ void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
 }
 void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // line
     SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.point, debug.theme.alphaDark);
@@ -150,7 +102,7 @@ void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float 
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // Req Condition
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
@@ -161,7 +113,7 @@ void DEBUG_DrawRect(const SDL_FRect* rect) {
 }
 void DEBUG_FillRect(const SDL_FRect* rect) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // Req Condition
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
@@ -176,7 +128,7 @@ void DEBUG_FillRect(const SDL_FRect* rect) {
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     // Pre Condition
-    if (!debug.on) {return NULL;}
+    if (!DEBUG_ON) {return NULL;}
 
     // Req Condition
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return NULL;}
@@ -191,7 +143,7 @@ static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
 }
 void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // Req Condition
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
@@ -210,7 +162,7 @@ void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
 }
 void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // Req Condition
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
@@ -226,7 +178,7 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 }
 void DEBUG_DrawFace(const SDL_Vertex* vertices) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     //
     const float a = 0.1f;
@@ -254,7 +206,7 @@ void DEBUG_DrawFace(const SDL_Vertex* vertices) {
 
 static void DEBUG_SendMessage(const int i, const char* newMessage) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // getMessage
     if (debug.message[i] == NULL) {
@@ -279,7 +231,7 @@ static void DEBUG_SendMessage(const int i, const char* newMessage) {
 }
 void DEBUG_SendMessageL(const char* format, ...) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // getNewMessage
     char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
@@ -293,7 +245,7 @@ void DEBUG_SendMessageL(const char* format, ...) {
 }
 void DEBUG_SendMessageR(const char* format, ...) {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
 
     // getNewMessage
     char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
@@ -307,7 +259,7 @@ void DEBUG_SendMessageR(const char* format, ...) {
 }
 void DEBUG_DrawMessage() {
     // Pre Condition
-    if (!debug.on) {return;}
+    if (!DEBUG_ON) {return;}
     const bool* state = SDL_GetKeyboardState(NULL);
     if (state[SDL_SCANCODE_LSHIFT] == false) { return; }
 

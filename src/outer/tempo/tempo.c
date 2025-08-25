@@ -12,8 +12,7 @@ void TEMPO_Unload() {
     TEMPO_UnloadTheme();
 }
 void TEMPO_Renew() {
-    static bool reload = !true;
-    if (reload == true) {
+    if (TEMPO_OFEN_RELOAD) {
         DEBUG_SendMessageL("reload = true\n");
         TEMPO_Unload();
         TEMPO_Load();

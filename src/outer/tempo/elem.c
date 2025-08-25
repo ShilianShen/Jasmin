@@ -293,34 +293,34 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
 
 // RENEW ===============================================================================================================
 static bool TEMPO_RenewElem_Tex(Elem* elem) {
+    if (elem->tex != NULL) {
+        SDL_DestroyTexture(elem->tex);
+        elem->tex = NULL;
+    }
     switch (elem->type) {
         case ELEM_TYPE_FILE: {
+            elem->tex = IMG_LoadTexture(renderer, elem->info.string);
             if (elem->tex == NULL) {
-                elem->tex = IMG_LoadTexture(renderer, elem->info.string);
-                if (elem->tex == NULL) {
-                    printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
-                    return NULL;
-                } // Req Condition
-                SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
-            }
+                printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                return NULL;
+            } // Req Condition
+            SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
             break;
         }
         case ELEM_TYPE_TEXT: {
+            elem->tex = TXT_LoadTextureWithLines(
+                renderer,
+                theme.font,
+                elem->info.string,
+                (SDL_Color){255, 255, 255, 255},
+                EMPTY,
+                'C'
+                );
             if (elem->tex == NULL) {
-                elem->tex = TXT_LoadTextureWithLines(
-                    renderer,
-                    theme.font,
-                    elem->info.string,
-                    (SDL_Color){255, 255, 255, 255},
-                    EMPTY,
-                    'C'
-                    );
-                if (elem->tex == NULL) {
-                    printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
-                    return NULL;
-                } // Req Condition
-                SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
-            }
+                printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                return NULL;
+            } // Req Condition
+            SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
             break;
         }
         case ELEM_TYPE_SLID_I:
@@ -332,14 +332,12 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
             elem->gid_rect.w = elem->gid_rect.h = 1;
-            if (elem->tex == NULL) {
-                elem->tex = SDL_CreateTexture(
-                renderer,
-                SDL_PIXELFORMAT_RGBA8888,
-                SDL_TEXTUREACCESS_TARGET,
-                (int)W, (int)H
-                );
-            }
+            elem->tex = SDL_CreateTexture(
+            renderer,
+            SDL_PIXELFORMAT_RGBA8888,
+            SDL_TEXTUREACCESS_TARGET,
+            (int)W, (int)H
+            );
             SDL_SetRenderTarget(renderer, elem->tex);
             SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
             const SDL_FRect frame[4] = {
@@ -387,14 +385,12 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
             elem->gid_rect.w = elem->gid_rect.h = 1;
-            if (elem->tex == NULL) {
-                elem->tex = SDL_CreateTexture(
-                   renderer,
-                   SDL_PIXELFORMAT_RGBA8888,
-                   SDL_TEXTUREACCESS_TARGET,
-                   (int)W, (int)H
-                   );
-            }
+            elem->tex = SDL_CreateTexture(
+               renderer,
+               SDL_PIXELFORMAT_RGBA8888,
+               SDL_TEXTUREACCESS_TARGET,
+               (int)W, (int)H
+               );
             SDL_SetRenderTarget(renderer, elem->tex);
             SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
             const SDL_FRect frame[5] = {
@@ -450,7 +446,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         case ELEM_TYPE_FILE:
         case ELEM_TYPE_TEXT:
         case ELEM_TYPE_SWITCH: {
-            if (mouseLeftIn && mouseIn) {
+            if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
                 DEVICE_SetMouseLeftTrig(elem->trig);
             }
             break;
