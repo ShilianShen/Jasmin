@@ -15,6 +15,7 @@ Jasmin is a 2D&3D rendering library based on C and SDL3, currently for internal 
 ```bash
 brew install sdl3 sdl3_ttf sdl3_image
 ```
+
 ```bash
 brew upgrade sdl3 sdl3_ttf sdl3_image
 ```
@@ -24,10 +25,19 @@ brew upgrade sdl3 sdl3_ttf sdl3_image
 The following are special function identifiers and their explanations:
 
 
-| Return Type | Function Name      | Parameters |
-| ----------- | ------------------ | ---------- |
-| MyStruct*   | XX_CreateMyStruct  | ...        |
-| void        | XX_DestroyMyStruct | MyStruct*  |
+| type   | Return    | Function Name     | Para               | Explan |
+| ------ | --------- | ----------------- | ------------------ | ------ |
+| extern | MyStruct* | XX_CreateMyStruct | cJSON*             |        |
+| extern | MyStruct* | XX_DeleteMyStruct | MyStruct*          |        |
+| extern | bool      | XX_RenewMyStruct  | MyStruct*          |        |
+| extern | bool      | XX_DrawMyStruct   | MyStruct*          |        |
+| extern | bool      | XX_Init           | void               |        |
+| extern | bool      | XX_Exit           | void               |        |
+| extern | bool      | XX_Renew          | void               |        |
+| extern | bool      | XX_Draw           | void               |        |
+| static | bool      | XX_YY_ZZ          | MyStruct*          |        |
+| static | bool      | XX_YY_RK          | MyStruct*, cJSON* | Risk   |
+| static | bool      | XX_YY_CK          | MyStruct*          | Check  |
 
 * init & deinit: Initialization (called only once before deinit) and deinitialization (can be called repeatedly after unload). These typically do not require file parameters.
 * load & unload: Loading (called only once after init and before unload) and unloading (can be called repeatedly). These usually involve file-related parameters.
