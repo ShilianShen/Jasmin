@@ -144,17 +144,17 @@ void TEMPO_UnloadMenu() {
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("tempo.path: /%s", BASIC_GetKeyByVal(menu.pageTable, menu.pageRoot));
+    DEBUG_SendMessageL("tempo.path: /%s", BASIC_GetKeyByVal(menu.lenPageTable, menu.pageTable, menu.pageRoot));
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear)
             menu.path[i] = NULL;
         else if (menu.path[i] == NULL)
             need_clear = true;
         else
-            DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.pageTable, menu.path[i]));
+            DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.lenPageTable, menu.pageTable, menu.path[i]));
     }
     if (need_clear == false) {
-        DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.pageTable, menu.pageEdge));
+        DEBUG_SendMessageL("/%s", BASIC_GetKeyByVal(menu.lenPageTable, menu.pageTable, menu.pageEdge));
     }
     DEBUG_SendMessageL("\n");
 }
@@ -252,3 +252,4 @@ const KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"switch", TEMPO_TrigFuncSwitch},
     {NULL, NULL}
 };
+const int TEMPO_MENU_TRIG_SET_LEN = sizeof(TEMPO_MENU_TRIG_SET) / sizeof(KeyVal);

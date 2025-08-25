@@ -71,5 +71,4 @@ int main() {
         running = running && Draw();
     }
     Exit();
-    return 0;
 }
