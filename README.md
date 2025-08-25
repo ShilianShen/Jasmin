@@ -7,10 +7,7 @@ graph LR
     interface.h --> BASIC
     BASIC --> TEMPO --> jasmin.h
     BASIC --> LOPO --> jasmin.h
-
-  
 ```
-
 ## 简介 INTRO
 
 Jasmin是基于SDL3的, OolongImPress自用的GUI.

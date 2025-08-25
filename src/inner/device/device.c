@@ -62,11 +62,11 @@ bool DEVICE_MouseLeftInRect(const SDL_FRect* rect) {
         );
 }
 void DEVICE_SetMouseLeftTrig(const Trig *trig) {
-    if (trig == NULL) {
-        return;
-    }
     if (mouse.left_trig != NULL) {
         mouse.left_trig = DeleteTrig(mouse.left_trig);
+    }
+    if (trig == NULL) {
+        return;
     }
     mouse.left_trig = CreateTrig(trig->func, trig->para);
 }

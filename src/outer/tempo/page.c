@@ -1,5 +1,8 @@
 #include "page.h"
 
+// PAGE PARA ===========================================================================================================
+const SDL_FRect* public_bck = NULL;
+
 
 // PAGE ================================================================================================================
 struct Page {
@@ -9,6 +12,7 @@ struct Page {
     int anchor;
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
+    SDL_Color color;
 };
 
 
@@ -65,6 +69,12 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         }
         else {
             printf("%s: failed malloc page.src.\n", __func__);
+            return false;
+        }
+    }
+    if (cJSON_ExistKey(page_json, key = "color")) {
+        if (cJSON_LoadFromObj(page_json, key, JSM_COLOR, &page->color) == false) {
+            printf("%s: failed malloc page.color.\n", __func__);
             return false;
         }
     }
@@ -142,6 +152,7 @@ bool TEMPO_RenewPage(Page *page) {
 
     //
     TEMPO_SetElemPublicBck(&page->dst_rect);
+    DEVICE_SetMouseLeftTrig(NULL);
     for (int i = 0; i < page->lenElemTable; i++) {
         const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
         if (renew == false) {
@@ -162,16 +173,12 @@ bool TEMPO_DrawPage(const Page* page) {
     }
 
     //
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
-    SDL_RenderClear(renderer);
-    {
-        SDL_SetRenderTarget(renderer, NULL);
-        DEBUG_SendMessageR("%s: dst = %s.\n", __func__, SDL_GetStringFromFRect(page->dst_rect));
-        SDL_SetRenderDrawColor(renderer, 64, 0, 0, 255);
-        // DEBUG_FillRect(&page->dst_rect);
-        bool ok = SDL_RenderFillRect(renderer, &page->dst_rect);
-        DEBUG_SendMessageR("%s: dst = %s.\n", __func__, SDL_GetStringFromFRect(page->dst_rect));
-    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 64);
+    SDL_RenderFillRect(renderer, NULL);
+
+    SDL_SetRenderSDLColor(renderer, page->color);
+    SDL_RenderFillRect(renderer, &page->dst_rect);
+
     for (int i = 0; i < page->lenElemTable; i++) {
         const bool draw = TEMPO_DrawElem(page->elemTable[i].val);
         if (draw == false) {

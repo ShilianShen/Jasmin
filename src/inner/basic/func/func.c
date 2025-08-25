@@ -85,6 +85,26 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE
             *(char**)target = val->valuestring;
             return true;
         }
+        case JSM_COLOR:  {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* color_json[4];
+            for (int i = 0; i < 4; i++) {
+                color_json[i] = cJSON_GetArrayItem(val, i);
+                if (color_json[i] == NULL || cJSON_IsNumber(color_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_Color color = {
+                (int)color_json[0]->valuedouble,
+                (int)color_json[1]->valuedouble,
+                (int)color_json[2]->valuedouble,
+                (int)color_json[3]->valuedouble,
+            };
+            *(SDL_Color*)target = color;
+            return true;
+        }
         default: return false;
     }
 }

@@ -12,7 +12,7 @@
       },
       "src": [0, 0, 1200, 1200],
       "anchor": 0,
-      "bck": null
+      "color": [64, 0, 0, 255]
     },
     "Edge": {
       "elemTable": {
@@ -24,8 +24,8 @@
         "0001": {"type": "TEXT", "info": "[R2R]", "anchor": 9, "func": "clear"}
       },
       "src": [0, 0, 1100, 1100],
-      "anchor": 0,
-      "bck": null
+      "anchor": 16,
+      "color": [0, 64, 0, 255]
     },
     "Title": {
       "elemTable": {
@@ -35,7 +35,7 @@
       },
       "src": [0, 0, 900, 900],
       "anchor": -20,
-      "bck": null
+      "color": [0, 0, 64, 255]
     },
     "Setting": {
       "elemTable": {
@@ -44,7 +44,7 @@
       },
       "src": [0, 0, 800, 800],
       "anchor": 0,
-      "bck": null
+      "color": [64, 64, 0, 255]
     }
   }
 }
