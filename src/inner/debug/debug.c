@@ -16,16 +16,6 @@ const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
 
 
-void DEBUG_Init(SDL_Renderer* renderer) {
-    // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return;}
-
-    //
-    debug = (Debug){0};
-    debug.renderer = renderer;
-    // 设置渲染器的混合模式（启用 Alpha 混合）
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-}
 static void DEBUG_LoadTheme() {
     debug.theme.font24 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 24);
     debug.theme.font32 = TTF_OpenFont("../resources/fonts/JetBrainsMono-Regular.ttf", 32);
@@ -57,12 +47,24 @@ static void DEBUG_LoadTheme() {
     debug.theme.darkFace.a = debug.theme.alphaDark;
     debug.theme.darkText.a = debug.theme.alphaDark;
 }
-void DEBUG_Load() {
+static void DEBUG_Load() {
     DEBUG_LoadTheme();
 }
-void DEBUG_Renew() {
+bool DEBUG_Init() {
+    // Req Condition
+    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return false;}
+
+    //
+    debug = (Debug){0};
+    debug.renderer = renderer;
+    // 设置渲染器的混合模式（启用 Alpha 混合）
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    DEBUG_Load();
+    return true;
+}
+bool DEBUG_Renew() {
     // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) {return true;}
 
     //
     for (int i = 0; i < 2; i++) {
@@ -77,6 +79,14 @@ void DEBUG_Renew() {
     t2 = SDL_GetTicks();
     DEBUG_SendMessageL("FPS: %4.2f\n", 1000.f / (float)(t2 - t1));
     t1 = SDL_GetTicks();
+    return true;
+}
+void DEBUG_Exit() {
+    TTF_CloseFont(debug.theme.font24);
+    TTF_CloseFont(debug.theme.font32);
+    TTF_CloseFont(debug.theme.font64);
+    TTF_CloseFont(debug.theme.font128);
+    TTF_CloseFont(debug.theme.font256);
 }
 
 
@@ -257,13 +267,15 @@ void DEBUG_SendMessageR(const char* format, ...) {
     //
     DEBUG_SendMessage(1, newMessage);
 }
-void DEBUG_DrawMessage() {
+
+bool DEBUG_Draw() {
     // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) {return true;}
     const bool* state = SDL_GetKeyboardState(NULL);
-    if (state[SDL_SCANCODE_LSHIFT] == false) { return; }
+    if (state[SDL_SCANCODE_LSHIFT] == false) { return true; }
 
     // Opt Condition
     if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
     if (debug.message[1] != NULL) {DEBUG_DrawTextAligned(debug.message[1], 'R');}
+    return true;
 }

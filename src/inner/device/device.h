@@ -5,8 +5,9 @@
 #include "../debug/debug.h"
 
 
-void DEVICE_RenewMouse();
-void DEVICE_DrawMouse(SDL_Renderer* renderer);
+bool DEVICE_Renew();
+
+bool DEVICE_Draw();
 bool DEVICE_MouseInRect(const SDL_FRect* rect);
 bool DEVICE_MouseLeftInRect(const SDL_FRect* rect);
 void DEVICE_SetMouseLeftTrig(const Trig *trig);

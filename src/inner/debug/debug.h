@@ -13,9 +13,10 @@
 
 #define DEBUG_ON 1
 
-void DEBUG_Init(SDL_Renderer* renderer);
-void DEBUG_Load();
-void DEBUG_Renew();
+bool DEBUG_Init();
+
+bool DEBUG_Renew();
+void DEBUG_Exit();
 
 
 void DEBUG_DrawPoint(Sint16 x, Sint16 y);
@@ -29,7 +30,8 @@ void DEBUG_DrawFace(const SDL_Vertex* vertices);
 
 void DEBUG_SendMessageL(const char* format, ...);
 void DEBUG_SendMessageR(const char* format, ...);
-void DEBUG_DrawMessage();
+
+bool DEBUG_Draw();
 
 
 #endif //JASMIN_BASIC_DEBUG_H

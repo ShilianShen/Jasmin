@@ -15,7 +15,7 @@ struct Mouse {
 struct Mouse mouse = {0};
 
 
-void DEVICE_RenewMouse() {
+bool DEVICE_Renew() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
 
     if (mouse.left_trig != NULL && mouse.left_pressed == true && (buttons & SDL_BUTTON_LMASK) == false) {
@@ -37,8 +37,10 @@ void DEVICE_RenewMouse() {
     }
     mouse.left_pressed = buttons & SDL_BUTTON_LMASK;
     mouse.right_pressed = buttons & SDL_BUTTON_RMASK;
+    return true;
 }
-void DEVICE_DrawMouse(SDL_Renderer* renderer) {
+
+bool DEVICE_Draw() {
     DEBUG_SendMessageL("mouse: %.2f, %.2f\n", mouse.x, mouse.y);
     if (mouse.left_trig != NULL) {
         DEBUG_SendMessageL("mouse.left_trig != NULL\n");
@@ -48,6 +50,7 @@ void DEVICE_DrawMouse(SDL_Renderer* renderer) {
     if (mouse.left_pressed) {
         DEBUG_DrawLine(mouse.x, mouse.y, mouse.left_x, mouse.left_y);
     }
+    return true;
 }
 bool DEVICE_MouseInRect(const SDL_FRect* rect) {
     return (

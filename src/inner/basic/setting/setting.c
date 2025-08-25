@@ -17,24 +17,33 @@ float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
 
 
-
-void BASIC_Init() {
+bool BASIC_Init() {
     // SDL
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
+        return false;
     }
     if (!TTF_Init()) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
+        return false;
     }
-    if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG, &window, &renderer)) {
+
+    window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG);
+    if (!window) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
+        return false;
+    }
+    renderer = SDL_CreateRenderer(window, NULL);
+    if (!renderer) {
+        printf("渲染器创建失败: %s\n", SDL_GetError());
+        return false;
     }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_HideCursor();
-    // 或者在创建渲染器时指定
     // SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    return true;
 }
-void BASIC_Deinit() {
+void BASIC_Exit() {
     SDL_DestroyWindow(window);
     SDL_Quit();
 }

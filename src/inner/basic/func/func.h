@@ -34,7 +34,7 @@ toml_table_t* getToml(const char* tomlPath);
 bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array);
 
 
-void renewScreenParas(SDL_Window* window);
+bool BASIC_Renew();
 
 
 #endif //BASIC_FUNC_H

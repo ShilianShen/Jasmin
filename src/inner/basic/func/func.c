@@ -135,11 +135,13 @@ toml_table_t* getToml(const char* tomlPath) {
 
     return toml;
 }
-void renewScreenParas(SDL_Window* window) {
+
+bool BASIC_Renew() {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
     scale_x = (float)windowWidth / (float)logical_w;
     scale_y = (float)windowHeight / (float)logical_h;
+    return true;
 }
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
     // N-Condition

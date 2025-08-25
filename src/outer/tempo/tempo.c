@@ -2,25 +2,28 @@
 #include "tempo.h"
 
 
-bool TEMPO_Load() {
+bool TEMPO_Init() {
     TEMPO_LoadTheme();
     TEMPO_LoadMenu();
     return true;
 }
-void TEMPO_Unload() {
+void TEMPO_Exit() {
     TEMPO_UnloadMenu();
     TEMPO_UnloadTheme();
 }
-void TEMPO_Renew() {
+
+bool TEMPO_Renew() {
     if (TEMPO_OFEN_RELOAD) {
         DEBUG_SendMessageL("reload = true\n");
-        TEMPO_Unload();
-        TEMPO_Load();
+        TEMPO_Exit();
+        TEMPO_Init();
     }
     TEMPO_RenewMenu();
+    return true;
 }
 
 
-void TEMPO_Draw() {
+bool TEMPO_Draw() {
     TEMPO_DrawMenu();
+    return true;
 }
