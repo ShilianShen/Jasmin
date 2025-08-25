@@ -15,7 +15,6 @@ extern SDL_Renderer* renderer;
 
 extern const char* WINDOW_TITLE;
 extern const int WINDOW_WIDTH, WINDOW_HEIGHT;
-extern bool oftenReload;
 extern bool running;
 extern const SDL_WindowFlags FLAG;
 SDL_Event event;

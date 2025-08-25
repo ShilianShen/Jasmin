@@ -7,8 +7,8 @@ set(CMAKE_C_STANDARD 99)
 
 
 # 强制设置编译标志，覆盖任何外部设置
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 
 
@@ -63,6 +63,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/table/table.h
         src/inner/basic/trigger/trigger.c
         src/inner/basic/trigger/trigger.h
+        tests/tempo_interface.c
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
