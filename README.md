@@ -1,5 +1,4 @@
-# JASMIN
-![Logo](./docs/icon/icon_64.png)
+# ![Logo](./docs/icon/icon_64.png) Jasmin by OolongImPress
 ## INTRO
 Jasmin
 Jasmin是基于SDL3的, OolongImPress自用的GUI.
