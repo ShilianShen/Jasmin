@@ -1,7 +1,7 @@
 #ifndef TRIG_H
 #define TRIG_H
 
-#include "../setting/setting.h"
+#include "setting.h"
 typedef void (*TrigFunc)(const char*);
 struct Trig {
     TrigFunc func;

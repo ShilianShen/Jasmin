@@ -3,7 +3,7 @@
 
 
 
-#include "../interface.h"
+#include "interface.h"
 
 
 typedef enum JSM_DATA_TYPE {

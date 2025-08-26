@@ -121,21 +121,6 @@ bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, cons
 }
 
 
-toml_table_t* getToml(const char* tomlPath) {
-    // Req Condition
-    FILE* file = fopen(tomlPath, "r"); // malloc
-    if (file == NULL) {printf("%s: failed to open \"%s\".\n", __func__, tomlPath); return NULL;}
-
-    //
-    toml_table_t* toml = toml_parse_file(file, NULL, 0); // malloc
-    fclose(file); // end malloc
-
-    // Req Condition
-    if (toml == NULL) {printf("%s: failed to read \"%s\".\n", __func__, tomlPath); return NULL;}
-
-    return toml;
-}
-
 bool BASIC_Renew() {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
@@ -297,25 +282,6 @@ char* SDL_GetStringFromFRect(const SDL_FRect rect) {
     static char string[32];
     snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
     return string;
-}
-bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array) {
-    if (rect == NULL) {
-        printf("%s: rect is null.\n", __func__);
-        return false;
-    }
-    if (array == NULL) {
-        printf("%s: array is null.\n", __func__);
-        return false;
-    }
-    const toml_datum_t x = toml_double_at(array, 0);
-    const toml_datum_t y = toml_double_at(array, 1);
-    const toml_datum_t w = toml_double_at(array, 2);
-    const toml_datum_t h = toml_double_at(array, 3);
-    if (x.ok && y.ok && w.ok && h.ok) {
-        *rect = (SDL_FRect){(float)x.u.d, (float)y.u.d, (float)w.u.d, (float)h.u.d};
-        return true;
-    }
-    return false;
 }
 bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
     if (surface == NULL) {

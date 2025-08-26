@@ -28,18 +28,17 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/outer/tempo/tempo.h
         src/inner/device/device.h
         src/inner/debug/debug.h
-        src/inner/basic/setting/setting.h
-        src/third_party/toml/toml.c
+        src/inner/basic/setting.h
         src/third_party/cJSON-1.7.18/cJSON.c
         src/third_party/cJSON-1.7.18/cJSON.h
         src/outer/tempo/elem.h
         src/outer/tempo/page.h
         src/inner/basic/basic.h
-        src/inner/basic/setting/setting.c
+        src/inner/basic/setting.c
         src/inner/debug/debug.c
         src/inner/device/device.c
-        src/inner/basic/ease/ease.c
-        src/inner/basic/ease/ease.h
+        src/inner/basic/ease.c
+        src/inner/basic/ease.h
         src/outer/tempo/elem.c
         src/outer/tempo/interface.h
         src/outer/tempo/tempo.c
@@ -57,12 +56,12 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/third_party/third_party.h
         src/inner/interface.h
         src/outer/outer.h
-        src/inner/basic/func/func.c
-        src/inner/basic/func/func.h
-        src/inner/basic/table/table.c
-        src/inner/basic/table/table.h
-        src/inner/basic/trigger/trigger.c
-        src/inner/basic/trigger/trigger.h
+        src/inner/basic/func.c
+        src/inner/basic/func.h
+        src/inner/basic/table.c
+        src/inner/basic/table.h
+        src/inner/basic/trigger.c
+        src/inner/basic/trigger.h
         tests/tempo_interface.c
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

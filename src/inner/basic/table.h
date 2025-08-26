@@ -2,7 +2,7 @@
 #define TABLE_H
 
 
-#include "../setting/setting.h"
+#include "setting.h"
 
 
 typedef struct KeyVal {char* key; void* val;} KeyVal;

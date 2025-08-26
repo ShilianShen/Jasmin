@@ -2,11 +2,11 @@
 #define JASMIN_BASIC_H
 
 
-#include "ease/ease.h"
-#include "setting/setting.h"
-#include "func/func.h"
-#include "table/table.h"
-#include "trigger/trigger.h"
+#include "ease.h"
+#include "setting.h"
+#include "func.h"
+#include "table.h"
+#include "trigger.h"
 
 
 #endif //JASMIN_BASIC_H

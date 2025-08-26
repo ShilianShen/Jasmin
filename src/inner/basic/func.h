@@ -1,8 +1,8 @@
 #ifndef BASIC_FUNC_H
 #define BASIC_FUNC_H
 
-#include "../table/table.h"
-#include "../setting/setting.h"
+#include "table.h"
+#include "setting.h"
 
 //
 void** allocate2DArray(size_t w, size_t h, size_t elementSize);
@@ -29,9 +29,7 @@ cJSON* getJson(const char* path);
 bool cJSON_ExistKey(const cJSON* object, const char* key);
 bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DATA_TYPE type, void* target);
 bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, int len, const KeyVal* table);
-// toml扩展
-toml_table_t* getToml(const char* tomlPath);
-bool loadFRectFromTomlArray(SDL_FRect* rect, const toml_array_t* array);
+
 
 
 bool BASIC_Renew();

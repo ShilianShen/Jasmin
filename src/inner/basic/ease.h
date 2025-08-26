@@ -8,13 +8,12 @@
  * t<0时, 返回0, t>1时返回1.
  */
 
+#include "setting.h"
 
-#include "../setting/setting.h"
 
-
-float EASE_None(const float x);
-float EASE_Sin2(const float x);
-SDL_FRect EASE_GetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const float t);
+float ACTIV_None(float x);
+float ACTIV_Sin2(float x);
+SDL_FRect ACTIV_GetFRect(SDL_FRect rect1, SDL_FRect rect2, float t);
 
 
 #endif //JASMIN_BASIC_EASE_H
