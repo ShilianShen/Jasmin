@@ -1,5 +1,4 @@
 #include "menu.h"
-#include "tempo.h"
 
 
 bool TEMPO_Init() {

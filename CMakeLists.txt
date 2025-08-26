@@ -25,7 +25,6 @@ find_package(SDL3_image REQUIRED)
 
 
 add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
-        src/outer/tempo/tempo.h
         src/inner/device/device.h
         src/inner/debug/debug.h
         src/inner/basic/setting.h
@@ -40,7 +39,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/ease.c
         src/inner/basic/ease.h
         src/outer/tempo/elem.c
-        src/outer/tempo/interface.h
+        src/outer/tempo/tempo.h
         src/outer/tempo/tempo.c
         src/outer/tempo/page.c
         src/inner/basic/interface.h
@@ -63,6 +62,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SCR_FILES}
         src/inner/basic/trigger.c
         src/inner/basic/trigger.h
         tests/tempo_interface.c
+        src/outer/lotri/lotri.c
+        src/outer/lotri/lotri.h
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3

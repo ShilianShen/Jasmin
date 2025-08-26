@@ -172,6 +172,30 @@ bool TEMPO_RenewPage(Page *page) {
 
 
 // DRAW ================================================================================================================
+static bool TEMPO_DrawPage_Frame(const Page* page) {
+    const float X = page->dst_rect.x;
+    const float Y = page->dst_rect.y;
+    const float W = page->dst_rect.w;
+    const float H = page->dst_rect.h;
+
+    const float A = 2;
+    const float B = 1;
+    const float C = 8;
+    const SDL_FRect rects[8] = {
+        {X - A, Y - A, W + 2 * A, A + B},
+        {X - A, Y - A, A + B, H + 2 * A},
+        {X - A, Y + H - B, W + 2 * A, A + B},
+        {X + W - B, Y - A, A + B, H + 2 * A},
+        {X - C, Y - C, 2 * C, 2 * C},
+        {X + W - C, Y - C, 2 * C, 2 * C},
+        {X - C, Y + H - C, 2 * C, 2 * C},
+        {X + W - C, Y + H - C, 2 * C, 2 * C},
+    };
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderFillRects(renderer, rects, 8);
+
+    return true;
+}
 bool TEMPO_DrawPage(const Page* page) {
     // Req Condition
     if (page == NULL) {
@@ -193,5 +217,7 @@ bool TEMPO_DrawPage(const Page* page) {
             return false;
         }
     }
+
+    // TEMPO_DrawPage_Frame(page);
     return true;
 }
