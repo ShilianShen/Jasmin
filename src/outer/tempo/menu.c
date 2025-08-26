@@ -174,7 +174,8 @@ static void TEMPO_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-void TEMPO_RenewMenu() {
+
+bool TEMPO_RenewMenu() {
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
 
@@ -189,6 +190,7 @@ void TEMPO_RenewMenu() {
             TEMPO_RenewPage(menu.path[i]);
         }
     }
+    return true;
 }
 
 

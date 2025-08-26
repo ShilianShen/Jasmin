@@ -3,9 +3,7 @@
 
 
 bool TEMPO_Init() {
-    TEMPO_LoadTheme();
-    TEMPO_LoadMenu();
-    return true;
+    return TEMPO_LoadTheme() && TEMPO_LoadMenu();
 }
 void TEMPO_Exit() {
     TEMPO_UnloadMenu();
@@ -13,13 +11,14 @@ void TEMPO_Exit() {
 }
 
 bool TEMPO_Renew() {
+    bool result = true;
     if (TEMPO_OFEN_RELOAD) {
         DEBUG_SendMessageL("reload = true\n");
         TEMPO_Exit();
-        TEMPO_Init();
+        result = result && TEMPO_Init();
     }
-    TEMPO_RenewMenu();
-    return true;
+    result = result && TEMPO_RenewMenu();
+    return result;
 }
 
 

@@ -8,10 +8,10 @@
 typedef struct Elem Elem;
 
 
-bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect);
-bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect);
+bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);
+bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst);
 bool TEMPO_SetElemPublicBck(const SDL_FRect* bck);
-bool TEMPO_SetElemPublicTable(int N, const KeyVal* table);
+bool TEMPO_SetElemPublicTable(int len, const KeyVal* table);
 
 
 Elem* TEMPO_CreateElem(const cJSON *elem_json);

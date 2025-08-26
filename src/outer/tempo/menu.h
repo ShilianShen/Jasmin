@@ -7,7 +7,8 @@
 
 bool TEMPO_LoadMenu();
 void TEMPO_UnloadMenu();
-void TEMPO_RenewMenu();
+
+bool TEMPO_RenewMenu();
 void TEMPO_DrawMenu();
 
 

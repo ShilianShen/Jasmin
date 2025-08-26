@@ -7,9 +7,7 @@
 
 bool TEMPO_Init();
 void TEMPO_Exit();
-
 bool TEMPO_Renew();
-
 bool TEMPO_Draw();
 
 

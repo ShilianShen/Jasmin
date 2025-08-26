@@ -1,7 +1,7 @@
 # TEMPO
 ```mermaid
 flowchart
-    subgraph inner
+    subgraph closed
         interface.h --> theme.h --> elem.h --> page.h --> menu.h --> tempo.c
         theme.h --> theme.c
         elem.h --> elem.c

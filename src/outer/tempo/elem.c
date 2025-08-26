@@ -4,10 +4,10 @@
 
 
 // ELEM PARA ===========================================================================================================
-const float A = 4, B = 4, C = 6, D = 36;
-static const SDL_FRect* public_bck = NULL;
-static const KeyVal* public_elem_table = NULL;
-static int public_lenElemTable = 0;
+static const float A = 4, B = 4, C = 6, D = 36;
+static const SDL_FRect* publicBck = NULL;
+static const KeyVal* publicElemTable = NULL;
+static int lenPublicElemTable = 0;
 
 
 // ELEM INFO ===========================================================================================================
@@ -71,29 +71,29 @@ bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
     elem->dst_rect = dst_rect;
     return true;
 }
-bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst_rect) {
+bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst) {
     if (elem == NULL) {
         printf("%s: elem is null.\n", __func__);
         return false;
     }
-    *dst_rect = elem->dst_rect;
+    *dst = elem->dst_rect;
     return true;
 }
 bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
     if (bck == NULL) {
         return false;
     }
-    public_bck = bck;
+    publicBck = bck;
     return true;
 }
-bool TEMPO_SetElemPublicTable(const int N, const KeyVal* table) {
+bool TEMPO_SetElemPublicTable(const int len, const KeyVal* table) {
     if (table == NULL) {
-        public_elem_table = NULL;
-        public_lenElemTable = 0;
+        publicElemTable = NULL;
+        lenPublicElemTable = 0;
     }
-    else if (N > 0){
-        public_elem_table = table;
-        public_lenElemTable = N;
+    else if (len > 0){
+        publicElemTable = table;
+        lenPublicElemTable = len;
     }
     else {
         return false;
@@ -229,10 +229,10 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        for (int i = 0; i < public_lenElemTable; i++) {
-            const char* subkey = public_elem_table[i].key;
+        for (int i = 0; i < lenPublicElemTable; i++) {
+            const char* subkey = publicElemTable[i].key;
             if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
-                Elem* other = public_elem_table[i].val;
+                Elem* other = publicElemTable[i].val;
                 elem->bck = &other->dst_rect;
                 break;
             }
@@ -414,7 +414,7 @@ static bool TEMPO_RenewElem_DstRect(Elem *elem) {
         elem->tex,
         elem->src,
         elem->gid,
-        elem->bck != NULL ? elem->bck : public_bck,
+        elem->bck != NULL ? elem->bck : publicBck,
         elem->anchor
         );
     return result;
