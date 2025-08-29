@@ -6,24 +6,21 @@ float test_float = 10.5f;
 bool test_bool = true;
 
 
-const KeyVal TEMPO_PUBLIC_INT[] = {
+static const KeyVal TABLE_INT[] = {
     {"test_int", &test_int}
 };
-const int TEMPO_PUBLIC_INT_LEN = sizeof(TEMPO_PUBLIC_INT) / sizeof(KeyVal);
 
-const KeyVal TEMPO_PUBLIC_FLOAT[] = {
+static const KeyVal TABLE_FLOAT[] = {
     {"test_float", &test_float},
 };
-const int TEMPO_PUBLIC_FLOAT_LEN = sizeof(TEMPO_PUBLIC_FLOAT) / sizeof(KeyVal);
 
-const KeyVal TEMPO_PUBLIC_BOOL[] = {
+static const KeyVal TABLE_BOOL[] = {
     {"test_bool", &test_bool},
 };
-const int TEMPO_PUBLIC_BOOL_LEN = sizeof(TEMPO_PUBLIC_BOOL) / sizeof(KeyVal);
 
 
-const Table INT_EE[JSM_NUM_TYPES] = {
-    [JSM_INT] = {sizeof(TEMPO_PUBLIC_INT) / sizeof(KeyVal), TEMPO_PUBLIC_INT},
-    [JSM_FLOAT] = {sizeof(TEMPO_PUBLIC_FLOAT) / sizeof(KeyVal), TEMPO_PUBLIC_FLOAT},
-    [JSM_BOOL] = {sizeof(TEMPO_PUBLIC_BOOL) / sizeof(KeyVal), TEMPO_PUBLIC_BOOL},
+const Table TEMPO_ExternTable[JSM_NUM_TYPES] = {
+    [JSM_INT] = {sizeof(TABLE_INT) / sizeof(KeyVal), TABLE_INT},
+    [JSM_FLOAT] = {sizeof(TABLE_FLOAT) / sizeof(KeyVal), TABLE_FLOAT},
+    [JSM_BOOL] = {sizeof(TABLE_BOOL) / sizeof(KeyVal), TABLE_BOOL},
 };

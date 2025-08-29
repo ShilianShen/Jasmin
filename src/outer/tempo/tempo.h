@@ -13,19 +13,7 @@
 // extern KeyVal TEMPO_INT[];
 // extern KeyVal TEMPO_FLOAT[];
 // extern KeyVal TEMPO_BOOL[];
-extern const KeyVal* TT[];
-
-extern const KeyVal TEMPO_PUBLIC_INT[];
-extern const int TEMPO_PUBLIC_INT_LEN;
-
-
-extern const KeyVal TEMPO_PUBLIC_FLOAT[];
-extern const int TEMPO_PUBLIC_FLOAT_LEN;
-
-
-extern const KeyVal TEMPO_PUBLIC_BOOL[];
-extern const int TEMPO_PUBLIC_BOOL_LEN;
-
+extern const Table TEMPO_ExternTable[];
 
 
 

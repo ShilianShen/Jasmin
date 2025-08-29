@@ -146,7 +146,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 }
                 const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
                 const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_PUBLIC_INT_LEN, TEMPO_PUBLIC_INT);
+                const Table table = TEMPO_ExternTable[JSM_INT];
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, table.len, table.kv);
                 if ((min && max && now) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
@@ -160,7 +161,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 }
                 const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
                 const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_PUBLIC_FLOAT_LEN, TEMPO_PUBLIC_FLOAT);
+                const Table table = TEMPO_ExternTable[JSM_FLOAT];
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, table.len, table.kv);
                 if ((min && max && now) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
@@ -173,7 +175,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                     return false;
                 }
                 // elem->info.switch_.now = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, info_json->valuestring);
-                elem->info.switch_.now = TABLE_GetValByKey((Table){TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL}, info_json->valuestring);
+                elem->info.switch_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
                 elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
                 if (elem->trig == NULL) {
                     printf("%s: failed in %s.\n", __func__, key);
@@ -512,7 +514,7 @@ bool TEMPO_DrawElem(const Elem *elem) {
 
 // TRIG ================================================================================================================
 void TEMPO_TrigFuncSwitch(const char* key) {
-    bool* val = TABLE_GetValByKey((Table){TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL}, key);
+    bool* val = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], key);
     // bool* val = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, key);
     if (val != NULL) {
         *val = !*val;
