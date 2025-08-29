@@ -16,7 +16,9 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
+add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
+        include/jasmin/inner.h
+        include/jasmin/outer.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf

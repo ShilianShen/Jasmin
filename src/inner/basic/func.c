@@ -115,7 +115,8 @@ bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, cons
 
     if (target == NULL || table == NULL) return false;
 
-    *target = BASIC_GetValByKey(len, table, val->valuestring);
+    *target = TABLE_GetValByKey((Table){len, table}, val->valuestring);
+    // *target = BASIC_GetValByKey(len, table, val->valuestring);
     if (*target == NULL) return false;
     return true;
 }

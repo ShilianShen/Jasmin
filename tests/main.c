@@ -1,4 +1,5 @@
-#include "../include/jasmin/jasmin.h"
+#include "../include/jasmin/inner.h"
+#include "../include/jasmin/outer.h"
 
 
 typedef struct Env {

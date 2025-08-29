@@ -146,7 +146,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 }
                 const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
                 const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_TABLE_INT_LEN, TEMPO_TABLE_INT);
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, TEMPO_PUBLIC_INT_LEN, TEMPO_PUBLIC_INT);
                 if ((min && max && now) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
@@ -160,7 +160,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 }
                 const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
                 const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_TABLE_FLOAT_LEN, TEMPO_TABLE_FLOAT);
+                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, TEMPO_PUBLIC_FLOAT_LEN, TEMPO_PUBLIC_FLOAT);
                 if ((min && max && now) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
@@ -172,7 +172,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-                elem->info.switch_.now = BASIC_GetValByKey(TEMPO_TABLE_BOOL_LEN, TEMPO_TABLE_BOOL, info_json->valuestring);
+                // elem->info.switch_.now = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, info_json->valuestring);
+                elem->info.switch_.now = TABLE_GetValByKey((Table){TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL}, info_json->valuestring);
                 elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
                 if (elem->trig == NULL) {
                     printf("%s: failed in %s.\n", __func__, key);
@@ -437,7 +438,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
         if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetKeyByVal(TEMPO_MENU_TRIG_SET_LEN, TEMPO_MENU_TRIG_SET, elem->trig->func), elem->trig->para);
+            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal((Table){TEMPO_MENU_TRIG_SET_LEN, TEMPO_MENU_TRIG_SET}, elem->trig->func), elem->trig->para);
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
@@ -511,7 +512,8 @@ bool TEMPO_DrawElem(const Elem *elem) {
 
 // TRIG ================================================================================================================
 void TEMPO_TrigFuncSwitch(const char* key) {
-    bool* val = BASIC_GetValByKey(TEMPO_TABLE_BOOL_LEN, TEMPO_TABLE_BOOL, key);
+    bool* val = TABLE_GetValByKey((Table){TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL}, key);
+    // bool* val = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, key);
     if (val != NULL) {
         *val = !*val;
     }

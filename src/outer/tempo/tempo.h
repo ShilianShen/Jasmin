@@ -10,19 +10,23 @@
 #define TEMPO_OFEN_RELOAD 0
 
 
-extern const KeyVal TEMPO_TABLE_INT[];
-extern const int TEMPO_TABLE_INT_LEN;
+// extern KeyVal TEMPO_INT[];
+// extern KeyVal TEMPO_FLOAT[];
+// extern KeyVal TEMPO_BOOL[];
+extern const KeyVal* TT[];
+
+extern const KeyVal TEMPO_PUBLIC_INT[];
+extern const int TEMPO_PUBLIC_INT_LEN;
 
 
-extern const KeyVal TEMPO_TABLE_FLOAT[];
-extern const int TEMPO_TABLE_FLOAT_LEN;
+extern const KeyVal TEMPO_PUBLIC_FLOAT[];
+extern const int TEMPO_PUBLIC_FLOAT_LEN;
 
 
-extern const KeyVal TEMPO_TABLE_PAGE[];
+extern const KeyVal TEMPO_PUBLIC_BOOL[];
+extern const int TEMPO_PUBLIC_BOOL_LEN;
 
 
-extern const KeyVal TEMPO_TABLE_BOOL[];
-extern const int TEMPO_TABLE_BOOL_LEN;
 
 
 extern const KeyVal TEMPO_MENU_TRIG_SET[];

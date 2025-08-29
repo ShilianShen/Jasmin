@@ -1,6 +1,11 @@
 #include "menu.h"
 
 
+// KeyVal TEMPO_INT[];
+// KeyVal TEMPO_FLOAT[];
+// KeyVal TEMPO_BOOL[];
+
+
 bool TEMPO_Init() {
     return TEMPO_LoadTheme() && TEMPO_LoadMenu();
 }
