@@ -3,17 +3,17 @@ project(Jasmin C)
 set(CMAKE_C_STANDARD 99)
 
 
+find_package(SDL3 REQUIRED)
+find_package(SDL3_ttf REQUIRED)
+find_package(SDL3_image REQUIRED)
+
+
 file(GLOB_RECURSE SRC_FILES
         "${PROJECT_SOURCE_DIR}/tests/*.c"
         "${PROJECT_SOURCE_DIR}/src/inner/*.c"
         "${PROJECT_SOURCE_DIR}/src/outer/*.c"
         "${PROJECT_SOURCE_DIR}/src/third_party/cJSON-1.7.18/cJSON.c"
 )
-
-
-find_package(SDL3 REQUIRED)
-find_package(SDL3_ttf REQUIRED)
-find_package(SDL3_image REQUIRED)
 
 
 add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
