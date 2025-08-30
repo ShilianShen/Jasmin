@@ -6,7 +6,7 @@
 
 
 typedef struct KeyVal {char* key; void* val;} KeyVal;
-typedef struct Table {const int len; const KeyVal* kv;} Table;
+typedef struct Table {int len; KeyVal* kv;} Table;
 
 
 void* TABLE_GetValByKey(Table table, const char* key);
