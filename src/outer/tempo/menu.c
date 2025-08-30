@@ -6,8 +6,7 @@ const char* MENU_EDGE_NAME = "Edge";
 #define MENU_PATH_VOLUME 6
 struct Menu {
     // malloc in INIT
-    Table table;
-    // KeyVal* pageTable;
+    Table pageTable;
     Page* pageRoot;
     Page* pageEdge;
 
@@ -49,32 +48,32 @@ static bool TEMPO_LoadMenu_PageSet(const cJSON* pageSet_json) {
         return false;
     } // Req Condition
 
-    menu.table.len = cJSON_GetArraySize(pageSet_json);
-    if (menu.table.len == 0) {
+    menu.pageTable.len = cJSON_GetArraySize(pageSet_json);
+    if (menu.pageTable.len == 0) {
         printf("%s: menu.lenPageSet == 0.\n", __func__);
         return false;
     } // Req Condition
 
-    menu.table.kv = calloc(menu.table.len, sizeof(KeyVal));
-    if (menu.table.kv == NULL) {
+    menu.pageTable.kv = calloc(menu.pageTable.len, sizeof(KeyVal));
+    if (menu.pageTable.kv == NULL) {
         printf("%s: menu.pageSet == NULL.\n", __func__);
         return false;
     } // Req Condition
 
-    for (int i = 0; i < menu.table.len; i++) {
+    for (int i = 0; i < menu.pageTable.len; i++) {
         const cJSON *item = cJSON_GetArrayItem(pageSet_json, i);
         if (item == NULL) {
             printf("%s: item == NULL.\n", __func__);
             return false;
         } // Req Condition
-        menu.table.kv[i].key = strdup(item->string);
-        if (menu.table.kv[i].key == NULL) {
+        menu.pageTable.kv[i].key = strdup(item->string);
+        if (menu.pageTable.kv[i].key == NULL) {
             printf("%s: menu.pageTable[i].key == NULL.\n", __func__);
             return false;
         } // Req Condition
     }
 
-    for (int i = 0; i < menu.table.len; i++) {
+    for (int i = 0; i < menu.pageTable.len; i++) {
         const cJSON *item = cJSON_GetArrayItem(pageSet_json, i);
         if (item == NULL) {
             printf("%s: item == NULL.\n", __func__);
@@ -87,12 +86,12 @@ static bool TEMPO_LoadMenu_PageSet(const cJSON* pageSet_json) {
             return false;
         } // Req Condition
 
-        menu.table.kv[i].val = TEMPO_CreatePage(page_json);
+        menu.pageTable.kv[i].val = TEMPO_CreatePage(page_json);
         if (strcmp(key, MENU_ROOT_NAME) == 0) {
-            menu.pageRoot = menu.table.kv[i].val;
+            menu.pageRoot = menu.pageTable.kv[i].val;
         } // Opt Condition
         if (strcmp(key, MENU_EDGE_NAME) == 0) {
-            menu.pageEdge = menu.table.kv[i].val;
+            menu.pageEdge = menu.pageTable.kv[i].val;
         } // Opt Condition
     }
 
@@ -135,10 +134,10 @@ bool TEMPO_LoadMenu() {
     return true;
 }
 void TEMPO_UnloadMenu() {
-    for (int i = 0; i < menu.table.len; i++) {
-        free(menu.table.kv[i].key);
-        menu.table.kv[i].key = NULL;
-        menu.table.kv[i].val = TEMPO_DeletePage(menu.table.kv[i].val);
+    for (int i = 0; i < menu.pageTable.len; i++) {
+        free(menu.pageTable.kv[i].key);
+        menu.pageTable.kv[i].key = NULL;
+        menu.pageTable.kv[i].val = TEMPO_DeletePage(menu.pageTable.kv[i].val);
     }
 }
 
@@ -147,17 +146,17 @@ void TEMPO_UnloadMenu() {
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("tempo.path: /%s", TABLE_GetKeyByVal((Table){menu.table.len, menu.table.kv}, menu.pageRoot));
+    DEBUG_SendMessageL("tempo.path: /%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageRoot));
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear)
             menu.path[i] = NULL;
         else if (menu.path[i] == NULL)
             need_clear = true;
         else
-            DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.table.len, menu.table.kv}, menu.path[i]));
+            DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.path[i]));
     }
     if (need_clear == false) {
-        DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.table.len, menu.table.kv}, menu.pageEdge));
+        DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageEdge));
     }
     DEBUG_SendMessageL("\n");
 }
@@ -224,16 +223,16 @@ static void TEMPO_TrigFuncForward(const char* para) {
     const char* pageName = para;
     // getPageId
     int pageId = 0;
-    for (int i = 0; i < menu.table.len; i++) {
-        if (menu.table.kv[i].val == NULL) {continue;}
-        if (strcmp(menu.table.kv[i].key, pageName) == 0) {pageId = i;}
+    for (int i = 0; i < menu.pageTable.len; i++) {
+        if (menu.pageTable.kv[i].val == NULL) {continue;}
+        if (strcmp(menu.pageTable.kv[i].key, pageName) == 0) {pageId = i;}
     }
     if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 
     // forward
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (menu.path[i] == 0) {
-            menu.path[i] = menu.table.kv[pageId].val;
+            menu.path[i] = menu.pageTable.kv[pageId].val;
             break;
         }
     }

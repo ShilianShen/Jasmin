@@ -6,9 +6,7 @@ const SDL_FRect* publicBck = NULL;
 
 // PAGE ================================================================================================================
 struct Page {
-    int lenElemTable;
-    KeyVal* elemTable;
-
+    Table elemTable;
     int anchor;
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
@@ -27,39 +25,37 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
             return false;
         } // Req Condition
 
-        page->lenElemTable = cJSON_GetArraySize(elemTable_json);
-        if (page->lenElemTable == 0) {
+        page->elemTable.len = cJSON_GetArraySize(elemTable_json);
+        if (page->elemTable.len == 0) {
             printf("%s: failed malloc page.lenElemSet.\n", __func__);
             return false;
         } // Req Condition
 
-        page->elemTable = calloc(page->lenElemTable, sizeof(KeyVal));
-        if (page->elemTable == NULL) {
+        page->elemTable.kv = calloc(page->elemTable.len, sizeof(KeyVal));
+        if (page->elemTable.kv == NULL) {
             printf("%s: failed malloc page.elemSet.\n", __func__);
             return false;
         } // Req Condition
 
-        TEMPO_SetElemPublicTable(page->lenElemTable, page->elemTable);
-
-        for (int i = 0; i < page->lenElemTable; i++) {
+        TEMPO_SetElemPublicTable(&page->elemTable);
+        for (int i = 0; i < page->elemTable.len; i++) {
             const cJSON* elem_json = cJSON_GetArrayItem(elemTable_json, i);
             if (elem_json == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
-            page->elemTable[i].key = strdup(elem_json->string);
-            if (page->elemTable[i].key == NULL) {
+            page->elemTable.kv[i].key = strdup(elem_json->string);
+            if (page->elemTable.kv[i].key == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
-            page->elemTable[i].val = TEMPO_CreateElem(elem_json); // malloc
-            if (page->elemTable[i].val == NULL) {
+            page->elemTable.kv[i].val = TEMPO_CreateElem(elem_json); // malloc
+            if (page->elemTable.kv[i].val == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
         }
-
-        TEMPO_SetElemPublicTable(0, NULL);
+        TEMPO_SetElemPublicTable(NULL);
     }
     if (cJSON_ExistKey(page_json, key = "anchor")) {
         if (cJSON_LoadFromObj(page_json, key, JSM_INT, &page->anchor) == false) {
@@ -85,8 +81,8 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     return true;
 }
 static bool TEMPO_CreatePage_CK(const Page* page) {
-    for (int i = 0; i < page->lenElemTable; i++) {
-        if (page->elemTable[i].key == NULL || page->elemTable[i].val == NULL) {
+    for (int i = 0; i < page->elemTable.len; i++) {
+        if (page->elemTable.kv[i].key == NULL || page->elemTable.kv[i].val == NULL) {
             printf("%s: elemSet[%d] == NULL.\n", __func__, i);
             return false;
         }
@@ -95,18 +91,18 @@ static bool TEMPO_CreatePage_CK(const Page* page) {
 }
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
-        if (page->elemTable != NULL) {
-            for (int i = 0; i < page->lenElemTable; i++) {
-                if (page->elemTable[i].key != NULL) {
-                    free(page->elemTable[i].key); // free
-                    page->elemTable[i].key = NULL;
+        if (page->elemTable.kv != NULL) {
+            for (int i = 0; i < page->elemTable.len; i++) {
+                if (page->elemTable.kv[i].key != NULL) {
+                    free(page->elemTable.kv[i].key); // free
+                    page->elemTable.kv[i].key = NULL;
                 }
-                if (page->elemTable[i].val != NULL) {
-                    page->elemTable[i].val = TEMPO_DeleteElem(page->elemTable[i].val); // free
+                if (page->elemTable.kv[i].val != NULL) {
+                    page->elemTable.kv[i].val = TEMPO_DeleteElem(page->elemTable.kv[i].val); // free
                 }
             }
-            free(page->elemTable);
-            page->elemTable = NULL;
+            free(page->elemTable.kv);
+            page->elemTable.kv = NULL;
         }
         free(page);
         page = NULL;
@@ -158,8 +154,8 @@ bool TEMPO_RenewPage(Page *page) {
     TEMPO_SetElemPublicBck(&page->dst_rect);
     {
         DEVICE_SetMouseLeftTrig(NULL);
-        for (int i = 0; i < page->lenElemTable; i++) {
-            const bool renew = TEMPO_RenewElem(page->elemTable[i].val);
+        for (int i = 0; i < page->elemTable.len; i++) {
+            const bool renew = TEMPO_RenewElem(page->elemTable.kv[i].val);
             if (renew == false) {
                 DEBUG_SendMessageR("%s: renew == false.\n", __func__);
                 return false;
@@ -210,8 +206,8 @@ bool TEMPO_DrawPage(const Page* page) {
     SDL_SetRenderSDLColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);
 
-    for (int i = 0; i < page->lenElemTable; i++) {
-        const bool draw = TEMPO_DrawElem(page->elemTable[i].val);
+    for (int i = 0; i < page->elemTable.len; i++) {
+        const bool draw = TEMPO_DrawElem(page->elemTable.kv[i].val);
         if (draw == false) {
             DEBUG_SendMessageR("%s: draw[%d] == false.\n", __func__, i);
             return false;

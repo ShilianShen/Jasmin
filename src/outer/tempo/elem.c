@@ -6,8 +6,11 @@
 // ELEM PARA ===========================================================================================================
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* publicBck = NULL;
-static const KeyVal* publicElemTable = NULL;
-static int lenPublicElemTable = 0;
+
+
+// static const KeyVal* publicElemTable = NULL;
+// static int lenPublicElemTable = 0;
+static const Table* publicTable = NULL;
 
 
 // ELEM TYPE ===========================================================================================================
@@ -86,18 +89,8 @@ bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
     publicBck = bck;
     return true;
 }
-bool TEMPO_SetElemPublicTable(const int len, const KeyVal* table) {
-    if (table == NULL) {
-        publicElemTable = NULL;
-        lenPublicElemTable = 0;
-    }
-    else if (len > 0){
-        publicElemTable = table;
-        lenPublicElemTable = len;
-    }
-    else {
-        return false;
-    }
+bool TEMPO_SetElemPublicTable(const Table* table) {
+    publicTable = table;
     return true;
 }
 
@@ -238,12 +231,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        for (int i = 0; i < lenPublicElemTable; i++) {
-            const char* subkey = publicElemTable[i].key;
-            if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
-                Elem* other = publicElemTable[i].val;
-                elem->bck = &other->dst_rect;
-                break;
+        if (publicTable != NULL) {
+            for (int i = 0; i < publicTable->len; i++) {
+                const char* subkey = publicTable->kv[i].key;
+                if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
+                    Elem* other = publicTable->kv[i].val;
+                    elem->bck = &other->dst_rect;
+                    break;
+                }
             }
         }
     }
