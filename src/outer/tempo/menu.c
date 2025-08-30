@@ -246,7 +246,7 @@ static void TEMPO_TrigFuncBackward(const char* para) {
 static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
-const KeyVal TEMPO_MENU_TRIG_SET[] = {
+static const KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"pass", TEMPO_TrigFuncPass},
     {"forward", TEMPO_TrigFuncForward},
     {"backward", TEMPO_TrigFuncBackward},
@@ -254,4 +254,8 @@ const KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"switch", TEMPO_TrigFuncSwitch},
     {NULL, NULL}
 };
-const int TEMPO_MENU_TRIG_SET_LEN = sizeof(TEMPO_MENU_TRIG_SET) / sizeof(KeyVal);
+static const int TEMPO_MENU_TRIG_SET_LEN = sizeof(TEMPO_MENU_TRIG_SET) / sizeof(KeyVal);
+const Table TEMPO_StaticTrigTable = {
+    .len = sizeof(TEMPO_MENU_TRIG_SET) / sizeof(KeyVal),
+    .kv = TEMPO_MENU_TRIG_SET
+};

@@ -10,15 +10,14 @@
 #define TEMPO_OFEN_RELOAD 0
 
 
-// extern KeyVal TEMPO_INT[];
-// extern KeyVal TEMPO_FLOAT[];
-// extern KeyVal TEMPO_BOOL[];
-extern const Table TEMPO_ExternTable[];
+extern const Table TEMPO_ExternTable[JSM_NUM_TYPES];
 
 
+// extern const KeyVal TEMPO_MENU_TRIG_SET[];
+// extern const int TEMPO_MENU_TRIG_SET_LEN;
 
-extern const KeyVal TEMPO_MENU_TRIG_SET[];
-extern const int TEMPO_MENU_TRIG_SET_LEN;
+
+extern const Table TEMPO_StaticTrigTable;
 
 
 bool TEMPO_Init();

@@ -1,11 +1,6 @@
 #include "menu.h"
 
 
-// KeyVal TEMPO_INT[];
-// KeyVal TEMPO_FLOAT[];
-// KeyVal TEMPO_BOOL[];
-
-
 bool TEMPO_Init() {
     return TEMPO_LoadTheme() && TEMPO_LoadMenu();
 }
@@ -13,7 +8,6 @@ void TEMPO_Exit() {
     TEMPO_UnloadMenu();
     TEMPO_UnloadTheme();
 }
-
 bool TEMPO_Renew() {
     bool result = true;
     if (TEMPO_OFEN_RELOAD) {
@@ -24,8 +18,6 @@ bool TEMPO_Renew() {
     result = result && TEMPO_RenewMenu();
     return result;
 }
-
-
 bool TEMPO_Draw() {
     TEMPO_DrawMenu();
     return true;

@@ -208,7 +208,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     if (cJSON_ExistKey(elem_json, key = "func")) {
         TrigFunc func = NULL; const char* para = NULL;
-        if (cJSON_LoadFromTab(elem_json, key, (void**)&func, TEMPO_MENU_TRIG_SET_LEN, TEMPO_MENU_TRIG_SET) == false) {
+        if (cJSON_LoadFromTab(elem_json, key, (void**)&func, TEMPO_StaticTrigTable.len, TEMPO_StaticTrigTable.kv) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
@@ -440,7 +440,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
         if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal((Table){TEMPO_MENU_TRIG_SET_LEN, TEMPO_MENU_TRIG_SET}, elem->trig->func), elem->trig->para);
+            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal(TEMPO_StaticTrigTable, elem->trig->func), elem->trig->para);
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
