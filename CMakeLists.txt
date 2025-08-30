@@ -10,15 +10,11 @@ find_package(SDL3_image REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES
         "${PROJECT_SOURCE_DIR}/tests/*.c"
-        "${PROJECT_SOURCE_DIR}/src/inner/*.c"
-        "${PROJECT_SOURCE_DIR}/src/outer/*.c"
-        "${PROJECT_SOURCE_DIR}/src/third_party/cJSON-1.7.18/cJSON.c"
+        "${PROJECT_SOURCE_DIR}/src/*.c"
 )
 
 
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
-        include/jasmin/inner.h
-        include/jasmin/outer.h)
+add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf

@@ -10,15 +10,6 @@ static const KeyVal* publicElemTable = NULL;
 static int lenPublicElemTable = 0;
 
 
-// ELEM INFO ===========================================================================================================
-typedef union ElemInfo {
-    char* string;
-    struct SlidI {int min, max, *now;} slidI;
-    struct SlidF {float min, max, *now;} slidF;
-    struct Switch {bool* now;} switch_;
-} ElemInfo;
-
-
 // ELEM TYPE ===========================================================================================================
 typedef enum ElemType {
     ELEM_TYPE_NULL,
@@ -45,6 +36,15 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     }
     return ELEM_TYPE_NULL;
 }
+
+
+// ELEM INFO ===========================================================================================================
+typedef union ElemInfo {
+    char* string;
+    struct SlidI {int min, max, *now;} slidI;
+    struct SlidF {float min, max, *now;} slidF;
+    struct Switch {bool* now;} switch_;
+} ElemInfo;
 
 
 // ELEM ================================================================================================================

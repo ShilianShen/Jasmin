@@ -38,9 +38,14 @@ static bool TEMPO_LoadTheme_RK(const cJSON* theme_json) {
     return true;
 }
 bool TEMPO_LoadTheme() {
-    memset(&theme, 0, sizeof(theme));
 
+#ifdef TEMPO_THEME_JSON
     cJSON* theme_json = getJson(TEMPO_THEME_JSON);
+#else
+    cJSON* theme_json = getJson(TEMPO_DEFAULT_THEME_JSON);
+#endif
+
+    memset(&theme, 0, sizeof(theme));
     if (theme_json == NULL) {
         printf("%s: getJson == NULL.\n", __func__);
         return false;

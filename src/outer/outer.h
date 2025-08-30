@@ -3,6 +3,8 @@
 
 
 #include "tempo/tempo.h"
+#include "lotri/lotri.h"
+#include "villa/villa.h"
 
 
 #endif //OUTER_H

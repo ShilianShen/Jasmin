@@ -113,10 +113,13 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
 
     return true;
 }
-
 bool TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
+#ifdef TEMPO_THEME_JSON
     cJSON* menu_json = getJson(TEMPO_MENU_JSON);
+#else
+    cJSON* menu_json = getJson(TEMPO_DEFAULT_MENU_JSON);
+#endif
     if (menu_json == NULL) {
         printf("%s: getJson == NULL.\n", __func__);
         return false;
