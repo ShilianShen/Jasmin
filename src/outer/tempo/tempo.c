@@ -1,6 +1,11 @@
 #include "menu.h"
 
 
+#ifndef USE_TEMPO_EXTERN_TABLE
+const Table TEMPO_ExternTable[];
+#endif
+
+
 bool TEMPO_Init() {
     return TEMPO_LoadTheme() && TEMPO_LoadMenu();
 }

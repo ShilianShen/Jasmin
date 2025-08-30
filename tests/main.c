@@ -1,5 +1,4 @@
-#include "../include/jasmin/inner.h"
-#include "../include/jasmin/outer.h"
+#include "../include/jasmin/jasmin.h"
 
 
 typedef struct Env {
@@ -9,8 +8,6 @@ typedef struct Env {
     bool (*draw)();
     void (*exit)();
 } Env;
-
-
 static const Env ENV_ARRAY[] = {
     {"BASIC", &BASIC_Init, &BASIC_Renew, NULL, &BASIC_Exit},
     {"DEBUG", &DEBUG_Init, &DEBUG_Renew, &DEBUG_Draw, &DEBUG_Exit},

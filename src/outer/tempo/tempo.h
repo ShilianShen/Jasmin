@@ -3,20 +3,12 @@
 
 
 #include "../interface.h"
-
-
 #define TEMPO_MENU_JSON "../config/tempo_menu.json"
 #define TEMPO_THEME_JSON "../config/tempo_theme.json"
 #define TEMPO_OFEN_RELOAD 0
 
 
-extern const Table TEMPO_ExternTable[JSM_NUM_TYPES];
-
-
-// extern const KeyVal TEMPO_MENU_TRIG_SET[];
-// extern const int TEMPO_MENU_TRIG_SET_LEN;
-
-
+extern const Table TEMPO_ExternTable[];
 extern const Table TEMPO_StaticTrigTable;
 
 

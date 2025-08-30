@@ -207,18 +207,24 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->src = &elem->src_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "func")) {
-        TrigFunc func = NULL; const char* para = NULL;
-        if (cJSON_LoadFromTab(elem_json, key, (void**)&func, TEMPO_StaticTrigTable.len, TEMPO_StaticTrigTable.kv) == false) {
+        const char* funcName = NULL;
+        if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &funcName) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
+        const TrigFunc func = TABLE_GetValByKey(TEMPO_StaticTrigTable, funcName);
+        if (func == NULL) {
+            printf("%s: failed in %s.\n", __func__, key);
+            return false;
+        }
+        const char* para = NULL;
         if (cJSON_ExistKey(elem_json, "para")) {
             if (cJSON_LoadFromObj(elem_json, "para", JSM_STRING, &para) == false) {
                 printf("%s: para == NULL, %s.\n", __func__, key);
                 return false;
             }
         }
-        if (func != NULL && elem->trig == NULL) {
+        if (elem->trig == NULL) {
             elem->trig = CreateTrig(func, para);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
