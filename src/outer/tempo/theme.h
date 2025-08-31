@@ -19,6 +19,7 @@ typedef struct Theme Theme;
 extern struct Theme {
     TTF_Font* fonts[TEMPO_TEXT_NUM_TYPES];
     SDL_Color colors[TEMPO_TEXT_NUM_TYPES];
+    Table fontTable;
 } theme;
 
 

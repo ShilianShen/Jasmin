@@ -1,14 +1,41 @@
 {
+  "path": {
+    "pageNow": "Title"
+  },
   "pageTable": {
     "Root": {
       "elemTable": {
-        "0000": {"type": "FILE", "info": "../res/images/491.gif", "anchor": 0, "gid": [0, 0, 2, 2]},
-        "0001": {"type": "TEXT", "info": "The dead can be cured.", "anchor": 9},
-        "0002": {"type": "TEXT", "info": "Title", "anchor": -20, "func": "forward", "para": "Title"},
-        "0003": {"type": "SLID_I", "info": {"min": 0, "max": 100, "now": "test_int"}, "anchor": -11, "gid": [70, 0, 1, 1]},
-        "0004": {"type": "SLID_F", "info": {"min": 0, "max": 100, "now": "test_float"}, "anchor": -11, "gid": [70, -100, 1, 1]},
-        "0005": {"type": "TEXT", "info": "The dead can be cured.", "anchor": 4, "bck": "0000"},
-        "0006": {"type": "SWITCH", "info": "test_bool", "anchor": -11, "gid": [70, 100, 1, 1]}
+        "0000": {
+          "type": "FILE",
+          "info": "../res/images/491.gif",
+          "anchor": 0,
+          "gid": [0, 0, 2, 2]
+        },
+        "0002": {
+          "type": "TEXT",
+          "info": "Title",
+          "anchor": -20,
+          "func": "forward",
+          "para": "Title"
+        },
+        "0003": {
+          "type": "SLID_I",
+          "info": {"min": 0, "max": 100, "now": "test_int"},
+          "anchor": -11,
+          "gid": [70, 0, 1, 1]
+        },
+        "0004": {
+          "type": "SLID_F",
+          "info": {"min": 0, "max": 100, "now": "test_float"},
+          "anchor": -11,
+          "gid": [70, -100, 1, 1]
+        },
+        "0006": {
+          "type": "SWITCH",
+          "info": "test_bool",
+          "anchor": -11,
+          "gid": [70, 100, 1, 1]
+        }
       }
     },
     "Edge": {
@@ -28,23 +55,11 @@
       "elemTable": {
         "0000": {"type": "TEXT", "info": "<<< Root.", "anchor": -20, "func": "clear", "head": 0},
         "0001": {"type": "TEXT", "info": "THE MAZE", "anchor": -9, "head": 1},
-        "0002": {"type": "TEXT", "info": "Setting", "anchor": 9, "func": "forward", "para": "Setting", "head": 2}
+        "0002": {"type": "TEXT", "info": "Setting", "anchor": 9, "head": 2}
       },
       "src": [0, 0, 900, 900],
       "anchor": -20,
       "color": [0, 0, 64, 255]
-    },
-    "Setting": {
-      "elemTable": {
-        "0000": {"type": "TEXT", "info": "<<<", "anchor": -20, "func": "backward"},
-        "0001": {"type": "TEXT", "info": "Go Test?.", "anchor": 9, "gid": [0, 10, 1, 1], "func": "forward", "para": "Setting"}
-      },
-      "src": [0, 0, 800, 800],
-      "anchor": 0,
-      "color": [64, 64, 0, 255]
     }
-  },
-  "path": {
-    "pageNow": "Title"
   }
 }
