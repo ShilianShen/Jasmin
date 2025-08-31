@@ -1,15 +1,9 @@
 #define TEMPO_EXTERN_TABLE
-
+#include "env.h"
 #include "../include/jasmin/jasmin.h"
 
 
-typedef struct Env {
-    const char* name;
-    bool (*init)();
-    bool (*renew)();
-    bool (*draw)();
-    void (*exit)();
-} Env;
+
 static const Env ENV_ARRAY[] = {
     {"BASIC", &BASIC_Init, &BASIC_Renew, NULL, &BASIC_Exit},
     {"DEBUG", &DEBUG_Init, &DEBUG_Renew, &DEBUG_Draw, &DEBUG_Exit},
@@ -19,48 +13,8 @@ static const Env ENV_ARRAY[] = {
 static const int LEN_ENV_ARRAY = sizeof(ENV_ARRAY) / sizeof(Env);
 
 
-static bool Init() {
-    for (int i = 0; i < LEN_ENV_ARRAY; i++) {
-        if (ENV_ARRAY[i].init != NULL && ENV_ARRAY[i].init() == false) {
-            printf("%s: fail in %s.\n", __func__, ENV_ARRAY[i].name);
-            return false;
-        }
-    }
-    return true;
-}
-static bool Renew() {
-    for (int i = 0; i < LEN_ENV_ARRAY; i++) {
-        if (ENV_ARRAY[i].renew != NULL && ENV_ARRAY[i].renew() == false) {
-            printf("%s: fail in %s.\n", __func__, ENV_ARRAY[i].name);
-            return false;
-        }
-    }
-    return true;
-}
-static bool Draw() {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    for (int i = LEN_ENV_ARRAY - 1; i >= 0; i--) {
-        if (ENV_ARRAY[i].draw != NULL && ENV_ARRAY[i].draw() == false) {
-            printf("%s: fail in %s.\n", __func__, ENV_ARRAY[i].name);
-            return false;
-        }
-    }
-    SDL_RenderPresent(renderer);
-    return true;
-}
-static void Exit() {
-    for (int i = LEN_ENV_ARRAY - 1; i >= 0; i--) {
-        if (ENV_ARRAY[i].exit != NULL) {
-            printf("%s: exiting: %s.\n", __func__, ENV_ARRAY[i].name);
-            ENV_ARRAY[i].exit();
-        }
-    }
-}
-
-
 int main() {
-    running = Init();
+    running = Init(LEN_ENV_ARRAY, ENV_ARRAY);
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -68,8 +22,14 @@ int main() {
                 default: break;
             }
         }
-        running = running && Renew();
-        running = running && Draw();
+        running = running && Renew(LEN_ENV_ARRAY, ENV_ARRAY);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        running = running && Draw(LEN_ENV_ARRAY, ENV_ARRAY);
+
+        SDL_RenderPresent(renderer);
     }
-    Exit();
+    Exit(LEN_ENV_ARRAY, ENV_ARRAY);
 }
