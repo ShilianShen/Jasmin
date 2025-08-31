@@ -7,15 +7,15 @@ float test_float = 10.5f;
 bool test_bool = true;
 
 
-static const KeyVal TABLE_INT[] = {
+static KeyVal TABLE_INT[] = {
     {"test_int", &test_int}
 };
 
-static const KeyVal TABLE_FLOAT[] = {
+static KeyVal TABLE_FLOAT[] = {
     {"test_float", &test_float},
 };
 
-static const KeyVal TABLE_BOOL[] = {
+static KeyVal TABLE_BOOL[] = {
     {"test_bool", &test_bool},
 };
 

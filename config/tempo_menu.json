@@ -13,7 +13,7 @@
         },
         "0002": {
           "type": "TEXT",
-          "info": "Title",
+          "info": {"font": "BT", "string": "Title"},
           "anchor": -20,
           "func": "forward",
           "para": "Title"
@@ -42,10 +42,13 @@
       "elemTable": {
         "0000": {
           "type": "TEXT",
-          "info": "The edge of menu system, it shouldn't appear.\nIf you are watching it, there is a bug need to be fixed.",
+          "info": {
+            "font": "BT",
+            "string": "The edge of menu system, it shouldn't appear.\nIf you are watching it, there is a bug need to be fixed."
+          },
           "anchor": -9
         },
-        "0001": {"type": "TEXT", "info": "[R2R]", "anchor": 9, "func": "clear"}
+        "0001": {"type": "TEXT", "info": {"font": "BT", "string": "[R2R]"}, "anchor": 9, "func": "clear"}
       },
       "src": [0, 0, 1100, 1100],
       "anchor": 16,
@@ -53,9 +56,9 @@
     },
     "Title": {
       "elemTable": {
-        "0000": {"type": "TEXT", "info": "<<< Root.", "anchor": -20, "func": "clear", "head": 0},
-        "0001": {"type": "TEXT", "info": "THE MAZE", "anchor": -9, "head": 1},
-        "0002": {"type": "TEXT", "info": "Setting", "anchor": 9, "head": 2}
+        "0000": {"type": "TEXT", "info": {"font": "BT", "string": "<<< Root."}, "anchor": -20, "func": "clear", "head": 0},
+        "0001": {"type": "TEXT", "info": {"font": "BT", "string": "THE MAZE"}, "anchor": -9, "head": 1},
+        "0002": {"type": "TEXT", "info": {"font": "BT", "string": "Setting"}, "anchor": 9, "head": 2}
       },
       "src": [0, 0, 900, 900],
       "anchor": -20,

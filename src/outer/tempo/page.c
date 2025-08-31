@@ -13,7 +13,15 @@ struct Page {
     SDL_Color color;
 };
 
-
+//
+void TEMPO_PrintPage(const Page* page) {
+    printf("TEMPO_Page:");
+    if (page == NULL) {
+        printf("NULL\n");
+        return;
+    }
+    printf("%d\n", page->elemTable.len);
+}
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));

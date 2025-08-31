@@ -46,7 +46,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 // ELEM INFO ===========================================================================================================
 typedef union ElemInfo {
     char* string;
-    struct Text {TEMPO_TEXT_TYPE head; char* string;} text;
+    struct Text {TTF_Font* font; char* string;} text;
     struct SlidI {int min, max, *now;} slidI;
     struct SlidF {float min, max, *now;} slidF;
     struct Switch {bool* now;} switch_;
@@ -120,26 +120,33 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         } // Req Condition
         switch (elem->type) {
             case ELEM_TYPE_TEXT:  {
-                char* string_json;
-                if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
-                    printf("%s: failed in %s.\n", __func__, key);
-                    return false;
-                } // Req Condition
+                const char*subkey = NULL;
+                char* string_json = NULL;
+                if (cJSON_ExistKey(info_json, subkey = "string")) {
+                    if (cJSON_LoadFromObj(info_json, subkey, JSM_STRING, &string_json) == false) {
+                        printf("%s: failed in %s.\n", __func__, subkey);
+                        return false;
+                    } // Req Condition
+                }
 
-                if (cJSON_ExistKey(elem_json, key = "head")) {
-                    cJSON_LoadFromObj(elem_json, "head", JSM_INT, &elem->info.text.head);
-                    if (elem->info.text.head >= TEMPO_TEXT_NUM_TYPES) {
-                        elem->info.text.head = TEMPO_TEXT_TYPE_TEXT;
+                char* font_json = NULL;
+                if (cJSON_ExistKey(info_json, subkey = "font")) {
+                    if (cJSON_LoadFromObj(info_json, subkey, JSM_STRING, &font_json) == false) {
+                        printf("%s: failed in %s.\n", __func__, subkey);
+                        return false;
                     }
                 }
 
-                if (string_json != NULL) {
-                    elem->info.text.string = strdup(string_json);
-                    if (elem->info.text.string == NULL) {
-                        printf("%s: failed in %s.\n", __func__, key);
-                        return false;
-                    }
+                if (string_json == NULL || font_json == NULL) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
                 } // Req Condition
+                elem->info.text.font = TABLE_GetValByKey(theme.fontTable, font_json);
+                elem->info.text.string = strdup(string_json);
+                if (elem->info.text.font == NULL || elem->info.text.string == NULL) {
+                    printf("%s: failed in %s, %s, %s.\n", __func__, key, font_json, string_json);
+                    return false;
+                }
                 break;
             }
             case ELEM_TYPE_FILE: {
@@ -337,9 +344,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         case ELEM_TYPE_TEXT: {
             elem->tex = TXT_LoadTextureWithLines(
                 renderer,
-                theme.fonts[elem->info.text.head],
+                elem->info.text.font,
                 elem->info.text.string,
-                theme.colors[elem->info.text.head],
+                (SDL_Color){255, 255, 255, 255},
                 EMPTY,
                 'C'
                 );
