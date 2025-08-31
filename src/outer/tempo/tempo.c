@@ -1,16 +1,6 @@
 #include "menu.h"
 
 
-#if  TEMPO_EXTERN_TABLE
-const Table TEMPO_ExternTable[];
-#endif
-
-//
-#ifndef TEMPO_EXTERN_PAGE_TABLE
-Table TEMPO_ExternPageTable = {0, NULL};
-#endif
-
-
 bool TEMPO_Init() {
     return TEMPO_LoadTheme() && TEMPO_LoadMenu();
 }

@@ -24,3 +24,4 @@ const Table TEMPO_ExternTable[] = {
     [JSM_FLOAT] = {sizeof(TABLE_FLOAT) / sizeof(KeyVal), TABLE_FLOAT},
     [JSM_BOOL] = {sizeof(TABLE_BOOL) / sizeof(KeyVal), TABLE_BOOL},
 };
+Table TEMPO_ExternPageTable = {0, NULL};

@@ -1,7 +1,5 @@
-#define TEMPO_EXTERN_TABLE
 #include "env.h"
 #include "../include/jasmin/jasmin.h"
-
 
 
 static const Env ENV_ARRAY[] = {
