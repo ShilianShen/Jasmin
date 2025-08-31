@@ -214,7 +214,6 @@ bool TEMPO_RenewMenu() {
 
 // DRAW ================================================================================================================
 void TEMPO_DrawMenu() {
-
     if (menu.path[0] == NULL) {
         TEMPO_DrawPage(menu.pageRoot);
     }

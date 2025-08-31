@@ -6,34 +6,48 @@ Theme theme = (Theme){0};
 
 
 // LOAD & UNLOAD =======================================================================================================
+static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
+    if (font_json == NULL) {
+        return NULL;
+    }
+    const char* key = NULL;
+    const char* path = NULL;
+    float size = 0;
+    if (cJSON_ExistKey(font_json, key = "path")) {
+        if (cJSON_LoadFromObj(font_json, key, JSM_STRING, &path) == false) {
+            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (cJSON_ExistKey(font_json, key = "size")) {
+        if (cJSON_LoadFromObj(font_json, key, JSM_FLOAT, &size) == false) {
+            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (path == NULL || size <= 0) {
+        return NULL;
+    }
+    TTF_Font* font = TTF_OpenFont(path, size);
+    if (font == NULL) {
+        printf("%s: TTF_OpenFont failed.\n", __func__);
+        return NULL;
+    }
+    return font;
+}
 static bool TEMPO_LoadTheme_RK(const cJSON* theme_json) {
     const char* key = NULL;
-    const char* font_path = NULL;
-    float font_size = 0;
-    SDL_Color font_color = {0};
-    if (cJSON_ExistKey(theme_json, key = "font_path")) {
-        if (cJSON_LoadFromObj(theme_json, key, JSM_STRING, &font_path) == false) {
-            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+    if (cJSON_ExistKey(theme_json, key = "textFont")) {
+        const cJSON* font_json = cJSON_GetObjectItem(theme_json, key);
+        if (font_json == NULL) {
+            printf("%s: cJSON_GetObjectItem failed.\n", __func__);
             return false;
-        } // Req Condition
-    }
-    if (cJSON_ExistKey(theme_json, key = "font_size")) {
-        if (cJSON_LoadFromObj(theme_json, key, JSM_FLOAT, &font_size) == false) {
-            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        }
+        theme.textFont = TEMPO_LoadTheme_Font(font_json);
+        if (theme.textFont == NULL) {
+            printf("%s: Theme.textFont failed.\n", __func__);
             return false;
-        } // Req Condition
-    }
-    if (cJSON_ExistKey(theme_json, key = "font_color")) {
-        if (cJSON_LoadFromObj(theme_json, key, JSM_COLOR, &font_color) == false) {
-            printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-            return false;
-        } // Req Condition
-    }
-    if (font_path != NULL && font_size > 0) {
-        theme.font = TTF_OpenFont(font_path, font_size); // alloc
-        if (theme.font == NULL) {
-            printf("%s: failed from.\n", __func__);
-        } // Req Condition
+        }
     }
     return true;
 }
@@ -62,8 +76,8 @@ bool TEMPO_LoadTheme() {
     return true;
 }
 void TEMPO_UnloadTheme() {
-    if (theme.font != NULL) {
-        TTF_CloseFont(theme.font); // free
-        theme.font = NULL;
+    if (theme.textFont != NULL) {
+        TTF_CloseFont(theme.textFont); // free
+        theme.textFont = NULL;
     } // Opt Condition
 }

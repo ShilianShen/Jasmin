@@ -1,5 +1,7 @@
 {
-  "font_path": "../resources/fonts/Courier New.ttf",
-  "font_size": 64.0,
-  "font_color": [255, 255, 225, 255]
+  "textFont": {
+    "path": "../resources/fonts/Courier New.ttf",
+    "size": 64.0,
+    "color": [255, 255, 25, 235]
+  }
 }

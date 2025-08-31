@@ -18,10 +18,10 @@ typedef enum ElemType {
     ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
-    //ELEM_TYPE_HEAD_1,
-    //ELEM_TYPE_HEAD_2,
-    //ELEM_TYPE_HEAD_3,
-    //ELEM_TYPE_HEAD_4,
+    ELEM_TYPE_HEAD_1,
+    ELEM_TYPE_HEAD_2,
+    ELEM_TYPE_HEAD_3,
+    ELEM_TYPE_HEAD_4,
     ELEM_TYPE_SLID_F,
     ELEM_TYPE_SLID_I,
     ELEM_TYPE_SWITCH,
@@ -30,11 +30,13 @@ typedef enum ElemType {
 const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
+
     [ELEM_TYPE_TEXT] = "TEXT",
-    //[ELEM_TYPE_HEAD_1] = "HEAD_1",
-    //[ELEM_TYPE_HEAD_2] = "HEAD_2",
-    //[ELEM_TYPE_HEAD_3] = "HEAD_3",
-    //[ELEM_TYPE_HEAD_4] = "HEAD_4",
+    [ELEM_TYPE_HEAD_1] = "HEAD_1",
+    [ELEM_TYPE_HEAD_2] = "HEAD_2",
+    [ELEM_TYPE_HEAD_3] = "HEAD_3",
+    [ELEM_TYPE_HEAD_4] = "HEAD_4",
+
     [ELEM_TYPE_SLID_F] = "SLID_F",
     [ELEM_TYPE_SLID_I] = "SLID_I",
     [ELEM_TYPE_SWITCH] = "SWITCH",
@@ -322,7 +324,7 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         case ELEM_TYPE_TEXT: {
             elem->tex = TXT_LoadTextureWithLines(
                 renderer,
-                theme.font,
+                theme.textFont,
                 elem->info.string,
                 (SDL_Color){255, 255, 255, 255},
                 EMPTY,
