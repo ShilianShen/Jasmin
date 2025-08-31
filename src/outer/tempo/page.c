@@ -44,11 +44,13 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
+
             page->elemTable.kv[i].key = strdup(elem_json->string);
             if (page->elemTable.kv[i].key == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);
                 return false;
             } // Req Condition
+
             page->elemTable.kv[i].val = TEMPO_CreateElem(elem_json); // malloc
             if (page->elemTable.kv[i].val == NULL) {
                 printf("%s: failed malloc page.elemSet.\n", __func__);

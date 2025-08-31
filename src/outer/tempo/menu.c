@@ -99,16 +99,32 @@ static bool TEMPO_LoadMenu_PageSet(const cJSON* pageSet_json) {
     return true;
 }
 static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
-    const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, "pageTable");
-    if (pageSet_json == NULL) {
-        printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
-        return false;
-    } // Req Condition
 
-    if (TEMPO_LoadMenu_PageSet(pageSet_json) == false) {
-        printf("%s: TEMPO_LoadMenu_PageSet == false.\n", __func__);
-        return false;
-    } // Req Condition
+    const char *key = NULL, *subkey = NULL;
+    if (cJSON_ExistKey(menu_json, key = "pageTable")) {
+        const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, key);
+        if (pageSet_json == NULL) {
+            printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
+            return false;
+        } // Req Condition
+        if (TEMPO_LoadMenu_PageSet(pageSet_json) == false) {
+            printf("%s: TEMPO_LoadMenu_PageSet == false.\n", __func__);
+            return false;
+        } // Req Condition
+    }
+    if (cJSON_ExistKey(menu_json, key = "path")) {
+        const cJSON* path_json = cJSON_GetObjectItem(menu_json, key);
+        if (path_json == NULL) {
+            printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
+            return false;
+        }
+        if (cJSON_ExistKey(path_json, subkey = "pageNow")) {
+            const char* pageNow_json = NULL;
+            if (cJSON_LoadFromObj(path_json, subkey, JSM_STRING, &pageNow_json)) {
+                menu.path[0] = TABLE_GetValByKey(menu.pageTable, pageNow_json);
+            }
+        }
+    }
 
     return true;
 }
@@ -248,7 +264,7 @@ static void TEMPO_TrigFuncBackward(const char* para) {
 static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
-static const KeyVal TEMPO_MENU_TRIG_SET[] = {
+static KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"pass", TEMPO_TrigFuncPass},
     {"forward", TEMPO_TrigFuncForward},
     {"backward", TEMPO_TrigFuncBackward},
