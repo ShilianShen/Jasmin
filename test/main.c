@@ -1,3 +1,5 @@
+#define TEMPO_EXTERN_TABLE
+
 #include "../include/jasmin/jasmin.h"
 
 

@@ -9,7 +9,7 @@ find_package(SDL3_image REQUIRED)
 
 
 file(GLOB_RECURSE SRC_FILES
-        "${PROJECT_SOURCE_DIR}/tests/*.c"
+        "${PROJECT_SOURCE_DIR}/test/*.c"
         "${PROJECT_SOURCE_DIR}/src/*.c"
 )
 

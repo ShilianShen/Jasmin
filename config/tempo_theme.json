@@ -1,9 +1,9 @@
 {
   "fontTable": {
-    "BT": {"path": "../res/fonts/Courier New.ttf", "size": 50.0},
-    "H1": {"path": "../res/fonts/Courier New.ttf", "size": 60.0},
-    "H2": {"path": "../res/fonts/Courier New.ttf", "size": 70.0},
-    "H3": {"path": "../res/fonts/Courier New.ttf", "size": 80.0},
-    "H4": {"path": "../res/fonts/Courier New.ttf", "size": 90.0}
+    "BT": {"path": "../res/font/Courier New.ttf", "size": 50.0},
+    "H1": {"path": "../res/font/Courier New.ttf", "size": 60.0},
+    "H2": {"path": "../res/font/Courier New.ttf", "size": 70.0},
+    "H3": {"path": "../res/font/Courier New.ttf", "size": 80.0},
+    "H4": {"path": "../res/font/Courier New.ttf", "size": 90.0}
   }
 }

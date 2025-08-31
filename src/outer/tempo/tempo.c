@@ -1,8 +1,13 @@
 #include "menu.h"
 
 
-#ifndef USE_TEMPO_EXTERN_TABLE
+#if  TEMPO_EXTERN_TABLE
 const Table TEMPO_ExternTable[];
+#endif
+
+//
+#ifndef TEMPO_EXTERN_PAGE_TABLE
+Table TEMPO_ExternPageTable = {0, NULL};
 #endif
 
 

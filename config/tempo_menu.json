@@ -7,7 +7,7 @@
       "elemTable": {
         "0000": {
           "type": "FILE",
-          "info": "../res/images/491.gif",
+          "info": "../res/image/491.gif",
           "anchor": 0,
           "gid": [0, 0, 2, 2]
         },
@@ -56,9 +56,9 @@
     },
     "Title": {
       "elemTable": {
-        "0000": {"type": "TEXT", "info": {"font": "BT", "string": "<<< Root."}, "anchor": -20, "func": "clear", "head": 0},
-        "0001": {"type": "TEXT", "info": {"font": "BT", "string": "THE MAZE"}, "anchor": -9, "head": 1},
-        "0002": {"type": "TEXT", "info": {"font": "BT", "string": "Setting"}, "anchor": 9, "head": 2}
+        "0000": {"type": "TEXT", "info": {"font": "BT", "string": "<<< Root."}, "anchor": -20, "func": "clear"},
+        "0001": {"type": "TEXT", "info": {"font": "BT", "string": "THE MAZE"}, "anchor": -9, "func": "swap", "para": "Root"},
+        "0002": {"type": "TEXT", "info": {"font": "BT", "string": "Setting"}, "anchor": 9}
       },
       "src": [0, 0, 900, 900],
       "anchor": -20,

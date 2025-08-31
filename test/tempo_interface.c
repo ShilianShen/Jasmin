@@ -1,6 +1,5 @@
 #include "../include/jasmin/jasmin.h"
 
-#define USE_TEMPO_EXTERN_TABLE
 
 int test_int = 10;
 float test_float = 10.5f;

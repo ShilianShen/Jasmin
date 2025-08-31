@@ -263,12 +263,28 @@ static void TEMPO_TrigFuncBackward(const char* para) {
 static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
+void TEMPO_TrigFuncSwap(const char* para) {
+    Page* page = TABLE_GetValByKey(menu.pageTable, para);
+    if (page == NULL) {
+        page = TABLE_GetValByKey(TEMPO_ExternPageTable, para);
+    }
+    if (page == NULL) {
+        return;
+    }
+    for (int i = 0; i < MENU_PATH_VOLUME; i++) {
+        if (menu.path[i] == NULL) {
+            menu.path[i-1] = page;
+            return;
+        }
+    }
+}
 static KeyVal TEMPO_MENU_TRIG_SET[] = {
     {"pass", TEMPO_TrigFuncPass},
     {"forward", TEMPO_TrigFuncForward},
     {"backward", TEMPO_TrigFuncBackward},
     {"clear", TEMPO_TrigFuncClear},
     {"switch", TEMPO_TrigFuncSwitch},
+    {"swap", TEMPO_TrigFuncSwap},
     {NULL, NULL}
 };
 const Table TEMPO_StaticTrigTable = {

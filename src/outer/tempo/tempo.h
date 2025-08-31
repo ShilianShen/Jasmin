@@ -8,14 +8,25 @@
 #define TEMPO_OFEN_RELOAD 0
 
 
+#ifndef TEMPO_EXTERN_TABLE
+    #define TEMPO_EXTERN_TABLE true
+#endif
+
+
+
+
 extern const Table TEMPO_ExternTable[];
 extern const Table TEMPO_StaticTrigTable;
+extern Table TEMPO_ExternPageTable;
 
 
 bool TEMPO_Init();
 void TEMPO_Exit();
 bool TEMPO_Renew();
 bool TEMPO_Draw();
+
+
+void TEMPO_TrigFuncSwap(const char* para);
 
 
 #endif //JASMIN_MENU_INTERFACE_H
