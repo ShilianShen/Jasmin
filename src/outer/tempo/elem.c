@@ -18,10 +18,6 @@ typedef enum ElemType {
     ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
-    ELEM_TYPE_HEAD_1,
-    ELEM_TYPE_HEAD_2,
-    ELEM_TYPE_HEAD_3,
-    ELEM_TYPE_HEAD_4,
     ELEM_TYPE_SLID_F,
     ELEM_TYPE_SLID_I,
     ELEM_TYPE_SWITCH,
@@ -32,10 +28,6 @@ const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_FILE] = "FILE",
 
     [ELEM_TYPE_TEXT] = "TEXT",
-    [ELEM_TYPE_HEAD_1] = "HEAD_1",
-    [ELEM_TYPE_HEAD_2] = "HEAD_2",
-    [ELEM_TYPE_HEAD_3] = "HEAD_3",
-    [ELEM_TYPE_HEAD_4] = "HEAD_4",
 
     [ELEM_TYPE_SLID_F] = "SLID_F",
     [ELEM_TYPE_SLID_I] = "SLID_I",
@@ -54,6 +46,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 // ELEM INFO ===========================================================================================================
 typedef union ElemInfo {
     char* string;
+    struct Text {TEMPO_TEXT_TYPE head; char* string;} text;
     struct SlidI {int min, max, *now;} slidI;
     struct SlidF {float min, max, *now;} slidF;
     struct Switch {bool* now;} switch_;
@@ -126,7 +119,29 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             return false;
         } // Req Condition
         switch (elem->type) {
-            case ELEM_TYPE_TEXT:
+            case ELEM_TYPE_TEXT:  {
+                char* string_json;
+                if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
+                    printf("%s: failed in %s.\n", __func__, key);
+                    return false;
+                } // Req Condition
+
+                if (cJSON_ExistKey(elem_json, key = "head")) {
+                    cJSON_LoadFromObj(elem_json, "head", JSM_INT, &elem->info.text.head);
+                    if (elem->info.text.head >= TEMPO_TEXT_NUM_TYPES) {
+                        elem->info.text.head = TEMPO_TEXT_TYPE_TEXT;
+                    }
+                }
+
+                if (string_json != NULL) {
+                    elem->info.text.string = strdup(string_json);
+                    if (elem->info.text.string == NULL) {
+                        printf("%s: failed in %s.\n", __func__, key);
+                        return false;
+                    }
+                } // Req Condition
+                break;
+            }
             case ELEM_TYPE_FILE: {
                 char* string_json;
                 if (cJSON_LoadFromObj(elem_json, "info", JSM_STRING, &string_json) == false) {
@@ -177,7 +192,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-                // elem->info.switch_.now = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, info_json->valuestring);
                 elem->info.switch_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
                 elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
                 if (elem->trig == NULL) {
@@ -254,19 +268,18 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     return true;
 }
-static bool TEMPO_CreateElem_CK(const Elem* elem) {
-    if ((elem->type == ELEM_TYPE_FILE || elem->type == ELEM_TYPE_TEXT) && elem->info.string == NULL) {
-        printf("%s: info == NULL.\n", __func__);
-        return false;
-    } // Req Condition
-    return true;
-}
 Elem* TEMPO_DeleteElem(Elem *elem) {
     if (elem == NULL) {
         return elem;
     } // Opt Condition
     switch (elem->type) {
-        case ELEM_TYPE_TEXT: {}
+        case ELEM_TYPE_TEXT: {
+            if (elem->info.text.string != NULL) {
+                free(elem->info.text.string);
+                elem->info.text.string = NULL;
+            }
+            break;
+        }
         case ELEM_TYPE_FILE: {
             if (elem->info.string != NULL) {
                 free(elem->info.string);
@@ -297,8 +310,8 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
         printf("%s: elem == NULL.\n", __func__);
         return elem;
     } // Req Condition
-    if (TEMPO_CreateElem_RK(elem, elem_json) == false || TEMPO_CreateElem_CK(elem) == false) {
-        printf("%s: RK or CK == false.\n", __func__);
+    if (TEMPO_CreateElem_RK(elem, elem_json) == false) {
+        printf("%s: RK == false.\n", __func__);
         elem = TEMPO_DeleteElem(elem);
     } // Req Condition
     return elem;
@@ -324,9 +337,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         case ELEM_TYPE_TEXT: {
             elem->tex = TXT_LoadTextureWithLines(
                 renderer,
-                theme.textFont,
-                elem->info.string,
-                (SDL_Color){255, 255, 255, 255},
+                theme.fonts[elem->info.text.head],
+                elem->info.text.string,
+                theme.colors[elem->info.text.head],
                 EMPTY,
                 'C'
                 );

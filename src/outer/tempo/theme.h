@@ -3,14 +3,22 @@
 
 
 #include "tempo.h"
-#define NUM_TEXT_TYPES 4
+
+
+typedef enum {
+    TEMPO_TEXT_TYPE_TEXT,
+    TEMPO_TEXT_TYPE_HEAD_1,
+    TEMPO_TEXT_TYPE_HEAD_2,
+    TEMPO_TEXT_TYPE_HEAD_3,
+    TEMPO_TEXT_TYPE_HEAD_4,
+    TEMPO_TEXT_NUM_TYPES,
+} TEMPO_TEXT_TYPE;
 
 
 typedef struct Theme Theme;
 extern struct Theme {
-    TTF_Font* textFont; // malloc
-    TTF_Font* headFonts[NUM_TEXT_TYPES];
-    SDL_Color colors[NUM_TEXT_TYPES];
+    TTF_Font* fonts[TEMPO_TEXT_NUM_TYPES];
+    SDL_Color colors[TEMPO_TEXT_NUM_TYPES];
 } theme;
 
 

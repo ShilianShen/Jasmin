@@ -36,17 +36,26 @@ static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
     return font;
 }
 static bool TEMPO_LoadTheme_RK(const cJSON* theme_json) {
-    const char* key = NULL;
-    if (cJSON_ExistKey(theme_json, key = "textFont")) {
-        const cJSON* font_json = cJSON_GetObjectItem(theme_json, key);
-        if (font_json == NULL) {
-            printf("%s: cJSON_GetObjectItem failed.\n", __func__);
-            return false;
-        }
-        theme.textFont = TEMPO_LoadTheme_Font(font_json);
-        if (theme.textFont == NULL) {
-            printf("%s: Theme.textFont failed.\n", __func__);
-            return false;
+    const char *key = NULL, *subkey = NULL;
+    if (cJSON_ExistKey(theme_json, key = "fonts")) {
+        const cJSON* fonts_json = cJSON_GetObjectItem(theme_json, key);
+
+        for (int i = 0; i < TEMPO_TEXT_NUM_TYPES; i++) {
+            const cJSON* font_json = cJSON_GetArrayItem(fonts_json, i);
+            if (font_json == NULL) {
+                printf("%s: cJSON_GetObjectItem failed.\n", __func__);
+                return false;
+            }
+
+            theme.fonts[i] = TEMPO_LoadTheme_Font(font_json);
+            if (theme.fonts[i] == NULL) {
+                printf("%s: Theme.textFont failed.\n", __func__);
+                return false;
+            }
+
+            if (cJSON_ExistKey(font_json, subkey = "color")) {
+                cJSON_LoadFromObj(font_json, subkey, JSM_COLOR, &theme.colors[i]);
+            }
         }
     }
     return true;
@@ -76,8 +85,10 @@ bool TEMPO_LoadTheme() {
     return true;
 }
 void TEMPO_UnloadTheme() {
-    if (theme.textFont != NULL) {
-        TTF_CloseFont(theme.textFont); // free
-        theme.textFont = NULL;
-    } // Opt Condition
+    for (int i = 0; i < TEMPO_TEXT_NUM_TYPES; i++) {
+        if (theme.fonts[i] != NULL) {
+            TTF_CloseFont(theme.fonts[i]); // free
+            theme.fonts[i] = NULL;
+        }
+    }
 }

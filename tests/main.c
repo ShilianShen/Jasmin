@@ -50,6 +50,7 @@ static bool Draw() {
 static void Exit() {
     for (int i = LEN_ENV_ARRAY - 1; i >= 0; i--) {
         if (ENV_ARRAY[i].exit != NULL) {
+            printf("%s: exiting: %s.\n", __func__, ENV_ARRAY[i].name);
             ENV_ARRAY[i].exit();
         }
     }

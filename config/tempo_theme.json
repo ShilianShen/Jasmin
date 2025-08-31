@@ -1,7 +1,9 @@
 {
-  "textFont": {
-    "path": "../resources/fonts/Courier New.ttf",
-    "size": 64.0,
-    "color": [255, 255, 25, 235]
-  }
+  "fonts": [
+    {"path": "../resources/fonts/Courier New.ttf", "size": 48.0, "color": [200, 50, 50, 255]},
+    {"path": "../resources/fonts/Courier New.ttf", "size": 128.0, "color": [50, 200, 50, 255]},
+    {"path": "../resources/fonts/Courier New.ttf", "size": 96.0, "color": [50, 50, 200, 255]},
+    {"path": "../resources/fonts/Courier New.ttf", "size": 72.0, "color": [200, 200, 50, 235]},
+    {"path": "../resources/fonts/Courier New.ttf", "size": 64.0, "color": [200, 50, 200, 235]}
+  ]
 }
