@@ -2,15 +2,10 @@
 #define JASMIN_BASIC_DEBUG_H
 
 
-/*
- * Debug是简化Debug的, 尤其是显示的部分.
- * 所以Debug函数在Debug.on = false时都不会做任何事情.
- */
-
-
 #include "../basic/basic.h"
 
 
+#define DEBUG_DEFAULT_THEME_JSON "../config/debug_theme.json"
 #define DEBUG_ON 1
 
 bool DEBUG_Init();

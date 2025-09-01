@@ -5,7 +5,7 @@ typedef struct Debug Debug;
 struct Debug {
     SDL_Renderer* renderer;
     struct {
-        TTF_Font *font24, *font32, *font64, *font128, *font256;
+        TTF_Font *font;
         SDL_Color point, rect, face, text, dark, light;
         SDL_Color darkPoint, darkRect, darkFace, darkText;
         int alphaLight, alphaDark;
@@ -17,13 +17,7 @@ const int DETAIL_SIZE_MAX = 64;
 
 
 static void DEBUG_LoadTheme() {
-    debug.theme.font24 = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
-    debug.theme.font32 = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 32);
-    debug.theme.font64 = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 64);
-    debug.theme.font128 = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 128);
-    debug.theme.font256 = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 256);
-    if (debug.theme.font128 == NULL) {printf("Fail to load font.\n");}
-    // debug.on = true;
+    debug.theme.font = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
 
     // color
     debug.theme.point = (SDL_Color){246, 202, 124, 255};
@@ -82,11 +76,7 @@ bool DEBUG_Renew() {
     return true;
 }
 void DEBUG_Exit() {
-    TTF_CloseFont(debug.theme.font24);
-    TTF_CloseFont(debug.theme.font32);
-    TTF_CloseFont(debug.theme.font64);
-    TTF_CloseFont(debug.theme.font128);
-    TTF_CloseFont(debug.theme.font256);
+    TTF_CloseFont(debug.theme.font);
 }
 
 
@@ -145,7 +135,7 @@ static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
 
     // Req Condition
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
-        debug.renderer, debug.theme.font24, text, debug.theme.light, debug.theme.dark, aligned
+        debug.renderer, debug.theme.font, text, debug.theme.light, debug.theme.dark, aligned
         );
     if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return NULL;}
 
