@@ -7,6 +7,7 @@
 #include "func.h"
 #include "table.h"
 #include "trigger.h"
+#include "env.h"
 
 
 #endif //JASMIN_BASIC_H

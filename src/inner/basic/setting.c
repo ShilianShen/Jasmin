@@ -19,22 +19,22 @@ SDL_Color EMPTY = {0, 0, 0, 0};
 
 bool BASIC_Init() {
     // SDL
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
+    if (SDL_Init(SDL_INIT_VIDEO) == false) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
         return false;
     }
-    if (!TTF_Init()) {
+    if (TTF_Init() == false) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
         return false;
     }
 
     window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG);
-    if (!window) {
+    if (window == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
         return false;
     }
     renderer = SDL_CreateRenderer(window, NULL);
-    if (!renderer) {
+    if (renderer == NULL) {
         printf("渲染器创建失败: %s\n", SDL_GetError());
         return false;
     }
