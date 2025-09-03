@@ -12,7 +12,7 @@ static const int LEN_ENV_ARRAY = sizeof(ENV_ARRAY) / sizeof(Env);
 
 
 int main() {
-    running = Init(LEN_ENV_ARRAY, ENV_ARRAY);
+    running = BASIC_InitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -20,14 +20,14 @@ int main() {
                 default: break;
             }
         }
-        running = running && Renew(LEN_ENV_ARRAY, ENV_ARRAY);
+        running = running && BASIC_RenewEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        running = running && Draw(LEN_ENV_ARRAY, ENV_ARRAY);
+        running = running && BASIC_DrawEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 
         SDL_RenderPresent(renderer);
     }
-    Exit(LEN_ENV_ARRAY, ENV_ARRAY);
+    BASIC_ExitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 }

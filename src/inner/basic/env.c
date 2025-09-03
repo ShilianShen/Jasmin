@@ -1,7 +1,7 @@
 #include "env.h"
 
 
-bool Init(const int len, const Env arr[len]) {
+bool BASIC_InitEnv(const int len, const Env arr[len]) {
     for (int i = 0; i < len; i++) {
         if (arr[i].init != NULL && arr[i].init() == false) {
             printf("%s: fail in %s.\n", __func__, arr[i].name);
@@ -10,7 +10,7 @@ bool Init(const int len, const Env arr[len]) {
     }
     return true;
 }
-bool Renew(const int len, const Env arr[len]) {
+bool BASIC_RenewEnv(const int len, const Env arr[len]) {
     for (int i = 0; i < len; i++) {
         if (arr[i].renew != NULL && arr[i].renew() == false) {
             printf("%s: fail in %s.\n", __func__, arr[i].name);
@@ -19,7 +19,7 @@ bool Renew(const int len, const Env arr[len]) {
     }
     return true;
 }
-bool Draw(const int len, const Env arr[len]) {
+bool BASIC_DrawEnv(const int len, const Env arr[len]) {
 
     for (int i = len - 1; i >= 0; i--) {
         if (arr[i].draw != NULL && arr[i].draw() == false) {
@@ -30,10 +30,9 @@ bool Draw(const int len, const Env arr[len]) {
 
     return true;
 }
-void Exit(const int len, const Env arr[len]) {
+void BASIC_ExitEnv(const int len, const Env arr[len]) {
     for (int i = len - 1; i >= 0; i--) {
         if (arr[i].exit != NULL) {
-            printf("%s: exiting: %s.\n", __func__, arr[i].name);
             arr[i].exit();
         }
     }

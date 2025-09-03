@@ -1,5 +1,5 @@
-#ifndef ENV_H
-#define ENV_H
+#ifndef BASIC_ENV_H
+#define BASIC_ENV_H
 
 
 #include "_basic.h"
@@ -14,10 +14,10 @@ typedef struct Env {
 } Env;
 
 
-bool Init(int len, const Env arr[len]);
-bool Renew(int len, const Env arr[len]);
-bool Draw(int len, const Env arr[len]);
-void Exit(int len, const Env arr[len]);
+bool BASIC_InitEnv(int len, const Env arr[len]);
+bool BASIC_RenewEnv(int len, const Env arr[len]);
+bool BASIC_DrawEnv(int len, const Env arr[len]);
+void BASIC_ExitEnv(int len, const Env arr[len]);
 
 
-#endif //ENV_H
+#endif //BASIC_ENV_H
