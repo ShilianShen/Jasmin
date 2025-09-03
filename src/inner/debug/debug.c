@@ -89,7 +89,7 @@ void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
     const SDL_FRect rect = {(float)x - w, (float)y - w, 2 * w, 2 * w};
 
     // draw
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.point, debug.theme.alphaLight);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
     SDL_RenderFillRect(debug.renderer, &rect);
 }
 void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
@@ -97,7 +97,7 @@ void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float 
     if (!DEBUG_ON) {return;}
 
     // line
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.point, debug.theme.alphaDark);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
     SDL_RenderLine(debug.renderer, x1, y1, x2, y2);
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
@@ -108,7 +108,7 @@ void DEBUG_DrawRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaLight);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
     SDL_RenderRect(debug.renderer, rect);
 }
 void DEBUG_FillRect(const SDL_FRect* rect) {
@@ -119,11 +119,11 @@ void DEBUG_FillRect(const SDL_FRect* rect) {
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
 
     // rect back
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaDark);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.darkRect);
     SDL_RenderFillRect(debug.renderer, rect);
 
     // rect edge
-    SDL_SetRenderSDLColorAlpha(debug.renderer, debug.theme.rect, debug.theme.alphaLight);
+    SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
     SDL_RenderRect(debug.renderer, rect);
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {

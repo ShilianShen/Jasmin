@@ -26,8 +26,5 @@ extern float scale_x, scale_y;
 extern SDL_Color EMPTY;
 
 
-bool BASIC_Init();
-void BASIC_Exit();
-
 
 #endif //JASMIN_BASIC_SETTING_H

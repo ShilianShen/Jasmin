@@ -6,6 +6,7 @@ static const Env ENV_ARRAY[] = {
     {"DEBUG", &DEBUG_Init, &DEBUG_Renew, &DEBUG_Draw, &DEBUG_Exit},
     {"DEVICE", NULL, &DEVICE_Renew, &DEVICE_Draw, NULL},
     {"TEMPO", &TEMPO_Init, &TEMPO_Renew, &TEMPO_Draw, &TEMPO_Exit},
+    {"VILLA", &VILLA_Init, &VILLA_Renew, &VILLA_Draw, &VILLA_Exit},
 };
 static const int LEN_ENV_ARRAY = sizeof(ENV_ARRAY) / sizeof(Env);
 

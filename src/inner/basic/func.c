@@ -237,9 +237,6 @@ bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
 bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
-bool SDL_SetRenderSDLColorAlpha(SDL_Renderer* renderer, const SDL_Color color, const Uint8 alpha) {
-    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
-}
 
 void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
     void** array = (void**)malloc(w * sizeof(void*));

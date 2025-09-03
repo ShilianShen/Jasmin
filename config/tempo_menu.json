@@ -58,10 +58,11 @@
       "elemTable": {
         "0000": {"type": "TEXT", "info": {"font": "BT", "string": "<<< Root."}, "anchor": -20, "func": "clear"},
         "0001": {"type": "TEXT", "info": {"font": "BT", "string": "THE MAZE"}, "anchor": -9, "func": "swap", "para": "Root"},
-        "0002": {"type": "TEXT", "info": {"font": "BT", "string": "Setting"}, "anchor": 9}
+        "0002": {"type": "TEXT", "info": {"font": "BT", "string": "FUCKING LIGHTING!"}, "anchor": 9, "gid": [10, 0, 0.5, 1]},
+        "0003": {"type": "TEXT", "info": {"font": "BT", "string": "FUCKING LIGHTING!"}, "anchor": 36, "bck": "0002"}
       },
-      "src": [0, 0, 900, 900],
-      "anchor": -20,
+      "src": [0, 0, 90, 900],
+      "anchor": 0,
       "color": [0, 0, 64, 255]
     }
   }
