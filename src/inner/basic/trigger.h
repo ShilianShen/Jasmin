@@ -1,7 +1,10 @@
 #ifndef TRIG_H
 #define TRIG_H
 
-#include "setting.h"
+
+#include "_basic.h"
+
+
 typedef void (*TrigFunc)(const char*);
 struct Trig {
     TrigFunc func;
@@ -12,8 +15,8 @@ typedef struct Trig Trig;
 
 
 void PullTrig(const Trig* trig);
-Trig* CreateTrig(TrigFunc func, const char* para);
-Trig* DeleteTrig(Trig *trig);
+Trig* BASIC_CreateTrig(TrigFunc func, const char* para);
+Trig* BASIC_DeleteTrig(Trig *trig);
 
 
 #endif //TRIG_H

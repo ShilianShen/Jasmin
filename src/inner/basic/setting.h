@@ -3,12 +3,9 @@
 
 
 
-#include "interface.h"
+#include "_basic.h"
 
 
-typedef enum JSM_DATA_TYPE {
-    JSM_INT, JSM_FLOAT, JSM_STRING, JSM_BOOL, JSM_RECT, JSM_COLOR, JSM_NUM_TYPES
-} JSM_DATA_TYPE;
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 

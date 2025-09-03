@@ -200,7 +200,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                     return false;
                 }
                 elem->info.switch_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
-                elem->trig = CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
+                elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
                 if (elem->trig == NULL) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
@@ -249,7 +249,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
         if (elem->trig == NULL) {
-            elem->trig = CreateTrig(func, para);
+            elem->trig = BASIC_CreateTrig(func, para);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -297,7 +297,7 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
         default: break;
     }
     if (elem->trig != NULL) {
-        elem->trig = DeleteTrig(elem->trig);
+        elem->trig = BASIC_DeleteTrig(elem->trig);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);

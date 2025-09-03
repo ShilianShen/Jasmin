@@ -2,8 +2,8 @@
 #define BASIC_FUNC_H
 
 
+#include "_basic.h"
 #include "table.h"
-#include "setting.h"
 
 
 // 2D-ARRAY ============================================================================================================

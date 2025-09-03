@@ -1,5 +1,5 @@
 #include "func.h"
-
+#include "setting.h"
 
 
 cJSON* getJson(const char* path) {

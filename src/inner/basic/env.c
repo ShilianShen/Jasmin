@@ -1,7 +1,5 @@
 #include "env.h"
 
-#include <stdio.h>
-
 
 bool Init(const int len, const Env arr[len]) {
     for (int i = 0; i < len; i++) {
