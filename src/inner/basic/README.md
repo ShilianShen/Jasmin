@@ -2,9 +2,9 @@
 
 ```mermaid
 graph LR
-    tempo_interface.h --> setting.h --> ease.h --> debug.h --> device.h --> basic.h
-    setting.h --setting.c--> setting.h
-    ease.h --ease.c--> ease.h
-    debug.h --debug.c--> debug.h
-    device.h --device.c--> device.h
+    _basic.h --> ease.h --> basic.h
+    _basic.h --> env.h --> basic.h
+    _basic.h --> func.h --> basic.h
+    _basic.h --> setting.h --> basic.h
+    _basic.h --> table.h --> basic.h
 ```
