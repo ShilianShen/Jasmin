@@ -5,9 +5,9 @@
 #include "_basic.h"
 
 
-float ACTIV_None(float x);
-float ACTIV_Sin2(float x);
-SDL_FRect ACTIV_GetFRect(SDL_FRect rect1, SDL_FRect rect2, float t);
+float BASIC_AtvLinear(float x);
+float BASIC_AtvSin2(float x);
+SDL_FRect BASIC_AtvGetFRect(SDL_FRect rect1, SDL_FRect rect2, float t);
 
 
 #endif //JASMIN_BASIC_EASE_H

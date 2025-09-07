@@ -164,34 +164,47 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
                 } // Req Condition
                 break;
             }
+            case ELEM_TYPE_SLID_F: {}
             case ELEM_TYPE_SLID_I: {
                 if (cJSON_IsObject(info_json) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-                const bool min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
-                const bool max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
-                const Table table = TEMPO_ExternTable[JSM_INT];
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidI.now, table.len, table.kv);
-                if ((min && max && now) == false) {
+
+                bool min = false, max = false;
+                if (elem->type == ELEM_TYPE_SLID_I) {
+                    min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
+                    max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
+                }
+                else {
+                    min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
+                    max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
+                }
+                if ((min && max) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-                break;
-            }
-            case ELEM_TYPE_SLID_F: {
-                if (cJSON_IsObject(info_json) == false) {
+
+                const char* nowKey = NULL;
+                if (cJSON_LoadFromObj(info_json, "now", JSM_STRING, &nowKey) == false) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
-                const bool min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
-                const bool max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
-                const Table table = TEMPO_ExternTable[JSM_FLOAT];
-                const bool now = cJSON_LoadFromTab(info_json, "now", (void**)&elem->info.slidF.now, table.len, table.kv);
-                if ((min && max && now) == false) {
+
+                const JSM_DATA_TYPE type = elem->type == ELEM_TYPE_SLID_I ? JSM_INT : JSM_FLOAT;
+                void* now = TABLE_GetValByKey(TEMPO_ExternTable[type], nowKey);
+                if (now == NULL) {
                     printf("%s: failed in %s.\n", __func__, key);
                     return false;
                 }
+
+                if (elem->type == ELEM_TYPE_SLID_I) {
+                    elem->info.slidI.now = now;
+                }
+                else {
+                    elem->info.slidF.now = now;
+                }
+
                 break;
             }
             case ELEM_TYPE_SWITCH: {

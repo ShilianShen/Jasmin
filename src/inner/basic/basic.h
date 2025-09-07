@@ -2,6 +2,7 @@
 #define JASMIN_BASIC_H
 
 
+#include "_basic.h"
 #include "ease.h"
 #include "setting.h"
 #include "func.h"

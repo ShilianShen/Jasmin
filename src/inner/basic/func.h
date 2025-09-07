@@ -3,7 +3,6 @@
 
 
 #include "_basic.h"
-#include "table.h"
 
 
 // 2D-ARRAY ============================================================================================================
@@ -53,7 +52,6 @@ bool SDL_RenderTextureAligned(
 cJSON* getJson(const char* path);
 bool cJSON_ExistKey(const cJSON* object, const char* key);
 bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DATA_TYPE type, void* target);
-bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, int len, const KeyVal* table);
 
 
 #endif //BASIC_FUNC_H

@@ -1,27 +1,58 @@
 #include "villa.h"
 
 
-const int NUM_RAIN = 100;
-SDL_FPoint rain[NUM_RAIN] = {0};
+const int NUM_RAIN = 2000;
+SDL_FRect rainDrops[NUM_RAIN] = {0};
+SDL_FPoint rainPos[NUM_RAIN] = {0};
+typedef struct RainTheme {
+    int num;
+    float len;
+    float arg;
+    SDL_Color color;
+    float min, max;
+    float* arr;
+} RainTheme;
+RainTheme rainTheme = {
+    .num = 1000,
+    .len = 50,
+    .arg = 0.1f,
+    .color = {250, 250, 250, 128},
+    .min = 1,
+    .max = 4,
+};
 
 
 bool VILLA_Init() {
     for (int i = 0; i < NUM_RAIN; i++) {
-        rain[i].x = (float)WINDOW_WIDTH * SDL_randf();
-        rain[i].y = (float)WINDOW_HEIGHT * SDL_randf();
-        // printf("%f, %f\n", rain[i].x, rain[i].y);
+        rainDrops[i].x = SDL_randf();
+        rainDrops[i].y = SDL_randf();
+        rainDrops[i].w = SDL_randf();
+        rainDrops[i].h = SDL_randf();
     }
     return true;
 }
 bool VILLA_Renew() {
-
+    const float cos = SDL_cosf(rainTheme.arg), sin = SDL_sinf(rainTheme.arg);
+    const float A = (float)SDL_GetTicks();
+    const float B = SDL_max(windowRect.w, windowRect.h);
+    for (int i = 0; i < NUM_RAIN; i++) {
+        const float rate = rainTheme.min + (rainTheme.max - rainTheme.min) * BASIC_AtvLinear(rainDrops[i].w);
+        const float offset = SDL_fmodf(A * rate, 2 * B) - B;
+        rainPos[i].x = rainDrops[i].x * windowRect.w + offset * sin;
+        rainPos[i].y = rainDrops[i].y * windowRect.h + offset * cos;
+    }
+    DEBUG_SendMessageR("%s: %d\n", __func__, SDL_GetTicks());
     return true;
 }
 bool VILLA_Draw() {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 128);
+    const float dx = rainTheme.len * SDL_sinf(rainTheme.arg);
+    const float dy = rainTheme.len * SDL_cosf(rainTheme.arg);
+    SDL_SetRenderSDLColor(renderer, rainTheme.color);
     for (int i = 0; i < NUM_RAIN; i++) {
-        SDL_FRect rect = {rain[i].x, rain[i].y, 40, 40};
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderLine(renderer,
+            rainPos[i].x, rainPos[i].y,
+            rainPos[i].x + dx, rainPos[i].y + dy
+            );
     }
     return true;
 }

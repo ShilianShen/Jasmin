@@ -14,6 +14,7 @@ typedef enum JSM_DATA_TYPE {
     JSM_COLOR,
     JSM_NUM_TYPES
 } JSM_DATA_TYPE;
+extern SDL_FRect windowRect;
 
 
 bool BASIC_Init();

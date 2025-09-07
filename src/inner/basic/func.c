@@ -108,18 +108,6 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE
         default: return false;
     }
 }
-bool cJSON_LoadFromTab(const cJSON* object, const char* key, void** target, const int len, const KeyVal* table) {
-    if (object == NULL || key == NULL) return true;
-    const cJSON* val = cJSON_GetObjectItem(object, key);
-    if (val == NULL || cJSON_IsString(val) == false) return true;
-
-    if (target == NULL || table == NULL) return false;
-
-    *target = TABLE_GetValByKey((Table){len, table}, val->valuestring);
-    // *target = BASIC_GetValByKey(len, table, val->valuestring);
-    if (*target == NULL) return false;
-    return true;
-}
 
 
 bool BASIC_Renew() {
@@ -127,6 +115,7 @@ bool BASIC_Renew() {
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
     scale_x = (float)windowWidth / (float)logical_w;
     scale_y = (float)windowHeight / (float)logical_h;
+    windowRect = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
     return true;
 }
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {

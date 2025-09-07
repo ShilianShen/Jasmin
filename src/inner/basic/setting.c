@@ -3,7 +3,7 @@
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-
+SDL_FRect windowRect = {0, 0, 0, 0};
 
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
