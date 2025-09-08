@@ -12,7 +12,9 @@ file(GLOB_RECURSE SRC_FILES
         "${PROJECT_SOURCE_DIR}/test/*.c"
         "${PROJECT_SOURCE_DIR}/src/*.c"
 )
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
+add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
+        src/outer/tempo/elem/text.c
+        src/outer/tempo/elem/text.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf

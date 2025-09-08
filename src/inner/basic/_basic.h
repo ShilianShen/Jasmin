@@ -17,9 +17,15 @@ typedef enum JSM_DATA_TYPE {
 extern SDL_FRect windowRect;
 
 
+// extern ma_result result;
+// extern ma_engine engine;
+
 bool BASIC_Init();
 bool BASIC_Renew();
 void BASIC_Exit();
+
+
+void MA_PlaySound(const char *sound);
 
 
 

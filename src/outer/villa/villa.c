@@ -1,6 +1,7 @@
 #include "villa.h"
 
 
+#include "weather.h"
 const int NUM_RAIN = 2000;
 SDL_FRect rainDrops[NUM_RAIN] = {0};
 SDL_FPoint rainPos[NUM_RAIN] = {0};

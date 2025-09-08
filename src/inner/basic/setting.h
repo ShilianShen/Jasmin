@@ -14,7 +14,7 @@ extern const char* WINDOW_TITLE;
 extern const int WINDOW_WIDTH, WINDOW_HEIGHT;
 extern bool running;
 extern const SDL_WindowFlags FLAG;
-SDL_Event event;
+SDL_Event sdl_event;
 
 
 extern int logical_w, logical_h;

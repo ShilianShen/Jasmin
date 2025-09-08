@@ -1,4 +1,7 @@
+#define MINIAUDIO_IMPLEMENTATION
 #include "../include/jasmin/jasmin.h"
+
+
 
 
 static const Env ENV_ARRAY[] = {
@@ -11,11 +14,13 @@ static const Env ENV_ARRAY[] = {
 static const int LEN_ENV_ARRAY = sizeof(ENV_ARRAY) / sizeof(Env);
 
 
+
 int main() {
     running = BASIC_InitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
+
     while (running) {
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
+        while (SDL_PollEvent(&sdl_event)) {
+            switch (sdl_event.type) {
                 case SDL_EVENT_QUIT: running = false; break;
                 default: break;
             }
@@ -29,5 +34,6 @@ int main() {
 
         SDL_RenderPresent(renderer);
     }
+
     BASIC_ExitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 }
