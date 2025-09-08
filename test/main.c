@@ -1,4 +1,4 @@
-#define MINIAUDIO_IMPLEMENTATION
+// #define MINIAUDIO_IMPLEMENTATION
 #include "../include/jasmin/jasmin.h"
 
 

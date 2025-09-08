@@ -17,16 +17,16 @@ float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
 
 
-// ma_result result;
-// ma_engine engine;
+ma_result result;
+ma_engine engine;
 
 
 bool BASIC_Init() {
     // miniaudio
-    // result = ma_engine_init(NULL, &engine);
-    // if (result != MA_SUCCESS) {
-    //     return false;
-    // }
+    result = ma_engine_init(NULL, &engine);
+    if (result != MA_SUCCESS) {
+        return false;
+    }
 
     // SDL
     if (SDL_Init(SDL_INIT_VIDEO) == false) {
@@ -58,6 +58,6 @@ void BASIC_Exit() {
     SDL_DestroyWindow(window);
     SDL_Quit();
     // miniaudio
-    // ma_engine_uninit(&engine);
+    ma_engine_uninit(&engine);
 }
 

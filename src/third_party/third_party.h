@@ -5,10 +5,10 @@
 #include "cJSON-1.7.18/cJSON.h"
 
 
-// #define MA_ENABLE_FLAC
-// #define MA_ENABLE_VORBIS
-// #define MA_ENABLE_MP3
-// #include "miniaudio/miniaudio.h"
+#define MA_ENABLE_FLAC
+#define MA_ENABLE_VORBIS
+#define MA_ENABLE_MP3
+#include "miniaudio/miniaudio.h"
 
 
 #include <SDL3/SDL.h>

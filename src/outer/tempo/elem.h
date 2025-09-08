@@ -6,6 +6,10 @@
 
 
 typedef struct Elem Elem;
+typedef struct ElemTT {
+    const char *name;
+
+} ElemTT;
 
 
 bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);

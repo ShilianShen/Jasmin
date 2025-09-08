@@ -1,5 +1,5 @@
 #include <math.h>
-
+#include "elem/text.h"
 #include "menu.h"
 
 
@@ -99,6 +99,12 @@ static bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
     }
     return true;
 }
+static void TEMPO_DeleteElemText(Elem* elem) {
+    if (elem->info.text.string != NULL) {
+        free(elem->info.text.string);
+        elem->info.text.string = NULL;
+    }
+}
 static bool TEMPO_CreateElemFile(Elem* elem, const cJSON* info_json) {
     const char* string_json = NULL;
     if (cJSON_IsString(info_json)) {
@@ -112,6 +118,12 @@ static bool TEMPO_CreateElemFile(Elem* elem, const cJSON* info_json) {
         }
     } // Req Condition
     return true;
+}
+static void TEMPO_DeleteElemFile(Elem* elem) {
+    if (elem->info.string != NULL) {
+        free(elem->info.string);
+        elem->info.string = NULL;
+    }
 }
 static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
     if (cJSON_IsObject(info_json) == false) {
@@ -171,16 +183,17 @@ static bool TEMPO_CreateElemSwitch(Elem* elem, const cJSON* info_json) {
 
 // ELEM EREN
 struct {
+    const char* name;
     bool (*create)(Elem*, const cJSON*);
     bool (*renew)(Elem*);
     void (*delete)(Elem*);
 } arrElem[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_NULL] = {NULL, NULL, NULL},
-    [ELEM_TYPE_FILE] = {TEMPO_CreateElemFile, NULL, NULL},
-    [ELEM_TYPE_TEXT] = {TEMPO_CreateElemText, NULL, NULL},
-    [ELEM_TYPE_SLID_F] = {TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_SLID_I] = {TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_SWITCH] = {TEMPO_CreateElemSwitch, NULL, NULL},
+    [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
+    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
+    [ELEM_TYPE_SLID_F] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
+    [ELEM_TYPE_SLID_I] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
+    [ELEM_TYPE_SWITCH] = {"SWITCH", TEMPO_CreateElemSwitch, NULL, NULL},
 };
 
 
@@ -308,22 +321,9 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     if (elem == NULL) {
         return elem;
     } // Opt Condition
-    switch (elem->type) {
-        case ELEM_TYPE_TEXT: {
-            if (elem->info.text.string != NULL) {
-                free(elem->info.text.string);
-                elem->info.text.string = NULL;
-            }
-            break;
-        }
-        case ELEM_TYPE_FILE: {
-            if (elem->info.string != NULL) {
-                free(elem->info.string);
-                elem->info.string = NULL;
-            }
-            break;
-        }
-        default: break;
+
+    if (arrElem[elem->type].delete != NULL) {
+        arrElem[elem->type].delete(elem);
     }
     if (elem->trig != NULL) {
         elem->trig = BASIC_DeleteTrig(elem->trig);
