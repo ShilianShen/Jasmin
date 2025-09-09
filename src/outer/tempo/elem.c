@@ -19,8 +19,7 @@ typedef enum ElemType {
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
     ELEM_TYPE_SLID,
-    ELEM_TYPE_SWITCH,
-    // ELEM_TYPE_SHOW,
+    ELEM_TYPE_BOOL,
     ELEM_NUM_TYPES,
 } ElemType;
 const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
@@ -28,8 +27,7 @@ const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT",
     [ELEM_TYPE_SLID] = "SLID",
-    [ELEM_TYPE_SWITCH] = "SWITCH",
-    // [ELEM_TYPE_SHOW] = "SHOW",
+    [ELEM_TYPE_BOOL] = "BOOL",
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
@@ -45,10 +43,9 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 // ELEM INFO ===========================================================================================================
 typedef union ElemInfo {
     char* string;
-    struct Text {TTF_Font* font; char* string;} text;
-    struct SlidF {bool discrete; float min, max, *now;} slid;
-    struct Switch {bool* now;} switch_;
-    // struct Show {TTF_Font* font; JSM_DATA_TYPE type; void* now;} show;
+    struct {TTF_Font* font; char* string;} text;
+    struct {bool discrete; float min, max, *now;} slid;
+    struct {bool* now;} bool_;
 } ElemInfo;
 
 
@@ -139,6 +136,11 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
         return false;
     }
 
+    if (elem->info.slid.discrete) {
+        elem->info.slid.min = roundf(elem->info.slid.min);
+        elem->info.slid.max = roundf(elem->info.slid.max);
+    }
+
     const JSM_DATA_TYPE type = elem->info.slid.discrete ? JSM_INT : JSM_FLOAT;
     elem->info.slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
     if (elem->info.slid.now == NULL) {
@@ -153,7 +155,7 @@ static bool TEMPO_CreateElemSwitch(Elem* elem, const cJSON* info_json) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    elem->info.switch_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
+    elem->info.bool_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
     elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring, false);
     if (elem->trig == NULL) {
         // printf("%s: failed in %s.\n", __func__, key);
@@ -174,7 +176,7 @@ struct {
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
     [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_SWITCH] = {"SWITCH", TEMPO_CreateElemSwitch, NULL, NULL},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemSwitch, NULL, NULL},
 };
 
 
@@ -419,9 +421,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             SDL_SetRenderTarget(renderer, NULL);
             break;
         }
-        case ELEM_TYPE_SWITCH: {
+        case ELEM_TYPE_BOOL: {
             const float M = 1;
-            const float N = *elem->info.switch_.now;
+            const float N = *elem->info.bool_.now;
             const float W = 2 * A + (M + 1) * B + M * D;
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
@@ -486,7 +488,7 @@ bool TEMPO_RenewElem(Elem *elem) {
     switch (elem->type) {
         case ELEM_TYPE_FILE:
         case ELEM_TYPE_TEXT:
-        case ELEM_TYPE_SWITCH: {
+        case ELEM_TYPE_BOOL: {
             if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
                 DEVICE_SetMouseLeftTrig(elem->trig);
             }
