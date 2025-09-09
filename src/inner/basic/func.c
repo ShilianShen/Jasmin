@@ -58,6 +58,13 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DATA_TYPE
             }
             return false;
         }
+        case JSM_BOOL: {
+            if (cJSON_IsBool(val)) {
+                *(bool*)target = (bool)val->valueint;
+                return true;
+            }
+            return false;
+        }
         case JSM_RECT: {
             if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
                 return false;

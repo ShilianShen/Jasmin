@@ -19,7 +19,6 @@ typedef enum ElemType {
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
     ELEM_TYPE_SLID,
-    ELEM_TYPE_SLID_I,
     ELEM_TYPE_SWITCH,
     // ELEM_TYPE_SHOW,
     ELEM_NUM_TYPES,
@@ -28,8 +27,7 @@ const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT",
-    [ELEM_TYPE_SLID] = "SLID_F",
-    [ELEM_TYPE_SLID_I] = "SLID_I",
+    [ELEM_TYPE_SLID] = "SLID",
     [ELEM_TYPE_SWITCH] = "SWITCH",
     // [ELEM_TYPE_SHOW] = "SHOW",
 };
@@ -48,8 +46,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 typedef union ElemInfo {
     char* string;
     struct Text {TTF_Font* font; char* string;} text;
-    struct SlidF {bool discrete; float min, max, *now;} slidF;
-    struct SlidI {int min, max, *now;} slidI;
+    struct SlidF {bool discrete; float min, max, *now;} slid;
     struct Switch {bool* now;} switch_;
     // struct Show {TTF_Font* font; JSM_DATA_TYPE type; void* now;} show;
 } ElemInfo;
@@ -119,43 +116,36 @@ static void TEMPO_DeleteElemFile(Elem* elem) {
 }
 static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
     if (cJSON_IsObject(info_json) == false) {
-        // printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
 
-    bool min = false, max = false;
-    if (elem->type == ELEM_TYPE_SLID_I) {
-        min = cJSON_LoadFromObj(info_json, "min", JSM_INT, &elem->info.slidI.min);
-        max = cJSON_LoadFromObj(info_json, "max", JSM_INT, &elem->info.slidI.max);
+    const char* key = NULL;
+    const char* now_json = NULL;
+
+    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &elem->info.slid.discrete) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
     }
-    else {
-        min = cJSON_LoadFromObj(info_json, "min", JSM_FLOAT, &elem->info.slidF.min);
-        max = cJSON_LoadFromObj(info_json, "max", JSM_FLOAT, &elem->info.slidF.max);
+    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &elem->info.slid.min) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
     }
-    if ((min && max) == false) {
-        // printf("%s: failed in %s.\n", __func__, key);
+    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &elem->info.slid.max) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
+    if (cJSON_LoadFromObj(info_json, key = "now", JSM_STRING, &now_json) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
 
-    const char* nowKey = NULL;
-    if (cJSON_LoadFromObj(info_json, "now", JSM_STRING, &nowKey) == false) {
-        // printf("%s: failed in %s.\n", __func__, key);
+    const JSM_DATA_TYPE type = elem->info.slid.discrete ? JSM_INT : JSM_FLOAT;
+    elem->info.slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
+    if (elem->info.slid.now == NULL) {
+        printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
 
-    const JSM_DATA_TYPE type = elem->type == ELEM_TYPE_SLID_I ? JSM_INT : JSM_FLOAT;
-    void* now = TABLE_GetValByKey(TEMPO_ExternTable[type], nowKey);
-    if (now == NULL) {
-        // printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-
-    if (elem->type == ELEM_TYPE_SLID_I) {
-        elem->info.slidI.now = now;
-    }
-    else {
-        elem->info.slidF.now = now;
-    }
     return true;
 }
 static bool TEMPO_CreateElemSwitch(Elem* elem, const cJSON* info_json) {
@@ -184,7 +174,6 @@ struct {
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
     [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_SLID_I] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
     [ELEM_TYPE_SWITCH] = {"SWITCH", TEMPO_CreateElemSwitch, NULL, NULL},
 };
 
@@ -378,11 +367,8 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
             break;
         }
-        case ELEM_TYPE_SLID_I:
         case ELEM_TYPE_SLID: {
-            const float M = elem->type == ELEM_TYPE_SLID_I
-                    ? (float)(elem->info.slidI.max - elem->info.slidI.min)
-                    : elem->info.slidF.max - elem->info.slidF.min;
+            const float M = elem->info.slid.max - elem->info.slid.min;
             const float W = 2 * A + (M + 1) * B + M * C;
             const float H = 2 * A + 2 * B + D;
             elem->src_rect = (SDL_FRect){0, 0, W, H};
@@ -402,9 +388,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
                 (SDL_FRect){W - A, 0, A, H},
             };
             SDL_RenderFillRects(renderer, frame, 4);
-            if (elem->type == ELEM_TYPE_SLID_I) {
-                if (elem->info.slidI.now != NULL) {
-                    const int N = *elem->info.slidI.now - elem->info.slidI.min;
+            if (elem->info.slid.discrete) {
+                if (elem->info.slid.now != NULL) {
+                    const int N = *(int*)elem->info.slid.now - (int)elem->info.slid.min;
                     SDL_FRect rects[N];
                     for (int i = 0; i < N; i++) {
                         rects[i].x = A + (float)(i + 1) * B + (float)i * C;
@@ -419,9 +405,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
                     SDL_RenderLine(renderer, W, 0, 0, H);
                 }
             }
-            if (elem->type == ELEM_TYPE_SLID) {
-                if (elem->info.slidF.now != NULL) {
-                    const float N = *elem->info.slidF.now - elem->info.slidF.min;
+            else {
+                if (elem->info.slid.now != NULL) {
+                    const float N = *elem->info.slid.now - elem->info.slid.min;
                     const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
                     SDL_RenderFillRect(renderer, &rect);
                 }
@@ -506,7 +492,6 @@ bool TEMPO_RenewElem(Elem *elem) {
             }
             break;
         }
-        case ELEM_TYPE_SLID_I:
         case ELEM_TYPE_SLID: {
             if (mouseLeftIn == false) {
                 break;
@@ -514,21 +499,21 @@ bool TEMPO_RenewElem(Elem *elem) {
             const float min = elem->dst_rect.x + A + B;
             const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
             const float now = DEVICE_GetMousePos().x;
-            if (elem->type == ELEM_TYPE_SLID) {
+            if (elem->info.slid.discrete) {
                 if (now <= min)
-                    *elem->info.slidF.now = elem->info.slidF.min;
+                    *(int*)elem->info.slid.now = (int)elem->info.slid.min;
                 else if (now >= max)
-                    *elem->info.slidF.now = elem->info.slidF.max;
+                    *(int*)elem->info.slid.now = (int)elem->info.slid.max;
                 else
-                    *elem->info.slidF.now = elem->info.slidF.min + (elem->info.slidF.max - elem->info.slidF.min) * (now - min) / (max - min);
+                    *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
             }
-            if (elem->type == ELEM_TYPE_SLID_I) {
+            else {
                 if (now <= min)
-                    *elem->info.slidI.now = elem->info.slidI.min;
+                    *(float*)elem->info.slid.now = elem->info.slid.min;
                 else if (now >= max)
-                    *elem->info.slidI.now = elem->info.slidI.max;
+                    *(float*)elem->info.slid.now = elem->info.slid.max;
                 else
-                    *elem->info.slidI.now = (int)((now - min) / (B + C));
+                    *(float*)elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
             }
             break;
         }

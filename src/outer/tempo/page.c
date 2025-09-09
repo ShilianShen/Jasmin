@@ -61,7 +61,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
 
             page->elemTable.kv[i].val = TEMPO_CreateElem(elem_json); // malloc
             if (page->elemTable.kv[i].val == NULL) {
-                printf("%s: failed malloc page.elemSet.\n", __func__);
+                printf("%s: failed malloc page.elemSet, %s.\n", __func__, page->elemTable.kv[i].key);
                 return false;
             } // Req Condition
         }
