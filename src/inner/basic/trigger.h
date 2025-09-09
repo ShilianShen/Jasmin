@@ -9,7 +9,7 @@ typedef void (*TrigFunc)(const char*);
 struct Trig {
     bool sustain;
     TrigFunc func;
-    char* para;
+    void* para;
 };
 typedef struct Trig Trig;
 

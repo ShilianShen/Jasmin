@@ -169,14 +169,15 @@ static bool TEMPO_CreateElemBool(Elem* elem, const cJSON* info_json) {
 struct {
     const char* name;
     bool (*create)(Elem*, const cJSON*);
-    bool (*renew)(Elem*);
     void (*delete)(Elem*);
+    bool (*renew)(Elem*);
+    TrigFunc func;
 } arrElem[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL},
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
-    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL},
+    [ELEM_TYPE_NULL] = {NULL, NULL, NULL, NULL, NULL},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL, NULL},
+    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL, NULL},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL, NULL},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL, NULL},
 };
 
 
@@ -226,25 +227,28 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->src = &elem->src_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "func") && elem->trig == NULL) {
-        const char* funcName = NULL;
-        if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &funcName) == false) {
+        const char* func_json = NULL;
+        if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &func_json) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        const TrigFunc func = TABLE_GetValByKey(TEMPO_StaticTrigTable, funcName);
+
+        const TrigFunc func = TABLE_GetValByKey(TEMPO_StaticTrigTable, func_json);
         if (func == NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        const char* para = NULL;
+
+        const char* para_json = NULL;
         if (cJSON_ExistKey(elem_json, "para")) {
-            if (cJSON_LoadFromObj(elem_json, "para", JSM_STRING, &para) == false) {
+            if (cJSON_LoadFromObj(elem_json, "para", JSM_STRING, &para_json) == false) {
                 printf("%s: para == NULL, %s.\n", __func__, key);
                 return false;
             }
         }
+
         if (elem->trig == NULL) {
-            elem->trig = BASIC_CreateTrig(func, para, false);
+            elem->trig = BASIC_CreateTrig(func, para_json, false);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
