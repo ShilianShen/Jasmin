@@ -150,7 +150,7 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
 
     return true;
 }
-static bool TEMPO_CreateElemSwitch(Elem* elem, const cJSON* info_json) {
+static bool TEMPO_CreateElemBool(Elem* elem, const cJSON* info_json) {
     if (cJSON_IsString(info_json) == false) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
@@ -176,38 +176,8 @@ struct {
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
     [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemSwitch, NULL, NULL},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL},
 };
-
-
-// SET & GET ===========================================================================================================
-bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
-    if (elem == NULL) {
-        printf("%s: elem is null.\n", __func__);
-        return false;
-    }
-    elem->dst_rect = dst_rect;
-    return true;
-}
-bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst) {
-    if (elem == NULL) {
-        printf("%s: elem is null.\n", __func__);
-        return false;
-    }
-    *dst = elem->dst_rect;
-    return true;
-}
-bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
-    if (bck == NULL) {
-        return false;
-    }
-    publicBck = bck;
-    return true;
-}
-bool TEMPO_SetElemPublicTable(const Table* table) {
-    publicTable = table;
-    return true;
-}
 
 
 // CREATE & DELETE =====================================================================================================
@@ -558,4 +528,34 @@ void TEMPO_TrigFuncSwitch(const char* key) {
     if (val != NULL) {
         *val = !*val;
     }
+}
+
+
+// SET & GET ===========================================================================================================
+bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return false;
+    }
+    elem->dst_rect = dst_rect;
+    return true;
+}
+bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst) {
+    if (elem == NULL) {
+        printf("%s: elem is null.\n", __func__);
+        return false;
+    }
+    *dst = elem->dst_rect;
+    return true;
+}
+bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
+    if (bck == NULL) {
+        return false;
+    }
+    publicBck = bck;
+    return true;
+}
+bool TEMPO_SetElemPublicTable(const Table* table) {
+    publicTable = table;
+    return true;
 }
