@@ -6,10 +6,6 @@
 // ELEM PARA ===========================================================================================================
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* publicBck = NULL;
-
-
-// static const KeyVal* publicElemTable = NULL;
-// static int lenPublicElemTable = 0;
 static const Table* publicTable = NULL;
 
 
@@ -47,8 +43,6 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     }
     return ELEM_TYPE_NULL;
 }
-
-
 
 
 
@@ -172,7 +166,7 @@ static bool TEMPO_CreateElemSwitch(Elem* elem, const cJSON* info_json) {
         return false;
     }
     elem->info.switch_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
-    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring);
+    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring, false);
     if (elem->trig == NULL) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
@@ -291,7 +285,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
         if (elem->trig == NULL) {
-            elem->trig = BASIC_CreateTrig(func, para);
+            elem->trig = BASIC_CreateTrig(func, para, false);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;

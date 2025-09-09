@@ -18,7 +18,19 @@ struct Mouse mouse = {0};
 bool DEVICE_Renew() {
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse.x, &mouse.y);
 
-    if (mouse.left_trig != NULL && mouse.left_pressed == true && (buttons & SDL_BUTTON_LMASK) == false) {
+    if (mouse.left_trig != NULL
+        && mouse.left_trig->sustain == false
+        && mouse.left_pressed == true
+        && (buttons & SDL_BUTTON_LMASK) == false
+        ) {
+        ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        PullTrig(mouse.left_trig);
+    }
+
+    if (mouse.left_trig != NULL
+        && mouse.left_trig->sustain == true
+        && mouse.left_pressed == true
+        ) {
         ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
         PullTrig(mouse.left_trig);
     }
