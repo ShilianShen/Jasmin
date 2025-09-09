@@ -18,7 +18,7 @@ typedef enum ElemType {
     ELEM_TYPE_NULL,
     ELEM_TYPE_FILE,
     ELEM_TYPE_TEXT,
-    ELEM_TYPE_SLID_F,
+    ELEM_TYPE_SLID,
     ELEM_TYPE_SLID_I,
     ELEM_TYPE_SWITCH,
     // ELEM_TYPE_SHOW,
@@ -28,7 +28,7 @@ const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
     [ELEM_TYPE_TEXT] = "TEXT",
-    [ELEM_TYPE_SLID_F] = "SLID_F",
+    [ELEM_TYPE_SLID] = "SLID_F",
     [ELEM_TYPE_SLID_I] = "SLID_I",
     [ELEM_TYPE_SWITCH] = "SWITCH",
     // [ELEM_TYPE_SHOW] = "SHOW",
@@ -183,7 +183,7 @@ struct {
     [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL},
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL},
-    [ELEM_TYPE_SLID_F] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
     [ELEM_TYPE_SLID_I] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL},
     [ELEM_TYPE_SWITCH] = {"SWITCH", TEMPO_CreateElemSwitch, NULL, NULL},
 };
@@ -379,7 +379,7 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
             break;
         }
         case ELEM_TYPE_SLID_I:
-        case ELEM_TYPE_SLID_F: {
+        case ELEM_TYPE_SLID: {
             const float M = elem->type == ELEM_TYPE_SLID_I
                     ? (float)(elem->info.slidI.max - elem->info.slidI.min)
                     : elem->info.slidF.max - elem->info.slidF.min;
@@ -419,7 +419,7 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
                     SDL_RenderLine(renderer, W, 0, 0, H);
                 }
             }
-            if (elem->type == ELEM_TYPE_SLID_F) {
+            if (elem->type == ELEM_TYPE_SLID) {
                 if (elem->info.slidF.now != NULL) {
                     const float N = *elem->info.slidF.now - elem->info.slidF.min;
                     const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
@@ -507,14 +507,14 @@ bool TEMPO_RenewElem(Elem *elem) {
             break;
         }
         case ELEM_TYPE_SLID_I:
-        case ELEM_TYPE_SLID_F: {
+        case ELEM_TYPE_SLID: {
             if (mouseLeftIn == false) {
                 break;
             }
             const float min = elem->dst_rect.x + A + B;
             const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
             const float now = DEVICE_GetMousePos().x;
-            if (elem->type == ELEM_TYPE_SLID_F) {
+            if (elem->type == ELEM_TYPE_SLID) {
                 if (now <= min)
                     *elem->info.slidF.now = elem->info.slidF.min;
                 else if (now >= max)
