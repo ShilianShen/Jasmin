@@ -26,7 +26,7 @@
         },
         "0004": {
           "type": "SLID_F",
-          "info": {"min": 0, "max": 100, "now": "test_float"},
+          "info": {"discrete": false, "min": 0, "max": 100, "now": "test_float"},
           "anchor": -11,
           "gid": [70, -100, 1, 1]
         },

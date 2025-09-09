@@ -27,9 +27,7 @@ typedef enum ElemType {
 const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = "NULL",
     [ELEM_TYPE_FILE] = "FILE",
-
     [ELEM_TYPE_TEXT] = "TEXT",
-
     [ELEM_TYPE_SLID_F] = "SLID_F",
     [ELEM_TYPE_SLID_I] = "SLID_I",
     [ELEM_TYPE_SWITCH] = "SWITCH",
@@ -50,8 +48,8 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 typedef union ElemInfo {
     char* string;
     struct Text {TTF_Font* font; char* string;} text;
+    struct SlidF {bool discrete; float min, max, *now;} slidF;
     struct SlidI {int min, max, *now;} slidI;
-    struct SlidF {float min, max, *now;} slidF;
     struct Switch {bool* now;} switch_;
     // struct Show {TTF_Font* font; JSM_DATA_TYPE type; void* now;} show;
 } ElemInfo;
@@ -71,7 +69,7 @@ struct Elem {
     Trig* trig;
 };
 
-static bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
+bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -266,7 +264,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
         elem->src = &elem->src_rect;
     }
-    if (cJSON_ExistKey(elem_json, key = "func")) {
+    if (cJSON_ExistKey(elem_json, key = "func") && elem->trig == NULL) {
         const char* funcName = NULL;
         if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &funcName) == false) {
             printf("%s: failed in %s.\n", __func__, key);
