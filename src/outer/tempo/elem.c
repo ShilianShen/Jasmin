@@ -44,7 +44,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 typedef union ElemInfo {
     char* string;
     struct {TTF_Font* font; char* string;} text;
-    struct {bool discrete; float min, max, *now;} slid;
+    struct {bool readonly; bool discrete; float min, max, *now;} slid;
     struct {bool* now;} bool_;
 } ElemInfo;
 
@@ -121,6 +121,10 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
     const char* now_json = NULL;
 
     if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &elem->info.slid.discrete) == false) {
+        printf("%s: failed in %s.\n", __func__, key);
+        return false;
+    }
+    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &elem->info.slid.readonly) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
@@ -473,8 +477,14 @@ bool TEMPO_RenewElem(Elem *elem) {
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
-    if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-        DEVICE_SetMouseLeftTrig(elem->trig);
+
+    if (elem->trig != NULL) {
+        if (elem->trig->sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
+            DEVICE_SetMouseLeftTrig(elem->trig);
+        }
+        if (elem->trig->sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
+            DEVICE_SetMouseLeftTrig(elem->trig);
+        }
     }
 
     return true;
@@ -508,15 +518,18 @@ bool TEMPO_DrawElem(const Elem *elem) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncSwitch(void *para) {
+void TEMPO_TrigFuncSwitch(const void *para) {
     const Elem* elem = para;
     bool* now = elem->info.bool_.now;
     if (now != NULL) {
         *now = !*now;
     }
 }
-void TEMPO_TrigFuncSlid(void *para) {
+void TEMPO_TrigFuncSlid(const void *para) {
     const Elem* elem = para;
+    if (elem->info.slid.readonly) {
+        return;
+    }
     const float min = elem->dst_rect.x + A + B;
     const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
     const float now = DEVICE_GetMousePos().x;

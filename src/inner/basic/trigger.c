@@ -9,7 +9,7 @@ void PullTrig(const Trig* trig) {
 
 
 // CREATE & DELETE =====================================================================================================
-Trig* BASIC_CreateTrig(const TrigFunc func, void *para, const bool sustain) {
+Trig* BASIC_CreateTrig(const TrigFunc func, const void *para, const bool sustain) {
     if (func == NULL) {
         return NULL;
     } // Req Condition
