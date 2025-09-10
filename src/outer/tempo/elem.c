@@ -7,7 +7,6 @@
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* publicBck = NULL;
 static const Table* publicElemTable = NULL;
-const char* slid_key = NULL;
 
 
 // ELEM TYPE FUNC ======================================================================================================
@@ -477,39 +476,7 @@ bool TEMPO_RenewElem(Elem *elem) {
     if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
         DEVICE_SetMouseLeftTrig(elem->trig);
     }
-    switch (elem->type) {
-        case ELEM_TYPE_FILE:
-        case ELEM_TYPE_TEXT:
-        case ELEM_TYPE_BOOL: {
-            break;
-        }
-        case ELEM_TYPE_SLID: {
-            if (mouseLeftIn == false) {
-                break;
-            }
-            // const float min = elem->dst_rect.x + A + B;
-            // const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
-            // const float now = DEVICE_GetMousePos().x;
-            // if (elem->info.slid.discrete) {
-            //     if (now <= min)
-            //         *(int*)elem->info.slid.now = (int)elem->info.slid.min;
-            //     else if (now >= max)
-            //         *(int*)elem->info.slid.now = (int)elem->info.slid.max;
-            //     else
-            //         *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
-            // }
-            // else {
-            //     if (now <= min)
-            //         *elem->info.slid.now = elem->info.slid.min;
-            //     else if (now >= max)
-            //         *elem->info.slid.now = elem->info.slid.max;
-            //     else
-            //         *elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
-            // }
-            break;
-        }
-        default: break;
-    }
+
     return true;
 }
 
@@ -569,7 +536,6 @@ void TEMPO_TrigFuncSlid(void *para) {
         else
             *elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
     }
-    DEBUG_SendMessageL("%s: %f <= %f <= %f\n", __func__, min, now, max);
 }
 
 

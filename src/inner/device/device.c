@@ -31,7 +31,8 @@ bool DEVICE_Renew() {
         && mouse.left_trig->sustain == true
         && mouse.left_pressed == true
         ) {
-        // ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        if ((buttons & SDL_BUTTON_LMASK) == false)
+            ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
         PullTrig(mouse.left_trig);
     }
     mouse.left_trig = NULL;
