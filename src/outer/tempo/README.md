@@ -7,4 +7,6 @@ flowchart
     page.h --> page.c
     menu.h --> menu.c
     tempo.h --> tempo_interface.c
+    elem.h --> type.h --> elem.c
+    type.h --> type.c
 ```

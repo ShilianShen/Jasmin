@@ -10,7 +10,16 @@ static const Table* publicElemTable = NULL;
 
 
 // ELEM TYPE FUNC ======================================================================================================
-
+typedef struct ElemFileInfo {char* string;} ElemFileInfo;
+typedef struct ElemTextInfo {TTF_Font* font; char* string;} ElemTextInfo;
+typedef struct ElemSlidInfo {bool readonly; bool discrete; float min, max, *now;} ElemSlidInfo;
+typedef struct ElemBoolInfo {bool* now;} ElemBoolInfo;
+typedef union ElemInfo {
+    ElemFileInfo file;
+    ElemTextInfo text;
+    ElemSlidInfo slid;
+    ElemBoolInfo bool_;
+} ElemInfo;
 
 
 // ELEM TYPE ===========================================================================================================
@@ -41,12 +50,7 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 
 
 // ELEM INFO ===========================================================================================================
-typedef union ElemInfo {
-    char* string;
-    struct {TTF_Font* font; char* string;} text;
-    struct {bool readonly; bool discrete; float min, max, *now;} slid;
-    struct {bool* now;} bool_;
-} ElemInfo;
+
 
 
 // ELEM ================================================================================================================
@@ -64,7 +68,8 @@ struct Elem {
     char* para_string;
 };
 
-static bool TEMPO_CreateElemText(ElemInfo* info, const cJSON* info_json)   {
+static bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
+    ElemTextInfo* text = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -79,42 +84,48 @@ static bool TEMPO_CreateElemText(ElemInfo* info, const cJSON* info_json)   {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    info->text.font = TABLE_GetValByKey(theme.fontTable, font_json);
-    info->text.string = strdup(string_json);
-    if (info->text.font == NULL || info->text.string == NULL) {
+    text->font = TABLE_GetValByKey(theme.fontTable, font_json);
+    text->string = strdup(string_json);
+    if (text->font == NULL || text->string == NULL) {
         return false;
     }
     return true;
 }
-static void TEMPO_DeleteElemText(Elem* elem) {
-    if (elem->info.text.string != NULL) {
-        free(elem->info.text.string);
-        elem->info.text.string = NULL;
+static void TEMPO_DeleteElemText(void* info) {
+    ElemTextInfo* text = info;
+    if (text->string != NULL) {
+        free(text->string);
+        text->string = NULL;
     }
 }
 
-static bool TEMPO_CreateElemFile(ElemInfo* info, const cJSON* info_json) {
+
+static bool TEMPO_CreateElemFile(void* info, const cJSON* info_json) {
+    ElemFileInfo* file = info;
     const char* string_json = NULL;
     if (cJSON_IsString(info_json)) {
         string_json = info_json->valuestring;
     }
     if (string_json != NULL) {
-        info->string = strdup(string_json);
-        if (info->string == NULL) {
+        file->string = strdup(string_json);
+        if (file->string == NULL) {
             // printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
     } // Req Condition
     return true;
 }
-static void TEMPO_DeleteElemFile(Elem* elem) {
-    if (elem->info.string != NULL) {
-        free(elem->info.string);
-        elem->info.string = NULL;
+static void TEMPO_DeleteElemFile(void* info) {
+    ElemFileInfo* file = info;
+    if (file->string != NULL) {
+        free(file->string);
+        file->string = NULL;
     }
 }
 
-static bool TEMPO_CreateElemSlid(ElemInfo* info, const cJSON* info_json) {
+
+static bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
+    ElemSlidInfo* slid = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -122,19 +133,19 @@ static bool TEMPO_CreateElemSlid(ElemInfo* info, const cJSON* info_json) {
     const char* key = NULL;
     const char* now_json = NULL;
 
-    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &info->slid.discrete) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &slid->discrete) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &info->slid.readonly) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &slid->readonly) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &info->slid.min) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &slid->min) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &info->slid.max) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &slid->max) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
@@ -143,26 +154,27 @@ static bool TEMPO_CreateElemSlid(ElemInfo* info, const cJSON* info_json) {
         return false;
     }
 
-    if (info->slid.discrete) {
-        info->slid.min = roundf(info->slid.min);
-        info->slid.max = roundf(info->slid.max);
+    if (slid->discrete) {
+        slid->min = roundf(slid->min);
+        slid->max = roundf(slid->max);
     }
 
-    const JSM_DataType type = info->slid.discrete ? JSM_INT : JSM_FLOAT;
-    info->slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
-    if (info->slid.now == NULL) {
+    const JSM_DataType type = slid->discrete ? JSM_INT : JSM_FLOAT;
+    slid->now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
+    if (slid->now == NULL) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
 
     return true;
 }
-static bool TEMPO_CreateElemBool(ElemInfo* info, const cJSON* info_json) {
+static bool TEMPO_CreateElemBool(void* info, const cJSON* info_json) {
+    ElemBoolInfo* bool_ = info;
     if (cJSON_IsString(info_json) == false) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    info->bool_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
+    bool_->now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
     return true;
 }
 
@@ -170,14 +182,14 @@ static bool TEMPO_CreateElemBool(ElemInfo* info, const cJSON* info_json) {
 // ELEM EREN
 typedef struct Eren {
     const char* name;
-    bool (*create)(ElemInfo*, const cJSON*);
-    bool (*renew)(Elem*);
-    void (*delete)(Elem*);
+    bool (*create)(void*, const cJSON*);
+    bool (*renew)(void*);
+    void (*delete)(void*);
     Trig trig;
 } Eren;
 Eren arrElem[ELEM_NUM_TYPES] = {
     // [ELEM_TYPE_NULL] = {NULL, NULL, NULL, NULL, 0},
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL, 0},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, TEMPO_DeleteElemFile, 0},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, TEMPO_DeleteElemText, 0},
     [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
     [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL, {TEMPO_TrigFuncBool, NULL, false}},
@@ -291,7 +303,7 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     } // Opt Condition
 
     if (arrElem[elem->type].delete != NULL) {
-        arrElem[elem->type].delete(elem);
+        arrElem[elem->type].delete(&elem->info);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -331,9 +343,9 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
     }
     switch (elem->type) {
         case ELEM_TYPE_FILE: {
-            elem->tex = IMG_LoadTexture(renderer, elem->info.string);
+            elem->tex = IMG_LoadTexture(renderer, elem->info.file.string);
             if (elem->tex == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                printf("%s: failed from \"%s\".\n", __func__, elem->info.file.string);
                 return NULL;
             } // Req Condition
             SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
@@ -349,7 +361,7 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
                 'C'
                 );
             if (elem->tex == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, elem->info.string);
+                printf("%s: failed from \"%s\".\n", __func__, elem->info.file.string);
                 return NULL;
             } // Req Condition
             SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
