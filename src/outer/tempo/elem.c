@@ -62,6 +62,7 @@ struct Elem {
     SDL_FRect dst_rect, *bck;
 
     Trig* trig;
+    char* para_string;
 };
 
 bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
@@ -149,7 +150,7 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
         return false;
     }
 
-    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSlid, now_json, true);
+    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSlid, elem, true);
 
     return true;
 }
@@ -159,7 +160,7 @@ static bool TEMPO_CreateElemBool(Elem* elem, const cJSON* info_json) {
         return false;
     }
     elem->info.bool_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
-    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, info_json->valuestring, false);
+    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, elem, false);
     if (elem->trig == NULL) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
@@ -250,9 +251,16 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
 
-        // Page* para = TABLE_GetValByKey(NULL, para_json);
+        if (para_json != NULL) {
+            elem->para_string = strdup(para_json);
+            if (elem->para_string == NULL) {
+                printf("%s: failed in %s.\n", __func__, key);
+                return false;
+            }
+        }
+
         if (elem->trig == NULL) {
-            elem->trig = BASIC_CreateTrig(func, para_json, false);
+            elem->trig = BASIC_CreateTrig(func, elem->para_string, false);
             if (elem->trig == NULL) {
                 printf("%s: failed in %s.\n", __func__, key);
                 return false;
@@ -292,6 +300,10 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
+    }
+    if (elem->para_string != NULL) {
+        free(elem->para_string);
+        elem->para_string = NULL;
     }
     free(elem);
     elem = NULL;
@@ -462,39 +474,38 @@ bool TEMPO_RenewElem(Elem *elem) {
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
-
+    if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
+        DEVICE_SetMouseLeftTrig(elem->trig);
+    }
     switch (elem->type) {
         case ELEM_TYPE_FILE:
         case ELEM_TYPE_TEXT:
         case ELEM_TYPE_BOOL: {
-            if (mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-                DEVICE_SetMouseLeftTrig(elem->trig);
-            }
             break;
         }
         case ELEM_TYPE_SLID: {
             if (mouseLeftIn == false) {
                 break;
             }
-            const float min = elem->dst_rect.x + A + B;
-            const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
-            const float now = DEVICE_GetMousePos().x;
-            if (elem->info.slid.discrete) {
-                if (now <= min)
-                    *(int*)elem->info.slid.now = (int)elem->info.slid.min;
-                else if (now >= max)
-                    *(int*)elem->info.slid.now = (int)elem->info.slid.max;
-                else
-                    *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
-            }
-            else {
-                if (now <= min)
-                    *(float*)elem->info.slid.now = elem->info.slid.min;
-                else if (now >= max)
-                    *(float*)elem->info.slid.now = elem->info.slid.max;
-                else
-                    *(float*)elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
-            }
+            // const float min = elem->dst_rect.x + A + B;
+            // const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
+            // const float now = DEVICE_GetMousePos().x;
+            // if (elem->info.slid.discrete) {
+            //     if (now <= min)
+            //         *(int*)elem->info.slid.now = (int)elem->info.slid.min;
+            //     else if (now >= max)
+            //         *(int*)elem->info.slid.now = (int)elem->info.slid.max;
+            //     else
+            //         *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
+            // }
+            // else {
+            //     if (now <= min)
+            //         *elem->info.slid.now = elem->info.slid.min;
+            //     else if (now >= max)
+            //         *elem->info.slid.now = elem->info.slid.max;
+            //     else
+            //         *elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
+            // }
             break;
         }
         default: break;
@@ -530,15 +541,35 @@ bool TEMPO_DrawElem(const Elem *elem) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncSwitch(const char* key) {
-    bool* val = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], key);
-    // bool* val = BASIC_GetValByKey(TEMPO_PUBLIC_BOOL_LEN, TEMPO_PUBLIC_BOOL, key);
-    if (val != NULL) {
-        *val = !*val;
+void TEMPO_TrigFuncSwitch(void *para) {
+    const Elem* elem = para;
+    bool* now = elem->info.bool_.now;
+    if (now != NULL) {
+        *now = !*now;
     }
 }
-void TEMPO_TrigFuncSlid(const char* key) {
-    slid_key = key;
+void TEMPO_TrigFuncSlid(void *para) {
+    const Elem* elem = para;
+    const float min = elem->dst_rect.x + A + B;
+    const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
+    const float now = DEVICE_GetMousePos().x;
+    if (elem->info.slid.discrete) {
+        if (now <= min)
+            *(int*)elem->info.slid.now = (int)elem->info.slid.min;
+        else if (now >= max)
+            *(int*)elem->info.slid.now = (int)elem->info.slid.max;
+        else
+            *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
+    }
+    else {
+        if (now <= min)
+            *elem->info.slid.now = elem->info.slid.min;
+        else if (now >= max)
+            *elem->info.slid.now = elem->info.slid.max;
+        else
+            *elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
+    }
+    DEBUG_SendMessageL("%s: %f <= %f <= %f\n", __func__, min, now, max);
 }
 
 

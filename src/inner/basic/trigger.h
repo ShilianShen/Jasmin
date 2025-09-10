@@ -5,18 +5,18 @@
 #include "_basic.h"
 
 
-typedef void (*TrigFunc)(const char*);
+typedef void (*TrigFunc)(void*);
 struct Trig {
-    bool sustain;
     TrigFunc func;
     void* para;
+    bool sustain;
 };
 typedef struct Trig Trig;
 
 
 
 void PullTrig(const Trig* trig);
-Trig* BASIC_CreateTrig(TrigFunc func, const char *para, bool sustain);
+Trig* BASIC_CreateTrig(TrigFunc func, void *para, bool sustain);
 Trig* BASIC_DeleteTrig(Trig *trig);
 
 

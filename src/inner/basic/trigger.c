@@ -9,20 +9,7 @@ void PullTrig(const Trig* trig) {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool BASIC_CreateTrig_RK(Trig* trig, const TrigFunc func, const char *para, const bool sustain) {
-    trig->func = func;
-    trig->para = NULL;
-    trig->sustain = sustain;
-    if (para == NULL)
-        return true;
-    trig->para = strdup(para);
-    if (trig->para == NULL) {
-        printf("%s: fail\n", __func__);
-        return false;
-    }
-    return true;
-}
-Trig* BASIC_CreateTrig(const TrigFunc func, const char *para, const bool sustain) {
+Trig* BASIC_CreateTrig(const TrigFunc func, void *para, const bool sustain) {
     if (func == NULL) {
         return NULL;
     } // Req Condition
@@ -31,10 +18,11 @@ Trig* BASIC_CreateTrig(const TrigFunc func, const char *para, const bool sustain
         printf("%s: malloc failed\n", __func__);
         return NULL;
     } // Req Condition
-    if (BASIC_CreateTrig_RK(trig, func, para, sustain) == false) {
-        printf("%s: fail\n", __func__);
-        trig = BASIC_DeleteTrig(trig);
-    }
+
+    trig->func = func;
+    trig->para = para;
+    trig->sustain = sustain;
+
     return trig;
 }
 Trig* BASIC_DeleteTrig(Trig *trig) {
@@ -43,7 +31,6 @@ Trig* BASIC_DeleteTrig(Trig *trig) {
             trig->func = NULL;
         }
         if (trig->para != NULL) {
-            free(trig->para);
             trig->para = NULL;
         }
         trig = NULL;

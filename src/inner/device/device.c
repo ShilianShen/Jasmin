@@ -31,7 +31,7 @@ bool DEVICE_Renew() {
         && mouse.left_trig->sustain == true
         && mouse.left_pressed == true
         ) {
-        ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        // ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
         PullTrig(mouse.left_trig);
     }
     mouse.left_trig = NULL;
@@ -84,7 +84,7 @@ void DEVICE_SetMouseLeftTrig(const Trig *trig) {
 
 
 SDL_FPoint DEVICE_GetMousePos() {
-    const SDL_FPoint point = {mouse.x, mouse.y};
+    const SDL_FPoint point = {mouse.x * scale_x, mouse.y * scale_y};
     return point;
 }
 
