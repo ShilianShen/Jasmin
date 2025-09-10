@@ -1,5 +1,5 @@
 #include <math.h>
-#include "elem/text.h"
+#include "elem_type/text.h"
 #include "menu.h"
 
 
@@ -60,11 +60,11 @@ struct Elem {
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
 
-    Trig* trig;
+    Trig trig;
     char* para_string;
 };
 
-bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
+static bool TEMPO_CreateElemText(ElemInfo* info, const cJSON* info_json)   {
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -79,9 +79,9 @@ bool TEMPO_CreateElemText(Elem* elem, const cJSON* info_json)   {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    elem->info.text.font = TABLE_GetValByKey(theme.fontTable, font_json);
-    elem->info.text.string = strdup(string_json);
-    if (elem->info.text.font == NULL || elem->info.text.string == NULL) {
+    info->text.font = TABLE_GetValByKey(theme.fontTable, font_json);
+    info->text.string = strdup(string_json);
+    if (info->text.font == NULL || info->text.string == NULL) {
         return false;
     }
     return true;
@@ -92,14 +92,15 @@ static void TEMPO_DeleteElemText(Elem* elem) {
         elem->info.text.string = NULL;
     }
 }
-static bool TEMPO_CreateElemFile(Elem* elem, const cJSON* info_json) {
+
+static bool TEMPO_CreateElemFile(ElemInfo* info, const cJSON* info_json) {
     const char* string_json = NULL;
     if (cJSON_IsString(info_json)) {
         string_json = info_json->valuestring;
     }
     if (string_json != NULL) {
-        elem->info.string = strdup(string_json);
-        if (elem->info.string == NULL) {
+        info->string = strdup(string_json);
+        if (info->string == NULL) {
             // printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
@@ -112,7 +113,8 @@ static void TEMPO_DeleteElemFile(Elem* elem) {
         elem->info.string = NULL;
     }
 }
-static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
+
+static bool TEMPO_CreateElemSlid(ElemInfo* info, const cJSON* info_json) {
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -120,19 +122,19 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
     const char* key = NULL;
     const char* now_json = NULL;
 
-    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &elem->info.slid.discrete) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &info->slid.discrete) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &elem->info.slid.readonly) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &info->slid.readonly) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &elem->info.slid.min) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &info->slid.min) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &elem->info.slid.max) == false) {
+    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &info->slid.max) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
@@ -141,50 +143,44 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
         return false;
     }
 
-    if (elem->info.slid.discrete) {
-        elem->info.slid.min = roundf(elem->info.slid.min);
-        elem->info.slid.max = roundf(elem->info.slid.max);
+    if (info->slid.discrete) {
+        info->slid.min = roundf(info->slid.min);
+        info->slid.max = roundf(info->slid.max);
     }
 
-    const JSM_DataType type = elem->info.slid.discrete ? JSM_INT : JSM_FLOAT;
-    elem->info.slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
-    if (elem->info.slid.now == NULL) {
+    const JSM_DataType type = info->slid.discrete ? JSM_INT : JSM_FLOAT;
+    info->slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
+    if (info->slid.now == NULL) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
 
-    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSlid, elem, true);
-
     return true;
 }
-static bool TEMPO_CreateElemBool(Elem* elem, const cJSON* info_json) {
+static bool TEMPO_CreateElemBool(ElemInfo* info, const cJSON* info_json) {
     if (cJSON_IsString(info_json) == false) {
         // printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    elem->info.bool_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
-    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSwitch, elem, false);
-    if (elem->trig == NULL) {
-        // printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
+    info->bool_.now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
     return true;
 }
 
 
 // ELEM EREN
-struct {
+typedef struct Eren {
     const char* name;
-    bool (*create)(Elem*, const cJSON*);
-    void (*delete)(Elem*);
+    bool (*create)(ElemInfo*, const cJSON*);
     bool (*renew)(Elem*);
-    TrigFunc func;
-} arrElem[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_NULL] = {NULL, NULL, NULL, NULL, NULL},
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL, NULL},
-    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, NULL, NULL},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL, NULL},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL, NULL},
+    void (*delete)(Elem*);
+    Trig trig;
+} Eren;
+Eren arrElem[ELEM_NUM_TYPES] = {
+    // [ELEM_TYPE_NULL] = {NULL, NULL, NULL, NULL, 0},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, NULL, 0},
+    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, TEMPO_DeleteElemText, 0},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL, {TEMPO_TrigFuncBool, NULL, false}},
 };
 
 
@@ -208,9 +204,13 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         } // Req Condition
-        if (arrElem[elem->type].create(elem, info_json) == false) {
+        if (arrElem[elem->type].create(&elem->info, info_json) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
+        }
+        if (arrElem[elem->type].trig.func != NULL) {
+            elem->trig = arrElem[elem->type].trig;
+            elem->trig.para = elem;
         }
     }
     if (cJSON_ExistKey(elem_json, key = "anchor")) {
@@ -233,7 +233,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
         elem->src = &elem->src_rect;
     }
-    if (cJSON_ExistKey(elem_json, key = "func") && elem->trig == NULL) {
+    if (cJSON_ExistKey(elem_json, key = "func") && elem->trig.func == NULL) {
         const char* func_json = NULL;
         if (cJSON_LoadFromObj(elem_json, key, JSM_STRING, &func_json) == false) {
             printf("%s: failed in %s.\n", __func__, key);
@@ -262,12 +262,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
 
-        if (elem->trig == NULL) {
-            elem->trig = BASIC_CreateTrig(func, elem->para_string, false);
-            if (elem->trig == NULL) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
+        if (elem->trig.func ==  NULL) {
+            elem->trig = (Trig){func, elem->para_string, false};
         }
     }
     if (cJSON_ExistKey(elem_json, key = "bck")) {
@@ -296,9 +292,6 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
 
     if (arrElem[elem->type].delete != NULL) {
         arrElem[elem->type].delete(elem);
-    }
-    if (elem->trig != NULL) {
-        elem->trig = BASIC_DeleteTrig(elem->trig);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -472,18 +465,18 @@ bool TEMPO_RenewElem(Elem *elem) {
         DEBUG_SendMessageL("Elem:\n");
         DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
-        if (elem->trig != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal(TEMPO_StaticTrigTable, elem->trig->func), elem->trig->para);
+        if (elem->trig.func != NULL) {
+            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }
 
-    if (elem->trig != NULL) {
-        if (elem->trig->sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            DEVICE_SetMouseLeftTrig(elem->trig);
+    if (elem->trig.func != NULL) {
+        if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
+            DEVICE_SetMouseLeftTrig(&elem->trig);
         }
-        if (elem->trig->sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            DEVICE_SetMouseLeftTrig(elem->trig);
+        if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
+            DEVICE_SetMouseLeftTrig(&elem->trig);
         }
     }
 
@@ -518,7 +511,7 @@ bool TEMPO_DrawElem(const Elem *elem) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncSwitch(const void *para) {
+void TEMPO_TrigFuncBool(const void *para) {
     const Elem* elem = para;
     bool* now = elem->info.bool_.now;
     if (now != NULL) {

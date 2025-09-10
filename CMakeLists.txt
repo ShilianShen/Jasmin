@@ -13,14 +13,14 @@ file(GLOB_RECURSE SRC_FILES
         "${PROJECT_SOURCE_DIR}/src/*.c"
 )
 add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
-        src/outer/tempo/elem/text.c
-        src/outer/tempo/elem/text.h
-        src/outer/tempo/elem/slid.c
-        src/outer/tempo/elem/slid.h
-        src/outer/tempo/elem/switch.c
-        src/outer/tempo/elem/switch.h
-        src/outer/tempo/elem/file.c
-        src/outer/tempo/elem/file.h)
+        src/outer/tempo/elem_type/text.c
+        src/outer/tempo/elem_type/text.h
+        src/outer/tempo/elem_type/slid.c
+        src/outer/tempo/elem_type/slid.h
+        src/outer/tempo/elem_type/switch.c
+        src/outer/tempo/elem_type/switch.h
+        src/outer/tempo/elem_type/file.c
+        src/outer/tempo/elem_type/file.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf
