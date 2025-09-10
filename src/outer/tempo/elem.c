@@ -12,15 +12,6 @@ static const SDL_FRect* publicBck = NULL;
 static const Table* publicElemTable = NULL;
 
 
-// ELEM TYPE FUNC ======================================================================================================
-typedef union ElemInfo {
-    ElemFileInfo file;
-    ElemTextInfo text;
-    ElemSlidInfo slid;
-    ElemBoolInfo bool_;
-} ElemInfo;
-
-
 // ELEM TYPE ===========================================================================================================
 typedef enum ElemType {
     ELEM_TYPE_NULL,
@@ -30,26 +21,37 @@ typedef enum ElemType {
     ELEM_TYPE_BOOL,
     ELEM_NUM_TYPES,
 } ElemType;
-const char* ELEM_TYPE_STRING_SET[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_NULL] = "NULL",
-    [ELEM_TYPE_FILE] = "FILE",
-    [ELEM_TYPE_TEXT] = "TEXT",
-    [ELEM_TYPE_SLID] = "SLID",
-    [ELEM_TYPE_BOOL] = "BOOL",
+
+
+// ELEM INFO ===========================================================================================================
+typedef union ElemInfo {
+    ElemFileInfo file;
+    ElemTextInfo text;
+    ElemSlidInfo slid;
+    ElemBoolInfo bool_;
+} ElemInfo;
+// ELEM EREN
+struct {
+    const char* name;
+    bool (*create)(void*, const cJSON*);
+    bool (*renew)(const void*, SDL_Texture**);
+    void (*delete)(void*);
+    Trig trig;
+} arrElem[ELEM_NUM_TYPES] = {
+    [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL, 0},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
+    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, NULL, false}},
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
-        if (strcmp(string, ELEM_TYPE_STRING_SET[i]) == 0) {
+        if (strcmp(string, arrElem[i].name) == 0) {
             return i;
         }
     }
     return ELEM_TYPE_NULL;
 }
-
-
-
-// ELEM INFO ===========================================================================================================
-
 
 
 // ELEM ================================================================================================================
@@ -66,30 +68,7 @@ struct Elem {
     Trig trig;
     char* para_string;
 };
-// ELEM EREN
-typedef struct Eren {
-    const char* name;
-    bool (*create)(void*, const cJSON*);
-    bool (*renew)(const void*, SDL_Texture**);
-    void (*delete)(void*);
-    Trig trig;
-} Eren;
 
-
-
-
-
-
-
-
-
-
-Eren arrElem[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
-    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, NULL, false}},
-};
 
 
 // CREATE & DELETE =====================================================================================================
@@ -271,7 +250,7 @@ bool TEMPO_RenewElem(Elem *elem) {
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    type: %s\n", ELEM_TYPE_STRING_SET[elem->type]);
+        DEBUG_SendMessageL("    type: %s\n", arrElem[elem->type].name);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
         if (elem->trig.func != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
