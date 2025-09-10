@@ -6,7 +6,8 @@
 // ELEM PARA ===========================================================================================================
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* publicBck = NULL;
-static const Table* publicTable = NULL;
+static const Table* publicElemTable = NULL;
+const char* slid_key = NULL;
 
 
 // ELEM TYPE FUNC ======================================================================================================
@@ -141,12 +142,14 @@ static bool TEMPO_CreateElemSlid(Elem* elem, const cJSON* info_json) {
         elem->info.slid.max = roundf(elem->info.slid.max);
     }
 
-    const JSM_DATA_TYPE type = elem->info.slid.discrete ? JSM_INT : JSM_FLOAT;
+    const JSM_DataType type = elem->info.slid.discrete ? JSM_INT : JSM_FLOAT;
     elem->info.slid.now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
     if (elem->info.slid.now == NULL) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
+
+    elem->trig = BASIC_CreateTrig(TEMPO_TrigFuncSlid, now_json, true);
 
     return true;
 }
@@ -247,6 +250,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             }
         }
 
+        // Page* para = TABLE_GetValByKey(NULL, para_json);
         if (elem->trig == NULL) {
             elem->trig = BASIC_CreateTrig(func, para_json, false);
             if (elem->trig == NULL) {
@@ -261,11 +265,11 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
-        if (publicTable != NULL) {
-            for (int i = 0; i < publicTable->len; i++) {
-                const char* subkey = publicTable->kv[i].key;
+        if (publicElemTable != NULL) {
+            for (int i = 0; i < publicElemTable->len; i++) {
+                const char* subkey = publicElemTable->kv[i].key;
                 if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
-                    Elem* other = publicTable->kv[i].val;
+                    Elem* other = publicElemTable->kv[i].val;
                     elem->bck = &other->dst_rect;
                     break;
                 }
@@ -533,6 +537,9 @@ void TEMPO_TrigFuncSwitch(const char* key) {
         *val = !*val;
     }
 }
+void TEMPO_TrigFuncSlid(const char* key) {
+    slid_key = key;
+}
 
 
 // SET & GET ===========================================================================================================
@@ -560,6 +567,6 @@ bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
     return true;
 }
 bool TEMPO_SetElemPublicTable(const Table* table) {
-    publicTable = table;
+    publicElemTable = table;
     return true;
 }

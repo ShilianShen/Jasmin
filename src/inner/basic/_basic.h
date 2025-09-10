@@ -6,6 +6,7 @@
 
 
 typedef enum JSM_DATA_TYPE {
+    JSM_PTR,
     JSM_INT,
     JSM_FLOAT,
     JSM_STRING,
@@ -13,7 +14,7 @@ typedef enum JSM_DATA_TYPE {
     JSM_RECT,
     JSM_COLOR,
     JSM_NUM_TYPES
-} JSM_DATA_TYPE;
+} JSM_DataType;
 extern SDL_FRect windowRect;
 
 

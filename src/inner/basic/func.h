@@ -51,7 +51,7 @@ bool SDL_RenderTextureAligned(
 // JSON ================================================================================================================
 cJSON* getJson(const char* path);
 bool cJSON_ExistKey(const cJSON* object, const char* key);
-bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DATA_TYPE type, void* target);
+bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DataType type, void* target);
 
 
 #endif //BASIC_FUNC_H

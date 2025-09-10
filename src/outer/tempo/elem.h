@@ -6,10 +6,7 @@
 
 
 typedef struct Elem Elem;
-typedef struct ElemTT {
-    const char *name;
 
-} ElemTT;
 
 
 bool TEMPO_SetElemDstRect(Elem *elem, SDL_FRect dst_rect);
@@ -25,6 +22,7 @@ bool TEMPO_DrawElem(const Elem* elem);
 
 
 void TEMPO_TrigFuncSwitch(const char*);
+void TEMPO_TrigFuncSlid(const char* key);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H
