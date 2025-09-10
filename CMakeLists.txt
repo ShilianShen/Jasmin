@@ -17,8 +17,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
         src/outer/tempo/elem_type/text.h
         src/outer/tempo/elem_type/slid.c
         src/outer/tempo/elem_type/slid.h
-        src/outer/tempo/elem_type/switch.c
-        src/outer/tempo/elem_type/switch.h
+        src/outer/tempo/elem_type/bool.c
+        src/outer/tempo/elem_type/bool.h
         src/outer/tempo/elem_type/file.c
         src/outer/tempo/elem_type/file.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

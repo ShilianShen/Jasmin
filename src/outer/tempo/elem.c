@@ -1,5 +1,8 @@
 #include <math.h>
 #include "elem_type/text.h"
+#include "elem_type/file.h"
+#include "elem_type/slid.h"
+#include "elem_type/bool.h"
 #include "menu.h"
 
 
@@ -10,10 +13,6 @@ static const Table* publicElemTable = NULL;
 
 
 // ELEM TYPE FUNC ======================================================================================================
-typedef struct ElemFileInfo {char* string;} ElemFileInfo;
-typedef struct ElemTextInfo {TTF_Font* font; char* string;} ElemTextInfo;
-typedef struct ElemSlidInfo {bool readonly; bool discrete; float min, max, *now;} ElemSlidInfo;
-typedef struct ElemBoolInfo {bool* now;} ElemBoolInfo;
 typedef union ElemInfo {
     ElemFileInfo file;
     ElemTextInfo text;
@@ -67,132 +66,29 @@ struct Elem {
     Trig trig;
     char* para_string;
 };
-
-static bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
-    ElemTextInfo* text = info;
-    if (cJSON_IsObject(info_json) == false) {
-        return false;
-    }
-    const char* key = NULL;
-    char* string_json = NULL;
-    char* font_json = NULL;
-    if (cJSON_LoadFromObj(info_json, key = "string", JSM_STRING, &string_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(info_json, key = "font", JSM_STRING, &font_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    text->font = TABLE_GetValByKey(theme.fontTable, font_json);
-    text->string = strdup(string_json);
-    if (text->font == NULL || text->string == NULL) {
-        return false;
-    }
-    return true;
-}
-static void TEMPO_DeleteElemText(void* info) {
-    ElemTextInfo* text = info;
-    if (text->string != NULL) {
-        free(text->string);
-        text->string = NULL;
-    }
-}
-
-
-static bool TEMPO_CreateElemFile(void* info, const cJSON* info_json) {
-    ElemFileInfo* file = info;
-    const char* string_json = NULL;
-    if (cJSON_IsString(info_json)) {
-        string_json = info_json->valuestring;
-    }
-    if (string_json != NULL) {
-        file->string = strdup(string_json);
-        if (file->string == NULL) {
-            // printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
-    } // Req Condition
-    return true;
-}
-static void TEMPO_DeleteElemFile(void* info) {
-    ElemFileInfo* file = info;
-    if (file->string != NULL) {
-        free(file->string);
-        file->string = NULL;
-    }
-}
-
-
-static bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
-    ElemSlidInfo* slid = info;
-    if (cJSON_IsObject(info_json) == false) {
-        return false;
-    }
-
-    const char* key = NULL;
-    const char* now_json = NULL;
-
-    if (cJSON_LoadFromObj(info_json, key = "discrete", JSM_BOOL, &slid->discrete) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(info_json, key = "readonly", JSM_BOOL, &slid->readonly) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(info_json, key = "min", JSM_FLOAT, &slid->min) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(info_json, key = "max", JSM_FLOAT, &slid->max) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadFromObj(info_json, key = "now", JSM_STRING, &now_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-
-    if (slid->discrete) {
-        slid->min = roundf(slid->min);
-        slid->max = roundf(slid->max);
-    }
-
-    const JSM_DataType type = slid->discrete ? JSM_INT : JSM_FLOAT;
-    slid->now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
-    if (slid->now == NULL) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-
-    return true;
-}
-static bool TEMPO_CreateElemBool(void* info, const cJSON* info_json) {
-    ElemBoolInfo* bool_ = info;
-    if (cJSON_IsString(info_json) == false) {
-        // printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    bool_->now = TABLE_GetValByKey(TEMPO_ExternTable[JSM_BOOL], info_json->valuestring);
-    return true;
-}
-
-
 // ELEM EREN
 typedef struct Eren {
     const char* name;
     bool (*create)(void*, const cJSON*);
-    bool (*renew)(void*);
+    bool (*renew)(const void*, SDL_Texture**);
     void (*delete)(void*);
     Trig trig;
 } Eren;
+
+
+
+
+
+
+
+
+
+
 Eren arrElem[ELEM_NUM_TYPES] = {
-    // [ELEM_TYPE_NULL] = {NULL, NULL, NULL, NULL, 0},
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, NULL, TEMPO_DeleteElemFile, 0},
-    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, NULL, TEMPO_DeleteElemText, 0},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, NULL, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, NULL, NULL, {TEMPO_TrigFuncBool, NULL, false}},
+    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
+    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, NULL, false}},
 };
 
 
@@ -341,112 +237,12 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
     }
-    switch (elem->type) {
-        case ELEM_TYPE_FILE: {
-            elem->tex = IMG_LoadTexture(renderer, elem->info.file.string);
-            if (elem->tex == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, elem->info.file.string);
-                return NULL;
-            } // Req Condition
-            SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
-            break;
-        }
-        case ELEM_TYPE_TEXT: {
-            elem->tex = TXT_LoadTextureWithLines(
-                renderer,
-                elem->info.text.font,
-                elem->info.text.string,
-                (SDL_Color){255, 255, 255, 255},
-                EMPTY,
-                'C'
-                );
-            if (elem->tex == NULL) {
-                printf("%s: failed from \"%s\".\n", __func__, elem->info.file.string);
-                return NULL;
-            } // Req Condition
-            SDL_SetTextureScaleMode(elem->tex, SDL_SCALEMODE_NEAREST);
-            break;
-        }
-        case ELEM_TYPE_SLID: {
-            const float M = elem->info.slid.max - elem->info.slid.min;
-            const float W = 2 * A + (M + 1) * B + M * C;
-            const float H = 2 * A + 2 * B + D;
-            elem->src_rect = (SDL_FRect){0, 0, W, H};
-            elem->gid_rect.w = elem->gid_rect.h = 1;
-            elem->tex = SDL_CreateTexture(
-            renderer,
-            SDL_PIXELFORMAT_RGBA8888,
-            SDL_TEXTUREACCESS_TARGET,
-            (int)W, (int)H
-            );
-            SDL_SetRenderTarget(renderer, elem->tex);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
-            const SDL_FRect frame[4] = {
-                (SDL_FRect){0, 0, W, A},
-                (SDL_FRect){0, 0, A, H},
-                (SDL_FRect){0, H - A, W, A},
-                (SDL_FRect){W - A, 0, A, H},
-            };
-            SDL_RenderFillRects(renderer, frame, 4);
-            if (elem->info.slid.discrete) {
-                if (elem->info.slid.now != NULL) {
-                    const int N = *(int*)elem->info.slid.now - (int)elem->info.slid.min;
-                    SDL_FRect rects[N];
-                    for (int i = 0; i < N; i++) {
-                        rects[i].x = A + (float)(i + 1) * B + (float)i * C;
-                        rects[i].y = A + B;
-                        rects[i].w = C;
-                        rects[i].h = D;
-                    }
-                    SDL_RenderFillRects(renderer, rects, N);
-                }
-                else {
-                    SDL_RenderLine(renderer, 0, 0, W, H);
-                    SDL_RenderLine(renderer, W, 0, 0, H);
-                }
-            }
-            else {
-                if (elem->info.slid.now != NULL) {
-                    const float N = *elem->info.slid.now - elem->info.slid.min;
-                    const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
-                    SDL_RenderFillRect(renderer, &rect);
-                }
-                else {
-                    SDL_RenderLine(renderer, 0, 0, W, H);
-                    SDL_RenderLine(renderer, W, 0, 0, H);
-                }
-            }
-            SDL_SetRenderTarget(renderer, NULL);
-            break;
-        }
-        case ELEM_TYPE_BOOL: {
-            const float M = 1;
-            const float N = *elem->info.bool_.now;
-            const float W = 2 * A + (M + 1) * B + M * D;
-            const float H = 2 * A + 2 * B + D;
-            elem->src_rect = (SDL_FRect){0, 0, W, H};
-            elem->gid_rect.w = elem->gid_rect.h = 1;
-            elem->tex = SDL_CreateTexture(
-               renderer,
-               SDL_PIXELFORMAT_RGBA8888,
-               SDL_TEXTUREACCESS_TARGET,
-               (int)W, (int)H
-               );
-            SDL_SetRenderTarget(renderer, elem->tex);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
-            const SDL_FRect frame[5] = {
-                (SDL_FRect){0, 0, W, A},
-                (SDL_FRect){0, 0, A, H},
-                (SDL_FRect){0, H - A, W, A},
-                (SDL_FRect){W - A, 0, A, H},
-                (SDL_FRect){A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B},
-            };
-            SDL_RenderFillRects(renderer, frame, 5);
-            SDL_SetRenderTarget(renderer, NULL);
-            break;
-        }
-        default: break;
+
+    if (arrElem[elem->type].renew == NULL || arrElem[elem->type].renew(&elem->info, &elem->tex) == false) {
+        printf("%s: failed in %s.\n", __func__, "asd");
+        return false;
     }
+
     return true;
 }
 static bool TEMPO_RenewElem_DstRect(Elem *elem) {
