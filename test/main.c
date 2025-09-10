@@ -33,6 +33,7 @@ int main() {
         running = running && BASIC_DrawEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 
         SDL_RenderPresent(renderer);
+        SDL_Delay(10);
     }
 
     BASIC_ExitEnv(LEN_ENV_ARRAY, ENV_ARRAY);

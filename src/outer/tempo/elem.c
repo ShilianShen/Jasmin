@@ -30,7 +30,6 @@ typedef union ElemInfo {
     ElemSlidInfo slid;
     ElemBoolInfo bool_;
 } ElemInfo;
-// ELEM EREN
 struct {
     const char* name;
     bool (*create)(void*, const cJSON*);
@@ -68,7 +67,6 @@ struct Elem {
     Trig trig;
     char* para_string;
 };
-
 
 
 // CREATE & DELETE =====================================================================================================

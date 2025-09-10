@@ -20,7 +20,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
         src/outer/tempo/elem_type/bool.c
         src/outer/tempo/elem_type/bool.h
         src/outer/tempo/elem_type/file.c
-        src/outer/tempo/elem_type/file.h)
+        src/outer/tempo/elem_type/file.h
+)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf

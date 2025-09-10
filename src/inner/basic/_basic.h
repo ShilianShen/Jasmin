@@ -6,6 +6,7 @@
 
 
 typedef enum JSM_DATA_TYPE {
+    JSM_VOID,
     JSM_PTR,
     JSM_INT,
     JSM_FLOAT,
