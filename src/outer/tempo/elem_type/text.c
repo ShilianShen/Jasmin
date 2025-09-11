@@ -38,7 +38,7 @@ bool TEMPO_RenewElemText(const void* info, SDL_Texture** tex) {
     const ElemTextInfo* text = info;
     const char* string = text->string;
     char buffer[20];
-    if (text->type == JSM_VOID) {
+    if (text->type != JSM_VOID) {
         const int* val = TABLE_GetValByKey(TEMPO_ExternTable[JSM_INT], text->string);
         if (val != NULL) {
             snprintf(buffer, sizeof(buffer), "%d", *val);
