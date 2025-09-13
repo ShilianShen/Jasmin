@@ -5,7 +5,7 @@
 #include "../elem.h"
 
 
-typedef struct ElemTextInfo {TTF_Font* font; JSM_DataType type; char* string;} ElemTextInfo;
+typedef struct ElemTextInfo {TTF_Font* font; bool key; char* string;} ElemTextInfo;
 
 
 bool TEMPO_CreateElemText(void* info, const cJSON* info_json);

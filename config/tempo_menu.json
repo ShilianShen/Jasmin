@@ -44,7 +44,7 @@
         },
         "0007": {
           "type": "TEXT",
-          "info": {"font": "BT", "type": "INT", "string": "test_int"},
+          "info": {"font": "BT", "key": true, "string": "test_string"},
           "anchor": -38,
           "bck": "0003"
         }
