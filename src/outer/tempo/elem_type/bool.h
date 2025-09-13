@@ -5,7 +5,7 @@
 #include "../elem.h"
 
 
-typedef struct ElemBoolInfo {bool* now;} ElemBoolInfo;
+typedef struct ElemBoolInfo {bool readonly; bool* now;} ElemBoolInfo;
 
 
 bool TEMPO_CreateElemBool(void* info, const cJSON* info_json);

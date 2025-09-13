@@ -38,7 +38,7 @@
         },
         "0006": {
           "type": "BOOL",
-          "info": "test_bool",
+          "info": {"readonly": false, "now": "test_bool"},
           "anchor": -11,
           "gid": [70, 100, 1, 1]
         },

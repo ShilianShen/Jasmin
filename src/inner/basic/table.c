@@ -2,6 +2,9 @@
 
 
 static void* BASIC_GetValByKey(const int len, const KeyVal table[], const char* key) {
+    if (key == NULL) {
+        return NULL;
+    }
     for (int idx = 0; idx < len; idx++) {
         if (strcmp(key, table[idx].key) == 0) {
             return table[idx].val;
