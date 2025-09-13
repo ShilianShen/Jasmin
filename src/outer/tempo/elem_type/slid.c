@@ -105,3 +105,30 @@ bool TEMPO_RenewElemSlid(const void* info, SDL_Texture** tex) {
     SDL_SetRenderTarget(renderer, NULL);
     return true;
 }
+
+
+
+void TrigFunc_Slid(const ElemSlidInfo* slid, const SDL_FRect dst_rect) {
+    if (slid->readonly) {
+        return;
+    }
+    const float min = dst_rect.x + A + B;
+    const float max = dst_rect.x + dst_rect.w - A - B;
+    const float now = DEVICE_GetMousePos().x;
+    if (slid->discrete) {
+        if (now <= min)
+            *(int*)slid->now = (int)slid->min;
+        else if (now >= max)
+            *(int*)slid->now = (int)slid->max;
+        else
+            *(int*)slid->now = (int)((now - min) / (B + C) + slid->min);
+    }
+    else {
+        if (now <= min)
+            *slid->now = slid->min;
+        else if (now >= max)
+            *slid->now = slid->max;
+        else
+            *slid->now = slid->min + (slid->max - slid->min) * (now - min) / (max - min);
+    }
+}

@@ -7,7 +7,6 @@
 
 
 // ELEM PARA ===========================================================================================================
-static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_FRect* publicBck = NULL;
 static const Table* publicElemTable = NULL;
 
@@ -305,28 +304,9 @@ void TEMPO_TrigFuncBool(const void *para) {
 }
 void TEMPO_TrigFuncSlid(const void *para) {
     const Elem* elem = para;
-    if (elem->info.slid.readonly) {
-        return;
-    }
-    const float min = elem->dst_rect.x + A + B;
-    const float max = elem->dst_rect.x + elem->dst_rect.w - A - B;
-    const float now = DEVICE_GetMousePos().x;
-    if (elem->info.slid.discrete) {
-        if (now <= min)
-            *(int*)elem->info.slid.now = (int)elem->info.slid.min;
-        else if (now >= max)
-            *(int*)elem->info.slid.now = (int)elem->info.slid.max;
-        else
-            *(int*)elem->info.slid.now = (int)((now - min) / (B + C) + elem->info.slid.min);
-    }
-    else {
-        if (now <= min)
-            *elem->info.slid.now = elem->info.slid.min;
-        else if (now >= max)
-            *elem->info.slid.now = elem->info.slid.max;
-        else
-            *elem->info.slid.now = elem->info.slid.min + (elem->info.slid.max - elem->info.slid.min) * (now - min) / (max - min);
-    }
+    const SDL_FRect dst_rect = elem->dst_rect;
+    const ElemSlidInfo* slid = &elem->info.slid;
+    TrigFunc_Slid(slid, dst_rect);
 }
 
 

@@ -9,5 +9,7 @@ typedef struct ElemSlidInfo {bool readonly; bool discrete; float min, max, *now;
 
 bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json);
 bool TEMPO_RenewElemSlid(const void* info, SDL_Texture** tex);
+void TrigFunc_Slid(const ElemSlidInfo* slid, SDL_FRect dst_rect);
+
 
 #endif //SLID_H
