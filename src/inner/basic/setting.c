@@ -12,7 +12,7 @@ SDL_FRect windowRect = {0, 0, 0, 0};
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
 bool running = true;
-const SDL_WindowFlags FLAG = SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY;//  | SDL_WINDOW_RESIZABLE;
+const SDL_WindowFlags FLAG = SDL_WINDOW_METAL | SDL_WINDOW_HIGH_PIXEL_DENSITY;//  | SDL_WINDOW_RESIZABLE;
 SDL_GLContext content;
 
 
@@ -46,12 +46,6 @@ bool BASIC_Init() {
     window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG);
     if (window == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
-        return false;
-    }
-
-    content = SDL_GL_CreateContext(window);
-    if (content == NULL) {
-        SDL_Log("SDL_GL_CreateContext() failed, %s\n", SDL_GetError());
         return false;
     }
 
