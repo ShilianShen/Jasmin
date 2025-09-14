@@ -24,6 +24,7 @@ typedef union vec4i {
 
 Matrix LOTRI_MultipleMatrix(Matrix A, Matrix B);
 Matrix LOTRI_LoadR(float x, float y, float z);
+Matrix LOTRI_LoadS(float x, float y, float z);
 bool LOTRI_Trans(int N, vec4f vec_in[N], Matrix mat, vec4f vec_out[N]);
 
 

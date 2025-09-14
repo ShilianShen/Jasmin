@@ -13,10 +13,10 @@ Matrix LOTRI_MultipleMatrix(const Matrix A, const Matrix B) {
     return AB;
 }
 Matrix LOTRI_LoadR(const float x, const float y, const float z) {
-    const Matrix rx = {
+    const Matrix rz = {
         .m = {
-            {SDL_cosf(x), -SDL_sinf(x), 0, 0},
-            {SDL_sinf(x), SDL_cosf(x), 0, 0},
+            {SDL_cosf(z), -SDL_sinf(z), 0, 0},
+            {SDL_sinf(z), SDL_cosf(z), 0, 0},
             {0, 0, 1, 0},
             {0, 0, 0, 1}
         }
@@ -29,16 +29,28 @@ Matrix LOTRI_LoadR(const float x, const float y, const float z) {
             {0, 0, 0, 1}
         }
     };
-    const Matrix rz = {
+    const Matrix rx = {
         .m = {
             {1, 0, 0, 0},
-            {0, SDL_cosf(z), -SDL_sinf(z), 0},
-            {0, SDL_sinf(z), SDL_cosf(z), 0},
+            {0, SDL_cosf(x), -SDL_sinf(x), 0},
+            {0, SDL_sinf(x), SDL_cosf(x), 0},
             {0, 0, 0, 1}
         }
     };
     const Matrix rzy = LOTRI_MultipleMatrix(rz, ry);
     return LOTRI_MultipleMatrix(rzy, rx);
+
+}
+Matrix LOTRI_LoadS(const float x, const float y, const float z) {
+    const Matrix result = {
+        {
+            {x, 0, 0, 0},
+            {0, y, 0, 0},
+            {0, 0, z, 0},
+            {0, 0, 0, 1}
+        }
+    };
+    return result;
 
 }
 
