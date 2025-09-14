@@ -24,6 +24,8 @@ RainTheme rainTheme = {
 
 
 bool VILLA_Init() {
+
+
     for (int i = 0; i < NUM_RAIN; i++) {
         rainDrops[i].x = SDL_randf();
         rainDrops[i].y = SDL_randf();

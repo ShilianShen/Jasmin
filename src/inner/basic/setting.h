@@ -15,6 +15,7 @@ extern const int WINDOW_WIDTH, WINDOW_HEIGHT;
 extern bool running;
 extern const SDL_WindowFlags FLAG;
 SDL_Event sdl_event;
+extern SDL_GLContext content;
 
 
 extern int logical_w, logical_h;
