@@ -8,7 +8,8 @@
 typedef struct Model {
     int numVertex;
     Vec4f* modelVertices;
-    SDL_Vertex* worldVertices;
+    Vec4f* worldVertices;
+    SDL_Vertex* finalVertices;
 
     int numIndices;
     int shape;

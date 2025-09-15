@@ -196,12 +196,13 @@ void DEBUG_DrawGeometry(
     SDL_RenderGeometry(renderer, NULL, debugVertices, num_vertices, indices, num_indices);
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
     for (int i = 0; i < num_indices; i += 3) {
-        const SDL_FPoint points[3] = {
+        const SDL_FPoint points[4] = {
             debugVertices[indices[i]].position,
             debugVertices[indices[i+1]].position,
             debugVertices[indices[i+2]].position,
+            debugVertices[indices[i]].position,
         };
-        SDL_RenderLines(renderer, points, 3);
+        SDL_RenderLines(renderer, points, 4);
     }
 }
 

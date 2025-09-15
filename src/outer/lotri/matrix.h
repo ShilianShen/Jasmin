@@ -15,7 +15,7 @@ Mat4f LOTRI_GetMatXMat(Mat4f A, Mat4f B);
 Mat4f LOTRI_GetProd(int N, Mat4f matArray[N]);
 Mat4f LOTRI_GetMatR(Vec3f vec);
 Mat4f LOTRI_GetInvR(Vec3f vec);
-Mat4f LOTRI_GetMatS(float x, float y, float z);
+Mat4f LOTRI_GetMatS(Vec3f vec);
 bool LOTRI_LoadVecXMat(int N, Vec4f vec_in[N], Mat4f mat, Vec4f vec_out[N]);
 
 

@@ -11,7 +11,8 @@ Vec4f cubeModelVertices[8] = {
     { 0.5f,  0.5f,  0.5f, 1},  // 6 - 右上前
     {-0.5f,  0.5f,  0.5f, 1}   // 7 - 左上前
 };
-SDL_Vertex cubeWorldVertices[8] = {0};
+Vec4f cubeWorldVertices[8] = {};
+SDL_Vertex cubeFinalVertices[8] = {0};
 Vec3i cubeIndices[12] = {
     // 后面（z = -0.5）
     {0, 1, 2},
@@ -37,6 +38,7 @@ Model cube = {
     .numVertex = 8,
     .modelVertices = cubeModelVertices,
     .worldVertices = cubeWorldVertices,
+    .finalVertices = cubeFinalVertices,
 
     .numIndices = 12,
     .indices = cubeIndices,

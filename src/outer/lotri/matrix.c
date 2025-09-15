@@ -71,12 +71,12 @@ Mat4f LOTRI_GetInvR(const Vec3f vec) {
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
-Mat4f LOTRI_GetMatS(const float x, const float y, const float z) {
+Mat4f LOTRI_GetMatS(const Vec3f vec) {
     const Mat4f result = {
         {
-            {x, 0, 0, 0},
-            {0, y, 0, 0},
-            {0, 0, z, 0},
+            {vec.v.x, 0, 0, 0},
+            {0, vec.v.y, 0, 0},
+            {0, 0, vec.v.z, 0},
             {0, 0, 0, 1}
         }
     };
