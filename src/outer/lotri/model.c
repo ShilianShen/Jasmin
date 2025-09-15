@@ -68,36 +68,11 @@ bool LOTRI_SetModelNormals(const Model* model, const bool in) {
     }
     return true;
 }
-bool LOTRI_SetModelVertices(const Model* model, const int N, const Vec3f xyz[N]) {
-    if (model == NULL) return false;
-
-    for (int i = 0; i < model->numVertices; ++i) {
-        model->modelVertices[i] = xyz[i];
-    }
-    return true;
-}
-bool LOTRI_SetModelFaces(const Model* model, const int N, const Vec3i abc[N]) {
-    if (model == NULL) return false;
-
-    for (int i = 0; i < model->numFaces; ++i) {
-        model->modelFaces[i] = abc[i];
-    }
-    return true;
-}
 bool LOTRI_SetModelTexture(Model* model, const char* filename) {
     if (model == NULL) return false;
 
     model->texture = IMG_LoadTexture(renderer, filename);
     if (model->texture == NULL) return false;
-    return true;
-}
-bool LOTRI_SetModelUV(const Model* model, const int N, const Vec2f uv[N]) {
-    if (model == NULL) return false;
-
-    for (int i = 0; i < model->numVertices; ++i) {
-        model->finalVertices[i].tex_coord.x = uv[i].v.x;
-        model->finalVertices[i].tex_coord.y = uv[i].v.y;
-    }
     return true;
 }
 bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {

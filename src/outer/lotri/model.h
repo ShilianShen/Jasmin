@@ -17,10 +17,7 @@ Model* LOTRI_CreateModel(const char* filename);
 
 
 bool LOTRI_SetModelNormals(const Model* model, bool in);
-bool LOTRI_SetModelVertices(const Model* model, int N, const Vec3f xyz[N]);
-bool LOTRI_SetModelFaces(const Model* model, int N, const Vec3i abc[N]);
 bool LOTRI_SetModelTexture(Model* model, const char* filename);
-bool LOTRI_SetModelUV(const Model* model, int N, const Vec2f uv[N]);
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
