@@ -8,7 +8,7 @@ Camera camera = {
 
 
 bool LOTRI_RenewCamera() {
-    const float angle = 0.01f;
+    const float angle = 0.03f;
     if (DEVICE_KeyPressed(SDL_SCANCODE_LEFT )) camera.rotation.v.z += angle;
     if (DEVICE_KeyPressed(SDL_SCANCODE_RIGHT)) camera.rotation.v.z -= angle;
     if (DEVICE_KeyPressed(SDL_SCANCODE_DOWN )) camera.rotation.v.y += angle;

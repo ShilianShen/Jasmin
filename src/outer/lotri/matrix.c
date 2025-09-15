@@ -1,6 +1,7 @@
 #include "matrix.h"
 
 
+
 Mat4f LOTRI_GetMatXMat(const Mat4f A, const Mat4f B) {
     Mat4f AB = {0};
     for (int i = 0; i < 4; i++) {
@@ -12,63 +13,63 @@ Mat4f LOTRI_GetMatXMat(const Mat4f A, const Mat4f B) {
     }
     return AB;
 }
-Mat4f LOTRI_GetMatR(const float x, const float y, const float z) {
-    const Mat4f rz = {
-        .m = {
-            {SDL_cosf(z), -SDL_sinf(z), 0, 0},
-            {SDL_sinf(z), SDL_cosf(z), 0, 0},
-            {0, 0, 1, 0},
-            {0, 0, 0, 1}
-        }
-    };
-    const Mat4f ry = {
-        .m = {
-            {SDL_cosf(y), 0, -SDL_sinf(y), 0},
-            {0, 1, 0, 0},
-            {SDL_sinf(y), 0, SDL_cosf(y), 0},
-            {0, 0, 0, 1}
-        }
-    };
-    const Mat4f rx = {
-        .m = {
+Mat4f LOTRI_GetProd(const int N, Mat4f matArray[N]) {
+    Mat4f result = matArray[0];
+    for (int i = 1; i < N; i++) {
+        result = LOTRI_GetMatXMat(result, matArray[i]);
+    }
+    return result;
+}
+
+
+static Mat4f LOTRI_GetMatRX(const float x) {
+    const Mat4f result = {
+        {
             {1, 0, 0, 0},
             {0, SDL_cosf(x), -SDL_sinf(x), 0},
             {0, SDL_sinf(x), SDL_cosf(x), 0},
             {0, 0, 0, 1}
         }
     };
-    const Mat4f rzy = LOTRI_GetMatXMat(rz, ry);
-    return LOTRI_GetMatXMat(rzy, rx);
-
+    return result;
 }
-Mat4f LOTRI_GetInvR(const float x, const float y, const float z) {
-    const Mat4f rz = {
-        .m = {
-            {SDL_cosf(-z), -SDL_sinf(-z), 0, 0},
-            {SDL_sinf(-z), SDL_cosf(-z), 0, 0},
+static Mat4f LOTRI_GetMatRY(const float y) {
+    const Mat4f result = {
+        {
+            {SDL_cosf(y), 0, SDL_sinf(y), 0},
+            {0, 1, 0, 0},
+            {-SDL_sinf(y), 0, SDL_cosf(y), 0},
+            {0, 0, 0, 1}
+        }
+    };
+    return result;
+}
+static Mat4f LOTRI_GetMatRZ(const float z) {
+    const Mat4f result = {
+        {
+            {SDL_cosf(z), -SDL_sinf(z), 0, 0},
+            {SDL_sinf(z), SDL_cosf(z), 0, 0},
             {0, 0, 1, 0},
             {0, 0, 0, 1}
         }
     };
-    const Mat4f ry = {
-        .m = {
-            {SDL_cosf(-y), 0, -SDL_sinf(-y), 0},
-            {0, 1, 0, 0},
-            {SDL_sinf(-y), 0, SDL_cosf(-y), 0},
-            {0, 0, 0, 1}
-        }
+    return result;
+}
+Mat4f LOTRI_GetMatR(const Vec3f vec) {
+    const Mat4f M[] = {
+        LOTRI_GetMatRZ(vec.v.z),
+        LOTRI_GetMatRY(vec.v.y),
+        LOTRI_GetMatRX(vec.v.x),
     };
-    const Mat4f rx = {
-        .m = {
-            {1, 0, 0, 0},
-            {0, SDL_cosf(-x), -SDL_sinf(-x), 0},
-            {0, SDL_sinf(-x), SDL_cosf(-x), 0},
-            {0, 0, 0, 1}
-        }
+    return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
+}
+Mat4f LOTRI_GetInvR(const Vec3f vec) {
+    const Mat4f M[] = {
+        LOTRI_GetMatRX(-vec.v.x),
+        LOTRI_GetMatRY(-vec.v.y),
+        LOTRI_GetMatRZ(-vec.v.z),
     };
-    const Mat4f yz = LOTRI_GetMatXMat(ry, rz);
-    return LOTRI_GetMatXMat(rx, yz);
-
+    return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
 Mat4f LOTRI_GetMatS(const float x, const float y, const float z) {
     const Mat4f result = {
