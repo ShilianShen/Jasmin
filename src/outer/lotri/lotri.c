@@ -22,10 +22,10 @@ bool LOTRI_Init() {
 bool LOTRI_Renew() {
     matProj = (Mat4f){
         .m = {
-            {0, 0, -1, -1},
-            {10, 0, 0, 0},
-            {0, -10, 0, 0},
-            {(float)windowWidth / 2, (float)windowHeight / 2, 0, 1},
+            {0, 0, 1, 1},
+            {-500, 0, 0, 0},
+            {0, -500, 0, 0},
+            {(float)windowWidth / 2, (float)windowHeight / 2, 0, 0},
         }
     };
     LOTRI_RenewCamera();

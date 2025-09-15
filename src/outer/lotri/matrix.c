@@ -57,17 +57,17 @@ static Mat4f LOTRI_GetMatR_Z(const float z) {
 }
 Mat4f LOTRI_GetMatR(const Vec3f vec) {
     const Mat4f M[] = {
-        LOTRI_GetMatR_Z(vec.v.z),
-        LOTRI_GetMatR_Y(vec.v.y),
         LOTRI_GetMatR_X(vec.v.x),
+        LOTRI_GetMatR_Y(vec.v.y),
+        LOTRI_GetMatR_Z(vec.v.z),
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
 Mat4f LOTRI_GetInvR(const Vec3f vec) {
     const Mat4f M[] = {
-        LOTRI_GetMatR_X(-vec.v.x),
-        LOTRI_GetMatR_Y(-vec.v.y),
         LOTRI_GetMatR_Z(-vec.v.z),
+        LOTRI_GetMatR_Y(-vec.v.y),
+        LOTRI_GetMatR_X(-vec.v.x),
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }

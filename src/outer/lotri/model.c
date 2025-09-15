@@ -90,7 +90,13 @@ bool LOTRI_DrawModel(const Model* model) {
     if (model == NULL) return false;
 
     for (int i = 0; i < model->numFaces; i++) {
-        if (model->worldFaceNormals[i].v.z <= 0) continue;
+        if (model->worldFaceNormals[i].v.z > 0) continue;
+        //
+        // const Vec3i face = model->modelFaces[i];
+        // if (model->worldVertices[face.v.a].v.z <= 0) continue;
+        // if (model->worldVertices[face.v.b].v.z <= 0) continue;
+        // if (model->worldVertices[face.v.c].v.z <= 0) continue;
+
 
         SDL_RenderGeometry(
            renderer, model->texture,

@@ -2,8 +2,8 @@
 
 
 Camera camera = {
-    .position = {10, 0, 0},
-    .rotation = {0, 0, -3.14f},
+    .position = {2, 0, 0},
+    .rotation = {0, 0, 0},
 };
 
 
@@ -18,7 +18,7 @@ bool LOTRI_RenewCamera() {
     if (camera.rotation.v.y < -1.57f) camera.rotation.v.y = -1.57f;
     if (camera.rotation.v.y > +1.57f) camera.rotation.v.y = +1.57f;
 
-    const float step = 1.f;
+    const float step = 0.01f;
     if (DEVICE_KeyPressed(SDL_SCANCODE_W)) {
         camera.position.v.x += step * SDL_cosf(camera.rotation.v.z);
         camera.position.v.y += step * SDL_sinf(camera.rotation.v.z);
