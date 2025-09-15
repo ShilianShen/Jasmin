@@ -1,19 +1,21 @@
 #include "cube.h"
 
 
-Vec4f cubeModelVertices[8] = {
-    {-0.5f, -0.5f, -0.5f, 1},  // 0 - 左下后
-    { 0.5f, -0.5f, -0.5f, 1},  // 1 - 右下后
-    { 0.5f,  0.5f, -0.5f, 1},  // 2 - 右上后
-    {-0.5f,  0.5f, -0.5f, 1},  // 3 - 左上后
-    {-0.5f, -0.5f,  0.5f, 1},  // 4 - 左下前
-    { 0.5f, -0.5f,  0.5f, 1},  // 5 - 右下前
-    { 0.5f,  0.5f,  0.5f, 1},  // 6 - 右上前
-    {-0.5f,  0.5f,  0.5f, 1}   // 7 - 左上前
+Vec3f cubeModelVertices[8] = {
+    {-0.5f, -0.5f, -0.5f},  // 0 - 左下后
+    { 0.5f, -0.5f, -0.5f},  // 1 - 右下后
+    { 0.5f,  0.5f, -0.5f},  // 2 - 右上后
+    {-0.5f,  0.5f, -0.5f},  // 3 - 左上后
+    {-0.5f, -0.5f,  0.5f},  // 4 - 左下前
+    { 0.5f, -0.5f,  0.5f},  // 5 - 右下前
+    { 0.5f,  0.5f,  0.5f},  // 6 - 右上前
+    {-0.5f,  0.5f,  0.5f}   // 7 - 左上前
 };
 Vec4f cubeWorldVertices[8] = {};
-SDL_Vertex cubeFinalVertices[8] = {0};
-Vec3i cubeIndices[12] = {
+SDL_Vertex cubeFinalVertices[8] = {};
+
+
+Vec3i cubeModelIndices[12] = {
     // 后面（z = -0.5）
     {0, 1, 2},
     {2, 3, 0},
@@ -33,13 +35,19 @@ Vec3i cubeIndices[12] = {
     {3, 2, 6},
     {6, 7, 3}
 };
-
+Vec3i cubeFinalIndices[12];
+Vec3f cubeModelNormals[12];
+Vec4f cubeWorldNormals[12];
+int cubeFaceIndices[12];
 Model cube = {
-    .numVertex = 8,
+    .numVertices = 8,
     .modelVertices = cubeModelVertices,
     .worldVertices = cubeWorldVertices,
     .finalVertices = cubeFinalVertices,
 
-    .numIndices = 12,
-    .indices = cubeIndices,
+    .numFaces = 12,
+    .modelFaces = cubeModelIndices,
+    .modelFaceNormals = cubeModelNormals,
+    .worldFaceNormals = cubeWorldNormals,
+    .faceIndices = cubeFaceIndices,
 };

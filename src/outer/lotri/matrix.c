@@ -71,6 +71,8 @@ Mat4f LOTRI_GetInvR(const Vec3f vec) {
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
+
+
 Mat4f LOTRI_GetMatS(const Vec3f vec) {
     const Mat4f result = {
         {
@@ -85,12 +87,40 @@ Mat4f LOTRI_GetMatS(const Vec3f vec) {
 }
 
 
-bool LOTRI_LoadVecXMat(const int N, Vec4f vec_in[N], const Mat4f mat, Vec4f vec_out[N]) {
+Vec3f LOTRI_GetNormal(const Vec3f A, const Vec3f B, const Vec3f C) {
+    const Vec3f AB = {B.v.x - A.v.x, B.v.y - A.v.y, B.v.z - A.v.z};  // 计算 AB 向量
+    const Vec3f AC = {C.v.x - A.v.x, C.v.y - A.v.y, C.v.z - A.v.z};  // 计算 AC 向量
+
+    // 计算叉积
+    Vec3f normal;
+    normal.v.x = AB.v.y * AC.v.z - AB.v.z * AC.v.y;
+    normal.v.y = AB.v.z * AC.v.x - AB.v.x * AC.v.z;
+    normal.v.z = AB.v.x * AC.v.y - AB.v.y * AC.v.x;
+
+    return normal;
+}
+Vec3f LOTRI_GetSum(const Vec3f A, const Vec3f B, const Vec3f C) {
+    const Vec3f result = {
+        A.v.x + B.v.x + C.v.x,
+        A.v.y + B.v.y + C.v.y,
+        A.v.z + B.v.z + C.v.z,
+    };
+    return result;
+}
+float LOTRI_GetDot(const Vec3f A, const Vec3f B) {
+    return A.v.x * B.v.x + A.v.y * B.v.y + A.v.z * B.v.z;
+}
+
+
+bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out[N], const bool w) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < 4; j++) {
             vec_out[i].arr[j] = 0;
-            for (int k = 0; k < 4; k++) {
+            for (int k = 0; k < 3; k++) {
                 vec_out[i].arr[j] += vec_in[i].arr[k] * mat.m[k][j];
+            }
+            if (w) {
+                vec_out[i].arr[j] += mat.m[3][j];
             }
         }
     }
