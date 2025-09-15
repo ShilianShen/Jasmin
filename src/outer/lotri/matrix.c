@@ -22,7 +22,7 @@ Mat4f LOTRI_GetProd(const int N, Mat4f matArray[N]) {
 }
 
 
-static Mat4f LOTRI_GetMatRX(const float x) {
+static Mat4f LOTRI_GetMatR_X(const float x) {
     const Mat4f result = {
         {
             {1, 0, 0, 0},
@@ -33,7 +33,7 @@ static Mat4f LOTRI_GetMatRX(const float x) {
     };
     return result;
 }
-static Mat4f LOTRI_GetMatRY(const float y) {
+static Mat4f LOTRI_GetMatR_Y(const float y) {
     const Mat4f result = {
         {
             {SDL_cosf(y), 0, SDL_sinf(y), 0},
@@ -44,7 +44,7 @@ static Mat4f LOTRI_GetMatRY(const float y) {
     };
     return result;
 }
-static Mat4f LOTRI_GetMatRZ(const float z) {
+static Mat4f LOTRI_GetMatR_Z(const float z) {
     const Mat4f result = {
         {
             {SDL_cosf(z), -SDL_sinf(z), 0, 0},
@@ -57,17 +57,17 @@ static Mat4f LOTRI_GetMatRZ(const float z) {
 }
 Mat4f LOTRI_GetMatR(const Vec3f vec) {
     const Mat4f M[] = {
-        LOTRI_GetMatRZ(vec.v.z),
-        LOTRI_GetMatRY(vec.v.y),
-        LOTRI_GetMatRX(vec.v.x),
+        LOTRI_GetMatR_Z(vec.v.z),
+        LOTRI_GetMatR_Y(vec.v.y),
+        LOTRI_GetMatR_X(vec.v.x),
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
 Mat4f LOTRI_GetInvR(const Vec3f vec) {
     const Mat4f M[] = {
-        LOTRI_GetMatRX(-vec.v.x),
-        LOTRI_GetMatRY(-vec.v.y),
-        LOTRI_GetMatRZ(-vec.v.z),
+        LOTRI_GetMatR_X(-vec.v.x),
+        LOTRI_GetMatR_Y(-vec.v.y),
+        LOTRI_GetMatR_Z(-vec.v.z),
     };
     return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
 }
@@ -84,6 +84,30 @@ Mat4f LOTRI_GetMatS(const Vec3f vec) {
     };
     return result;
 
+}
+
+
+Mat4f LOTRI_GetMatT(const Vec3f vec) {
+    const Mat4f result = {
+        .m = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {vec.v.x, vec.v.y, vec.v.z, 1},
+        }
+    };
+    return result;
+}
+Mat4f LOTRI_GetInvT(const Vec3f vec) {
+    const Mat4f result = {
+        .m = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {-vec.v.x, -vec.v.y, -vec.v.z, 1},
+        }
+    };
+    return result;
 }
 
 

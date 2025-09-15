@@ -5,7 +5,7 @@
 typedef struct {int index; float key;} KeyIndex;
 int compare_key_index(const void *a, const void *b) {
     const float diff = ((KeyIndex*)a)->key - ((KeyIndex*)b)->key;
-    return (diff < 0) - (diff > 0);
+    return ((diff < 0) - (diff > 0));
 }
 void sort_indices_by_keys(const int N, const float keys[N], int indices[N]) {
     KeyIndex temp[N];
