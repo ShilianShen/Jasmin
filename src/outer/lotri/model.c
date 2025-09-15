@@ -27,6 +27,28 @@ void sort_indices_by_keys(const int N, const float keys[N], int indices[N]) {
 
 
 
+struct Model {
+    Vec3f position;
+    Vec3f rotation;
+
+    int numVertices;
+    Vec3f* modelVertices;
+    Vec4f* worldVertices;
+    SDL_Vertex* finalVertices;
+
+    int numFaces;
+    Vec3i* modelFaces;
+    Vec3f* modelFaceNormals;
+    Vec4f* worldFaceNormals;
+
+    int* faceIndices;
+
+    float depth;
+    SDL_Texture* texture;
+    Mat4f mat;
+};
+
+
 // GET & SET ===========================================================================================================
 bool LOTRI_SetModelNormals(const Model* model, const bool in) {
     if (model == NULL) return false;
@@ -79,6 +101,12 @@ bool LOTRI_SetModelUV(const Model* model, const int N, const Vec2f uv[N]) {
     }
     return true;
 }
+bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
+    if (model == NULL) return false;
+
+    model->mat = mat;
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================
@@ -111,6 +139,10 @@ static bool LOTRI_CreateModel_RK(Model* model, const int numVertices, const int 
     if (model->faceIndices == NULL) {
         printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
         return false;
+    }
+
+    for (int i = 0; i < model->numVertices; i++) {
+        model->finalVertices[i].color = (SDL_FColor){1, 1, 1, 1};
     }
 
     return true;
@@ -191,6 +223,15 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
 bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
+    const Mat4f matArr[] = {
+        LOTRI_GetMatR(model->rotation),
+        LOTRI_GetMatT(model->position),
+        LOTRI_GetInvT(camera.position),
+        LOTRI_GetInvR(camera.rotation),
+        matProj,
+    };
+
+    LOTRI_SetModelMat(model, LOTRI_GetProd(sizeof(matArr) / sizeof(Mat4f), matArr));
     LOTRI_LoadV3M4(model->numVertices, model->modelVertices, model->mat, model->worldVertices, true);
     LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
 
@@ -204,6 +245,7 @@ bool LOTRI_RenewModel(Model* model) {
 
     return true;
 }
+
 
 // DRAW ================================================================================================================
 bool LOTRI_DrawModel(const Model* model) {

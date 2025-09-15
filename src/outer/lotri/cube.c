@@ -53,8 +53,5 @@ bool LOTRI_InitCube() {
     else {
         return false;
     }
-    for (int i = 0; i < cube->numVertices; i++) {
-        cube->finalVertices[i].color = (SDL_FColor){1, 1, 1, 1};
-    }
     return true;
 }

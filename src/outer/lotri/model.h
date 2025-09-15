@@ -3,26 +3,14 @@
 
 
 #include "matrix.h"
+#include "camera.h"
+
+
+extern Mat4f matProj;
 
 
 typedef struct Model Model;
-struct Model {
-    int numVertices;
-    Vec3f* modelVertices;
-    Vec4f* worldVertices;
-    SDL_Vertex* finalVertices;
 
-    int numFaces;
-    Vec3i* modelFaces;
-    Vec3f* modelFaceNormals;
-    Vec4f* worldFaceNormals;
-
-    int* faceIndices;
-
-    float depth;
-    SDL_Texture* texture;
-    Mat4f mat;
-};
 
 
 
@@ -35,6 +23,7 @@ bool LOTRI_SetModelVertices(const Model* model, int N, const Vec3f xyz[N]);
 bool LOTRI_SetModelFaces(const Model* model, int N, const Vec3i abc[N]);
 bool LOTRI_SetModelTexture(Model* model, const char* filename);
 bool LOTRI_SetModelUV(const Model* model, int N, const Vec2f uv[N]);
+bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
 bool LOTRI_RenewModel(Model* model);
