@@ -8,6 +8,7 @@
 typedef struct {float m[4][4];} Mat4f;
 typedef union {struct {float x, y, z, w;} v; float arr[4];} Vec4f;
 typedef union {struct {float x, y, z;} v; float arr[3];} Vec3f;
+typedef union {struct {float x, y;} v; float arr[2];} Vec2f;
 typedef union {struct {int a, b, c;} v; int arr[3];} Vec3i;
 
 

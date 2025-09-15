@@ -5,7 +5,10 @@
 #include "model.h"
 
 
-extern Model cube;
+extern Model* cube;
+
+
+bool LOTRI_InitCube();
 
 
 #endif //CUBE_H

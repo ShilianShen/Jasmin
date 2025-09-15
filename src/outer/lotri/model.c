@@ -27,7 +27,7 @@ void sort_indices_by_keys(const int N, const float keys[N], int indices[N]) {
 
 
 
-
+// GET & SET ===========================================================================================================
 bool LOTRI_SetModelNormals(const Model* model, const bool in) {
     if (model == NULL) return false;
 
@@ -47,8 +47,126 @@ bool LOTRI_SetModelNormals(const Model* model, const bool in) {
     }
     return true;
 }
+bool LOTRI_SetModelVertices(const Model* model, const int N, const Vec3f xyz[N]) {
+    if (model == NULL) return false;
+
+    for (int i = 0; i < model->numVertices; ++i) {
+        model->modelVertices[i] = xyz[i];
+    }
+    return true;
+}
+bool LOTRI_SetModelFaces(const Model* model, const int N, const Vec3i abc[N]) {
+    if (model == NULL) return false;
+
+    for (int i = 0; i < model->numFaces; ++i) {
+        model->modelFaces[i] = abc[i];
+    }
+    return true;
+}
+bool LOTRI_SetModelTexture(Model* model, const char* filename) {
+    if (model == NULL) return false;
+
+    model->texture = IMG_LoadTexture(renderer, filename);
+    if (model->texture == NULL) return false;
+    return true;
+}
+bool LOTRI_SetModelUV(const Model* model, const int N, const Vec2f uv[N]) {
+    if (model == NULL) return false;
+
+    for (int i = 0; i < model->numVertices; ++i) {
+        model->finalVertices[i].tex_coord.x = uv[i].v.x;
+        model->finalVertices[i].tex_coord.y = uv[i].v.y;
+    }
+    return true;
+}
 
 
+// CREATE & DELETE =====================================================================================================
+static bool LOTRI_CreateModel_RK(Model* model, const int numVertices, const int numFaces) {
+    memset(model, 0, sizeof(Model));
+
+    model->numVertices = numVertices;
+    model->modelVertices = calloc(numVertices, sizeof(Vec3f));
+    model->worldVertices = calloc(numVertices, sizeof(Vec4f));
+    model->finalVertices = calloc(numVertices, sizeof(SDL_Vertex));
+    if (model->modelVertices == NULL ||
+        model->worldVertices == NULL ||
+        model->finalVertices == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+        return false;
+    }
+
+    model->numFaces = numFaces;
+    model->modelFaces = calloc(numFaces, sizeof(Vec3i));
+    model->modelFaceNormals = calloc(numFaces, sizeof(Vec3f));
+    model->worldFaceNormals = calloc(numFaces, sizeof(Vec4f));
+    if (model->modelFaces == NULL ||
+        model->modelFaceNormals == NULL ||
+        model->worldFaceNormals == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+        return false;
+    }
+
+    model->faceIndices = calloc(numFaces, sizeof(int));
+    if (model->faceIndices == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+        return false;
+    }
+
+    return true;
+}
+Model* LOTRI_CreateModel(const int numVertices, const int numFaces) {
+    Model* model = malloc(sizeof(Model));
+    if (model == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI model\n", __func__);
+        return model;
+    }
+    if (LOTRI_CreateModel_RK(model, numVertices, numFaces) == false) {
+        LOTRI_DestroyModel(model);
+        model = NULL;
+    }
+    return model;
+}
+void LOTRI_DestroyModel(Model* model) {
+    if (model != NULL) {
+        if (model->modelVertices != NULL) {
+            free(model->modelVertices);
+            model->modelVertices = NULL;
+        }
+        if (model->worldVertices != NULL) {
+            free(model->worldVertices);
+            model->worldVertices = NULL;
+        }
+        if (model->finalVertices != NULL) {
+            free(model->finalVertices);
+            model->finalVertices = NULL;
+        }
+        if (model->modelFaces != NULL) {
+            free(model->modelFaces);
+            model->modelFaces = NULL;
+        }
+        if (model->modelFaceNormals != NULL) {
+            free(model->modelFaceNormals);
+            model->modelFaceNormals = NULL;
+        }
+        if (model->worldFaceNormals != NULL) {
+            free(model->worldFaceNormals);
+            model->worldFaceNormals = NULL;
+        }
+        if (model->faceIndices != NULL) {
+            free(model->faceIndices);
+            model->faceIndices = NULL;
+        }
+        if (model->texture != NULL) {
+            SDL_DestroyTexture(model->texture);
+            model->texture = NULL;
+        }
+        free(model);
+    }
+}
+
+
+// RENEW ===============================================================================================================
 static void LOTRI_RenewModel_Depth(Model* model) {
     float depth = 0;
     for (int i = 0; i < model->numVertices; i++) {
@@ -86,6 +204,8 @@ bool LOTRI_RenewModel(Model* model) {
 
     return true;
 }
+
+// DRAW ================================================================================================================
 bool LOTRI_DrawModel(const Model* model) {
     if (model == NULL) return false;
 
