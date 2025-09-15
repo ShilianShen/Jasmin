@@ -41,7 +41,7 @@ Vec2f cubeUV[8] = {
 };
 
 bool LOTRI_InitCube() {
-    cube = LOTRI_CreateModel("../config/cube.obj");
+    cube = LOTRI_CreateModel("../res/model/cube/cube.obj");
     if (cube == NULL) {
         return false;
     }
