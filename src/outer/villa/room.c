@@ -1,14 +1,15 @@
 #include "room.h"
 
 
-struct Room {};
+struct Room {
+    Model* model;
+};
 
 
 
 
 
 Room *VILLA_CreateRoom() {
-
     return NULL;
 }
 bool VILLA_RenewRoom(Room* room) {

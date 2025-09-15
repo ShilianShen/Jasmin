@@ -4,6 +4,7 @@
 
 #include "matrix.h"
 
+
 typedef struct Camera {
     Vec3f position;
     Vec3f rotation;

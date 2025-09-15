@@ -3,6 +3,7 @@
 
 
 #include "cJSON-1.7.18/cJSON.h"
+#include "fast_obj-1.3/fast_obj.h"
 
 
 #define MA_ENABLE_FLAC

@@ -12,10 +12,8 @@ extern Mat4f matProj;
 typedef struct Model Model;
 
 
-
-
-Model* LOTRI_CreateModel(int numVertices, int numFaces);
 void LOTRI_DestroyModel(Model* model);
+Model* LOTRI_CreateModel(const char* filename);
 
 
 bool LOTRI_SetModelNormals(const Model* model, bool in);

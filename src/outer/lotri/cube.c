@@ -41,18 +41,13 @@ Vec2f cubeUV[8] = {
 };
 
 bool LOTRI_InitCube() {
-    cube = LOTRI_CreateModel(8, 12);
-    if (cube == NULL) return false;
-
-    if (
-        LOTRI_SetModelTexture(cube, "../res/image/Composition_pour_Jazz.jpg") &&
-        LOTRI_SetModelVertices(cube, 8, cubeModelVertices) &&
-        LOTRI_SetModelUV(cube, 8, cubeUV) &&
-        LOTRI_SetModelFaces(cube, 12, cubeModelFaces) &&
-        LOTRI_SetModelNormals(cube, false)) {
-    }
-    else {
+    cube = LOTRI_CreateModel("../config/cube.obj");
+    if (cube == NULL) {
         return false;
     }
+    if (LOTRI_SetModelTexture(cube, "../res/image/Composition_pour_Jazz.jpg") == false) {
+        return false;
+    }
+    // LOTRI_SetModelNormals(cube, false);
     return true;
 }
