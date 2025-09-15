@@ -7,7 +7,8 @@ Mat4f matProj;
 
 
 bool LOTRI_Init() {
-    return LOTRI_InitCube();;
+    LOTRI_InitCube();
+    return true;
 }
 
 bool LOTRI_Renew() {
@@ -16,14 +17,17 @@ bool LOTRI_Renew() {
             {0, 0, 1, 1},
             {-500, 0, 0, 0},
             {0, -500, 0, 0},
-            {(float)windowWidth / 2, (float)windowHeight / 2, 0, 0},
+            {0, 0, 0, 0},
         }
     };
-    return LOTRI_RenewCamera() && LOTRI_RenewModel(cube);
+    LOTRI_RenewCamera();
+    LOTRI_RenewModel(cube);
     return true;
 }
 bool LOTRI_Draw() {
     LOTRI_DrawModel(cube);
     return true;
 }
-void LOTRI_Exit() {}
+void LOTRI_Exit() {
+    LOTRI_DestroyModel(cube);
+}

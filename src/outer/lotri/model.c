@@ -214,7 +214,7 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
         float depth = 0;
         for (int j = 0; j < 3; j++) {
             const Vec4f vertex = model->worldVertices[index.arr[j]];
-            depth += vertex.v.z;
+            depth = SDL_max(depth, vertex.v.z);
         }
         depths[i] = depth;
     }
@@ -236,8 +236,8 @@ bool LOTRI_RenewModel(Model* model) {
     LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
 
     for (int i = 0; i < model->numVertices; i++) {
-        model->finalVertices[i].position.x = model->worldVertices[i].v.x;
-        model->finalVertices[i].position.y = model->worldVertices[i].v.y;
+        model->finalVertices[i].position.x = (float)windowWidth / 2 + model->worldVertices[i].v.x;
+        model->finalVertices[i].position.y = (float)windowHeight / 2 + model->worldVertices[i].v.y;
     }
 
     LOTRI_RenewModel_Depth(model);
@@ -253,17 +253,13 @@ bool LOTRI_DrawModel(const Model* model) {
 
     for (int i = 0; i < model->numFaces; i++) {
         if (model->worldFaceNormals[i].v.z > 0) continue;
-        //
-        // const Vec3i face = model->modelFaces[i];
-        // if (model->worldVertices[face.v.a].v.z <= 0) continue;
-        // if (model->worldVertices[face.v.b].v.z <= 0) continue;
-        // if (model->worldVertices[face.v.c].v.z <= 0) continue;
 
+        const Vec3i face = model->modelFaces[i];
 
         SDL_RenderGeometry(
            renderer, model->texture,
            model->finalVertices, model->numVertices,
-           model->modelFaces[i].arr, 3
+           face.arr, 3
            );
     }
     return true;

@@ -2,6 +2,7 @@
 
 
 Model* cube = NULL;
+// xyz, rgba, uvw
 Vec3f cubeModelVertices[8] = {
     {-0.5f, -0.5f, -0.5f},  // 0 - 左下后
     { 0.5f, -0.5f, -0.5f},  // 1 - 右下后
