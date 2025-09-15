@@ -20,7 +20,11 @@ void DEBUG_DrawRect(const SDL_FRect* rect);
 void DEBUG_FillRect(const SDL_FRect* rect);
 void DEBUG_DrawText(Sint16 x, Sint16 y, const char* text);
 void DEBUG_DrawTextAligned(const char* text, char aligned);
-void DEBUG_DrawFace(const SDL_Vertex* vertices);
+void DEBUG_DrawGeometry(
+    SDL_Renderer *renderer,
+    SDL_Texture *texture,
+    const SDL_Vertex *vertices, int num_vertices,
+    const int *indices, int num_indices);
 
 
 void DEBUG_SendMessageL(const char* format, ...);

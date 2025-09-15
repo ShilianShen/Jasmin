@@ -29,7 +29,7 @@ static void DEBUG_LoadTheme() {
 
     // alpha
     debug.theme.alphaLight = 255;
-    debug.theme.alphaDark = 128;
+    debug.theme.alphaDark = 64;
 
     debug.theme.darkPoint = debug.theme.point;
     debug.theme.darkRect = debug.theme.rect;
@@ -176,31 +176,33 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }
-void DEBUG_DrawFace(const SDL_Vertex* vertices) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
 
-    //
-    const float a = 0.1f;
-    const SDL_FColor color = {
-        a * (float)debug.theme.face.r / 256,
-        a * (float)debug.theme.face.g / 256,
-        a * (float)debug.theme.face.b / 256,
-        0.75f
-    };
-    SDL_Vertex v[3];
-    for (int i = 0; i < 3; i++) {
-        v[i] = vertices[i];
-        v[i].color = color;
+void DEBUG_DrawGeometry(
+    SDL_Renderer *renderer,
+    SDL_Texture *texture,
+    const SDL_Vertex *vertices,
+    const int num_vertices,
+    const int *indices,
+    const int num_indices) {
+    if (DEBUG_ON == false) {
+        return;
     }
-    SDL_RenderGeometry(debug.renderer, NULL, v, 3, NULL, 0);
-    SDL_FPoint points[4];
-    for (int i = 0; i < 3; i++) {
-        points[i] = vertices[i].position;
+
+    SDL_Vertex debugVertices[num_vertices];
+    for (int i = 0; i < num_vertices; i++) {
+        debugVertices[i] = vertices[i];
+        debugVertices[i].color = SDL_GetFColorFromColor(debug.theme.darkFace);
     }
-    points[3] = vertices[0].position;
+    SDL_RenderGeometry(renderer, NULL, debugVertices, num_vertices, indices, num_indices);
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
-    SDL_RenderLines(debug.renderer, points, 4);
+    for (int i = 0; i < num_indices; i += 3) {
+        const SDL_FPoint points[3] = {
+            debugVertices[indices[i]].position,
+            debugVertices[indices[i+1]].position,
+            debugVertices[indices[i+2]].position,
+        };
+        SDL_RenderLines(renderer, points, 3);
+    }
 }
 
 

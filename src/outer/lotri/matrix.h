@@ -5,27 +5,17 @@
 #include "lotri.h"
 
 
-typedef struct Matrix {
-    float m[4][4];
-} Matrix;
+typedef struct {float m[4][4];} Mat4f;
+typedef union {struct {float x, y, z, a;} v; float arr[4];} Vec4f;
+typedef union {struct {float x, y, z;} v; float arr[3];} Vec3f;
+typedef union {struct {int a, b, c;} v; int arr[3];} Vec3i;
 
 
-typedef union vec4f {
-    struct {float x, y, z, a;} v;
-    float arr[4];
-} vec4f;
-
-
-typedef union vec4i {
-    struct {int a, b, c, d;} v;
-    int arr[4];
-} vec4i;
-
-
-Matrix LOTRI_MultipleMatrix(Matrix A, Matrix B);
-Matrix LOTRI_LoadR(float x, float y, float z);
-Matrix LOTRI_LoadS(float x, float y, float z);
-bool LOTRI_Trans(int N, vec4f vec_in[N], Matrix mat, vec4f vec_out[N]);
+Mat4f LOTRI_GetMatXMat(Mat4f A, Mat4f B);
+Mat4f LOTRI_GetMatR(float x, float y, float z);
+Mat4f LOTRI_GetInvR(float x, float y, float z);
+Mat4f LOTRI_GetMatS(float x, float y, float z);
+bool LOTRI_LoadVecXMat(int N, Vec4f vec_in[N], Mat4f mat, Vec4f vec_out[N]);
 
 
 #endif //MATRIX_H

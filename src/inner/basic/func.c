@@ -227,6 +227,9 @@ SDL_Texture* TXT_LoadTextureWithLines(
 
     return texture;
 }
+SDL_FColor SDL_GetFColorFromColor(const SDL_Color color) {
+    return (SDL_FColor){(float)color.r / 255, (float)color.g / 255, (float)color.b / 255, (float)color.a / 255};
+}
 bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }

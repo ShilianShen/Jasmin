@@ -18,7 +18,9 @@ add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES}
         src/outer/lotri/matrix.c
         src/outer/lotri/matrix.h
         src/outer/lotri/model.c
-        src/outer/lotri/model.h)
+        src/outer/lotri/model.h
+        src/outer/lotri/camera.c
+        src/outer/lotri/camera.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_ttf::SDL3_ttf

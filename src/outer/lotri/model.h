@@ -7,12 +7,12 @@
 
 typedef struct Model {
     int numVertex;
-    vec4f* modelVertices;
+    Vec4f* modelVertices;
     SDL_Vertex* worldVertices;
 
     int numIndices;
     int shape;
-    vec4i* indices;
+    Vec3i* indices;
 } Model;
 
 

@@ -15,6 +15,7 @@ char* SDL_GetStringFromSDLColor(SDL_Color color);
 char* SDL_GetStringFromFRect(SDL_FRect rect);
 bool SDL_CompareSDLColor(SDL_Color x, SDL_Color y);
 bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
+SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
 bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_Texture* TXT_LoadTexture(
     SDL_Renderer* renderer,

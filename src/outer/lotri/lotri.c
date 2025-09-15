@@ -1,27 +1,27 @@
 #include "lotri.h"
+
+#include "camera.h"
 #include "cube.h"
 
 
-bool LOTRI_Init() {
 
+bool LOTRI_Init() {
     return true;
 }
 bool LOTRI_Renew() {
-
-
-    return true;
+    return LOTRI_RenewCamera();
 }
 bool LOTRI_Draw() {
 
-    const float t = (float)SDL_GetTicks() / 100;
-    const Matrix matR = LOTRI_LoadR(0, 0, t);
-    const Matrix matS = LOTRI_LoadS(100, 100, 100);
-    const Matrix mat = LOTRI_MultipleMatrix(matS, matR);
+    const float t = (float)SDL_GetTicks() / 300;
+    const Mat4f matR = LOTRI_GetMatR(0, 0, 0);
+    const Mat4f matS = LOTRI_GetMatS(200, 200, 200);
+    const Mat4f invR = LOTRI_GetInvR(camera.rotation.v.x, camera.rotation.v.y, camera.rotation.v.z);
+    const Mat4f matSR = LOTRI_GetMatXMat(LOTRI_GetMatXMat(matS, matR), invR);
 
-    vec4f vec_after[8];
-    LOTRI_Trans(8, cube.modelVertices, mat, vec_after);
+    Vec4f vec_after[8];
+    LOTRI_LoadVecXMat(8, cube.modelVertices, matSR, vec_after);
 
-    DEBUG_SendMessageR("%f, %f, %f\n", vec_after[0].v.x, vec_after[0].v.y, vec_after[0].v.z);
 
     for (int i = 0; i < 8; i++) {
         cube.worldVertices[i].position.x = vec_after[i].v.x + (float)windowWidth / 2;
@@ -31,8 +31,7 @@ bool LOTRI_Draw() {
 
     const int f = 1;
 
-
-    SDL_RenderGeometry(renderer, NULL, cube.worldVertices, cube.numVertex, cube.indices[f].arr, cube.shape);
+    DEBUG_DrawGeometry(renderer, NULL, cube.worldVertices, cube.numVertex, (int*)cube.indices, cube.numIndices * 3);
     return true;
 }
 void LOTRI_Exit() {}

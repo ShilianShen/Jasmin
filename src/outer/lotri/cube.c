@@ -1,7 +1,7 @@
 #include "cube.h"
 
 
-vec4f cubeModelVertices[8] = {
+Vec4f cubeModelVertices[8] = {
     {-0.5f, -0.5f, -0.5f, 1},  // 0 - 左下后
     { 0.5f, -0.5f, -0.5f, 1},  // 1 - 右下后
     { 0.5f,  0.5f, -0.5f, 1},  // 2 - 右上后
@@ -12,7 +12,7 @@ vec4f cubeModelVertices[8] = {
     {-0.5f,  0.5f,  0.5f, 1}   // 7 - 左上前
 };
 SDL_Vertex cubeWorldVertices[8] = {0};
-vec4i cubeIndices[12] = {
+Vec3i cubeIndices[12] = {
     // 后面（z = -0.5）
     {0, 1, 2},
     {2, 3, 0},
@@ -39,6 +39,5 @@ Model cube = {
     .worldVertices = cubeWorldVertices,
 
     .numIndices = 12,
-    .shape = 3,
     .indices = cubeIndices,
 };
