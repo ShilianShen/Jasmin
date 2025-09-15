@@ -5,7 +5,10 @@
 #include "villa.h"
 
 
-// bool VILLA_DrawRain(const RainTheme rainTheme);
+bool VILLA_InitRain();
+bool VILLA_RenewRain();
+bool VILLA_DrawRain();
+void VILLA_ExitRain();
 
 
 
