@@ -8,7 +8,7 @@ static const Env ENV_ARRAY[] = {
     {"BASIC", &BASIC_Init, &BASIC_Renew, NULL, &BASIC_Exit},
     {"DEBUG", &DEBUG_Init, &DEBUG_Renew, &DEBUG_Draw, &DEBUG_Exit},
     {"DEVICE", NULL, &DEVICE_Renew, &DEVICE_Draw, NULL},
-    {"TEMPO", &TEMPO_Init, &TEMPO_Renew, &TEMPO_Draw, &TEMPO_Exit},
+    // {"TEMPO", &TEMPO_Init, &TEMPO_Renew, &TEMPO_Draw, &TEMPO_Exit},
     {"LOTRI", &LOTRI_Init, &LOTRI_Renew, &LOTRI_Draw, &LOTRI_Exit},
     {"VILLA", &VILLA_Init, &VILLA_Renew, &VILLA_Draw, &VILLA_Exit},
 };
