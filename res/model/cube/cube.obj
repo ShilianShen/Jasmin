@@ -1,5 +1,5 @@
 mtllib cube.mtl
-usemtl cube
+usemtl cube0
 v -0.5 -0.5 -0.5
 v 0.5 -0.5 -0.5
 v 0.5 0.5 -0.5

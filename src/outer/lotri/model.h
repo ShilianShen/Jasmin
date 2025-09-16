@@ -13,11 +13,11 @@ typedef struct Model Model;
 
 
 void LOTRI_DestroyModel(Model* model);
-Model* LOTRI_CreateModel(const char* filename);
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl);
 
 
 bool LOTRI_SetModelNormals(const Model* model, bool in);
-bool LOTRI_SetModelTexture(Model* model, const char* filename);
+
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 

@@ -1,6 +1,45 @@
 #include "func.h"
 #include "setting.h"
 
+#define MAX_MATERIALS 128
+
+
+
+int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials) {
+    FILE* file = fopen(path, "r");
+    if (!file) {
+        fprintf(stderr, "Failed to open MTL file: %s\n", path);
+        return 0;
+    }
+
+    char line[512];
+    int count = 0;
+    MTLMaterial* current = NULL;
+
+    while (fgets(line, sizeof(line), file)) {
+        // 去除前导空格
+        char* ptr = line;
+        while (isspace(*ptr)) ptr++;
+
+        if (strncmp(ptr, "newmtl ", 7) == 0) {
+            if (count >= max_materials) break;
+            current = &materials[count++];
+            memset(current, 0, sizeof(MTLMaterial));
+            sscanf(ptr + 7, "%63s", current->name);
+        } else if (current && strncmp(ptr, "map_Kd ", 7) == 0) {
+            sscanf(ptr + 7, "%255s", current->map_Kd);
+        } else if (current && strncmp(ptr, "map_Bump ", 9) == 0) {
+            sscanf(ptr + 9, "%255s", current->map_Bump);
+        } else if (current && strncmp(ptr, "map_Ks ", 7) == 0) {
+            sscanf(ptr + 7, "%255s", current->map_Ks);
+        }
+    }
+
+    fclose(file);
+    return count;  // 返回材质数量
+}
+
+
 
 cJSON* getJson(const char* path) {
     FILE* file = fopen(path, "r");

@@ -48,6 +48,14 @@ bool SDL_RenderTextureAligned(
     int anchor
     );
 
+//
+typedef struct {
+    char name[64];
+    char map_Kd[256];
+    char map_Bump[256];
+    char map_Ks[256];
+} MTLMaterial;
+int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials);
 
 // JSON ================================================================================================================
 cJSON* getJson(const char* path);

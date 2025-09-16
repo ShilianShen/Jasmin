@@ -68,13 +68,6 @@ bool LOTRI_SetModelNormals(const Model* model, const bool in) {
     }
     return true;
 }
-bool LOTRI_SetModelTexture(Model* model, const char* filename) {
-    if (model == NULL) return false;
-
-    model->texture = IMG_LoadTexture(renderer, filename);
-    if (model->texture == NULL) return false;
-    return true;
-}
 bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
     if (model == NULL) return false;
 
@@ -121,58 +114,70 @@ void LOTRI_DestroyModel(Model* model) {
         free(model);
     }
 }
-static bool LOTRI_Create_RK(Model* model, const char* filename, const fastObjMesh* mesh) {
-    model->numVertices = (int)mesh->position_count;
-    model->modelVertices = calloc(model->numVertices, sizeof(Vec3f));
-    model->worldVertices = calloc(model->numVertices, sizeof(Vec4f));
-    model->finalVertices = calloc(model->numVertices, sizeof(SDL_Vertex));
+static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const char* file_mtl) {
+    {
+        model->numVertices = (int)mesh->position_count;
+        model->modelVertices = calloc(model->numVertices, sizeof(Vec3f));
+        model->worldVertices = calloc(model->numVertices, sizeof(Vec4f));
+        model->finalVertices = calloc(model->numVertices, sizeof(SDL_Vertex));
 
-    if (model->modelVertices == NULL ||
-        model->worldVertices == NULL ||
-        model->finalVertices == NULL) {
-        printf("%s: Failed to allocate memory for LOTRI_Create_RK\n", __func__);
+        if (model->modelVertices == NULL ||
+            model->worldVertices == NULL ||
+            model->finalVertices == NULL) {
+            printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+            return false;
+            }
+
+        for (int i = 0; i < model->numVertices; i++) {
+            model->modelVertices[i] = (Vec3f){
+                mesh->positions[3*i],
+                mesh->positions[3*i+1],
+                mesh->positions[3*i+2]
+            };
+            model->finalVertices[i].color = (SDL_FColor){1, 1, 1, 1};
+            model->finalVertices[i].tex_coord = (SDL_FPoint){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
+        }
+    }
+    {
+        model->numFaces = (int)mesh->face_count;
+        model->modelFaces = calloc(model->numFaces, sizeof(Vec3i));
+        model->modelFaceNormals = calloc(model->numFaces, sizeof(Vec3f));
+        model->worldFaceNormals = calloc(model->numFaces, sizeof(Vec4f));
+        model->faceIndices = calloc(model->numFaces, sizeof(int));
+
+        if (model->modelFaces == NULL ||
+            model->modelFaceNormals == NULL ||
+            model->worldFaceNormals == NULL ||
+            model->faceIndices == NULL) {
+            printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+            return false;
+            }
+
+        for (int i = 0; i < model->numFaces; i++) {
+            model->modelFaces[i] = (Vec3i){
+                (int)mesh->indices[3*i].p,
+                (int)mesh->indices[3*i+1].p,
+                (int)mesh->indices[3*i+2].p,
+            };
+            model->modelFaceNormals[i] = (Vec3f){
+                mesh->normals[3*i+3],
+                mesh->normals[3*i+4],
+                mesh->normals[3*i+5],
+            };
+        }
+    }
+
+    MTLMaterial materials[1];
+    const int num_materials = parse_mtl_file(file_mtl, materials, 1);
+    model->texture = IMG_LoadTexture(renderer, materials[0].map_Kd);
+    if (model->texture == NULL) {
+        printf("%s: Failed to load texture\n", __func__);
         return false;
     }
 
-    for (int i = 0; i < model->numVertices; i++) {
-        model->modelVertices[i] = (Vec3f){
-            mesh->positions[3*i],
-            mesh->positions[3*i+1],
-            mesh->positions[3*i+2]
-        };
-        model->finalVertices[i].color = (SDL_FColor){1, 1, 1, 1};
-        model->finalVertices[i].tex_coord = (SDL_FPoint){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
-    }
-
-    model->numFaces = (int)mesh->face_count;
-    model->modelFaces = calloc(model->numFaces, sizeof(Vec3i));
-    model->modelFaceNormals = calloc(model->numFaces, sizeof(Vec3f));
-    model->worldFaceNormals = calloc(model->numFaces, sizeof(Vec4f));
-    model->faceIndices = calloc(model->numFaces, sizeof(int));
-
-    if (model->modelFaces == NULL ||
-        model->modelFaceNormals == NULL ||
-        model->worldFaceNormals == NULL ||
-        model->faceIndices == NULL) {
-        printf("%s: Failed to allocate memory for LOTRI_Create_RK\n", __func__);
-        return false;
-    }
-
-    for (int i = 0; i < model->numFaces; i++) {
-        model->modelFaces[i] = (Vec3i){
-            (int)mesh->indices[3*i].p,
-            (int)mesh->indices[3*i+1].p,
-            (int)mesh->indices[3*i+2].p,
-        };
-        model->modelFaceNormals[i] = (Vec3f){
-            mesh->normals[3*i+3],
-            mesh->normals[3*i+4],
-            mesh->normals[3*i+5],
-        };
-    }
     return true;
 }
-Model* LOTRI_CreateModel(const char* filename) {
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl) {
 
     Model* model = malloc(sizeof(Model));
     if (model == NULL) {
@@ -180,13 +185,13 @@ Model* LOTRI_CreateModel(const char* filename) {
         return false;
     }
 
-    fastObjMesh* mesh = fast_obj_read(filename);
+    fastObjMesh* mesh = fast_obj_read(file_obj);
     if (mesh == NULL) {
         printf("%s: Failed to read OBJ file\n", __func__);
         return false;
     }
 
-    if (LOTRI_Create_RK(model, filename, mesh) == false) {
+    if (LOTRI_CreateModel_RK(model, mesh, file_mtl) == false) {
         printf("%s: Failed to create LOTRI model\n", __func__);
         LOTRI_DestroyModel(model);
         model = NULL;

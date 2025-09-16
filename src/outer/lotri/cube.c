@@ -41,13 +41,9 @@ Vec2f cubeUV[8] = {
 };
 
 bool LOTRI_InitCube() {
-    cube = LOTRI_CreateModel("../res/model/cube/cube.obj");
+    cube = LOTRI_CreateModel("../res/model/cube/cube.obj", "../res/model/cube/cube.mtl");
     if (cube == NULL) {
         return false;
     }
-    if (LOTRI_SetModelTexture(cube, "../res/image/Composition_pour_Jazz.jpg") == false) {
-        return false;
-    }
-    // LOTRI_SetModelNormals(cube, false);
     return true;
 }
