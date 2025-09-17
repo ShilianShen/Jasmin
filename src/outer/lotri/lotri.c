@@ -10,7 +10,6 @@ bool LOTRI_Init() {
     LOTRI_InitCube();
     return true;
 }
-
 bool LOTRI_Renew() {
     matProj = (Mat4f){
         .m = {

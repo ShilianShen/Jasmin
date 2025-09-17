@@ -2,7 +2,7 @@
 
 
 Camera camera = {
-    .position = {0, 0, 1.8},
+    .position = {0, 0, 1.8f},
     .rotation = {0, 0, -3.14f},
 };
 
