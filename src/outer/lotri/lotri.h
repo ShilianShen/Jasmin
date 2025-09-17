@@ -2,14 +2,10 @@
 #define LOTRI_H
 
 
-#include "../_outer.h"
-
-
-
-bool LOTRI_Init();
-bool LOTRI_Renew();
-bool LOTRI_Draw();
-void LOTRI_Exit();
+#include "matrix.h"
+#include "camera.h"
+#include "cube.h"
+#include "model.h"
 
 
 #endif //LOTRI_H

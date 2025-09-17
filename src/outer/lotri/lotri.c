@@ -1,13 +1,10 @@
 #include "lotri.h"
 
-#include "cube.h"
-
 
 Mat4f matProj;
 
 
 bool LOTRI_Init() {
-    LOTRI_InitCube();
     return true;
 }
 bool LOTRI_Renew() {
@@ -20,13 +17,10 @@ bool LOTRI_Renew() {
         }
     };
     LOTRI_RenewCamera();
-    LOTRI_RenewModel(cube);
     return true;
 }
 bool LOTRI_Draw() {
-    LOTRI_DrawModel(cube);
     return true;
 }
 void LOTRI_Exit() {
-    LOTRI_DestroyModel(cube);
 }

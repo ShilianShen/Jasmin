@@ -4,7 +4,6 @@
 
 #include "../../inner/inner.h"
 #include "../lotri/lotri.h"
-#include "../lotri/model.h"
 
 
 bool VILLA_Init();

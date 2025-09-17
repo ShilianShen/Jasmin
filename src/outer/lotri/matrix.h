@@ -2,7 +2,7 @@
 #define MATRIX_H
 
 
-#include "lotri.h"
+#include "_lotri.h"
 
 
 typedef struct {float m[4][4];} Mat4f;
