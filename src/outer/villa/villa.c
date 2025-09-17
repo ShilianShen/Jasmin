@@ -2,7 +2,8 @@
 #include "weather.h"
 
 
-Model* modelArr[3] = {0};
+
+Model* modelArr[3];
 
 
 bool VILLA_Init() {
@@ -16,19 +17,18 @@ bool VILLA_Init() {
     return true;
 }
 bool VILLA_Renew() {
-    bool result = true;
     const float t = (float)SDL_GetTicks() / 500;
-    result = result && LOTRI_SetModelPosition(modelArr[2], (Vec3f){1.5f * SDL_cosf(t), 1.5f * SDL_sinf(t), 1.5f});
-    result = result && LOTRI_RenewModelArray(len_of(modelArr), modelArr);
-    result = result && VILLA_RenewRain();
-    return result;
+    return true
+    && LOTRI_SetModelPosition(modelArr[2], (Vec3f){1.5f * SDL_cosf(t), 1.5f * SDL_sinf(t), 1.5f})
+    && LOTRI_RenewModelArray(len_of(modelArr), modelArr)
+    && VILLA_RenewRain()
+    ;
 }
 bool VILLA_Draw() {
-    bool result = true
+    return true
     && LOTRI_DrawModelArray(len_of(modelArr), modelArr)
     // && VILLA_DrawRain()
     ;
-    return true;
 }
 void VILLA_Exit() {
     for (int i = 0; i < len_of(modelArr); i++) {
