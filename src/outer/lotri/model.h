@@ -6,14 +6,11 @@
 #include "camera.h"
 
 
-extern Mat4f matProj;
-
-
 typedef struct Model Model;
 
 
 void LOTRI_DestroyModel(Model* model);
-Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl);
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, bool in);
 
 
 bool LOTRI_SetModelPosition(Model* model, Vec3f position);
@@ -23,7 +20,9 @@ bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
 bool LOTRI_RenewModel(Model* model);
+bool LOTRI_RenewModelArray(int N, Model* modelArray[N]);
 bool LOTRI_DrawModel(const Model* model);
+bool LOTRI_DrawModelArray(int N, const Model* modelArray[N]);
 
 
 #endif //MODEL_H

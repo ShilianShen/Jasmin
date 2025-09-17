@@ -1,7 +1,7 @@
 #ifndef JASMIN_BASIC_INTERFACE_H
 #define JASMIN_BASIC_INTERFACE_H
 
-
+#define len_of(x) (sizeof(x) / sizeof((x)[0]))
 #include "../_inner.h"
 
 

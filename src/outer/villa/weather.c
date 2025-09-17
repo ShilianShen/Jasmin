@@ -55,5 +55,6 @@ bool VILLA_DrawRain() {
             rainPos[i].x + dx, rainPos[i].y + dy
             );
     }
+    return true;
 }
 void VILLA_ExitRain() {}

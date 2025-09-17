@@ -5,7 +5,7 @@
 typedef struct {int index; float key;} KeyIndex;
 int compare_key_index(const void *a, const void *b) {
     const float diff = ((KeyIndex*)a)->key - ((KeyIndex*)b)->key;
-    return ((diff < 0) - (diff > 0));
+    return (diff < 0) - (diff > 0);
 }
 void sort_indices_by_keys(const int N, const float keys[N], int indices[N]) {
     KeyIndex temp[N];
@@ -43,6 +43,8 @@ struct Model {
     Vec4f* worldFaceNormals;
     int* faceIndices;
 
+    bool in;
+    float depth;
     SDL_Texture* texture;
     Mat4f mat;
 };
@@ -205,7 +207,7 @@ static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const ch
 
     return true;
 }
-Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl) {
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const bool in) {
 
     Model* model = malloc(sizeof(Model));
     if (model == NULL) {
@@ -224,8 +226,13 @@ Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl) {
         LOTRI_DestroyModel(model);
         model = NULL;
     }
+    else {
+        model->scale = (Vec3f){1, 1, 1};
+        model->in = in;
+        LOTRI_SetModelNormals(model, in);
+    }
     fast_obj_destroy(mesh);
-    LOTRI_SetModelScale(model, (Vec3f){1, 1, 1});
+
 
     return model;
 }
@@ -245,6 +252,19 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     }
     sort_indices_by_keys(model->numFaces, depths, model->faceIndices);
 }
+static void LOTRI_RenewModel_Depth(Model* model) {
+    float depth = 0;
+    for (int i = 0; i < model->numVertices; i++) {
+        const Vec4f vertex = model->worldVertices[i];
+        if (model->in) {
+            depth = SDL_max(depth, vertex.v.z);
+        }
+        else {
+            depth = SDL_min(depth, vertex.v.z);
+        }
+    }
+    model->depth = depth;
+}
 bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
@@ -252,12 +272,10 @@ bool LOTRI_RenewModel(Model* model) {
         LOTRI_GetMatS(model->scale),
         LOTRI_GetMatR(model->rotation),
         LOTRI_GetMatT(model->position),
-        LOTRI_GetInvT(camera.position),
-        LOTRI_GetInvR(camera.rotation),
-        matProj,
+        camera.mat,
     };
 
-    LOTRI_SetModelMat(model, LOTRI_GetProd(sizeof(matArr) / sizeof(Mat4f), matArr));
+    LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
     LOTRI_LoadV3M4(model->numVertices, model->modelVertices, model->mat, model->worldVertices, true);
     LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
 
@@ -266,8 +284,17 @@ bool LOTRI_RenewModel(Model* model) {
         model->finalVertices[i].position.y = (float)windowHeight / 2 + model->worldVertices[i].v.y;
     }
     LOTRI_RenewModel_FaceIndices(model);
+    LOTRI_RenewModel_Depth(model);
 
     return true;
+}
+bool LOTRI_RenewModelArray(const int N, Model* modelArray[N]) {
+    if (modelArray == NULL) return false;
+    bool result = true;
+    for (int i = 0; i < N; i++) {
+        result = result && LOTRI_RenewModel(modelArray[i]);
+    }
+    return result;
 }
 
 
@@ -285,10 +312,24 @@ bool LOTRI_DrawModel(const Model* model) {
            model->finalVertices, model->numVertices,
            face.arr, 3
            );
-        DEBUG_SendMessageR("%.2f, ", model->worldFaceNormals[i].v.x);
-        DEBUG_SendMessageR("%.2f, ", model->worldFaceNormals[i].v.y);
-        DEBUG_SendMessageR("%.2f\n", model->worldFaceNormals[i].v.z);
-
     }
     return true;
+}
+bool LOTRI_DrawModelArray(const int N, const Model* modelArray[N]) {
+    if (modelArray == NULL) return false;
+
+    float depth[N];
+    for (int i = 0; i < N; i++) {
+        depth[i] = modelArray[i]->depth;
+        DEBUG_SendMessageR("%d: %.2f\n", i, depth[i]);
+    }
+
+    int indices[N];
+    sort_indices_by_keys(N, depth, indices);
+
+    bool result = true;
+    for (int i = 0; i < N; i++) {
+        result = result && LOTRI_DrawModel(modelArray[indices[i]]);
+    }
+    return result;
 }

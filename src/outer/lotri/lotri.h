@@ -4,7 +4,6 @@
 
 #include "matrix.h"
 #include "camera.h"
-#include "cube.h"
 #include "model.h"
 
 
