@@ -18,7 +18,7 @@ typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
 Mat4f LOTRI_GetMatXMat(Mat4f A, Mat4f B);
-Mat4f LOTRI_GetProd(int N, Mat4f matArray[N]);
+Mat4f LOTRI_GetProd(int N, const Mat4f matArray[]);
 Mat4f LOTRI_GetMatR(Vec3f vec);
 Mat4f LOTRI_GetInvR(Vec3f vec);
 Mat4f LOTRI_GetMatS(Vec3f vec);

@@ -242,8 +242,8 @@ bool TEMPO_RenewElem(Elem *elem) {
         return false;
     }
 
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
+    const bool mouseIn = DEVICE_GetMouseInRect(elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_GetMouseLeftInRect(elem->dst_rect);
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
@@ -275,8 +275,8 @@ bool TEMPO_DrawElem(const Elem *elem) {
         DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
-    const bool mouseIn = DEVICE_MouseInRect(&elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_MouseLeftInRect(&elem->dst_rect);
+    const bool mouseIn = DEVICE_GetMouseInRect(elem->dst_rect);
+    const bool mouseLeftIn = DEVICE_GetMouseLeftInRect(elem->dst_rect);
     if (mouseLeftIn) {
         DEBUG_FillRect(&elem->dst_rect);
     }

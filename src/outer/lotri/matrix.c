@@ -12,7 +12,7 @@ Mat4f LOTRI_GetMatXMat(const Mat4f A, const Mat4f B) {
     }
     return AB;
 }
-Mat4f LOTRI_GetProd(const int N, Mat4f matArray[N]) {
+Mat4f LOTRI_GetProd(const int N, const Mat4f matArray[]) {
     Mat4f result = matArray[0];
     for (int i = 1; i < N; i++) {
         result = LOTRI_GetMatXMat(result, matArray[i]);
@@ -60,7 +60,7 @@ Mat4f LOTRI_GetMatR(const Vec3f vec) {
         LOTRI_GetMatR_Y(vec.v.y),
         LOTRI_GetMatR_Z(vec.v.z),
     };
-    return LOTRI_GetProd(sizeof(M) / sizeof(Mat4f), M);
+    return LOTRI_GetProd(len_of(M), M);
 }
 Mat4f LOTRI_GetInvR(const Vec3f vec) {
     const Mat4f M[] = {
