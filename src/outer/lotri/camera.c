@@ -2,14 +2,7 @@
 
 
 
-const Mat4f matProj = {
-    .m = {
-        {0, 0, 1, 1},
-        {-1, 0, 0, 0},
-        {0, -1, 0, 0},
-        {0, 0, 0, 0},
-    }
-};
+static Mat4f matProj;
 
 
 Camera camera = {
@@ -20,6 +13,14 @@ Camera camera = {
 
 
 bool LOTRI_RenewCamera() {
+    matProj = (Mat4f){
+        .m = {
+            {0, 0, 1, 0},
+            {-1, 0, 0, 0},
+            {0, -1, 0, 0},
+            {(float)windowWidth / 2, (float)windowHeight / 2, 0, 1},
+        }
+    };
     {
         const float angle = 0.03f;
         if (DEVICE_KeyPressed(SDL_SCANCODE_LEFT)) camera.rotation.v.z += angle;

@@ -32,7 +32,7 @@ struct Model {
     Vec3f rotation;
 
     int numVertices;
-    Vec9f *model, *world;
+    LOTRI_Vertex *modelVertices, *worldVertices;
 
     int numFaces;
     Vec3i* modelFaces;
@@ -82,9 +82,9 @@ bool LOTRI_SetModelNormals(const Model* model, const ModelSide side) {
 
     for (int i = 0; i < model->numFaces; i++) {
         const Vec3i index = model->modelFaces[i];
-        const Vec3f a = model->model[index.v.i].xyz;
-        const Vec3f b = model->model[index.v.j].xyz;
-        const Vec3f c = model->model[index.v.k].xyz;
+        const Vec3f a = model->modelVertices[index.v.i].xyz;
+        const Vec3f b = model->modelVertices[index.v.j].xyz;
+        const Vec3f c = model->modelVertices[index.v.k].xyz;
         const Vec3f normal = LOTRI_GetNormal(a, b, c);
         const Vec3f sum = LOTRI_GetSum(a, b, c);
         if (side == MODEL_SIDE_IN ^ LOTRI_GetDot(normal, sum) < 0) {
@@ -121,13 +121,13 @@ bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src) {
 // CREATE & DELETE =====================================================================================================
 void LOTRI_DestroyModel(Model* model) {
     if (model != NULL) {
-        if (model->model != NULL) {
-            free(model->model);
-            model->model = NULL;
+        if (model->modelVertices != NULL) {
+            free(model->modelVertices);
+            model->modelVertices = NULL;
         }
-        if (model->world != NULL) {
-            free(model->world);
-            model->world = NULL;
+        if (model->worldVertices != NULL) {
+            free(model->worldVertices);
+            model->worldVertices = NULL;
         }
         if (model->modelFaces != NULL) {
             free(model->modelFaces);
@@ -155,22 +155,22 @@ void LOTRI_DestroyModel(Model* model) {
 static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const char* file_mtl) {
     {
         model->numVertices = (int)mesh->position_count;
-        model->model = calloc(model->numVertices, sizeof(Vec9f));
-        model->world = calloc(model->numVertices, sizeof(Vec9f));
+        model->modelVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
+        model->worldVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
 
-        if (model->model == NULL || model->world == NULL) {
+        if (model->modelVertices == NULL || model->worldVertices == NULL) {
             printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
             return false;
             }
 
         for (int i = 0; i < model->numVertices; i++) {
-            model->model[i].xyz = (Vec3f){
+            model->modelVertices[i].xyz = (Vec3f){
                 mesh->positions[3*i],
                 mesh->positions[3*i+1],
                 mesh->positions[3*i+2]
             };
-            model->world[i].color = model->model[i].color = (Vec4f){1, 1, 1, 1};
-            model->world[i].uv = model->model[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
+            model->worldVertices[i].rgba = model->modelVertices[i].rgba = (Vec4f){1, 1, 1, 1};
+            model->worldVertices[i].uv = model->modelVertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
         }
     }
     {
@@ -228,7 +228,7 @@ Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const Model
     }
 
     if (LOTRI_CreateModel_RK(model, mesh, file_mtl) == false) {
-        printf("%s: Failed to create LOTRI model\n", __func__);
+        printf("%s: Failed to create LOTRI modelVertices\n", __func__);
         LOTRI_DestroyModel(model);
         model = NULL;
     }
@@ -245,13 +245,41 @@ Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const Model
 
 
 // RENEW ===============================================================================================================
+static void LOTRI_RenewModel_Mat(Model* model) {
+    Vec3f rotation = model->rotation;
+    if (model->side == MODEL_SIDE_CAMERA) {
+        rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
+    }
+    const Mat4f matArr[] = {
+        LOTRI_GetMatS(model->scale),
+        LOTRI_GetMatR(rotation),
+        LOTRI_GetMatT(model->position),
+        camera.mat,
+    };
+    LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
+}
+static void LOTRI_RenewModel_WorldVertices(const Model* model) {
+    for (int i = 0; i < model->numVertices; i++) {
+        for (int j = 0; j < 3; j++) {
+            float* ij = &model->worldVertices[i].xyz.arr[j];
+            *ij = 0;
+            for (int k = 0; k < 3; k++) {
+                *ij += model->modelVertices[i].xyz.arr[k] * model->mat.m[k][j];
+            }
+            *ij += model->mat.m[3][j];
+        }
+    }
+}
+static void LOTRI_RenewModel_WorldNormals(const Model* model) {
+    LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
+}
 static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     float depths[model->numFaces];
     for (int i = 0; i < model->numFaces; i++) {
         const Vec3i index = model->modelFaces[i];
         float depth = 0;
         for (int j = 0; j < 3; j++) {
-            const Vec3f vertex = model->world[index.arr[j]].xyz;
+            const Vec3f vertex = model->worldVertices[index.arr[j]].xyz;
             depth = SDL_max(depth, vertex.v.z);
         }
         depths[i] = depth;
@@ -260,12 +288,12 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
 }
 static void LOTRI_RenewModel_Depth(Model* model) {
     if (model->side == MODEL_SIDE_NULL) {
-        model->depth = model->world[0].xyz.v.z;
+        model->depth = model->worldVertices[0].xyz.v.z;
         return;
     }
     float depth = 0;
     for (int i = 0; i < model->numVertices; i++) {
-        const Vec3f vertex = model->world[i].xyz;
+        const Vec3f vertex = model->worldVertices[i].xyz;
         if (model->side == MODEL_SIDE_IN) {
             depth = SDL_max(depth, vertex.v.z);
         }
@@ -278,26 +306,9 @@ static void LOTRI_RenewModel_Depth(Model* model) {
 bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
-    Vec3f rotation = model->rotation;
-    if (model->side == MODEL_SIDE_CAMERA) {
-        rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
-    }
-
-    const Mat4f matArr[] = {
-        LOTRI_GetMatS(model->scale),
-        LOTRI_GetMatR(rotation),
-        LOTRI_GetMatT(model->position),
-        camera.mat,
-    };
-
-    LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
-    LOTRI_LoadV9M4(model->numVertices, model->model, model->mat, model->world, true);
-    LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
-
-    for (int i = 0; i < model->numVertices; i++) {
-        model->world[i].xyz.v.x += (float)windowWidth / 2;
-        model->world[i].xyz.v.y += (float)windowHeight / 2;
-    }
+    LOTRI_RenewModel_Mat(model);
+    LOTRI_RenewModel_WorldVertices(model);
+    LOTRI_RenewModel_WorldNormals(model);
     LOTRI_RenewModel_FaceIndices(model);
     LOTRI_RenewModel_Depth(model);
 
@@ -323,9 +334,9 @@ bool LOTRI_DrawModel(const Model* model) {
 
         SDL_RenderGeometryRaw(
             renderer, model->texture,
-            (float*)&model->world[0].xyz, sizeof(Vec9f),
-            (SDL_FColor*)&model->world[0].color, sizeof(Vec9f),
-            (float*)&model->world[0].uv, sizeof(Vec9f),
+            (float*)&model->worldVertices[0].xyz, sizeof(LOTRI_Vertex),
+            (SDL_FColor*)&model->worldVertices[0].rgba, sizeof(LOTRI_Vertex),
+            (float*)&model->worldVertices[0].uv, sizeof(LOTRI_Vertex),
             model->numVertices, face.arr, 3, sizeof(int)
             );
     }

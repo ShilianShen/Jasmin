@@ -12,11 +12,8 @@ typedef union {struct {float x, y;} v; float arr[2];} Vec2f;
 typedef union {struct {int i, j, k;} v; int arr[3];} Vec3i;
 
 
-typedef struct {
-    Vec3f xyz;
-    Vec4f color;
-    Vec2f uv;
-} Vec9f;
+typedef struct {Vec3f xyz; Vec4f rgba; Vec2f uv;} LOTRI_Vertex;
+typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
 
@@ -34,7 +31,6 @@ float LOTRI_GetDot(Vec3f A, Vec3f B);
 
 
 bool LOTRI_LoadV3M4(int N, Vec3f vec_in[N], Mat4f mat, Vec4f vec_out[N], bool w);
-bool LOTRI_LoadV9M4(int N, Vec9f vec_in[N], Mat4f mat, Vec9f vec_out[N], bool w);
 
 
 #endif //MATRIX_H
