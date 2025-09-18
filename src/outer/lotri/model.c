@@ -142,7 +142,7 @@ void LOTRI_DestroyModel(Model* model) {
     }
 }
 static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const char* file_mtl) {
-
+    memset(model, 0, sizeof(Model));
     model->numVertices = (int)mesh->position_count;
     model->modelVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
     model->worldVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
@@ -225,6 +225,7 @@ static void LOTRI_RenewModel_Mat(Model* model) {
     LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
 }
 static void LOTRI_RenewModel_WorldVertices(const Model* model) {
+    // xyz
     for (int i = 0; i < model->numVertices; i++) {
         for (int j = 0; j < 3; j++) {
             float* ij = &model->worldVertices[i].xyz.arr[j];
@@ -233,6 +234,20 @@ static void LOTRI_RenewModel_WorldVertices(const Model* model) {
                 *ij += model->modelVertices[i].xyz.arr[k] * model->mat.m[k][j];
             }
             *ij += model->mat.m[3][j];
+        }
+    }
+    // uv
+    if (model->src == NULL) {
+        for (int i = 0; i < model->numVertices; i++) {
+            model->worldVertices[i].uv = model->modelVertices[i].uv;
+        }
+    }
+    else {
+        for (int i = 0; i < model->numVertices; i++) {
+            model->worldVertices[i].uv = (Vec2f){
+                model->src->x + model->src->w * model->modelVertices[i].uv.v.x,
+                model->src->y + model->src->h * model->modelVertices[i].uv.v.y,
+            };
         }
     }
 }
