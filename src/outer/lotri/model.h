@@ -12,16 +12,16 @@ typedef enum ModelSide {
     MODEL_SIDE_OUT,
     MODEL_SIDE_IN,
     MODEL_SIDE_CAMERA
-} LOTRI_ModelSide;
+} ModelSide;
 
 
 void LOTRI_DestroyModel(Model* model);
-Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, LOTRI_ModelSide side);
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
 bool LOTRI_SetModelPosition(Model* model, Vec3f position);
 bool LOTRI_SetModelRotation(Model* model, Vec3f rotation);
-bool LOTRI_SetModelNormals(const Model* model, LOTRI_ModelSide side);
+bool LOTRI_SetModelNormals(const Model* model, ModelSide side);
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 

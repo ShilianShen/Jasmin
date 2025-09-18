@@ -149,3 +149,15 @@ bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out
     }
     return true;
 }
+bool LOTRI_LoadV9M4(const int N, Vec9f vec_in[N], const Mat4f mat, Vec9f vec_out[N], const bool w) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < 3; j++) {
+            vec_out[i].xyz.arr[j] = 0;
+            for (int k = 0; k < 3; k++) {
+                vec_out[i].xyz.arr[j] += vec_in[i].xyz.arr[k] * mat.m[k][j];
+            }
+            if (w) vec_out[i].xyz.arr[j] += mat.m[3][j];
+        }
+    }
+    return true;
+}

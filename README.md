@@ -13,6 +13,10 @@ Jasmin is a 2D&3D rendering library based on C and SDL3, currently for internal 
 ### macOS
 
 ```bash
+brew uninstall sdl3 sdl3_ttf sdl3_image
+```
+
+```bash
 brew install sdl3 sdl3_ttf sdl3_image
 ```
 
