@@ -9,6 +9,7 @@ bool LOTRI_Renew() {
     return true;
 }
 bool LOTRI_Draw() {
+    LOTRI_DrawCamera();
     return true;
 }
 void LOTRI_Exit() {

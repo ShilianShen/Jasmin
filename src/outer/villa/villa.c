@@ -27,41 +27,30 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 
 
 void VILLA_Renew_Camera() {
-    static VILLA_Direct direct = DIRECT_A;
-    Vec3f rotation = {0}, position = {0};
-
-    const Vec3f dd[NUM_DIRECTS] = {
-        [DIRECT_S] = {0, 0.5f, M_PI_2 * 0},
-        [DIRECT_D] = {0, 0.5f, M_PI_2 * 1},
-        [DIRECT_W] = {0, 0.5f, M_PI_2 * 2},
-        [DIRECT_A] = {0, 0.5f, M_PI_2 * 3},
+    static DelayVec3f smallRotate = {0}, bigRotate = {0};
+    {
+        const float angle = M_PI_4 * 0.8;
+        Vec3f v = {0, 0.5f, 0};
+        if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
+        if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
+        if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
+        if (DEVICE_GetKeyPressed(SDL_SCANCODE_RIGHT)) v.v.z -= angle;
+        LOTRI_SetDelayVec(&smallRotate, v, 1.f);
+    }
+    {
+        static float k = 0;
+        if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) k += 1;
+        if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) k -= 1;
+        LOTRI_SetDelayVec(&bigRotate, (Vec3f){0, 0, k * (float)M_PI_2}, 0.5f);
+    }
+    const Vec3f vs = LOTRI_GetDelayVecVec(smallRotate);
+    const Vec3f vd = LOTRI_GetDelayVecVec(bigRotate);
+    const Vec3f rotate = (Vec3f){
+        vs.v.x + vd.v.x,
+        vs.v.y + vd.v.y,
+        vs.v.z + vd.v.z
     };
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) {
-        switch (direct) {
-            case DIRECT_W: direct = DIRECT_A; break;
-            case DIRECT_A: direct = DIRECT_S; break;
-            case DIRECT_S: direct = DIRECT_D; break;
-            case DIRECT_D: direct = DIRECT_W; break;
-            default: break;
-        }
-    }
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) {
-        switch (direct) {
-            case DIRECT_W: direct = DIRECT_D; break;
-            case DIRECT_A: direct = DIRECT_W; break;
-            case DIRECT_S: direct = DIRECT_A; break;
-            case DIRECT_D: direct = DIRECT_S; break;
-            default: break;
-        }
-    }
-    rotation = dd[direct];
-    const float angle = M_PI_4 * 0.8;
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT)) rotation.v.z += angle;
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_RIGHT)) rotation.v.z -= angle;
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN)) rotation.v.y += angle;
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP)) rotation.v.y -= angle;
-
-    LOTRI_SetCamera(rotation, position, 1000);
+    LOTRI_SetCamera(rotate);
 }
 bool VILLA_Init() {
     modelArr[0] = LOTRI_CreateModel(
@@ -93,8 +82,7 @@ bool VILLA_Renew() {
 bool VILLA_Draw() {
     float a = 0;
     LOTRI_GetModelCZ(modelArr[1], &a);
-    if (a < 0) a += M_PI * 2;
-    if (a > M_PI * 2) a -= M_PI * 2;
+    a = loop(0, a, M_PI * 2);
     DEBUG_SendMessageR("%f, %.4f\n", M_PI_4, a);
     if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_W]);
     else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_A]);
