@@ -39,6 +39,7 @@ struct Model {
     Vec3f* modelFaceNormals;
     Vec4f* worldFaceNormals;
     int* faceIndices;
+    LOTRI_Face *modelF, *worldF;
 
     ModelSide side;
     SDL_FRect* src;
@@ -149,6 +150,14 @@ void LOTRI_DestroyModel(Model* model) {
             SDL_DestroyTexture(model->texture);
             model->texture = NULL;
         }
+        if (model->modelF != NULL) {
+            free(model->modelF);
+            model->modelF = NULL;
+        }
+        if (model->worldF != NULL) {
+            free(model->worldF);
+            model->worldF = NULL;
+        }
         free(model);
     }
 }
@@ -179,11 +188,15 @@ static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const ch
         model->modelFaceNormals = calloc(model->numFaces, sizeof(Vec3f));
         model->worldFaceNormals = calloc(model->numFaces, sizeof(Vec4f));
         model->faceIndices = calloc(model->numFaces, sizeof(int));
+        model->modelF = calloc(model->numFaces, sizeof(LOTRI_Face));
+        model->worldF = calloc(model->numFaces, sizeof(LOTRI_Face));
 
         if (model->modelFaces == NULL ||
             model->modelFaceNormals == NULL ||
             model->worldFaceNormals == NULL ||
-            model->faceIndices == NULL) {
+            model->faceIndices == NULL ||
+            model->worldF == NULL ||
+            model->modelF == NULL) {
             printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
             return false;
             }
