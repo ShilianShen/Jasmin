@@ -7,10 +7,11 @@
 
 
 typedef struct Model Model;
-typedef enum LOTRI_ModelSide {
+typedef enum ModelSide {
     MODEL_SIDE_NULL,
     MODEL_SIDE_OUT,
     MODEL_SIDE_IN,
+    MODEL_SIDE_CAMERA
 } LOTRI_ModelSide;
 
 
@@ -24,9 +25,12 @@ bool LOTRI_SetModelNormals(const Model* model, LOTRI_ModelSide side);
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
+bool LOTRI_GetModelCZ(const Model* model, float* cz);
+
+
 bool LOTRI_RenewModel(Model* model);
 bool LOTRI_RenewModelArray(int N, Model* modelArray[N]);
-bool LOTRI_SS(Model* model);
+
 bool LOTRI_DrawModel(const Model* model);
 bool LOTRI_DrawModelArray(int N, const Model* modelArray[N]);
 

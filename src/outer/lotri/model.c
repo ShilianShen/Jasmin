@@ -106,6 +106,14 @@ bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
 }
 
 
+bool LOTRI_GetModelCZ(const Model* model, float* cz) {
+    if (model == NULL || cz == NULL) return false;
+
+    *cz = model->rotation.v.z - camera.rotation.v.z;
+    return true;
+}
+
+
 // CREATE & DELETE =====================================================================================================
 void LOTRI_DestroyModel(Model* model) {
     if (model != NULL) {
@@ -273,6 +281,10 @@ static void LOTRI_RenewModel_Depth(Model* model) {
 bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
+    if (model->side == MODEL_SIDE_CAMERA) {
+        model->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + 3.14f};
+    }
+
     const Mat4f matArr[] = {
         LOTRI_GetMatS(model->scale),
         LOTRI_GetMatR(model->rotation),
@@ -300,31 +312,6 @@ bool LOTRI_RenewModelArray(const int N, Model* modelArray[N]) {
         result = result && LOTRI_RenewModel(modelArray[i]);
     }
     return result;
-}
-bool LOTRI_SS(Model* model) {
-    if (model == NULL) return false;
-
-    const Mat4f matArr[] = {
-        LOTRI_GetMatS(model->scale),
-        LOTRI_GetMatR((Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + 3.14f}),
-        LOTRI_GetMatT(model->position),
-        LOTRI_GetInvT(camera.position),
-        LOTRI_GetInvR(camera.rotation),
-        LOTRI_GetMatS(camera.scale),
-        matProj,
-    };
-
-    LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
-    LOTRI_LoadV3M4(model->numVertices, model->modelVertices, model->mat, model->worldVertices, true);
-    LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
-
-    for (int i = 0; i < model->numVertices; i++) {
-        model->finalVertices[i].position.x = (float)windowWidth / 2 + model->worldVertices[i].v.x;
-        model->finalVertices[i].position.y = (float)windowHeight / 2 + model->worldVertices[i].v.y;
-    }
-    LOTRI_RenewModel_FaceIndices(model);
-    LOTRI_RenewModel_Depth(model);
-    return true;
 }
 
 

@@ -15,7 +15,7 @@ bool VILLA_Init() {
     modelArr[1] = LOTRI_CreateModel(
         "../res/model/character_bw/model.obj",
         "../res/model/character_bw/material.mtl",
-        MODEL_SIDE_NULL
+        MODEL_SIDE_CAMERA
         );
 
     VILLA_InitRain();
@@ -24,7 +24,6 @@ bool VILLA_Init() {
 bool VILLA_Renew() {
     return true
     && LOTRI_RenewModelArray(len_of(modelArr), modelArr)
-    && LOTRI_SS(modelArr[1]);
     // && VILLA_RenewRain()
     ;
 }
