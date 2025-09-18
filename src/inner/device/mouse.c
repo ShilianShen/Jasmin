@@ -32,41 +32,41 @@ bool DEVICE_GetMouseInRect(const SDL_FRect rect) {
 
 
 // RENEW ===============================================================================================================
-bool DEVICE_RenewMouse() {
+static void DEVICE_RenewMouse_State() {
     float x, y;
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&x, &y);
-
-    // TRIG
-    {
-        if (mouse.left_trig != NULL
+    mouse.state1 = mouse.state2;
+    mouse.state2.pos = (SDL_FPoint){x * scale_x, y * scale_y};
+    mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
+    mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
+    if (!mouse.state1.leftPressed && mouse.state2.leftPressed)
+        mouse.state2.leftPos = mouse.state2.pos;
+    else if (mouse.state1.leftPressed && !mouse.state2.leftPressed)
+        mouse.state2.leftPos = (SDL_FPoint){-255, -245};
+}
+static void DEVICE_RenewMouse_Trig() {
+    if (mouse.left_trig != NULL
            && mouse.left_trig->sustain == false
-           && mouse.state2.leftPressed == true
-           && (buttons & SDL_BUTTON_LMASK) == false
+           && mouse.state1.leftPressed == true
+           && mouse.state2.leftPressed == false
            ) {
-            ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-            PullTrig(mouse.left_trig);
+        ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        PullTrig(mouse.left_trig);
            }
 
-        if (mouse.left_trig != NULL
-            && mouse.left_trig->sustain == true
-            && mouse.state2.leftPressed == true
-            ) {
-            if ((buttons & SDL_BUTTON_LMASK) == false)
-                ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-            PullTrig(mouse.left_trig);
-            }
-        mouse.left_trig = NULL;
-    }
-    {
-        mouse.state1 = mouse.state2;
-        mouse.state2.pos = (SDL_FPoint){x * scale_x, y * scale_y};
-        mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
-        mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
-        if (!mouse.state1.leftPressed && mouse.state2.leftPressed)
-            mouse.state2.leftPos = mouse.state2.pos;
-        else if (mouse.state1.leftPressed && !mouse.state2.leftPressed)
-            mouse.state2.leftPos = (SDL_FPoint){-255, -245};
-    }
+    if (mouse.left_trig != NULL
+        && mouse.left_trig->sustain == true
+        && mouse.state1.leftPressed == true
+        ) {
+        if (mouse.state2.leftPressed == false)
+            ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        PullTrig(mouse.left_trig);
+        }
+    mouse.left_trig = NULL;
+}
+bool DEVICE_RenewMouse() {
+    DEVICE_RenewMouse_State();
+    DEVICE_RenewMouse_Trig();
     return true;
 }
 
