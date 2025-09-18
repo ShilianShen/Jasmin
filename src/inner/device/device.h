@@ -7,6 +7,8 @@
 #include "keyboard.h"
 
 
+bool DEVICE_Init();
+void DEVICE_Exit();
 bool DEVICE_Renew();
 bool DEVICE_Draw();
 

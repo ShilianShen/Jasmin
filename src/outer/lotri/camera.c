@@ -1,7 +1,6 @@
 #include "camera.h"
 
 
-
 static Mat4f matProj;
 
 
@@ -11,7 +10,12 @@ Camera camera = {
     .scale = {200, 200, 200},
 };
 
-
+// SET & GET ===========================================================================================================
+bool LOTRI_SetCameraRotation(const Vec3f rotation) {
+    camera.rotation = rotation;
+    return true;
+}
+// RENEW ===============================================================================================================
 static void LOTRI_RenewCamera_Proj() {
     matProj = (Mat4f){
         .m = {
@@ -72,3 +76,5 @@ bool LOTRI_RenewCamera() {
 
     return true;
 }
+
+// DRAW ================================================================================================================
