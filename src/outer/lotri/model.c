@@ -35,7 +35,6 @@ struct Model {
     LOTRI_Vertex *modelVertices, *worldVertices;
 
     int numFaces;
-    int* faceIndices;
     LOTRI_Face *modelFace, *worldFace;
 
     ModelSide side;
@@ -127,10 +126,6 @@ void LOTRI_DestroyModel(Model* model) {
             free(model->worldVertices);
             model->worldVertices = NULL;
         }
-        if (model->faceIndices != NULL) {
-            free(model->faceIndices);
-            model->faceIndices = NULL;
-        }
         if (model->texture != NULL) {
             SDL_DestroyTexture(model->texture);
             model->texture = NULL;
@@ -169,14 +164,10 @@ static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const ch
     }
     {
         model->numFaces = (int)mesh->face_count;
-        model->faceIndices = calloc(model->numFaces, sizeof(int));
         model->modelFace = calloc(model->numFaces, sizeof(LOTRI_Face));
         model->worldFace = calloc(model->numFaces, sizeof(LOTRI_Face));
 
-        if (
-            model->faceIndices == NULL ||
-            model->worldFace == NULL ||
-            model->modelFace == NULL) {
+        if (model->worldFace == NULL || model->modelFace == NULL) {
             printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
             return false;
             }
@@ -276,6 +267,7 @@ static void LOTRI_RenewModel_WorldNormals(const Model* model) {
 }
 static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     float depths[model->numFaces];
+    int indices[model->numFaces];
     for (int i = 0; i < model->numFaces; i++) {
         const Vec3i index = model->modelFace[i].ijk;
         float depth = 0;
@@ -285,7 +277,10 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
         }
         depths[i] = depth;
     }
-    sort_indices_by_keys(model->numFaces, depths, model->faceIndices);
+    sort_indices_by_keys(model->numFaces, depths, indices);
+    for (int i = 0; i < model->numFaces; i++) {
+        model->worldFace[i].ijk = model->modelFace[indices[i]].ijk;
+    }
 }
 static void LOTRI_RenewModel_Depth(Model* model) {
     if (model->side == MODEL_SIDE_NULL) {
