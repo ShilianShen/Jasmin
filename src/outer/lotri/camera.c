@@ -24,32 +24,32 @@ static void LOTRI_RenewCamera_Proj() {
 }
 static void LOTRI_RenewCamera_Rotation() {
     const float angle = 0.03f;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_LEFT)) camera.rotation.v.z += angle;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_RIGHT)) camera.rotation.v.z -= angle;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_DOWN)) camera.rotation.v.y += angle;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_UP)) camera.rotation.v.y -= angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT)) camera.rotation.v.z += angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_RIGHT)) camera.rotation.v.z -= angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN)) camera.rotation.v.y += angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP)) camera.rotation.v.y -= angle;
 
-    if (DEVICE_KeyPressed(SDL_SCANCODE_Q)) camera.rotation.v.z += angle;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_E)) camera.rotation.v.z -= angle;
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) camera.rotation.v.z += M_PI_2;
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) camera.rotation.v.z -= M_PI_2;
 
     camera.rotation.v.y = clip(-(float)M_PI_2, camera.rotation.v.y, M_PI_2);
     camera.rotation.v.z = loop(0, camera.rotation.v.z, M_PI * 2);
 }
 static void LOTRI_RenewCamera_Position() {
     const float step = 0.01f;
-    if (DEVICE_KeyPressed(SDL_SCANCODE_W)) {
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_W)) {
         camera.position.v.x += step * SDL_cosf(camera.rotation.v.z);
         camera.position.v.y += step * SDL_sinf(camera.rotation.v.z);
     }
-    if (DEVICE_KeyPressed(SDL_SCANCODE_S)) {
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_S)) {
         camera.position.v.x -= step * SDL_cosf(camera.rotation.v.z);
         camera.position.v.y -= step * SDL_sinf(camera.rotation.v.z);
     }
-    if (DEVICE_KeyPressed(SDL_SCANCODE_A)) {
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_A)) {
         camera.position.v.x -= step * SDL_sinf(camera.rotation.v.z);
         camera.position.v.y += step * SDL_cosf(camera.rotation.v.z);
     }
-    if (DEVICE_KeyPressed(SDL_SCANCODE_D)) {
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_D)) {
         camera.position.v.x += step * SDL_sinf(camera.rotation.v.z);
         camera.position.v.y -= step * SDL_cosf(camera.rotation.v.z);
     }

@@ -14,7 +14,7 @@ bool DEBUG_Renew();
 void DEBUG_Exit();
 
 
-void DEBUG_DrawPoint(Sint16 x, Sint16 y);
+void DEBUG_DrawPoint(float x, float y);
 void DEBUG_DrawLine(float x1, float y1, float x2, float y2);
 void DEBUG_DrawRect(const SDL_FRect* rect);
 void DEBUG_FillRect(const SDL_FRect* rect);

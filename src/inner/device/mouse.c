@@ -10,7 +10,7 @@ typedef struct Mouse {
     const Trig* left_trig;
 } Mouse;
 
-Mouse mouse = {0};
+static Mouse mouse;
 
 
 // SET & GET ===========================================================================================================

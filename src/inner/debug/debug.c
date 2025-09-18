@@ -80,7 +80,7 @@ void DEBUG_Exit() {
 }
 
 
-void DEBUG_DrawPoint(const Sint16 x, const Sint16 y) {
+void DEBUG_DrawPoint(const float x, const float y) {
     // Pre Condition
     if (!DEBUG_ON) {return;}
 
