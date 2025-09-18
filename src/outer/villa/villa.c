@@ -24,7 +24,7 @@ bool VILLA_Init() {
 bool VILLA_Renew() {
     return true
     && LOTRI_RenewModelArray(len_of(modelArr), modelArr)
-    // && LOTRI_SS(modelArr[1]);
+    && LOTRI_SS(modelArr[1]);
     // && VILLA_RenewRain()
     ;
 }

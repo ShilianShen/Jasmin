@@ -306,7 +306,7 @@ bool LOTRI_SS(Model* model) {
 
     const Mat4f matArr[] = {
         LOTRI_GetMatS(model->scale),
-        /// LOTRI_GetMatR((Vec3f){-camera.rotation.v.x, -camera.rotation.v.y, -camera.rotation.v.z}),
+        LOTRI_GetMatR((Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + 3.14f}),
         LOTRI_GetMatT(model->position),
         LOTRI_GetInvT(camera.position),
         LOTRI_GetInvR(camera.rotation),
