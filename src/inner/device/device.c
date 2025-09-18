@@ -90,15 +90,18 @@ SDL_FPoint DEVICE_GetMousePos() {
 }
 
 
-struct Keyboard {} keyboard;
+struct Keyboard {
+    bool state1[SDL_SCANCODE_COUNT];
+    bool state2[SDL_SCANCODE_COUNT];
+} keyboard;
 
 
 void DEVICE_RenewKeyboard() {
-    //
+
 }
 bool DEVICE_KeyPressed(const SDL_Scancode key) {
     const bool* state = SDL_GetKeyboardState(NULL);
-    //
+
     if (state[key]) {
         return true;
     }

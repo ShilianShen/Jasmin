@@ -8,7 +8,7 @@
 
 typedef struct Camera {
     Vec3f position;
-    Vec3f rotation;
+    Vec3f rotation, rotation1, rotation2;
     Vec3f scale;
     Mat4f mat;
 } Camera;

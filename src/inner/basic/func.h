@@ -5,6 +5,10 @@
 #include "_basic.h"
 
 
+float clip(float min, float value, float max);
+float loop(float min, float value, float max);
+
+
 // 2D-ARRAY ============================================================================================================
 void** allocate2DArray(size_t w, size_t h, size_t elementSize);
 void free2DArray(void** array, size_t w);

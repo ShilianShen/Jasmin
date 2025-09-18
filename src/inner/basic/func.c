@@ -276,6 +276,17 @@ bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
 
+float clip(const float min, const float value, const float max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+float loop(const float min, const float value, const float max) {
+    const float period = max - min;
+    float r = fmodf(value - min, period);  // 先移到以 a 为起点的坐标系
+    if (r < 0) r += period;             // 保证落在 [0, period)
+    return min + r;                       // 再移回原坐标系
+}
 void** allocate2DArray(size_t w, size_t h, size_t elementSize) {
     void** array = (void**)malloc(w * sizeof(void*));
     if (array == NULL) {
