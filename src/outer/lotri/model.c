@@ -278,7 +278,7 @@ static void LOTRI_RenewModel_WorldFaces(const Model* model) {
     }
 }
 static void LOTRI_RenewModel_Depth(Model* model) {
-    if (model->side == MODEL_SIDE_NULL) {
+    if (model->side == MODEL_SIDE_CAMERA) {
         model->depth = model->worldVertices[0].xyz.v.z;
         return;
     }
@@ -345,6 +345,7 @@ bool LOTRI_DrawModelArray(const int N, const Model* modelArray[N]) {
 
     bool result = true;
     for (int i = 0; i < N; i++) {
+        DEBUG_SendMessageR("%d, %f\n", i, depth[i]);
         result = result && LOTRI_DrawModel(modelArray[indices[i]]);
     }
     return result;
