@@ -28,6 +28,9 @@ bool VILLA_Renew() {
     ;
 }
 bool VILLA_Draw() {
+    float a = 0;
+    LOTRI_GetModelCZ(modelArr[1], &a);
+    DEBUG_SendMessageR("%.4f\n", a);
     return true
     && LOTRI_DrawModelArray(len_of(modelArr), modelArr)
     && VILLA_DrawRain()

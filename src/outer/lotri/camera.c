@@ -14,7 +14,7 @@ const Mat4f matProj = {
 
 Camera camera = {
     .position = {0, 0, 1.8f},
-    .rotation = {0, 0, -3.14f},
+    .rotation = {0, 0, -(float)M_PI},
     .scale = {200, 200, 200},
 };
 
@@ -27,8 +27,11 @@ bool LOTRI_RenewCamera() {
         else if (DEVICE_KeyPressed(SDL_SCANCODE_DOWN)) camera.rotation.v.y += angle;
         else if (DEVICE_KeyPressed(SDL_SCANCODE_UP)) camera.rotation.v.y -= angle;
 
-        if (camera.rotation.v.y < -1.57f) camera.rotation.v.y = -1.57f;
-        if (camera.rotation.v.y > +1.57f) camera.rotation.v.y = +1.57f;
+        if (camera.rotation.v.y < -M_PI_2) camera.rotation.v.y = -(float)M_PI_2;
+        if (camera.rotation.v.y > +M_PI_2) camera.rotation.v.y = M_PI_2;
+
+        if (camera.rotation.v.z < 0) camera.rotation.v.z += M_PI * 2;
+        if (camera.rotation.v.z > M_PI * 2) camera.rotation.v.z -= M_PI * 2;
     }
     {
         const float step = 0.01f;

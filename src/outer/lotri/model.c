@@ -44,6 +44,7 @@ struct Model {
     int* faceIndices;
 
     LOTRI_ModelSide side;
+    SDL_FRect* src;
     float depth;
     SDL_Texture* texture;
     Mat4f mat;
@@ -110,6 +111,12 @@ bool LOTRI_GetModelCZ(const Model* model, float* cz) {
     if (model == NULL || cz == NULL) return false;
 
     *cz = model->rotation.v.z - camera.rotation.v.z;
+    return true;
+}
+bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src) {
+    if (model == NULL) return false;
+
+    model->src = src;
     return true;
 }
 
@@ -281,13 +288,14 @@ static void LOTRI_RenewModel_Depth(Model* model) {
 bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
+    Vec3f rotation = model->rotation;
     if (model->side == MODEL_SIDE_CAMERA) {
-        model->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + 3.14f};
+        rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
     }
 
     const Mat4f matArr[] = {
         LOTRI_GetMatS(model->scale),
-        LOTRI_GetMatR(model->rotation),
+        LOTRI_GetMatR(rotation),
         LOTRI_GetMatT(model->position),
         camera.mat,
     };
@@ -321,9 +329,8 @@ bool LOTRI_DrawModel(const Model* model) {
 
     for (int i = 0; i < model->numFaces; i++) {
         if (model->worldFaceNormals[i].v.z > 0) continue;
-
         const Vec3i face = model->modelFaces[i];
-
+        
         SDL_RenderGeometry(
            renderer, model->texture,
            model->finalVertices, model->numVertices,

@@ -26,6 +26,7 @@ bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
 bool LOTRI_GetModelCZ(const Model* model, float* cz);
+bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src);
 
 
 bool LOTRI_RenewModel(Model* model);

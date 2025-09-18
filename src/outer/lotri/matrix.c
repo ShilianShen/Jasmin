@@ -1,7 +1,6 @@
 #include "matrix.h"
 
 
-
 Mat4f LOTRI_GetMatXMat(const Mat4f A, const Mat4f B) {
     Mat4f AB = {0};
     for (int i = 0; i < 4; i++) {
