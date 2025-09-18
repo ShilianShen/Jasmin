@@ -35,7 +35,7 @@ struct Model {
     LOTRI_Vertex *modelVertices, *worldVertices;
 
     int numFaces;
-    LOTRI_Face *modelFace, *worldFace;
+    LOTRI_Face *modelFaces, *worldFaces;
 
     ModelSide side;
     SDL_FRect* src;
@@ -78,17 +78,17 @@ bool LOTRI_SetModelNormals(const Model* model, const ModelSide side) {
     if (side == MODEL_SIDE_NULL) return true;
 
     for (int i = 0; i < model->numFaces; i++) {
-        const Vec3i index = model->modelFace[i].ijk;
+        const Vec3i index = model->modelFaces[i].ijk;
         const Vec3f a = model->modelVertices[index.v.i].xyz;
         const Vec3f b = model->modelVertices[index.v.j].xyz;
         const Vec3f c = model->modelVertices[index.v.k].xyz;
         const Vec3f normal = LOTRI_GetNormal(a, b, c);
         const Vec3f sum = LOTRI_GetSum(a, b, c);
         if (side == MODEL_SIDE_IN ^ LOTRI_GetDot(normal, sum) < 0) {
-            model->modelFace[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
+            model->modelFaces[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
         }
         else {
-            model->modelFace[i].xyz = normal;
+            model->modelFaces[i].xyz = normal;
         }
     }
     return true;
@@ -130,60 +130,42 @@ void LOTRI_DestroyModel(Model* model) {
             SDL_DestroyTexture(model->texture);
             model->texture = NULL;
         }
-        if (model->modelFace != NULL) {
-            free(model->modelFace);
-            model->modelFace = NULL;
+        if (model->modelFaces != NULL) {
+            free(model->modelFaces);
+            model->modelFaces = NULL;
         }
-        if (model->worldFace != NULL) {
-            free(model->worldFace);
-            model->worldFace = NULL;
+        if (model->worldFaces != NULL) {
+            free(model->worldFaces);
+            model->worldFaces = NULL;
         }
         free(model);
     }
 }
 static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const char* file_mtl) {
-    {
-        model->numVertices = (int)mesh->position_count;
-        model->modelVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
-        model->worldVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
 
-        if (model->modelVertices == NULL || model->worldVertices == NULL) {
-            printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
-            return false;
-            }
-
-        for (int i = 0; i < model->numVertices; i++) {
-            model->modelVertices[i].xyz = (Vec3f){
-                mesh->positions[3*i],
-                mesh->positions[3*i+1],
-                mesh->positions[3*i+2]
-            };
-            model->worldVertices[i].rgba = model->modelVertices[i].rgba = (Vec4f){1, 1, 1, 1};
-            model->worldVertices[i].uv = model->modelVertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
+    model->numVertices = (int)mesh->position_count;
+    model->modelVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
+    model->worldVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
+    if (model->modelVertices == NULL || model->worldVertices == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+        return false;
         }
+    for (int i = 0; i < model->numVertices; i++) {
+        model->modelVertices[i].xyz = (Vec3f){mesh->positions[3*i], mesh->positions[3*i+1], mesh->positions[3*i+2]};
+        model->worldVertices[i].rgba = model->modelVertices[i].rgba = (Vec4f){1, 1, 1, 1};
+        model->worldVertices[i].uv = model->modelVertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
     }
-    {
-        model->numFaces = (int)mesh->face_count;
-        model->modelFace = calloc(model->numFaces, sizeof(LOTRI_Face));
-        model->worldFace = calloc(model->numFaces, sizeof(LOTRI_Face));
 
-        if (model->worldFace == NULL || model->modelFace == NULL) {
-            printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
-            return false;
-            }
-
-        for (int i = 0; i < model->numFaces; i++) {
-            model->modelFace[i].ijk = (Vec3i){
-                (int)mesh->indices[3*i].p,
-                (int)mesh->indices[3*i+1].p,
-                (int)mesh->indices[3*i+2].p,
-            };
-            model->modelFace[i].xyz = (Vec3f){
-                mesh->normals[3*i+3],
-                mesh->normals[3*i+4],
-                mesh->normals[3*i+5],
-            };
+    model->numFaces = (int)mesh->face_count;
+    model->modelFaces = calloc(model->numFaces, sizeof(LOTRI_Face));
+    model->worldFaces = calloc(model->numFaces, sizeof(LOTRI_Face));
+    if (model->worldFaces == NULL || model->modelFaces == NULL) {
+        printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
+        return false;
         }
+    for (int i = 0; i < model->numFaces; i++) {
+        model->modelFaces[i].ijk = (Vec3i){(int)mesh->indices[3*i].p, (int)mesh->indices[3*i+1].p, (int)mesh->indices[3*i+2].p,};
+        model->modelFaces[i].xyz = (Vec3f){mesh->normals[3*i+3], mesh->normals[3*i+4], mesh->normals[3*i+5],};
     }
 
     MTLMaterial materials[1];
@@ -254,22 +236,20 @@ static void LOTRI_RenewModel_WorldVertices(const Model* model) {
         }
     }
 }
-static void LOTRI_RenewModel_WorldNormals(const Model* model) {
+static void LOTRI_RenewModel_WorldFaces(const Model* model) {
     for (int i = 0; i < model->numFaces; i++) {
         for (int j = 0; j < 3; j++) {
-            float* ij = &model->worldFace[i].xyz.arr[j];
+            float* ij = &model->worldFaces[i].xyz.arr[j];
             *ij = 0;
             for (int k = 0; k < 3; k++) {
-                *ij += model->modelFace[i].xyz.arr[k] * model->mat.m[k][j];
+                *ij += model->modelFaces[i].xyz.arr[k] * model->mat.m[k][j];
             }
         }
     }
-}
-static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     float depths[model->numFaces];
     int indices[model->numFaces];
     for (int i = 0; i < model->numFaces; i++) {
-        const Vec3i index = model->modelFace[i].ijk;
+        const Vec3i index = model->modelFaces[i].ijk;
         float depth = 0;
         for (int j = 0; j < 3; j++) {
             const Vec3f vertex = model->worldVertices[index.arr[j]].xyz;
@@ -279,7 +259,7 @@ static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     }
     sort_indices_by_keys(model->numFaces, depths, indices);
     for (int i = 0; i < model->numFaces; i++) {
-        model->worldFace[i].ijk = model->modelFace[indices[i]].ijk;
+        model->worldFaces[i].ijk = model->modelFaces[indices[i]].ijk;
     }
 }
 static void LOTRI_RenewModel_Depth(Model* model) {
@@ -304,8 +284,7 @@ bool LOTRI_RenewModel(Model* model) {
 
     LOTRI_RenewModel_Mat(model);
     LOTRI_RenewModel_WorldVertices(model);
-    LOTRI_RenewModel_WorldNormals(model);
-    LOTRI_RenewModel_FaceIndices(model);
+    LOTRI_RenewModel_WorldFaces(model);
     LOTRI_RenewModel_Depth(model);
 
     return true;
@@ -325,8 +304,8 @@ bool LOTRI_DrawModel(const Model* model) {
     if (model == NULL) return false;
 
     for (int i = 0; i < model->numFaces; i++) {
-        if (model->worldFace[i].xyz.v.z > 0) continue;
-        const Vec3i face = model->modelFace[i].ijk;
+        if (model->worldFaces[i].xyz.v.z > 0) continue;
+        const Vec3i face = model->modelFaces[i].ijk;
 
         SDL_RenderGeometryRaw(
             renderer, model->texture,
