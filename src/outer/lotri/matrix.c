@@ -149,3 +149,36 @@ bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out
     }
     return true;
 }
+
+
+typedef struct DelayVec3f {
+    float t1, t, t2;
+    Vec3f v1, v, v2;
+    AtvFunc func;
+} DelayVec3f;
+
+Vec3f LOTRI_AtvVec(const Vec3f a, const Vec3f b, const float t, const AtvFunc atv) {
+    Vec3f result;
+    for (int i = 0; i < 3; i++) {
+        result.arr[i] = a.arr[i] + atv(t) * (b.arr[i] - a.arr[i]);
+    }
+    return result;
+}
+bool LOTRI_RenewDelayVec(DelayVec3f* delay) {
+    if (delay == NULL || delay->func == NULL) return false;
+
+    delay->t = (float)SDL_GetTicks() / 1000;
+    const float rate = (delay->t - delay->t1) / (delay->t2 - delay->t1);
+    delay->v = LOTRI_AtvVec(delay->v1, delay->v2, rate, delay->func);
+    return true;
+}
+bool LOTRI_SetDelayVec(DelayVec3f* delay, const Vec3f v2, const float time) {
+    if (delay == NULL) return false;
+    if (LOTRI_RenewDelayVec(delay) == false) return false;
+
+    delay->v1 = delay->v;
+    delay->t1 = delay->t;
+    delay->v2 = v2;
+    delay->t2 = delay->t1 + time;
+    return true;
+}

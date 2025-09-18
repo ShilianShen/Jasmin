@@ -11,6 +11,16 @@ float BASIC_AtvSin2(const float x) {
     if (x <= 0) {return 0;}
     return SDL_powf(SDL_sinf(3.14f / 2 * x), 2);
 }
+float BASIC_AtvRank1(const float x) {
+    if (x >= 1) {return 1;}
+    if (x <= 0) {return 0;}
+    return x * x * (3.0f - 2.0f * x);
+}
+float BASIC_AtvRank2(const float x) {
+    if (x >= 1) {return 1;}
+    if (x <= 0) {return 0;}
+    return x*x*x*(x*(x*6 - 15) + 10);
+}
 SDL_FRect BASIC_AtvGetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const float t) {
     SDL_FRect rect;
     rect.x = (1 - t) * rect1.x + t * rect2.x;

@@ -1,5 +1,11 @@
 #include "villa.h"
+
+#include <MacTypes.h>
+
 #include "weather.h"
+
+
+
 
 
 
@@ -20,6 +26,43 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 };
 
 
+void VILLA_Renew_Camera() {
+    static VILLA_Direct direct = DIRECT_A;
+    Vec3f rotation = {0}, position = {0};
+
+    const Vec3f dd[NUM_DIRECTS] = {
+        [DIRECT_S] = {0, 0.5f, M_PI_2 * 0},
+        [DIRECT_D] = {0, 0.5f, M_PI_2 * 1},
+        [DIRECT_W] = {0, 0.5f, M_PI_2 * 2},
+        [DIRECT_A] = {0, 0.5f, M_PI_2 * 3},
+    };
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) {
+        switch (direct) {
+            case DIRECT_W: direct = DIRECT_A; break;
+            case DIRECT_A: direct = DIRECT_S; break;
+            case DIRECT_S: direct = DIRECT_D; break;
+            case DIRECT_D: direct = DIRECT_W; break;
+            default: break;
+        }
+    }
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) {
+        switch (direct) {
+            case DIRECT_W: direct = DIRECT_D; break;
+            case DIRECT_A: direct = DIRECT_W; break;
+            case DIRECT_S: direct = DIRECT_A; break;
+            case DIRECT_D: direct = DIRECT_S; break;
+            default: break;
+        }
+    }
+    rotation = dd[direct];
+    const float angle = M_PI_4 * 0.8;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT)) rotation.v.z += angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_RIGHT)) rotation.v.z -= angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN)) rotation.v.y += angle;
+    if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP)) rotation.v.y -= angle;
+
+    LOTRI_SetCamera(rotation, position, 1000);
+}
 bool VILLA_Init() {
     modelArr[0] = LOTRI_CreateModel(
         "../res/model/root_room/model.obj",
@@ -41,6 +84,7 @@ bool VILLA_Init() {
     return true;
 }
 bool VILLA_Renew() {
+    VILLA_Renew_Camera();
     return true
     && LOTRI_RenewModelArray(len_of(modelArr), modelArr)
     // && VILLA_RenewRain()
