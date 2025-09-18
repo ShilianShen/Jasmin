@@ -35,11 +35,8 @@ struct Model {
     LOTRI_Vertex *modelVertices, *worldVertices;
 
     int numFaces;
-    Vec3i* modelFaces;
-    Vec3f* modelFaceNormals;
-    Vec4f* worldFaceNormals;
     int* faceIndices;
-    LOTRI_Face *modelF, *worldF;
+    LOTRI_Face *modelFace, *worldFace;
 
     ModelSide side;
     SDL_FRect* src;
@@ -82,17 +79,17 @@ bool LOTRI_SetModelNormals(const Model* model, const ModelSide side) {
     if (side == MODEL_SIDE_NULL) return true;
 
     for (int i = 0; i < model->numFaces; i++) {
-        const Vec3i index = model->modelFaces[i];
+        const Vec3i index = model->modelFace[i].ijk;
         const Vec3f a = model->modelVertices[index.v.i].xyz;
         const Vec3f b = model->modelVertices[index.v.j].xyz;
         const Vec3f c = model->modelVertices[index.v.k].xyz;
         const Vec3f normal = LOTRI_GetNormal(a, b, c);
         const Vec3f sum = LOTRI_GetSum(a, b, c);
         if (side == MODEL_SIDE_IN ^ LOTRI_GetDot(normal, sum) < 0) {
-            model->modelFaceNormals[i] = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
+            model->modelFace[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
         }
         else {
-            model->modelFaceNormals[i] = normal;
+            model->modelFace[i].xyz = normal;
         }
     }
     return true;
@@ -130,18 +127,6 @@ void LOTRI_DestroyModel(Model* model) {
             free(model->worldVertices);
             model->worldVertices = NULL;
         }
-        if (model->modelFaces != NULL) {
-            free(model->modelFaces);
-            model->modelFaces = NULL;
-        }
-        if (model->modelFaceNormals != NULL) {
-            free(model->modelFaceNormals);
-            model->modelFaceNormals = NULL;
-        }
-        if (model->worldFaceNormals != NULL) {
-            free(model->worldFaceNormals);
-            model->worldFaceNormals = NULL;
-        }
         if (model->faceIndices != NULL) {
             free(model->faceIndices);
             model->faceIndices = NULL;
@@ -150,13 +135,13 @@ void LOTRI_DestroyModel(Model* model) {
             SDL_DestroyTexture(model->texture);
             model->texture = NULL;
         }
-        if (model->modelF != NULL) {
-            free(model->modelF);
-            model->modelF = NULL;
+        if (model->modelFace != NULL) {
+            free(model->modelFace);
+            model->modelFace = NULL;
         }
-        if (model->worldF != NULL) {
-            free(model->worldF);
-            model->worldF = NULL;
+        if (model->worldFace != NULL) {
+            free(model->worldFace);
+            model->worldFace = NULL;
         }
         free(model);
     }
@@ -184,30 +169,25 @@ static bool LOTRI_CreateModel_RK(Model* model, const fastObjMesh* mesh, const ch
     }
     {
         model->numFaces = (int)mesh->face_count;
-        model->modelFaces = calloc(model->numFaces, sizeof(Vec3i));
-        model->modelFaceNormals = calloc(model->numFaces, sizeof(Vec3f));
-        model->worldFaceNormals = calloc(model->numFaces, sizeof(Vec4f));
         model->faceIndices = calloc(model->numFaces, sizeof(int));
-        model->modelF = calloc(model->numFaces, sizeof(LOTRI_Face));
-        model->worldF = calloc(model->numFaces, sizeof(LOTRI_Face));
+        model->modelFace = calloc(model->numFaces, sizeof(LOTRI_Face));
+        model->worldFace = calloc(model->numFaces, sizeof(LOTRI_Face));
 
-        if (model->modelFaces == NULL ||
-            model->modelFaceNormals == NULL ||
-            model->worldFaceNormals == NULL ||
+        if (
             model->faceIndices == NULL ||
-            model->worldF == NULL ||
-            model->modelF == NULL) {
+            model->worldFace == NULL ||
+            model->modelFace == NULL) {
             printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
             return false;
             }
 
         for (int i = 0; i < model->numFaces; i++) {
-            model->modelFaces[i] = (Vec3i){
+            model->modelFace[i].ijk = (Vec3i){
                 (int)mesh->indices[3*i].p,
                 (int)mesh->indices[3*i+1].p,
                 (int)mesh->indices[3*i+2].p,
             };
-            model->modelFaceNormals[i] = (Vec3f){
+            model->modelFace[i].xyz = (Vec3f){
                 mesh->normals[3*i+3],
                 mesh->normals[3*i+4],
                 mesh->normals[3*i+5],
@@ -284,12 +264,20 @@ static void LOTRI_RenewModel_WorldVertices(const Model* model) {
     }
 }
 static void LOTRI_RenewModel_WorldNormals(const Model* model) {
-    LOTRI_LoadV3M4(model->numFaces, model->modelFaceNormals, model->mat, model->worldFaceNormals, false);
+    for (int i = 0; i < model->numFaces; i++) {
+        for (int j = 0; j < 3; j++) {
+            float* ij = &model->worldFace[i].xyz.arr[j];
+            *ij = 0;
+            for (int k = 0; k < 3; k++) {
+                *ij += model->modelFace[i].xyz.arr[k] * model->mat.m[k][j];
+            }
+        }
+    }
 }
 static void LOTRI_RenewModel_FaceIndices(const Model* model) {
     float depths[model->numFaces];
     for (int i = 0; i < model->numFaces; i++) {
-        const Vec3i index = model->modelFaces[i];
+        const Vec3i index = model->modelFace[i].ijk;
         float depth = 0;
         for (int j = 0; j < 3; j++) {
             const Vec3f vertex = model->worldVertices[index.arr[j]].xyz;
@@ -342,8 +330,8 @@ bool LOTRI_DrawModel(const Model* model) {
     if (model == NULL) return false;
 
     for (int i = 0; i < model->numFaces; i++) {
-        if (model->worldFaceNormals[i].v.z > 0) continue;
-        const Vec3i face = model->modelFaces[i];
+        if (model->worldFace[i].xyz.v.z > 0) continue;
+        const Vec3i face = model->modelFace[i].ijk;
 
         SDL_RenderGeometryRaw(
             renderer, model->texture,
