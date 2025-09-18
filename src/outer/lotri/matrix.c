@@ -26,8 +26,8 @@ static Mat4f LOTRI_GetMatR_X(const float x) {
     const Mat4f result = {
         {
             {1, 0, 0, 0},
-            {0, SDL_cosf(x), -SDL_sinf(x), 0},
-            {0, SDL_sinf(x), SDL_cosf(x), 0},
+            {0, SDL_cosf(x), SDL_sinf(x), 0},
+            {0, -SDL_sinf(x), SDL_cosf(x), 0},
             {0, 0, 0, 1}
         }
     };
@@ -36,9 +36,9 @@ static Mat4f LOTRI_GetMatR_X(const float x) {
 static Mat4f LOTRI_GetMatR_Y(const float y) {
     const Mat4f result = {
         {
-            {SDL_cosf(y), 0, SDL_sinf(y), 0},
+            {SDL_cosf(y), 0, -SDL_sinf(y), 0},
             {0, 1, 0, 0},
-            {-SDL_sinf(y), 0, SDL_cosf(y), 0},
+            {SDL_sinf(y), 0, SDL_cosf(y), 0},
             {0, 0, 0, 1}
         }
     };
@@ -47,8 +47,8 @@ static Mat4f LOTRI_GetMatR_Y(const float y) {
 static Mat4f LOTRI_GetMatR_Z(const float z) {
     const Mat4f result = {
         {
-            {SDL_cosf(z), -SDL_sinf(z), 0, 0},
-            {SDL_sinf(z), SDL_cosf(z), 0, 0},
+            {SDL_cosf(z), SDL_sinf(z), 0, 0},
+            {-SDL_sinf(z), SDL_cosf(z), 0, 0},
             {0, 0, 1, 0},
             {0, 0, 0, 1}
         }
