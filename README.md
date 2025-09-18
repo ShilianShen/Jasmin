@@ -34,19 +34,24 @@ We divide the modules into 2 kinds: OpenModule & ClosedModule.
 ### OM-Example
 ```mermaid
 flowchart LR
+    subgraph Module
+        _module.h --> detail_1.h --> detail_1.c
+        _module.h --> detail_2.h --> detail_2.c
+        detail_1.h --> module.h --> module.c
+        detail_2.h --> module.h
+    end
     in.h --> _module.h
-    _module.h --> detail_1.h --> detail_1.c
-    _module.h --> detail_2.h --> detail_2.c
-    detail_1.h --> module.h --> out.h
-    detail_2.h --> module.h
+    module.h --> out.h
 ```
 ### CM-Example
 ```mermaid
 flowchart LR
+    subgraph Module
+        module.h --> detail_1.h --> detail_1.c
+        module.h --> detail_2.h --> detail_2.c
+        detail_1.h --> module.c
+        detail_2.h --> module.c
+    end
     in.h --> module.h --> out.h
-    module.h --> detail_1.h --> detail_1.c
-    module.h --> detail_2.h --> detail_2.c
-    detail_1.h --> module.c
-    detail_2.h --> module.c
 ```
 

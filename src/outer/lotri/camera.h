@@ -5,6 +5,7 @@
 #include "matrix.h"
 #include "model.h"
 
+
 typedef struct Camera Camera;
 struct Camera {
     Vec3f position;
