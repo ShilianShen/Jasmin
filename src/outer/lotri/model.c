@@ -351,7 +351,6 @@ bool LOTRI_DrawModelArray(const int N, const Model* modelArray[N]) {
     float depth[N];
     for (int i = 0; i < N; i++) {
         depth[i] = modelArray[i]->depth;
-        DEBUG_SendMessageR("%d: %.2f\n", i, depth[i]);
     }
 
     int indices[N];
