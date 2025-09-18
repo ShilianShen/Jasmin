@@ -50,6 +50,8 @@ bool LOTRI_SetDelayVec(DelayVec3f* delay, const Vec3f v2, const float time) {
     if (delay == NULL || LOTRI_GetVecEqual(delay->v2, v2) == true) return false;
 
     const float t = (float)SDL_GetTicks() / 1000;
+    if (delay->block == true && t < delay->t2) return false;
+
     delay->v1 = LOTRI_GetDelayVecVec(*delay);
     delay->t1 = t;
     delay->t2 = t + time;

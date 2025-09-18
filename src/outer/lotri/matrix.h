@@ -10,7 +10,7 @@ typedef union {struct {float x, y, z, w;} v; float arr[4];} Vec4f;
 typedef union {struct {float x, y, z;} v; float arr[3];} Vec3f;
 typedef union {struct {float x, y;} v; float arr[2];} Vec2f;
 typedef union {struct {int i, j, k;} v; int arr[3];} Vec3i;
-typedef struct {float t1, t2; Vec3f v1, v2; AtvFunc func;} DelayVec3f;
+typedef struct {float t1, t2; Vec3f v1, v2; AtvFunc func; bool block;} DelayVec3f;
 
 
 Vec3f LOTRI_GetNormal(Vec3f A, Vec3f B, Vec3f C);

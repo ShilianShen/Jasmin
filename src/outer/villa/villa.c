@@ -28,9 +28,10 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 
 void VILLA_Renew_Camera() {
     static DelayVec3f smallRotate = {0}, bigRotate = {0};
+    bigRotate.block = true;
     {
-        const float angle = M_PI_4 * 0.8;
-        Vec3f v = {0, 0.5f, 0};
+        const float angle = M_PI_4 * 0.5;
+        Vec3f v = {0, 0.5f, 0.3f};
         if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
         if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
         if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
@@ -39,9 +40,11 @@ void VILLA_Renew_Camera() {
     }
     {
         static float k = 0;
+        Vec3f v = {0, 0, 0};
         if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) k += 1;
         if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) k -= 1;
-        LOTRI_SetDelayVec(&bigRotate, (Vec3f){0, 0, k * (float)M_PI_2}, 0.5f);
+        v.v.z += k * (float)M_PI_2;
+        LOTRI_SetDelayVec(&bigRotate, v, 0.5f);
     }
     const Vec3f vs = LOTRI_GetDelayVecVec(smallRotate);
     const Vec3f vd = LOTRI_GetDelayVecVec(bigRotate);
