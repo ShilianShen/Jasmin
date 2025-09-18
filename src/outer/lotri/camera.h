@@ -3,8 +3,10 @@
 
 
 #include "matrix.h"
+#include "model.h"
 
 
+extern const Mat4f matProj;
 typedef struct Camera {
     Vec3f position;
     Vec3f rotation;

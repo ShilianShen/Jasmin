@@ -7,20 +7,26 @@
 
 
 typedef struct Model Model;
+typedef enum LOTRI_ModelSide {
+    MODEL_SIDE_NULL,
+    MODEL_SIDE_OUT,
+    MODEL_SIDE_IN,
+} LOTRI_ModelSide;
 
 
 void LOTRI_DestroyModel(Model* model);
-Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, bool in);
+Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, LOTRI_ModelSide side);
 
 
 bool LOTRI_SetModelPosition(Model* model, Vec3f position);
 bool LOTRI_SetModelRotation(Model* model, Vec3f rotation);
-bool LOTRI_SetModelNormals(const Model* model, bool in);
+bool LOTRI_SetModelNormals(const Model* model, LOTRI_ModelSide side);
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
 bool LOTRI_RenewModel(Model* model);
 bool LOTRI_RenewModelArray(int N, Model* modelArray[N]);
+bool LOTRI_SS(Model* model);
 bool LOTRI_DrawModel(const Model* model);
 bool LOTRI_DrawModelArray(int N, const Model* modelArray[N]);
 

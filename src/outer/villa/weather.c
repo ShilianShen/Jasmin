@@ -17,7 +17,7 @@ typedef struct RainTheme {
 RainTheme rainTheme = {
     .num = 1000,
     .len = 50,
-    .arg = 0.1f,
+    .arg = 0.0f,
     .color = {250, 250, 250, 128},
     .min = 1,
     .max = 4,
