@@ -1,11 +1,11 @@
 #include "villa.h"
 
-#include <MacTypes.h>
-
+#include "room.h"
 #include "weather.h"
 
 
 Model* modelArr[3];
+Room* rootRoom = NULL;
 
 
 typedef enum VILLA_Direct {
@@ -53,6 +53,10 @@ void VILLA_Renew_Camera() {
     LOTRI_SetCamera(rotate);
 }
 bool VILLA_Init() {
+    cJSON* room_json = getJson("../res/room/root_room.json");
+    rootRoom = VILLA_CreateRoom(room_json);
+    cJSON_Delete(room_json);
+
     modelArr[0] = LOTRI_CreateModel(
         "../res/model/root_room/model.obj",
         "../res/model/root_room/material.mtl",
@@ -86,6 +90,7 @@ bool VILLA_Draw() {
     else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_A]);
     else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_S]);
     else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_D]);
+
     if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_W]);
     else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_A]);
     else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_S]);
@@ -99,4 +104,5 @@ void VILLA_Exit() {
     for (int i = 0; i < len_of(modelArr); i++) {
         LOTRI_DestroyModel(modelArr[i]);
     }
+    VILLA_DeleteRoom(rootRoom);
 }

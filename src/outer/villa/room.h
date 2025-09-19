@@ -8,8 +8,8 @@
 typedef struct Room Room;
 
 
-Room* VILLA_CreateRoom();
-Room* VILLA_DeleteRoom();
+Room* VILLA_CreateRoom(const cJSON *room_json);
+Room* VILLA_DeleteRoom(Room *room);
 bool VILLA_RenewRoom(Room* room);
 bool VILLA_DrawRoom(Room* room);
 
