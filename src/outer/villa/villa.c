@@ -5,11 +5,8 @@
 #include "weather.h"
 
 
-
-
-
-
 Model* modelArr[3];
+
 
 typedef enum VILLA_Direct {
     DIRECT_W,
@@ -76,11 +73,9 @@ bool VILLA_Init() {
     return true;
 }
 bool VILLA_Renew() {
+    LOTRI_RenewModelArray(len_of(modelArr), modelArr);
     VILLA_Renew_Camera();
-    return true
-    && LOTRI_RenewModelArray(len_of(modelArr), modelArr)
-    // && VILLA_RenewRain()
-    ;
+    return true;
 }
 bool VILLA_Draw() {
     float a = 0;
