@@ -318,7 +318,7 @@ bool LOTRI_DrawModel(const Model* model) {
     modelBufferHead++;
     return true;
 }
-static bool LOTRI_DrawModelArray_Model(const Model* model) {
+static bool LOTRI_DrawModelBuffer_Model(const Model* model) {
     if (model == NULL) return false;
 
     for (int i = 0; i < model->numFaces; i++) {
@@ -349,7 +349,7 @@ bool LOTRI_DrawModelBuffer(const int N, const Model* modelArray[N]) {
     bool result = true;
     for (int i = 0; i < N; i++) {
         DEBUG_SendMessageR("%d, %f\n", i, depth[i]);
-        result = result && LOTRI_DrawModelArray_Model(modelArray[indices[i]]);
+        result = result && LOTRI_DrawModelBuffer_Model(modelArray[indices[i]]);
     }
     return result;
 }

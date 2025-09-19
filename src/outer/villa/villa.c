@@ -4,7 +4,7 @@
 #include "weather.h"
 
 
-Model* modelArr[3];
+Model* modelArr[2];
 Room* rootRoom = NULL;
 
 
@@ -58,21 +58,16 @@ bool VILLA_Init() {
     cJSON_Delete(room_json);
 
     modelArr[0] = LOTRI_CreateModel(
-        "../res/model/root_room/model.obj",
-        "../res/model/root_room/material.mtl",
-        MODEL_SIDE_IN
-        );
-    modelArr[1] = LOTRI_CreateModel(
         "../res/model/character_bw/model.obj",
         "../res/model/character_bw/material.mtl",
         MODEL_SIDE_CAMERA
         );
-    modelArr[2] = LOTRI_CreateModel(
+    modelArr[1] = LOTRI_CreateModel(
         "../res/model/character_ot/model.obj",
         "../res/model/character_ot/material.mtl",
         MODEL_SIDE_CAMERA
         );
-    LOTRI_SetModelPosition(modelArr[2], (Vec3f){-1, 1, 0});
+    LOTRI_SetModelPosition(modelArr[1], (Vec3f){-1, 1, 0});
     VILLA_InitRain();
     return true;
 }
@@ -81,6 +76,7 @@ bool VILLA_Renew() {
         LOTRI_RenewModel(modelArr[i]);
     }
     VILLA_Renew_Camera();
+    VILLA_RenewRoom(rootRoom);
     return true;
 }
 bool VILLA_Draw() {
@@ -93,13 +89,14 @@ bool VILLA_Draw() {
     else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_S]);
     else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_D]);
 
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_W]);
-    else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_A]);
-    else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_S]);
-    else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_D]);
+    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_W]);
+    else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_A]);
+    else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_S]);
+    else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_D]);
     for (int i = 0; i < len_of(modelArr); i++) {
         LOTRI_DrawModel(modelArr[i]);
     }
+    VILLA_DrawRoom(rootRoom);
     return true
     && VILLA_DrawRain()
     ;

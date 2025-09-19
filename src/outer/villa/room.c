@@ -80,12 +80,14 @@ Room* VILLA_DeleteRoom(Room *room) {
 
 // RENEW ===============================================================================================================
 bool VILLA_RenewRoom(Room* room) {
+    LOTRI_RenewModel(room->model);
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool VILLA_DrawRoom(const Room *room) {
+    LOTRI_DrawModel(room->model);
     return true;
 }
 
