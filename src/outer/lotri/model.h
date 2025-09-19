@@ -15,6 +15,11 @@ typedef enum ModelSide {
 } ModelSide;
 
 
+#define MAX_MODEL_BUFFER 64
+extern int modelBufferHead;
+extern const Model* modelBuffer[];
+
+
 void LOTRI_DestroyModel(Model* model);
 Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
 
@@ -30,10 +35,10 @@ bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src);
 
 
 bool LOTRI_RenewModel(Model* model);
-bool LOTRI_RenewModelArray(int N, Model* modelArray[N]);
+
 
 bool LOTRI_DrawModel(const Model* model);
-bool LOTRI_DrawModelArray(int N, const Model* modelArray[N]);
+bool LOTRI_DrawModelBuffer(int N, const Model* modelArray[N]);
 
 
 #endif //MODEL_H

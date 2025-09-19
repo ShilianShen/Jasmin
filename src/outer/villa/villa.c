@@ -77,7 +77,9 @@ bool VILLA_Init() {
     return true;
 }
 bool VILLA_Renew() {
-    LOTRI_RenewModelArray(len_of(modelArr), modelArr);
+    for (int i = 0; i < len_of(modelArr); i++) {
+        LOTRI_RenewModel(modelArr[i]);
+    }
     VILLA_Renew_Camera();
     return true;
 }
@@ -95,8 +97,10 @@ bool VILLA_Draw() {
     else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_A]);
     else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_S]);
     else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[2], &direct2rect[DIRECT_D]);
+    for (int i = 0; i < len_of(modelArr); i++) {
+        LOTRI_DrawModel(modelArr[i]);
+    }
     return true
-    && LOTRI_DrawModelArray(len_of(modelArr), modelArr)
     && VILLA_DrawRain()
     ;
 }

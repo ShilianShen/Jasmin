@@ -1,6 +1,9 @@
 #include "model.h"
 
 
+int modelBufferHead = 0;
+const Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
+
 
 typedef struct {int index; float key;} KeyIndex;
 int compare_key_index(const void *a, const void *b) {
@@ -304,18 +307,18 @@ bool LOTRI_RenewModel(Model* model) {
 
     return true;
 }
-bool LOTRI_RenewModelArray(const int N, Model* modelArray[N]) {
-    if (modelArray == NULL) return false;
-    bool result = true;
-    for (int i = 0; i < N; i++) {
-        result = result && LOTRI_RenewModel(modelArray[i]);
-    }
-    return result;
-}
 
 
 // DRAW ================================================================================================================
 bool LOTRI_DrawModel(const Model* model) {
+    if (model == NULL) return false;
+    if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
+
+    modelBuffer[modelBufferHead] = model;
+    modelBufferHead++;
+    return true;
+}
+static bool LOTRI_DrawModelArray_Model(const Model* model) {
     if (model == NULL) return false;
 
     for (int i = 0; i < model->numFaces; i++) {
@@ -332,7 +335,7 @@ bool LOTRI_DrawModel(const Model* model) {
     }
     return true;
 }
-bool LOTRI_DrawModelArray(const int N, const Model* modelArray[N]) {
+bool LOTRI_DrawModelBuffer(const int N, const Model* modelArray[N]) {
     if (modelArray == NULL) return false;
 
     float depth[N];
@@ -346,7 +349,7 @@ bool LOTRI_DrawModelArray(const int N, const Model* modelArray[N]) {
     bool result = true;
     for (int i = 0; i < N; i++) {
         DEBUG_SendMessageR("%d, %f\n", i, depth[i]);
-        result = result && LOTRI_DrawModel(modelArray[indices[i]]);
+        result = result && LOTRI_DrawModelArray_Model(modelArray[indices[i]]);
     }
     return result;
 }

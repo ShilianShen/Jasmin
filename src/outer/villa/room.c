@@ -77,13 +77,15 @@ Room* VILLA_DeleteRoom(Room *room) {
     return NULL;
 }
 
+
 // RENEW ===============================================================================================================
 bool VILLA_RenewRoom(Room* room) {
     return true;
 }
 
+
 // DRAW ================================================================================================================
-bool VILLA_DrawRoom(Room* room) {
+bool VILLA_DrawRoom(const Room *room) {
     return true;
 }
 
