@@ -1,5 +1,7 @@
 #include "room.h"
 
+#include "character.h"
+
 
 const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
     [VILLA_DATA_NONE] = {255, 255, 255, 255},
@@ -10,7 +12,7 @@ const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
 typedef struct RoomCell RoomCell;
 struct RoomCell {
     VILLA_DATA_TYPE dataType;
-    void* dataPtr;
+    const void* dataPtr;
     Vec3f worldPosition;
     Vec3f cameraRotation;
     Vec3f cameraPosition;
@@ -23,6 +25,9 @@ struct Room {
     int w, h;
     RoomCell** cells;
 };
+
+
+// SET & GET ===========================================================================================================
 
 
 // CREATE & DELETE =====================================================================================================

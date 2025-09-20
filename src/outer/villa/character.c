@@ -18,10 +18,11 @@ SDL_FRect direct2rect2[NUM_DIRECTS] = {
 
 struct Character {
     Model* model;
+    Room* room;
+    int x, y;
 };
 
 // SET & GET ===========================================================================================================
-// bool VILLA_SetCharacterPosition(Character* character);
 
 
 // CREATE & DELETE =====================================================================================================
@@ -80,22 +81,22 @@ Character* VILLA_DeleteCharacter(Character* character) {
 
 
 // RENEW ===============================================================================================================
-bool VILLA_RenewCharacter(Character *character) {
+static bool VILLA_RenewCharacter_Src(const Character* character) {
+    float a = 0;
+    LOTRI_GetModelCZ(character->model, &a);
+    a = loop(0, a, M_PI * 2);
+    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_W]);
+    if (1 * M_PI_4 < a && a <= 3 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_A]);
+    if (3 * M_PI_4 < a && a <= 5 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_S]);
+    if (5 * M_PI_4 < a && a <= 7 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_D]);
+    return false;
+}
+bool VILLA_RenewCharacter(Character* character) {
     if (character == NULL) {
         printf("%s: character == NULL.\n", __func__);
         return false;
     }
-
-    float a = 0;
-    LOTRI_GetModelCZ(character->model, &a);
-    a = loop(0, a, M_PI * 2);
-    DEBUG_SendMessageR("%f, %.4f\n", M_PI_4, a);
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_W]);
-    else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_A]);
-    else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_S]);
-    else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_D]);
-
-
+    VILLA_RenewCharacter_Src(character);
     LOTRI_RenewModel(character->model);
     return true;
 }

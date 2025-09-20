@@ -3,6 +3,7 @@
 
 
 #include "villa.h"
+#include "room.h"
 
 
 typedef struct Character Character;
