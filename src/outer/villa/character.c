@@ -18,11 +18,20 @@ SDL_FRect direct2rect2[NUM_DIRECTS] = {
 
 struct Character {
     Model* model;
-    Room* room;
+    const Room* room;
     int x, y;
 };
 
+
 // SET & GET ===========================================================================================================
+bool VILLA_SetCharacterPosition(Character* character, const Room* room, const int x, const int y) {
+    if (character == NULL || VILLA_GetRoomCellEmpty(room, x, y) == false) return false;
+
+    character->room = room;
+    character->x = x;
+    character->y = y;
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================

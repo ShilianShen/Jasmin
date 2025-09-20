@@ -6,7 +6,8 @@
 
 
 Room* rootRoom = NULL;
-Character *characterBW = NULL, *characterOT = NULL;
+// Character *characterBW = NULL, *characterOT = NULL;
+Table characterTable = {0};
 
 
 typedef enum VILLA_Direct {
@@ -26,21 +27,44 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 
 bool VILLA_Init() {
     cJSON* room_json = getJson("../res/room/root_room.json");
-    cJSON* character_bw_json = getJson("../res/character/test_bw.json");
-    cJSON* character_ot_json = getJson("../res/character/test_ot.json");
+    cJSON* characterTable_json = getJson("../config/villa_character.json");
+    rootRoom = VILLA_CreateRoom(room_json);
     {
-        rootRoom = VILLA_CreateRoom(room_json);
-        characterBW = VILLA_CreateCharacter(character_bw_json);
-        characterOT = VILLA_CreateCharacter(character_ot_json);
-        if (rootRoom == NULL || characterBW == NULL || characterOT == NULL) {
+        characterTable.len = cJSON_GetArraySize(characterTable_json);
+        if (characterTable.len <= 0) {
+            printf("%s: characterTable.len <= 0.\n", __func__);
             return false;
         }
+
+        characterTable.kv = calloc(characterTable.len, sizeof(KeyVal));
+        if (characterTable.kv == NULL) {
+            printf("%s: characterTable.kv == NULL.\n", __func__);
+            return false;
+        }
+
+        for (int i = 0; i < characterTable.len; i++) {
+            const cJSON* character_json = cJSON_GetArrayItem(characterTable_json, i);
+            const char* key_json = character_json->string;
+
+            characterTable.kv[i].key = strdup(key_json);
+            if (characterTable.kv[i].key == NULL) {
+                printf("%s: characterTable.kv[i].key == NULL.\n", __func__);
+                return false;
+            }
+
+            characterTable.kv[i].val = VILLA_CreateCharacter(character_json);
+            if (characterTable.kv[i].val == NULL) {
+                printf("%s: characterTable.kv[i].val == NULL.\n", __func__);
+                return false;
+            }
+        }
+    }
+    if (rootRoom == NULL) {
+        return false;
     }
     cJSON_Delete(room_json);
-    cJSON_Delete(character_bw_json);
-    cJSON_Delete(character_ot_json);
+    cJSON_Delete(characterTable_json);
 
-    // LOTRI_SetModelPosition(modelArr[1], (Vec3f){-1, 1, 0});
     VILLA_InitRain();
     return true;
 }
@@ -75,23 +99,34 @@ static bool VILLA_Renew_Camera() {
     return true;
 }
 bool VILLA_Renew() {
+    VILLA_RenewRoom(rootRoom);
+    for (int i = 0; i < characterTable.len; i++) {
+        VILLA_RenewCharacter(characterTable.kv[i].val);
+    }
     return true
     && VILLA_RenewRoom(rootRoom)
-    && VILLA_RenewCharacter(characterBW)
-    && VILLA_RenewCharacter(characterOT)
     && VILLA_Renew_Camera()
     ;
 }
 bool VILLA_Draw() {
+    for (int i = 0; i < characterTable.len; i++) {
+        VILLA_DrawCharacter(characterTable.kv[i].val);
+    }
     return true
     && VILLA_DrawRoom(rootRoom)
-    && VILLA_DrawCharacter(characterBW)
-    && VILLA_DrawCharacter(characterOT)
     && VILLA_DrawRain()
     ;
 }
 void VILLA_Exit() {
     VILLA_DeleteRoom(rootRoom);
-    VILLA_DeleteCharacter(characterOT);
-    VILLA_DeleteCharacter(characterBW);
+    for (int i = 0; i < characterTable.len; i++) {
+        if (characterTable.kv[i].key != NULL) {
+            free(characterTable.kv[i].key);
+            characterTable.kv[i].key = NULL;
+        }
+        if (characterTable.kv[i].val != NULL) {
+            VILLA_DeleteCharacter(characterTable.kv[i].val);
+            characterTable.kv[i].val = NULL;
+        }
+    }
 }

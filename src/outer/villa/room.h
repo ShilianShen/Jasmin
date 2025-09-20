@@ -8,6 +8,7 @@
 typedef struct Room Room;
 
 
+bool VILLA_GetRoomCellEmpty(const Room* room, int x, int y);
 Room* VILLA_CreateRoom(const cJSON *room_json);
 Room* VILLA_DeleteRoom(Room *room);
 bool VILLA_RenewRoom(Room* room);

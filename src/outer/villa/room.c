@@ -10,13 +10,6 @@ const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
     [VILLA_DATA_WALL] = {0, 0, 0, 255},
 };
 typedef struct RoomCell RoomCell;
-struct RoomCell {
-    VILLA_DATA_TYPE dataType;
-    const void* dataPtr;
-    Vec3f worldPosition;
-    Vec3f cameraRotation;
-    Vec3f cameraPosition;
-};
 struct Room {
     Model* model;
     SDL_Surface* maskSur;
@@ -25,9 +18,24 @@ struct Room {
     int w, h;
     RoomCell** cells;
 };
+struct RoomCell {
+    VILLA_DATA_TYPE dataType;
+    const void* dataPtr;
+    Vec3f worldPosition;
+    Vec3f cameraRotation;
+    Vec3f cameraPosition;
+};
 
 
 // SET & GET ===========================================================================================================
+bool VILLA_GetRoomCellEmpty(const Room* room, const int x, const int y) {
+    return
+    room != NULL
+    && 0 <= x && x < room->w
+    && 0 <= y && y < room->h
+    && room->cells[x][y].dataType == VILLA_DATA_NONE
+    ;
+}
 
 
 // CREATE & DELETE =====================================================================================================
