@@ -103,7 +103,13 @@ bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
     return true;
 }
 
+bool LOTRI_GetModelWorldVertex(const Model* model, const int index, Vec3f* vec) {
+    if (model == NULL) return false;
+    if (index >= model->numVertices) return false;
 
+    *vec = model->worldVertices[index].xyz;
+    return true;
+}
 bool LOTRI_GetModelCZ(const Model* model, float* cz) {
     if (model == NULL || cz == NULL) return false;
 

@@ -104,14 +104,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
     }
     if (cJSON_ExistKey(elem_json, key = "gid")) {
-        if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->gid_rect) == false) {
+        if (cJSON_LoadFromObj(elem_json, key, JSM_FRECT, &elem->gid_rect) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }
         elem->gid = &elem->gid_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "src")) {
-        if (cJSON_LoadFromObj(elem_json, key, JSM_RECT, &elem->src_rect) == false) {
+        if (cJSON_LoadFromObj(elem_json, key, JSM_FRECT, &elem->src_rect) == false) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
         }

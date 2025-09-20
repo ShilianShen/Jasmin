@@ -12,6 +12,7 @@ typedef enum JSM_DATA_TYPE {
     JSM_FLOAT,
     JSM_STRING,
     JSM_BOOL,
+    JSM_FRECT,
     JSM_RECT,
     JSM_COLOR,
     JSM_NUM_TYPES

@@ -30,6 +30,7 @@ bool LOTRI_SetModelNormals(const Model* model, ModelSide side);
 bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
+bool LOTRI_GetModelWorldVertex(const Model* model, int index, Vec3f* vec);
 bool LOTRI_GetModelCZ(const Model* model, float* cz);
 bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src);
 

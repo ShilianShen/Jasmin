@@ -74,7 +74,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         }
     }
     if (cJSON_ExistKey(page_json, key = "src")) {
-        if (cJSON_LoadFromObj(page_json, key, JSM_RECT, &page->src_rect) == true) {
+        if (cJSON_LoadFromObj(page_json, key, JSM_FRECT, &page->src_rect) == true) {
             page->src = &page->src_rect;
         }
         else {

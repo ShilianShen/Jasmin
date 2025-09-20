@@ -104,7 +104,7 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DataType 
             }
             return false;
         }
-        case JSM_RECT: {
+        case JSM_FRECT: {
             if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
                 return false;
             }
@@ -122,6 +122,26 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DataType 
                 (float)rect_json[3]->valuedouble,
             };
             *(SDL_FRect*)target = rect;
+            return true;
+        }
+        case JSM_RECT: {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* rect_json[4];
+            for (int i = 0; i < 4; i++) {
+                rect_json[i] = cJSON_GetArrayItem(val, i);
+                if (rect_json[i] == NULL || cJSON_IsNumber(rect_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_Rect rect = {
+                rect_json[0]->valueint,
+                rect_json[1]->valueint,
+                rect_json[2]->valueint,
+                rect_json[3]->valueint,
+            };
+            *(SDL_Rect*)target = rect;
             return true;
         }
         case JSM_STRING: {

@@ -20,6 +20,9 @@ struct Character {
     Model* model;
 };
 
+// SET & GET ===========================================================================================================
+// bool VILLA_SetCharacterPosition(Character* character);
+
 
 // CREATE & DELETE =====================================================================================================
 static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* character_json) {
