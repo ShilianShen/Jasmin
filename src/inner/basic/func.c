@@ -176,6 +176,29 @@ bool cJSON_LoadFromObj(const cJSON* object, const char* key, const JSM_DataType 
 }
 
 
+bool GetSurfacePixel(SDL_Surface *surface, int x, int y, SDL_Color *outColor) {
+    if (!surface || !outColor) return false;
+    if (x < 0 || x >= surface->w || y < 0 || y >= surface->h) return false;
+
+    if (SDL_LockSurface(surface) < 0) return false;
+
+    const SDL_PixelFormatDetails *fmt = SDL_GetPixelFormatDetails(surface->format);
+    const SDL_Palette *palette = SDL_GetSurfacePalette(surface);
+
+    int bpp = fmt->bytes_per_pixel;
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    Uint32 pixelValue = 0;
+    memcpy(&pixelValue, p, bpp);  // 把实际的像素字节复制到低位
+
+    SDL_GetRGBA(pixelValue, fmt, palette,
+                &outColor->r, &outColor->g, &outColor->b, &outColor->a);
+
+    SDL_UnlockSurface(surface);
+    return true;
+}
+
+
 bool BASIC_Renew() {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
