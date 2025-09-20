@@ -1,6 +1,5 @@
-#ifndef CHARACTER_H
-#define CHARACTER_H
-
+#ifndef VILLA_CHARACTER_H
+#define VILLA_CHARACTER_H
 
 
 #include "villa.h"
@@ -9,10 +8,10 @@
 typedef struct Character Character;
 
 
-Character* VILLA_CreateCharacter(const cJSON* character);
-Character* VILLA_DeleteCharacter(const Character* character);
+Character* VILLA_CreateCharacter(const cJSON* character_json);
+Character* VILLA_DeleteCharacter(Character* character);
 bool VILLA_RenewCharacter(Character *character);
 bool VILLA_DrawCharacter(const Character *character);
 
 
-#endif //CHARACTER_H
+#endif //VILLA_CHARACTER_H

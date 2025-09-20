@@ -2,10 +2,11 @@
 
 #include "room.h"
 #include "weather.h"
+#include "character.h"
 
 
-Model* modelArr[2];
 Room* rootRoom = NULL;
+Character *characterBW, *characterOT;
 
 
 typedef enum VILLA_Direct {
@@ -54,56 +55,42 @@ void VILLA_Renew_Camera() {
 }
 bool VILLA_Init() {
     cJSON* room_json = getJson("../res/room/root_room.json");
-    rootRoom = VILLA_CreateRoom(room_json);
+    cJSON* character_bw_json = getJson("../res/character/test_bw.json");
+    cJSON* character_ot_json = getJson("../res/character/test_ot.json");
+    {
+        rootRoom = VILLA_CreateRoom(room_json);
+        characterBW = VILLA_CreateCharacter(character_bw_json);
+        characterOT = VILLA_CreateCharacter(character_ot_json);
+        if (rootRoom == NULL || characterBW == NULL || characterOT == NULL) {
+            return false;
+        }
+    }
     cJSON_Delete(room_json);
+    cJSON_Delete(character_bw_json);
+    cJSON_Delete(character_ot_json);
 
-    modelArr[0] = LOTRI_CreateModel(
-        "../res/model/character_bw/model.obj",
-        "../res/model/character_bw/material.mtl",
-        MODEL_SIDE_CAMERA
-        );
-    modelArr[1] = LOTRI_CreateModel(
-        "../res/model/character_ot/model.obj",
-        "../res/model/character_ot/material.mtl",
-        MODEL_SIDE_CAMERA
-        );
-    LOTRI_SetModelPosition(modelArr[1], (Vec3f){-1, 1, 0});
+    // LOTRI_SetModelPosition(modelArr[1], (Vec3f){-1, 1, 0});
     VILLA_InitRain();
     return true;
 }
 bool VILLA_Renew() {
-    for (int i = 0; i < len_of(modelArr); i++) {
-        LOTRI_RenewModel(modelArr[i]);
-    }
-    VILLA_Renew_Camera();
     VILLA_RenewRoom(rootRoom);
+    VILLA_RenewCharacter(characterBW);
+    VILLA_RenewCharacter(characterOT);
+
+    VILLA_Renew_Camera();
     return true;
 }
 bool VILLA_Draw() {
-    float a = 0;
-    LOTRI_GetModelCZ(modelArr[1], &a);
-    a = loop(0, a, M_PI * 2);
-    DEBUG_SendMessageR("%f, %.4f\n", M_PI_4, a);
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_W]);
-    else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_A]);
-    else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_S]);
-    else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[1], &direct2rect[DIRECT_D]);
-
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_W]);
-    else if (1 * M_PI_4 < a && a <= 3 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_A]);
-    else if (3 * M_PI_4 < a && a <= 5 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_S]);
-    else if (5 * M_PI_4 < a && a <= 7 * M_PI_4) LOTRI_SetModelSrc(modelArr[0], &direct2rect[DIRECT_D]);
-    for (int i = 0; i < len_of(modelArr); i++) {
-        LOTRI_DrawModel(modelArr[i]);
-    }
     VILLA_DrawRoom(rootRoom);
+    VILLA_DrawCharacter(characterBW);
+    VILLA_DrawCharacter(characterOT);
     return true
     && VILLA_DrawRain()
     ;
 }
 void VILLA_Exit() {
-    for (int i = 0; i < len_of(modelArr); i++) {
-        LOTRI_DestroyModel(modelArr[i]);
-    }
     VILLA_DeleteRoom(rootRoom);
+    VILLA_DeleteCharacter(characterOT);
+    VILLA_DeleteCharacter(characterBW);
 }
