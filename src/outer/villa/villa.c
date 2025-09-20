@@ -25,40 +25,60 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 };
 
 
+bool VILLA_CreateCharacterTable(const cJSON* characterTable_json) {
+    if (characterTable_json == NULL) {
+        printf("ERROR: characterTable_json == NULL.\n");
+        return false;
+    }
+
+    characterTable.len = cJSON_GetArraySize(characterTable_json);
+    if (characterTable.len <= 0) {
+        printf("%s: characterTable.len <= 0.\n", __func__);
+        return false;
+    }
+
+    characterTable.kv = calloc(characterTable.len, sizeof(KeyVal));
+    if (characterTable.kv == NULL) {
+        printf("%s: characterTable.kv == NULL.\n", __func__);
+        return false;
+    }
+
+    for (int i = 0; i < characterTable.len; i++) {
+        const cJSON* character_json = cJSON_GetArrayItem(characterTable_json, i);
+        const char* key_json = character_json->string;
+
+        characterTable.kv[i].key = strdup(key_json);
+        if (characterTable.kv[i].key == NULL) {
+            printf("%s: characterTable.kv[i].key == NULL.\n", __func__);
+            return false;
+        }
+
+        characterTable.kv[i].val = VILLA_CreateCharacter(character_json);
+        if (characterTable.kv[i].val == NULL) {
+            printf("%s: characterTable.kv[i].val == NULL.\n", __func__);
+            return false;
+        }
+    }
+    return true;
+}
+void VILLA_DeleteCharacterTable() {
+    for (int i = 0; i < characterTable.len; i++) {
+        if (characterTable.kv[i].key != NULL) {
+            free(characterTable.kv[i].key);
+            characterTable.kv[i].key = NULL;
+        }
+        if (characterTable.kv[i].val != NULL) {
+            VILLA_DeleteCharacter(characterTable.kv[i].val);
+            characterTable.kv[i].val = NULL;
+        }
+    }
+}
 bool VILLA_Init() {
     cJSON* room_json = getJson("../res/room/root_room.json");
     cJSON* characterTable_json = getJson("../config/villa_character.json");
     rootRoom = VILLA_CreateRoom(room_json);
-    {
-        characterTable.len = cJSON_GetArraySize(characterTable_json);
-        if (characterTable.len <= 0) {
-            printf("%s: characterTable.len <= 0.\n", __func__);
-            return false;
-        }
+    VILLA_CreateCharacterTable(characterTable_json);
 
-        characterTable.kv = calloc(characterTable.len, sizeof(KeyVal));
-        if (characterTable.kv == NULL) {
-            printf("%s: characterTable.kv == NULL.\n", __func__);
-            return false;
-        }
-
-        for (int i = 0; i < characterTable.len; i++) {
-            const cJSON* character_json = cJSON_GetArrayItem(characterTable_json, i);
-            const char* key_json = character_json->string;
-
-            characterTable.kv[i].key = strdup(key_json);
-            if (characterTable.kv[i].key == NULL) {
-                printf("%s: characterTable.kv[i].key == NULL.\n", __func__);
-                return false;
-            }
-
-            characterTable.kv[i].val = VILLA_CreateCharacter(character_json);
-            if (characterTable.kv[i].val == NULL) {
-                printf("%s: characterTable.kv[i].val == NULL.\n", __func__);
-                return false;
-            }
-        }
-    }
     if (rootRoom == NULL) {
         return false;
     }
@@ -118,15 +138,6 @@ bool VILLA_Draw() {
     ;
 }
 void VILLA_Exit() {
+    VILLA_DeleteCharacterTable();
     VILLA_DeleteRoom(rootRoom);
-    for (int i = 0; i < characterTable.len; i++) {
-        if (characterTable.kv[i].key != NULL) {
-            free(characterTable.kv[i].key);
-            characterTable.kv[i].key = NULL;
-        }
-        if (characterTable.kv[i].val != NULL) {
-            VILLA_DeleteCharacter(characterTable.kv[i].val);
-            characterTable.kv[i].val = NULL;
-        }
-    }
 }
