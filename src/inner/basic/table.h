@@ -11,12 +11,16 @@ typedef struct Table {
     KeyVal* kv;
 } Table;
 
+typedef void* (*CreateFunc)(const cJSON*);
+typedef void (*DestroyFunc)(void*);
+
+
 
 void* TABLE_GetValByKey(Table table, const char* key);
 const char* TABLE_GetKeyByVal(Table table, const void* val);
 
-bool BASIC_CreateTable(Table* table, const cJSON* table_json, void* (*create)(const cJSON*));
-void BASIC_DestroyTable(Table* table, void (*destroy)(void*));
+bool BASIC_CreateTable(Table* table, const cJSON* table_json, CreateFunc func);
+void BASIC_DeleteTable(Table* table, DestroyFunc func);
 
 
 #endif //TABLE_H

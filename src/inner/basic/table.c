@@ -23,7 +23,7 @@ const char* TABLE_GetKeyByVal(const Table table, const void* val) {
 
 
 // CREATE & DELETE =====================================================================================================
-bool BASIC_CreateTable(Table* table, const cJSON* table_json, void* (*create)(const cJSON*)) {
+bool BASIC_CreateTable(Table* table, const cJSON* table_json, const CreateFunc func) {
     if (table_json == NULL) {
         printf("%s: table_json == NULL.\n", __func__);
         return false;
@@ -36,29 +36,20 @@ bool BASIC_CreateTable(Table* table, const cJSON* table_json, void* (*create)(co
     }
 
     table->kv = calloc(table->len, sizeof(KeyVal));
-    if (table->kv == NULL) {
-        printf("%s: table->kv == NULL.\n", __func__);
-        return false;
-    }
+    if (table->kv == NULL) {printf("%s: table->kv == NULL.\n", __func__); return false;}
 
     for (int i = 0; i < table->len; i++) {
         const cJSON* keyval_json = cJSON_GetArrayItem(table_json, i);
 
         table->kv[i].key = strdup(keyval_json->string);
-        if (table->kv[i].key == NULL) {
-            printf("%s: table->kv[i].key == NULL.\n", __func__);
-            return false;
-        }
+        if (table->kv[i].key == NULL) {printf("%s: table->kv[i].key == NULL.\n", __func__); return false;}
 
-        table->kv[i].val = create(keyval_json);
-        if (table->kv[i].val == NULL) {
-            printf("%s: table->kv[i].val == NULL.\n", __func__);
-            return false;
-        }
+        table->kv[i].val = func(keyval_json);
+        if (table->kv[i].val == NULL) {printf("%s: table->kv[i].val == NULL.\n", __func__); return false;}
     }
     return true;
 }
-void BASIC_DestroyTable(Table* table, void (*destroy)(void*)) {
+void BASIC_DeleteTable(Table* table, const DestroyFunc func) {
     if (table->kv != NULL) {
         for (int i = 0; i < table->len; i++) {
             if (table->kv[i].key != NULL) {
@@ -67,7 +58,7 @@ void BASIC_DestroyTable(Table* table, void (*destroy)(void*)) {
             }
 
             if (table->kv[i].val != NULL) {
-                destroy(table->kv[i].val);
+                func(table->kv[i].val);
                 table->kv[i].val = NULL;
             }
         }

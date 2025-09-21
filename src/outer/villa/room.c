@@ -117,7 +117,8 @@ static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
 
     return true;
 }
-Room *VILLA_CreateRoom(const cJSON *room_json) {
+
+void *VILLA_CreateRoom(const cJSON *room_json) {
     if (room_json == NULL) {
         printf("%s: room_json == NULL\n", __func__);
         return NULL;
@@ -132,6 +133,10 @@ Room *VILLA_CreateRoom(const cJSON *room_json) {
         VILLA_DeleteRoom(room);
     }
     return room;
+}
+void VILLA_DestroyRoom_V(void* room_void) {
+    Room* room = room_void;
+    VILLA_DeleteRoom(room);
 }
 Room* VILLA_DeleteRoom(Room *room) {
     if (room != NULL) {

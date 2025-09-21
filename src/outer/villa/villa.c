@@ -5,9 +5,9 @@
 #include "character.h"
 
 
-Room* rootRoom = NULL;
 // Character *characterBW = NULL, *characterOT = NULL;
-Table characterTable = {0};
+Table characterTable;
+Table roomTable;
 
 
 typedef enum VILLA_Direct {
@@ -39,22 +39,19 @@ void VILLA_DeleteCharacterTable() {
     }
 }
 bool VILLA_Init() {
-    cJSON* room_json = getJson("../res/room/root_room.json");
     cJSON* characterTable_json = getJson("../config/villa_character.json");
-    rootRoom = VILLA_CreateRoom(room_json);
     BASIC_CreateTable(&characterTable, characterTable_json, VILLA_CreateCharacter);
-
-    if (rootRoom == NULL) {
-        return false;
-    }
-    cJSON_Delete(room_json);
     cJSON_Delete(characterTable_json);
+
+    cJSON* roomTable_json = getJson("../config/villa_room.json");
+    BASIC_CreateTable(&roomTable, roomTable_json, VILLA_CreateRoom);
+    cJSON_Delete(roomTable_json);
 
     VILLA_InitRain();
     return true;
 }
 static bool VILLA_Renew_Camera() {
-    static DelayVec3f smallRotate = {0}, bigRotate = {0, 0, 0};
+    static DelayVec3f smallRotate = {0}, bigRotate = {0};
     bigRotate.block = true;
     {
         const float angle = M_PI_4 * 0.5;
@@ -84,26 +81,28 @@ static bool VILLA_Renew_Camera() {
     return true;
 }
 bool VILLA_Renew() {
-    VILLA_RenewRoom(rootRoom);
+    for (int i = 0; i < roomTable.len; i++) {
+        VILLA_RenewRoom(roomTable.kv[i].val);
+    }
     for (int i = 0; i < characterTable.len; i++) {
         VILLA_RenewCharacter(characterTable.kv[i].val);
     }
     return true
-    && VILLA_RenewRoom(rootRoom)
     && VILLA_Renew_Camera()
     ;
 }
 bool VILLA_Draw() {
+    for (int i = 0; i < roomTable.len; i++) {
+        VILLA_DrawRoom(roomTable.kv[i].val);
+    }
     for (int i = 0; i < characterTable.len; i++) {
         VILLA_DrawCharacter(characterTable.kv[i].val);
     }
     return true
-    && VILLA_DrawRoom(rootRoom)
     && VILLA_DrawRain()
     ;
 }
 void VILLA_Exit() {
-    BASIC_DestroyTable(&characterTable, VILLA_DestroyCharacter_V);
-    // VILLA_DeleteCharacterTable();
-    VILLA_DeleteRoom(rootRoom);
+    BASIC_DeleteTable(&characterTable, VILLA_DestroyCharacter_V);
+    BASIC_DeleteTable(&roomTable, VILLA_DestroyRoom_V);
 }
