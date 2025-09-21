@@ -12,7 +12,9 @@ typedef struct Table {
 } Table;
 
 typedef void* (*CreateFunc)(const cJSON*);
-typedef void (*DestroyFunc)(void*);
+typedef bool (*RenewFunc)(void*);
+typedef bool (*DrawFunc)(const void*);
+typedef void (*DeleteFunc)(void*);
 
 
 
@@ -20,7 +22,9 @@ void* TABLE_GetValByKey(Table table, const char* key);
 const char* TABLE_GetKeyByVal(Table table, const void* val);
 
 bool BASIC_CreateTable(Table* table, const cJSON* table_json, CreateFunc func);
-void BASIC_DeleteTable(Table* table, DestroyFunc func);
+bool BASIC_RenewTable(const Table* table, RenewFunc func);
+bool BASIC_DrawTable(const Table* table, DrawFunc func);
+void BASIC_DeleteTable(Table* table, DeleteFunc func);
 
 
 #endif //TABLE_H

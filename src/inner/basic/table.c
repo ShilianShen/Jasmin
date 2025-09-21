@@ -49,7 +49,37 @@ bool BASIC_CreateTable(Table* table, const cJSON* table_json, const CreateFunc f
     }
     return true;
 }
-void BASIC_DeleteTable(Table* table, const DestroyFunc func) {
+bool BASIC_RenewTable(const Table* table, const RenewFunc func) {
+    if (table == NULL || func == NULL) {
+        printf("%s: table == NULL || func == NULL.\n", __func__);
+        return false;
+    }
+
+    for (int i = 0; i < table->len; i++) {
+        if (func(table->kv[i].val) == false) {
+            printf("%s: func(table->kv[i].val) == false.\n", __func__);
+            return false;
+        }
+    }
+
+    return true;
+}
+bool BASIC_DrawTable(const Table* table, const DrawFunc func) {
+    if (table == NULL || func == NULL) {
+        printf("%s: table == NULL || func == NULL.\n", __func__);
+        return false;
+    }
+
+    for (int i = 0; i < table->len; i++) {
+        if (func(table->kv[i].val) == false) {
+            printf("%s: func(table->kv[i].val) == false.\n", __func__);
+            return false;
+        }
+    }
+
+    return true;
+}
+void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
     if (table->kv != NULL) {
         for (int i = 0; i < table->len; i++) {
             if (table->kv[i].key != NULL) {

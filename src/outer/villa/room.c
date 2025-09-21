@@ -117,7 +117,6 @@ static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
 
     return true;
 }
-
 void *VILLA_CreateRoom(const cJSON *room_json) {
     if (room_json == NULL) {
         printf("%s: room_json == NULL\n", __func__);
@@ -163,7 +162,8 @@ Room* VILLA_DeleteRoom(Room *room) {
 
 
 // RENEW ===============================================================================================================
-bool VILLA_RenewRoom(Room* room) {
+bool VILLA_RenewRoom(void *room_void) {
+    Room* room = room_void;
     SDL_SetRenderTarget(renderer, room->maskTex);
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
@@ -179,7 +179,8 @@ bool VILLA_RenewRoom(Room* room) {
 
 
 // DRAW ================================================================================================================
-bool VILLA_DrawRoom(const Room *room) {
+bool VILLA_DrawRoom(const void *room_void) {
+    const Room* room = room_void;
     LOTRI_DrawModel(room->model);
     Vec3f vec3s[4];
     LOTRI_GetModelWorldVertex(room->model, room->mask_indices.x, &vec3s[0]);

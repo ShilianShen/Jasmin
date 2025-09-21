@@ -1,6 +1,7 @@
 #include "character.h"
 
 
+
 typedef enum VILLA_Direct {
     DIRECT_W,
     DIRECT_A,
@@ -108,7 +109,8 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     if (5 * M_PI_4 < a && a <= 7 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_D]);
     return false;
 }
-bool VILLA_RenewCharacter(Character* character) {
+bool VILLA_RenewCharacter(void *character_void) {
+    Character* character = character_void;
     if (character == NULL) {
         printf("%s: character == NULL.\n", __func__);
         return false;
@@ -120,7 +122,8 @@ bool VILLA_RenewCharacter(Character* character) {
 
 
 // DRAW ================================================================================================================
-bool VILLA_DrawCharacter(const Character *character) {
+bool VILLA_DrawCharacter(const void *character_void) {
+    const Character* character = (Character*)character_void;
     if (character == NULL) {
         printf("%s: character == NULL.\n", __func__);
         return false;

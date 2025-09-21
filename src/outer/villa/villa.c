@@ -5,7 +5,8 @@
 #include "character.h"
 
 
-// Character *characterBW = NULL, *characterOT = NULL;
+const char CHARACTER_TABLE_JSON_FILE[] = "../config/villa_character.json";
+const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
 Table characterTable;
 Table roomTable;
 
@@ -25,25 +26,12 @@ SDL_FRect direct2rect[NUM_DIRECTS] = {
 };
 
 
-
-void VILLA_DeleteCharacterTable() {
-    for (int i = 0; i < characterTable.len; i++) {
-        if (characterTable.kv[i].key != NULL) {
-            free(characterTable.kv[i].key);
-            characterTable.kv[i].key = NULL;
-        }
-        if (characterTable.kv[i].val != NULL) {
-            VILLA_DestroyCharacter(characterTable.kv[i].val);
-            characterTable.kv[i].val = NULL;
-        }
-    }
-}
 bool VILLA_Init() {
-    cJSON* characterTable_json = getJson("../config/villa_character.json");
+    cJSON* characterTable_json = getJson(CHARACTER_TABLE_JSON_FILE);
     BASIC_CreateTable(&characterTable, characterTable_json, VILLA_CreateCharacter);
     cJSON_Delete(characterTable_json);
 
-    cJSON* roomTable_json = getJson("../config/villa_room.json");
+    cJSON* roomTable_json = getJson(ROOM_TABLE_JSON_FILE);
     BASIC_CreateTable(&roomTable, roomTable_json, VILLA_CreateRoom);
     cJSON_Delete(roomTable_json);
 
@@ -81,24 +69,16 @@ static bool VILLA_Renew_Camera() {
     return true;
 }
 bool VILLA_Renew() {
-    for (int i = 0; i < roomTable.len; i++) {
-        VILLA_RenewRoom(roomTable.kv[i].val);
-    }
-    for (int i = 0; i < characterTable.len; i++) {
-        VILLA_RenewCharacter(characterTable.kv[i].val);
-    }
     return true
+    && BASIC_RenewTable(&roomTable, VILLA_RenewRoom)
+    && BASIC_RenewTable(&characterTable, VILLA_RenewCharacter)
     && VILLA_Renew_Camera()
     ;
 }
 bool VILLA_Draw() {
-    for (int i = 0; i < roomTable.len; i++) {
-        VILLA_DrawRoom(roomTable.kv[i].val);
-    }
-    for (int i = 0; i < characterTable.len; i++) {
-        VILLA_DrawCharacter(characterTable.kv[i].val);
-    }
     return true
+    && BASIC_DrawTable(&roomTable, VILLA_DrawRoom)
+    && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
     && VILLA_DrawRain()
     ;
 }
