@@ -63,7 +63,8 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
 
 	return true;
 }
-Character* VILLA_CreateCharacter(const cJSON* character_json) {
+
+void *VILLA_CreateCharacter(const cJSON *character_json) {
     if (character_json == NULL) {
         printf("%s: character_json == NULL.\n", __func__);
         return NULL;
@@ -75,17 +76,24 @@ Character* VILLA_CreateCharacter(const cJSON* character_json) {
     }
     if (VILLA_CreateCharacter_RK(character, character_json) == false) {
     	printf("%s: VILLA_CreateCharacter_RK failed.\n", __func__);
-        VILLA_DeleteCharacter(character);
+        VILLA_DestroyCharacter(character);
     }
     return character;
 }
-Character* VILLA_DeleteCharacter(Character* character) {
+void VILLA_DestroyCharacter_V(void* character_void) {
+    Character* character = character_void;
+    if (character != NULL) {
+        LOTRI_DestroyModel(character->model);
+        character->model = NULL;
+        free(character);
+    }
+}
+void VILLA_DestroyCharacter(Character *character) {
   	if (character != NULL) {
   	    LOTRI_DestroyModel(character->model);
   	    character->model = NULL;
         free(character);
   	}
-    return NULL;
 }
 
 

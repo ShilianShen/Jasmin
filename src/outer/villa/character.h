@@ -9,8 +9,9 @@
 typedef struct Character Character;
 
 
-Character* VILLA_CreateCharacter(const cJSON* character_json);
-Character* VILLA_DeleteCharacter(Character* character);
+void *VILLA_CreateCharacter(const cJSON *character_json);
+void VILLA_DestroyCharacter_V(void *character);
+void VILLA_DestroyCharacter(Character *character);
 bool VILLA_RenewCharacter(Character *character);
 bool VILLA_DrawCharacter(const Character *character);
 
