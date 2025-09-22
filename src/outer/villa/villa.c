@@ -25,8 +25,8 @@ bool VILLA_Init() {
     BASIC_CreateTable(&roomTable, roomTable_json, VILLA_CreateRoom);
     cJSON_Delete(roomTable_json);
 
-    VILLA_SetCharacterPosition(characterTable.kv[0].val, roomTable.kv[0].val, 3, 0);
-    VILLA_SetCharacterPosition(characterTable.kv[1].val, roomTable.kv[0].val, 0, 3);
+    VILLA_SetCharacterPosition(characterTable.kv[0].val, (Coord){roomTable.kv[0].val, 3, 0});
+    VILLA_SetCharacterPosition(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 0, 3});
 
     you = characterTable.kv[1].val;
 
@@ -66,10 +66,10 @@ static bool VILLA_Renew_Camera() {
 static bool VILLA_Renew_You() {
     if (you == NULL) return false;
 
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, DIRECT_W);
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, DIRECT_A);
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, DIRECT_S);
-    if (DEVICE_GetKeyPress(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, DIRECT_D);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_W);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_A);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_S);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_D);
     return true;
 }
 bool VILLA_Renew() {

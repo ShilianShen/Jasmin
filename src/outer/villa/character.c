@@ -3,40 +3,37 @@
 
 
 
-SDL_FRect direct2rect2[NUM_DIRECTS] = {
-    [DIRECT_W] = {0, 0, 0.25f, 0.25f},
-    [DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
-    [DIRECT_A] = {0, 0.5f, 0.25f, 0.25f},
-    [DIRECT_D] = {0, 0.75f, 0.25f, 0.25f},
+SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
+    [VILLA_DIRECT_W] = {0, 0, 0.25f, 0.25f},
+    [VILLA_DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
+    [VILLA_DIRECT_A] = {0, 0.5f, 0.25f, 0.25f},
+    [VILLA_DIRECT_D] = {0, 0.75f, 0.25f, 0.25f},
 };
 struct Character {
     Model* model;
-    const Room* room;
-    int x, y;
+    Coord coord;
 };
 
 
 // SET & GET ===========================================================================================================
-bool VILLA_SetCharacterPosition(Character* character, const Room* room, const int x, const int y) {
-    if (character == NULL || VILLA_GetRoomCellEmpty(room, x, y) == false) return false;
+bool VILLA_SetCharacterPosition(Character* character, const Coord coord) {
+    if (character == NULL || VILLA_GetRoomCellEmpty(coord) == false) return false;
 
-    character->room = room;
-    character->x = x;
-    character->y = y;
+    character->coord = coord;
     return true;
 }
 bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
     if (character == NULL) return false;
 
-    int x = character->x, y = character->y;
+    Coord coord = character->coord;
     switch (direct) {
-        case DIRECT_W: y--; break;
-        case DIRECT_A: x--; break;
-        case DIRECT_S: y++; break;
-        case DIRECT_D: x++; break;
+        case VILLA_DIRECT_W: coord.y--; break;
+        case VILLA_DIRECT_A: coord.x--; break;
+        case VILLA_DIRECT_S: coord.y++; break;
+        case VILLA_DIRECT_D: coord.x++; break;
         default: return false;
     }
-    VILLA_SetCharacterPosition(character, character->room, x, y);
+    VILLA_SetCharacterPosition(character, coord);
     return true;
 }
 
@@ -101,10 +98,10 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     float a = 0;
     LOTRI_GetModelCZ(character->model, &a);
     a = loop(0, a, M_PI * 2);
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_W]);
-    if (1 * M_PI_4 < a && a <= 3 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_A]);
-    if (3 * M_PI_4 < a && a <= 5 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_S]);
-    if (5 * M_PI_4 < a && a <= 7 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[DIRECT_D]);
+    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_W]);
+    if (1 * M_PI_4 < a && a <= 3 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_A]);
+    if (3 * M_PI_4 < a && a <= 5 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_S]);
+    if (5 * M_PI_4 < a && a <= 7 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_D]);
     return false;
 }
 bool VILLA_RenewCharacter(void *character_void) {
@@ -117,9 +114,9 @@ bool VILLA_RenewCharacter(void *character_void) {
     VILLA_RenewCharacter_Src(character);
 
     Vec3f position = {0};
-    if (character->room != NULL) {
-        if (VILLA_GetRoomCellPosition(character->room, character->x, character->y, &position) == false) {
-            printf("%s: failed in %d\n", __func__, character->x);
+    if (character->coord.room != NULL) {
+        if (VILLA_GetRoomCellPosition(character->coord, &position) == false) {
+            printf("%s: failed in \n", __func__);
             return false;
         }
         LOTRI_SetModelPosition(character->model, position);

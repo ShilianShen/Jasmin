@@ -7,17 +7,17 @@
 
 
 typedef enum VILLA_Direct {
-    DIRECT_W,
-    DIRECT_A,
-    DIRECT_S,
-    DIRECT_D,
-    NUM_DIRECTS,
+    VILLA_DIRECT_W,
+    VILLA_DIRECT_A,
+    VILLA_DIRECT_S,
+    VILLA_DIRECT_D,
+    VILLA_NUM_DIRECTS,
 } VILLA_Direct;
 
 
 typedef struct Character Character;
 
-bool VILLA_SetCharacterPosition(Character* character, const Room* room, int x, int y);
+bool VILLA_SetCharacterPosition(Character* character, Coord coord);
 bool VILLA_SetCharacterMove(Character* character, VILLA_Direct direct);
 void *VILLA_CreateCharacter(const cJSON *character_json);
 void VILLA_DeleteCharacter(void *character_void);

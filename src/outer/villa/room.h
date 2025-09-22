@@ -6,10 +6,15 @@
 
 
 typedef struct Room Room;
+typedef struct Coord Coord;
+struct Coord {
+    Room *room;
+    int x, y;
+};
 
 
-bool VILLA_GetRoomCellEmpty(const Room* room, int x, int y);
-bool VILLA_GetRoomCellPosition(const Room* room, int x, int y, Vec3f* position);
+bool VILLA_GetRoomCellEmpty(Coord coord);
+bool VILLA_GetRoomCellPosition(Coord coord, Vec3f* position);
 
 void *VILLA_CreateRoom(const cJSON *room_json);
 void VILLA_DestroyRoom_V(void* room_void);

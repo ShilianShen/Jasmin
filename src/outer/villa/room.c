@@ -25,17 +25,18 @@ struct RoomCell {
 };
 
 
+
 // SET & GET ===========================================================================================================
-bool VILLA_GetRoomCellEmpty(const Room* room, const int x, const int y) {
+bool VILLA_GetRoomCellEmpty(const Coord coord) {
     return
-    room != NULL
-    && 0 <= x && x < room->w
-    && 0 <= y && y < room->h
-    && room->cells[x][y].dataType == VILLA_DATA_NONE
+    coord.room != NULL
+    && 0 <= coord.x && coord.x < coord.room->w
+    && 0 <= coord.y && coord.y < coord.room->h
+    && coord.room->cells[coord.x][coord.y].dataType == VILLA_DATA_NONE
     ;
 }
-bool VILLA_GetRoomCellPosition(const Room* room, const int x, const int y, Vec3f* position) {
-    if (room == NULL) {
+bool VILLA_GetRoomCellPosition(const Coord coord, Vec3f* position) {
+    if (coord.room == NULL) {
         printf("%s: room == NULL.\n", __func__);
         return false;
     }
@@ -43,11 +44,11 @@ bool VILLA_GetRoomCellPosition(const Room* room, const int x, const int y, Vec3f
         printf("%s: position == NULL.\n", __func__);
         return false;
     }
-    if (0 <= x && x < room->w && 0 <= y && y < room->h == false) {
+    if (0 <= coord.x && coord.x < coord.room->w && 0 <= coord.y && coord.y < coord.room->h == false) {
         printf("%s: 0 <= x && x < room->w && 0 <= y && y < room->h == false.\n", __func__);
         return false;
     }
-    *position = room->cells[x][y].worldPosition;
+    *position = coord.room->cells[coord.x][coord.y].worldPosition;
     return true;
 }
 
