@@ -2,7 +2,7 @@
 #define JASMIN_MENU_INTERFACE_H
 
 
-#include "../_outer.h"
+#include "../device/device.h"
 #define TEMPO_DEFAULT_MENU_JSON "../config/tempo_menu.json"
 #define TEMPO_DEFAULT_THEME_JSON "../config/tempo_theme.json"
 #define TEMPO_OFEN_RELOAD 0

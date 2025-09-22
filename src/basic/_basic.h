@@ -2,7 +2,7 @@
 #define JASMIN_BASIC_INTERFACE_H
 
 #define len_of(x) (sizeof(x) / sizeof((x)[0]))
-#include "../_inner.h"
+#include "../third_party/third_party.h"
 
 
 typedef enum JSM_DATA_TYPE {

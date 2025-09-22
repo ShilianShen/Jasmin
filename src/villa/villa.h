@@ -2,7 +2,8 @@
 #define VILLA_H
 
 
-#include "../../inner/inner.h"
+#include "../device/device.h"
+#include "../tempo/tempo.h"
 #include "../lotri/lotri.h"
 
 

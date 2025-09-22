@@ -2,8 +2,16 @@
 #define INCLUDE_JASMIN_H
 
 
-#include "../../src/inner/inner.h"
-#include "../../src/outer/outer.h"
+#include "../../src/third_party/third_party.h"
+
+#include "../../src/basic/basic.h"
+#include "../../src/debug/debug.h"
+#include "../../src/device/device.h"
+
+#include "../../src/tempo/tempo.h"
+#include "../../src/lotri/lotri.h"
+#include "../../src/villa/villa.h"
+
 
 
 #endif //INCLUDE_JASMIN_H

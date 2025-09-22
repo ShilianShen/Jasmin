@@ -2,7 +2,6 @@
 
 
 
-
 SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
     [VILLA_DIRECT_W] = {0, 0, 0.25f, 0.25f},
     [VILLA_DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
@@ -12,11 +11,12 @@ SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
 struct Character {
     Model* model;
     Coord coord;
+    DelayVec3f delay;
 };
 
 
 // SET & GET ===========================================================================================================
-bool VILLA_SetCharacterPosition(Character* character, const Coord coord) {
+bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     if (character == NULL || VILLA_GetRoomCellEmpty(coord) == false) return false;
 
     character->coord = coord;
@@ -33,7 +33,7 @@ bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
         case VILLA_DIRECT_D: coord.x++; break;
         default: return false;
     }
-    VILLA_SetCharacterPosition(character, coord);
+    VILLA_SetCharacterCoord(character, coord);
     return true;
 }
 
@@ -64,6 +64,8 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
         printf("%s: character->model == NULL\n", __func__);
         return false;
     }
+
+    character->delay.block = true;
 
 	return true;
 }
@@ -119,7 +121,8 @@ bool VILLA_RenewCharacter(void *character_void) {
             printf("%s: failed in \n", __func__);
             return false;
         }
-        LOTRI_SetModelPosition(character->model, position);
+        LOTRI_SetDelayVec(&character->delay, position, 0.9f);
+        LOTRI_SetModelPosition(character->model, LOTRI_GetDelayVecVec(character->delay));
     }
     LOTRI_RenewModel(character->model);
     return true;

@@ -17,7 +17,7 @@ typedef enum VILLA_Direct {
 
 typedef struct Character Character;
 
-bool VILLA_SetCharacterPosition(Character* character, Coord coord);
+bool VILLA_SetCharacterCoord(Character* character, Coord coord);
 bool VILLA_SetCharacterMove(Character* character, VILLA_Direct direct);
 void *VILLA_CreateCharacter(const cJSON *character_json);
 void VILLA_DeleteCharacter(void *character_void);

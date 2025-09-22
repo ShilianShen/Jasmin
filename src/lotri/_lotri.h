@@ -2,7 +2,7 @@
 #define _LOTRI_H
 
 
-#include "../_outer.h"
+#include "../device/device.h"
 
 
 bool LOTRI_Init();

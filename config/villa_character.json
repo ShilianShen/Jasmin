@@ -5,6 +5,6 @@
   },
   "test_ot": {
     "model": "../res/model/character_ot/model.obj",
-    "material": "../res/model/character_ot/material.mtl"
+    "material": "../res/model/character_bw/material.mtl"
   }
 }
