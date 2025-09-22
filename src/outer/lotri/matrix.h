@@ -6,36 +6,14 @@
 
 
 // VEC =================================================================================================================
-typedef union {struct {float x, y, z, w;} v; float arr[4];} Vec4f;
-typedef union {struct {float x, y, z;} v; float arr[3];} Vec3f;
-typedef union {struct {float x, y;} v; float arr[2];} Vec2f;
-typedef union {struct {int i, j, k;} v; int arr[3];} Vec3i;
 typedef struct {float t1, t2; Vec3f v1, v2; AtvFunc func; bool block;} DelayVec3f;
-
-
-Vec3f LOTRI_GetNormal(Vec3f A, Vec3f B, Vec3f C);
-Vec3f LOTRI_GetSum(Vec3f A, Vec3f B, Vec3f C);
-float LOTRI_GetDot(Vec3f A, Vec3f B);
-
-
 Vec3f LOTRI_GetDelayVecVec(DelayVec3f delay);
 bool LOTRI_SetDelayVec(DelayVec3f* delay, Vec3f v2, float time);
 
 
-const char* LOTRI_GetStrVec3f(Vec3f vec);
-
 
 // MAT =================================================================================================================
-typedef struct {float m[4][4];} Mat4f;
 
-
-Mat4f LOTRI_GetMatXMat(Mat4f A, Mat4f B);
-Mat4f LOTRI_GetProd(int N, const Mat4f matArray[]);
-Mat4f LOTRI_GetMatR(Vec3f vec);
-Mat4f LOTRI_GetInvR(Vec3f vec);
-Mat4f LOTRI_GetMatS(Vec3f vec);
-Mat4f LOTRI_GetMatT(Vec3f vec);
-Mat4f LOTRI_GetInvT(Vec3f vec);
 
 
 // VERTEX & FACE =======================================================================================================

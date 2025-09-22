@@ -9,6 +9,7 @@
 #include "table.h"
 #include "trigger.h"
 #include "env.h"
+#include "matrix.h"
 
 
 #endif //JASMIN_BASIC_H

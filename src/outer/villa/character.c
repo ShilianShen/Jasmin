@@ -2,21 +2,13 @@
 
 
 
-typedef enum VILLA_Direct {
-    DIRECT_W,
-    DIRECT_A,
-    DIRECT_S,
-    DIRECT_D,
-    NUM_DIRECTS,
-} VILLA_Direct;
+
 SDL_FRect direct2rect2[NUM_DIRECTS] = {
     [DIRECT_W] = {0, 0, 0.25f, 0.25f},
     [DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
     [DIRECT_A] = {0, 0.5f, 0.25f, 0.25f},
     [DIRECT_D] = {0, 0.75f, 0.25f, 0.25f},
 };
-
-
 struct Character {
     Model* model;
     const Room* room;
@@ -31,6 +23,20 @@ bool VILLA_SetCharacterPosition(Character* character, const Room* room, const in
     character->room = room;
     character->x = x;
     character->y = y;
+    return true;
+}
+bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
+    if (character == NULL) return false;
+
+    int x = character->x, y = character->y;
+    switch (direct) {
+        case DIRECT_W: y--; break;
+        case DIRECT_A: x--; break;
+        case DIRECT_S: y++; break;
+        case DIRECT_D: x++; break;
+        default: return false;
+    }
+    VILLA_SetCharacterPosition(character, character->room, x, y);
     return true;
 }
 
@@ -64,8 +70,7 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
 
 	return true;
 }
-
-void *VILLA_CreateCharacter(const cJSON *character_json) {
+void*VILLA_CreateCharacter(const cJSON *character_json) {
     if (character_json == NULL) {
         printf("%s: character_json == NULL.\n", __func__);
         return NULL;
@@ -77,19 +82,12 @@ void *VILLA_CreateCharacter(const cJSON *character_json) {
     }
     if (VILLA_CreateCharacter_RK(character, character_json) == false) {
     	printf("%s: VILLA_CreateCharacter_RK failed.\n", __func__);
-        VILLA_DestroyCharacter(character);
+        VILLA_DeleteCharacter(character);
     }
     return character;
 }
-void VILLA_DestroyCharacter_V(void* character_void) {
+void VILLA_DeleteCharacter(void *character_void) {
     Character* character = character_void;
-    if (character != NULL) {
-        LOTRI_DestroyModel(character->model);
-        character->model = NULL;
-        free(character);
-    }
-}
-void VILLA_DestroyCharacter(Character *character) {
   	if (character != NULL) {
   	    LOTRI_DestroyModel(character->model);
   	    character->model = NULL;
@@ -115,7 +113,17 @@ bool VILLA_RenewCharacter(void *character_void) {
         printf("%s: character == NULL.\n", __func__);
         return false;
     }
+
     VILLA_RenewCharacter_Src(character);
+
+    Vec3f position = {0};
+    if (character->room != NULL) {
+        if (VILLA_GetRoomCellPosition(character->room, character->x, character->y, &position) == false) {
+            printf("%s: failed in %d\n", __func__, character->x);
+            return false;
+        }
+        LOTRI_SetModelPosition(character->model, position);
+    }
     LOTRI_RenewModel(character->model);
     return true;
 }

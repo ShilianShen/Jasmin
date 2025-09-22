@@ -25,6 +25,7 @@ bool BASIC_CreateTable(Table* table, const cJSON* table_json, CreateFunc func);
 bool BASIC_RenewTable(const Table* table, RenewFunc func);
 bool BASIC_DrawTable(const Table* table, DrawFunc func);
 void BASIC_DeleteTable(Table* table, DeleteFunc func);
+void BASIC_PrintTable(const Table* table);
 
 
 #endif //TABLE_H

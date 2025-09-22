@@ -33,12 +33,12 @@ bool LOTRI_RenewCamera() {
     LOTRI_RenewCamera_Proj();
 
     const Mat4f matArr[] = {
-        LOTRI_GetInvT(camera.position),
-        LOTRI_GetInvR(camera.rotation),
-        LOTRI_GetMatS(camera.scale),
+        BASIC_GetInvT(camera.position),
+        BASIC_GetInvR(camera.rotation),
+        BASIC_GetMatS(camera.scale),
         matProj,
     };
-    camera.mat = LOTRI_GetProd(len_of(matArr), matArr);
+    camera.mat = BASIC_GetProd(len_of(matArr), matArr);
     return true;
 }
 
@@ -46,7 +46,7 @@ bool LOTRI_RenewCamera() {
 // DRAW ================================================================================================================
 bool LOTRI_DrawCamera() {
     DEBUG_SendMessageL("%s\n", __func__);
-    DEBUG_SendMessageL(".position: %s\n", LOTRI_GetStrVec3f(camera.position));
-    DEBUG_SendMessageL(".rotation: %s\n", LOTRI_GetStrVec3f(camera.rotation));
+    DEBUG_SendMessageL(".position: %s\n", BASIC_GetStrVec3f(camera.position));
+    DEBUG_SendMessageL(".rotation: %s\n", BASIC_GetStrVec3f(camera.rotation));
     return true;
 }

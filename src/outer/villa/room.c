@@ -1,7 +1,5 @@
 #include "room.h"
 
-#include "character.h"
-
 
 const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
     [VILLA_DATA_NONE] = {255, 255, 255, 255},
@@ -35,6 +33,22 @@ bool VILLA_GetRoomCellEmpty(const Room* room, const int x, const int y) {
     && 0 <= y && y < room->h
     && room->cells[x][y].dataType == VILLA_DATA_NONE
     ;
+}
+bool VILLA_GetRoomCellPosition(const Room* room, const int x, const int y, Vec3f* position) {
+    if (room == NULL) {
+        printf("%s: room == NULL.\n", __func__);
+        return false;
+    }
+    if (position == NULL) {
+        printf("%s: position == NULL.\n", __func__);
+        return false;
+    }
+    if (0 <= x && x < room->w && 0 <= y && y < room->h == false) {
+        printf("%s: 0 <= x && x < room->w && 0 <= y && y < room->h == false.\n", __func__);
+        return false;
+    }
+    *position = room->cells[x][y].worldPosition;
+    return true;
 }
 
 
@@ -137,7 +151,8 @@ void VILLA_DestroyRoom_V(void* room_void) {
     Room* room = room_void;
     VILLA_DeleteRoom(room);
 }
-Room* VILLA_DeleteRoom(Room *room) {
+void VILLA_DeleteRoom(void *room_void) {
+    Room* room = room_void;
     if (room != NULL) {
         if (room->model != NULL) {
             LOTRI_DestroyModel(room->model);
@@ -157,23 +172,40 @@ Room* VILLA_DeleteRoom(Room *room) {
         free(room);
         room = NULL;
     }
-    return NULL;
 }
 
 
 // RENEW ===============================================================================================================
-bool VILLA_RenewRoom(void *room_void) {
-    Room* room = room_void;
+static bool VILLA_RenewRoomCells(Room* room) {
+    const int a = room->mask_indices.x, b = room->mask_indices.y, c = room->mask_indices.h;
+    Vec3f A, B, C;
+    LOTRI_GetModelModelVertex(room->model, a, &A);
+    LOTRI_GetModelModelVertex(room->model, b, &B);
+    LOTRI_GetModelModelVertex(room->model, c, &C);
+
     SDL_SetRenderTarget(renderer, room->maskTex);
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
-            const RoomCell cell = room->cells[i][j];
-            SDL_SetRenderSDLColor(renderer, colors[cell.dataType]);
+            RoomCell* cell = &room->cells[i][j];
+            SDL_SetRenderSDLColor(renderer, colors[cell->dataType]);
             SDL_RenderPoint(renderer, (float)i, (float)j);
+
+
+            for (int k = 0; k < 3; k++) {
+                cell->worldPosition.arr[k]
+                = A.arr[k]
+                + (B.arr[k] - A.arr[k]) * ((float)i + 0.5f) / (float)room->w
+                + (C.arr[k] - A.arr[k]) * ((float)j + 0.5f) / (float)room->h;
+            }
         }
     }
     SDL_SetRenderTarget(renderer, NULL);
+    return true;
+}
+bool VILLA_RenewRoom(void *room_void) {
+    Room* room = room_void;
     LOTRI_RenewModel(room->model);
+    VILLA_RenewRoomCells(room);
     return true;
 }
 
@@ -206,5 +238,4 @@ bool VILLA_DrawRoom(const void *room_void) {
     }
     return true;
 }
-
 

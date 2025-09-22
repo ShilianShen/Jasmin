@@ -7,23 +7,13 @@
 
 const char CHARACTER_TABLE_JSON_FILE[] = "../config/villa_character.json";
 const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
+
+
 Table characterTable;
 Table roomTable;
 
 
-typedef enum VILLA_Direct {
-    DIRECT_W,
-    DIRECT_A,
-    DIRECT_S,
-    DIRECT_D,
-    NUM_DIRECTS,
-} VILLA_Direct;
-SDL_FRect direct2rect[NUM_DIRECTS] = {
-    [DIRECT_W] = {0, 0, 0.25f, 0.25f},
-    [DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
-    [DIRECT_A] = {0, 0.5f, 0.25f, 0.25f},
-    [DIRECT_D] = {0, 0.75f, 0.25f, 0.25f},
-};
+Character* you = NULL;
 
 
 bool VILLA_Init() {
@@ -34,6 +24,11 @@ bool VILLA_Init() {
     cJSON* roomTable_json = getJson(ROOM_TABLE_JSON_FILE);
     BASIC_CreateTable(&roomTable, roomTable_json, VILLA_CreateRoom);
     cJSON_Delete(roomTable_json);
+
+    VILLA_SetCharacterPosition(characterTable.kv[0].val, roomTable.kv[0].val, 3, 0);
+    VILLA_SetCharacterPosition(characterTable.kv[1].val, roomTable.kv[0].val, 0, 3);
+
+    you = characterTable.kv[1].val;
 
     VILLA_InitRain();
     return true;
@@ -68,8 +63,18 @@ static bool VILLA_Renew_Camera() {
     LOTRI_SetCamera(rotate);
     return true;
 }
+static bool VILLA_Renew_You() {
+    if (you == NULL) return false;
+
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, DIRECT_W);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, DIRECT_A);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, DIRECT_S);
+    if (DEVICE_GetKeyPress(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, DIRECT_D);
+    return true;
+}
 bool VILLA_Renew() {
     return true
+    && VILLA_Renew_You()
     && BASIC_RenewTable(&roomTable, VILLA_RenewRoom)
     && BASIC_RenewTable(&characterTable, VILLA_RenewCharacter)
     && VILLA_Renew_Camera()
@@ -83,6 +88,6 @@ bool VILLA_Draw() {
     ;
 }
 void VILLA_Exit() {
-    BASIC_DeleteTable(&characterTable, VILLA_DestroyCharacter_V);
+    BASIC_DeleteTable(&characterTable, VILLA_DeleteCharacter);
     BASIC_DeleteTable(&roomTable, VILLA_DestroyRoom_V);
 }

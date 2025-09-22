@@ -18,6 +18,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3/SDL_opengl.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 
 #endif //THIRD_PARTY_H

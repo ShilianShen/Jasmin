@@ -12,7 +12,7 @@ SDL_FRect windowRect = {0, 0, 0, 0};
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 1200, WINDOW_HEIGHT = 800;
 bool running = true;
-const SDL_WindowFlags FLAG = SDL_WINDOW_METAL | SDL_WINDOW_HIGH_PIXEL_DENSITY;//  | SDL_WINDOW_RESIZABLE;
+const SDL_WindowFlags FLAG = SDL_WINDOW_METAL | SDL_WINDOW_HIGH_PIXEL_DENSITY;
 SDL_GLContext content;
 
 

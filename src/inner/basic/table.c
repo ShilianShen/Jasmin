@@ -98,4 +98,9 @@ void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
 
     table->len = 0;
 }
+void BASIC_PrintTable(const Table* table) {
+    for (int i = 0; i < table->len; i++) {
+        printf("%d, %s, %p\n", i, table->kv[i].key, table->kv[i].val);
+    }
+}
 

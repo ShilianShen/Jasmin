@@ -85,9 +85,9 @@ bool LOTRI_SetModelNormals(const Model* model, const ModelSide side) {
         const Vec3f a = model->modelVertices[index.v.i].xyz;
         const Vec3f b = model->modelVertices[index.v.j].xyz;
         const Vec3f c = model->modelVertices[index.v.k].xyz;
-        const Vec3f normal = LOTRI_GetNormal(a, b, c);
-        const Vec3f sum = LOTRI_GetSum(a, b, c);
-        if (side == MODEL_SIDE_IN ^ LOTRI_GetDot(normal, sum) < 0) {
+        const Vec3f normal = BASIC_GetNormal(a, b, c);
+        const Vec3f sum = BASIC_GetSum(a, b, c);
+        if (side == MODEL_SIDE_IN ^ BASIC_GetDot(normal, sum) < 0) {
             model->modelFaces[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
         }
         else {
@@ -108,6 +108,13 @@ bool LOTRI_GetModelWorldVertex(const Model* model, const int index, Vec3f* vec) 
     if (index >= model->numVertices) return false;
 
     *vec = model->worldVertices[index].xyz;
+    return true;
+}
+bool LOTRI_GetModelModelVertex(const Model* model, const int index, Vec3f* vec) {
+    if (model == NULL) return false;
+    if (index >= model->numVertices) return false;
+
+    *vec = model->modelVertices[index].xyz;
     return true;
 }
 bool LOTRI_GetModelCZ(const Model* model, float* cz) {
@@ -226,12 +233,12 @@ static void LOTRI_RenewModel_Mat(Model* model) {
         rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
     }
     const Mat4f matArr[] = {
-        LOTRI_GetMatS(model->scale),
-        LOTRI_GetMatR(rotation),
-        LOTRI_GetMatT(model->position),
+        BASIC_GetMatS(model->scale),
+        BASIC_GetMatR(rotation),
+        BASIC_GetMatT(model->position),
         camera.mat,
     };
-    LOTRI_SetModelMat(model, LOTRI_GetProd(len_of(matArr), matArr));
+    LOTRI_SetModelMat(model, BASIC_GetProd(len_of(matArr), matArr));
 }
 static void LOTRI_RenewModel_WorldVertices(const Model* model) {
     // xyz
@@ -354,7 +361,6 @@ bool LOTRI_DrawModelBuffer(const int N, const Model* modelArray[N]) {
 
     bool result = true;
     for (int i = 0; i < N; i++) {
-        DEBUG_SendMessageR("%d, %f\n", i, depth[i]);
         result = result && LOTRI_DrawModelBuffer_Model(modelArray[indices[i]]);
     }
     return result;

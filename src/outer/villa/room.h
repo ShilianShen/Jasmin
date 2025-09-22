@@ -9,10 +9,12 @@ typedef struct Room Room;
 
 
 bool VILLA_GetRoomCellEmpty(const Room* room, int x, int y);
+bool VILLA_GetRoomCellPosition(const Room* room, int x, int y, Vec3f* position);
 
 void *VILLA_CreateRoom(const cJSON *room_json);
 void VILLA_DestroyRoom_V(void* room_void);
-Room* VILLA_DeleteRoom(Room *room);
+
+void VILLA_DeleteRoom(void *room_void);
 bool VILLA_RenewRoom(void *room_void);
 bool VILLA_DrawRoom(const void *room_void);
 
