@@ -80,29 +80,23 @@ void DEBUG_Exit() {
 }
 
 
-void DEBUG_DrawPoint(const float x, const float y) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+void DEBUG_DrawPoint(const SDL_FPoint point) {
+    if (!DEBUG_ON) return; // Pre Condition
 
-    // point
     const float w = 8;
-    const SDL_FRect rect = {(float)x - w, (float)y - w, 2 * w, 2 * w};
+    const SDL_FRect rect = {point.x - w, point.y - w, 2 * w, 2 * w};
 
-    // draw
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
     SDL_RenderFillRect(debug.renderer, &rect);
 }
-void DEBUG_DrawLine(const float x1, const float y1, const float x2, const float y2) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
+    if (!DEBUG_ON) return; // Pre Condition
 
-    // line
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
-    SDL_RenderLine(debug.renderer, x1, y1, x2, y2);
+    SDL_RenderLine(debug.renderer, point1.x, point1.y, point2.x, point2.y);
 }
 void DEBUG_DrawRect(const SDL_FRect* rect) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return; // Pre Condition
 
     // Req Condition
     if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}

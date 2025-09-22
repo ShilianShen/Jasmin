@@ -77,12 +77,12 @@ bool DEVICE_DrawMouse() {
     if (mouse.left_trig != NULL) {
         DEBUG_SendMessageL("mouse.left_trig != NULL\n");
     }
-    DEBUG_DrawPoint(mouse.state2.leftPos.x, mouse.state2.leftPos.y);
-    DEBUG_DrawPoint(mouse.state2.pos.x, mouse.state2.pos.y);
+    DEBUG_DrawPoint(mouse.state2.leftPos);
+    DEBUG_DrawPoint(mouse.state2.pos);
     if (mouse.state2.leftPressed) {
         DEBUG_DrawLine(
-            mouse.state2.leftPos.x, mouse.state2.leftPos.y,
-            mouse.state2.pos.x, mouse.state2.pos.y
+            mouse.state2.leftPos,
+            mouse.state2.pos
             );
     }
     return true;
