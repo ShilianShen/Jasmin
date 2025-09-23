@@ -66,19 +66,19 @@ static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
     char* material_json = NULL;
     char* mask_json = NULL;
 
-    if (cJSON_LoadFromObj(room_json, key = "model", JSM_STRING, &model_json) == false) {
+    if (cJSON_Load(room_json, key = "model", JSM_STRING, &model_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(room_json, key = "material", JSM_STRING, &material_json) == false) {
+    if (cJSON_Load(room_json, key = "material", JSM_STRING, &material_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(room_json, key = "mask", JSM_STRING, &mask_json) == false) {
+    if (cJSON_Load(room_json, key = "mask", JSM_STRING, &mask_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(room_json, key = "rect", JSM_RECT, &room->mask_indices) == false) {
+    if (cJSON_Load(room_json, key = "rect", JSM_RECT, &room->mask_indices) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }

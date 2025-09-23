@@ -50,11 +50,11 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
     char* model_json = NULL;
     char* material_json = NULL;
 
-    if (cJSON_LoadFromObj(character_json, key = "model", JSM_STRING, &model_json) == false) {
+    if (cJSON_Load(character_json, key = "model", JSM_STRING, &model_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadFromObj(character_json, key = "material", JSM_STRING, &material_json) == false) {
+    if (cJSON_Load(character_json, key = "material", JSM_STRING, &material_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }

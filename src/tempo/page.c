@@ -68,13 +68,13 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         TEMPO_SetElemPublicTable(NULL);
     }
     if (cJSON_ExistKey(page_json, key = "anchor")) {
-        if (cJSON_LoadFromObj(page_json, key, JSM_INT, &page->anchor) == false) {
+        if (cJSON_Load(page_json, key, JSM_INT, &page->anchor) == false) {
             printf("%s: failed malloc page.anchor.\n", __func__);
             return false;
         }
     }
     if (cJSON_ExistKey(page_json, key = "src")) {
-        if (cJSON_LoadFromObj(page_json, key, JSM_FRECT, &page->src_rect) == true) {
+        if (cJSON_Load(page_json, key, JSM_FRECT, &page->src_rect) == true) {
             page->src = &page->src_rect;
         }
         else {
@@ -83,7 +83,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         }
     }
     if (cJSON_ExistKey(page_json, key = "color")) {
-        if (cJSON_LoadFromObj(page_json, key, JSM_COLOR, &page->color) == false) {
+        if (cJSON_Load(page_json, key, JSM_COLOR, &page->color) == false) {
             printf("%s: failed malloc page.color.\n", __func__);
             return false;
         }

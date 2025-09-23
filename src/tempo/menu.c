@@ -119,7 +119,7 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
         }
         if (cJSON_ExistKey(path_json, subkey = "pageNow")) {
             const char* pageNow_json = NULL;
-            if (cJSON_LoadFromObj(path_json, subkey, JSM_STRING, &pageNow_json)) {
+            if (cJSON_Load(path_json, subkey, JSM_STRING, &pageNow_json)) {
                 menu.path[0] = TABLE_GetValByKey(menu.pageTable, pageNow_json);
             }
         }

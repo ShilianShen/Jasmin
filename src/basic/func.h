@@ -65,7 +65,7 @@ int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials);
 // JSON ================================================================================================================
 cJSON* getJson(const char* path);
 bool cJSON_ExistKey(const cJSON* object, const char* key);
-bool cJSON_LoadFromObj(const cJSON* object, const char* key, JSM_DataType type, void* target);
+bool cJSON_Load(const cJSON* object, const char* key, JSM_DataType type, void* target);
 
 
 #endif //BASIC_FUNC_H

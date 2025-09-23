@@ -36,59 +36,28 @@ const int DETAIL_SIZE_MAX = 64;
 
 
 const bool DEBUG_ON = true;
-static void DEBUG_II_RK(const cJSON* debug_json) {
-    if (cJSON_IsObject(debug_json) == false) {
-        printf("%s: cJSON_IsObject(debug_json).\n", __func__);
-        return;
-    }
+static bool DEBUG_II_RK(const cJSON* debug_json) {
+    REQ_CONDITION(cJSON_IsObject(debug_json), return false);
 
-    char* key = NULL;
     char* font_path = NULL;
     float font_size = 0;
-    if (cJSON_LoadFromObj(debug_json, key = "font_path", JSM_STRING, &font_path) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "font_size", JSM_FLOAT, &font_size) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
+    REQ_CONDITION(cJSON_Load(debug_json, "font_path", JSM_STRING, &font_path), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "font_size", JSM_FLOAT, &font_size), return false);
+
+    debug.font = TTF_OpenFont(font_path, font_size);
+    REQ_CONDITION(debug.font != NULL, return false);
 
     SDL_Color colors[DEBUG_NUM_COLORS];
-    if (cJSON_LoadFromObj(debug_json, key = "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "color_rect", JSM_COLOR, &colors[DEBUG_COLOR_RECT]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "color_face", JSM_COLOR, &colors[DEBUG_COLOR_FACE]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "color_text", JSM_COLOR, &colors[DEBUG_COLOR_TEXT]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "color_dark", JSM_COLOR, &colors[DEBUG_COLOR_DARK]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
+    REQ_CONDITION(cJSON_Load(debug_json, "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "color_rect" , JSM_COLOR, &colors[DEBUG_COLOR_RECT ]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "color_face" , JSM_COLOR, &colors[DEBUG_COLOR_FACE ]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "color_text" , JSM_COLOR, &colors[DEBUG_COLOR_TEXT ]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "color_dark" , JSM_COLOR, &colors[DEBUG_COLOR_DARK ]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]), return false);
 
     int alphas[DEBUG_NUM_ALPHAS];
-    if (cJSON_LoadFromObj(debug_json, key = "alpha_dark", JSM_INT, &alphas[DEBUG_ALPHA_DARK]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
-    if (cJSON_LoadFromObj(debug_json, key = "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]) == false) {
-        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
-        return;
-    }
+    REQ_CONDITION(cJSON_Load(debug_json, "alpha_dark" , JSM_INT, &alphas[DEBUG_ALPHA_DARK ]), return false);
+    REQ_CONDITION(cJSON_Load(debug_json, "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]), return false);
 
     for (int i = 0; i < DEBUG_NUM_COLORS; i++) {
         for (int j = 0; j < DEBUG_NUM_ALPHAS; j++) {
