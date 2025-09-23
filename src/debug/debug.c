@@ -15,7 +15,7 @@ struct Debug {
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
 
-
+const bool DEBUG_ON = true;
 static void DEBUG_LoadTheme() {
     debug.theme.font = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
 
@@ -81,7 +81,7 @@ void DEBUG_Exit() {
 
 
 void DEBUG_DrawPoint(const SDL_FPoint point) {
-    if (!DEBUG_ON) return; // Pre Condition
+    if (!DEBUG_ON) return;
 
     const float w = 8;
     const SDL_FRect rect = {point.x - w, point.y - w, 2 * w, 2 * w};
@@ -90,35 +90,25 @@ void DEBUG_DrawPoint(const SDL_FPoint point) {
     SDL_RenderFillRect(debug.renderer, &rect);
 }
 void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
-    if (!DEBUG_ON) return; // Pre Condition
+    if (!DEBUG_ON) return;
 
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
     SDL_RenderLine(debug.renderer, point1.x, point1.y, point2.x, point2.y);
 }
-void DEBUG_DrawRect(const SDL_FRect* rect) {
-    if (!DEBUG_ON) return; // Pre Condition
+void DEBUG_DrawRect(const SDL_FRect rect) {
+    if (!DEBUG_ON) return;
 
-    // Req Condition
-    if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
-
-    // rect edge
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
-    SDL_RenderRect(debug.renderer, rect);
+    SDL_RenderRect(debug.renderer, &rect);
 }
-void DEBUG_FillRect(const SDL_FRect* rect) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+void DEBUG_FillRect(const SDL_FRect rect) {
+    if (!DEBUG_ON) return;
 
-    // Req Condition
-    if (rect == NULL) {printf("%s: rect is NULL.\n", __func__); return;}
-
-    // rect back
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.darkRect);
-    SDL_RenderFillRect(debug.renderer, rect);
+    SDL_RenderFillRect(debug.renderer, &rect);
 
-    // rect edge
     SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
-    SDL_RenderRect(debug.renderer, rect);
+    SDL_RenderRect(debug.renderer, &rect);
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     // Pre Condition

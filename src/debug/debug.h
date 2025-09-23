@@ -6,7 +6,7 @@
 
 
 #define DEBUG_THEME_JSON "../config/debug_theme.json"
-#define DEBUG_ON true
+
 
 bool DEBUG_Init();
 
@@ -16,8 +16,8 @@ void DEBUG_Exit();
 
 void DEBUG_DrawPoint(SDL_FPoint point);
 void DEBUG_DrawLine(SDL_FPoint point1, SDL_FPoint point2);
-void DEBUG_DrawRect(const SDL_FRect* rect);
-void DEBUG_FillRect(const SDL_FRect* rect);
+void DEBUG_DrawRect(SDL_FRect rect);
+void DEBUG_FillRect(SDL_FRect rect);
 void DEBUG_DrawText(Sint16 x, Sint16 y, const char* text);
 void DEBUG_DrawTextAligned(const char* text, char aligned);
 void DEBUG_DrawGeometry(

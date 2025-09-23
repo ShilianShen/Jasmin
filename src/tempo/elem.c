@@ -278,7 +278,7 @@ bool TEMPO_DrawElem(const Elem *elem) {
     const bool mouseIn = DEVICE_GetMouseInRect(elem->dst_rect);
     const bool mouseLeftIn = DEVICE_GetMouseLeftInRect(elem->dst_rect);
     if (mouseLeftIn) {
-        DEBUG_FillRect(&elem->dst_rect);
+        DEBUG_FillRect(elem->dst_rect);
     }
     const SDL_FRect dst = {
         roundf(elem->dst_rect.x),
@@ -288,7 +288,7 @@ bool TEMPO_DrawElem(const Elem *elem) {
     };
     SDL_RenderTexture(renderer, elem->tex, elem->src, &dst);
     if (mouseIn || mouseLeftIn) {
-        DEBUG_DrawRect(&elem->dst_rect);
+        DEBUG_DrawRect(elem->dst_rect);
     }
     return true;
 }
