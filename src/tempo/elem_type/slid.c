@@ -41,7 +41,7 @@ bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
     }
 
     const JSM_DataType type = slid->discrete ? JSM_INT : JSM_FLOAT;
-    slid->now = TABLE_GetValByKey(TEMPO_ExternTable[type], now_json);
+    slid->now = BASIC_GetTableValByKey(TEMPO_ExternTable[type], now_json);
     if (slid->now == NULL) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;

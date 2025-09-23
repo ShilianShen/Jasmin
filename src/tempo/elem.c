@@ -124,7 +124,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             return false;
         }
 
-        const TrigFunc func = TABLE_GetValByKey(TEMPO_StaticTrigTable, func_json);
+        const TrigFunc func = BASIC_GetTableValByKey(TEMPO_StaticTrigTable, func_json);
         if (func == NULL) {
             printf("%s: failed in %s.\n", __func__, key);
             return false;
@@ -250,7 +250,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         DEBUG_SendMessageL("    type: %s\n", arrElem[elem->type].name);
         // DEBUG_SendMessageL("    info: %s\n", elem->info);
         if (elem->trig.func != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", TABLE_GetKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
+            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
         }
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
     }

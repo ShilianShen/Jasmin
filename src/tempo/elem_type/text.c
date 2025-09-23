@@ -20,7 +20,7 @@ bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
     }
     cJSON_Load(info_json, key = "key", JSM_BOOL, &key_json);
 
-    text->font = TABLE_GetValByKey(theme.fontTable, font_json);
+    text->font = BASIC_GetTableValByKey(theme.fontTable, font_json);
     text->string = strdup(string_json);
     text->key = key_json;
     if (text->font == NULL || text->string == NULL) {
@@ -32,7 +32,7 @@ bool TEMPO_RenewElemText(const void* info, SDL_Texture** tex) {
     const ElemTextInfo* text = info;
     const char* string = text->string;
     if (text->key == true) {
-        string = TABLE_GetValByKey(TEMPO_ExternTable[JSM_STRING], text->string);
+        string = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_STRING], text->string);
         if (string == NULL) {
             printf("%s: failed in key.\n", __func__);
             return false;

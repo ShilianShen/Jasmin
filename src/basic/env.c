@@ -20,14 +20,12 @@ bool BASIC_RenewEnv(const int len, const Env arr[len]) {
     return true;
 }
 bool BASIC_DrawEnv(const int len, const Env arr[len]) {
-
     for (int i = len - 1; i >= 0; i--) {
         if (arr[i].draw != NULL && arr[i].draw() == false) {
             printf("%s: fail in %s.\n", __func__, arr[i].name);
             return false;
         }
     }
-
     return true;
 }
 void BASIC_ExitEnv(const int len, const Env arr[len]) {

@@ -2,7 +2,7 @@
 
 
 // SET & GET ===========================================================================================================
-void* TABLE_GetValByKey(const Table table, const char* key) {
+void* BASIC_GetTableValByKey(const Table table, const char* key) {
     if (key == NULL) return NULL;
 
     for (int idx = 0; idx < table.len; idx++) {
@@ -12,7 +12,7 @@ void* TABLE_GetValByKey(const Table table, const char* key) {
     }
     return NULL;
 }
-const char* TABLE_GetKeyByVal(const Table table, const void* val) {
+const char* BASIC_GetTableKeyByVal(const Table table, const void* val) {
     for (int idx = 0; idx < table.len; idx++) {
         if (table.kv[idx].val == val) {
             return table.kv[idx].key;

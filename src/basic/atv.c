@@ -1,4 +1,4 @@
-#include "ease.h"
+#include "atv.h"
 
 
 float BASIC_AtvLinear(const float x) {
@@ -28,4 +28,4 @@ SDL_FRect BASIC_AtvGetFRect(const SDL_FRect rect1, const SDL_FRect rect2, const 
     rect.w = (1 - t) * rect1.w + t * rect2.w;
     rect.h = (1 - t) * rect1.h + t * rect2.h;
     return rect;
-}
+} // fuck it

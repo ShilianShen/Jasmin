@@ -120,7 +120,7 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
         if (cJSON_ExistKey(path_json, subkey = "pageNow")) {
             const char* pageNow_json = NULL;
             if (cJSON_Load(path_json, subkey, JSM_STRING, &pageNow_json)) {
-                menu.path[0] = TABLE_GetValByKey(menu.pageTable, pageNow_json);
+                menu.path[0] = BASIC_GetTableValByKey(menu.pageTable, pageNow_json);
             }
         }
     }
@@ -161,17 +161,17 @@ void TEMPO_UnloadMenu() {
 static void TEMPO_RenewMenuPath() {
     //
     bool need_clear = false;
-    DEBUG_SendMessageL("tempo.path: /%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageRoot));
+    DEBUG_SendMessageL("tempo.path: /%s", BASIC_GetTableKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageRoot));
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (need_clear)
             menu.path[i] = NULL;
         else if (menu.path[i] == NULL)
             need_clear = true;
         else
-            DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.path[i]));
+            DEBUG_SendMessageL("/%s", BASIC_GetTableKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.path[i]));
     }
     if (need_clear == false) {
-        DEBUG_SendMessageL("/%s", TABLE_GetKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageEdge));
+        DEBUG_SendMessageL("/%s", BASIC_GetTableKeyByVal((Table){menu.pageTable.len, menu.pageTable.kv}, menu.pageEdge));
     }
     DEBUG_SendMessageL("\n");
 }
@@ -263,9 +263,9 @@ static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 void TEMPO_TrigFuncSwap(const char* para) {
-    Page* page = TABLE_GetValByKey(menu.pageTable, para);
+    Page* page = BASIC_GetTableValByKey(menu.pageTable, para);
     if (page == NULL) {
-        page = TABLE_GetValByKey(TEMPO_ExternPageTable, para);
+        page = BASIC_GetTableValByKey(TEMPO_ExternPageTable, para);
     }
     if (page == NULL) {
         return;

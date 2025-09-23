@@ -16,7 +16,7 @@ typedef struct Trig Trig;
 
 
 void PullTrig(const Trig* trig);
-Trig* BASIC_CreateTrig(TrigFunc func, const void *para, bool sustain);
+Trig* BASIC_CreateTrig(TrigFunc func, const void *para, bool sustain); // fuckit
 Trig* BASIC_DeleteTrig(Trig *trig);
 
 
