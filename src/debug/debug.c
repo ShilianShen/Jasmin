@@ -3,7 +3,6 @@
 
 typedef struct Debug Debug;
 struct Debug {
-    SDL_Renderer* renderer;
     struct {
         TTF_Font *font;
         SDL_Color point, rect, face, text, dark, light;
@@ -50,7 +49,6 @@ bool DEBUG_Init() {
 
     //
     debug = (Debug){0};
-    debug.renderer = renderer;
     // 设置渲染器的混合模式（启用 Alpha 混合）
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     DEBUG_Load();
@@ -80,54 +78,51 @@ void DEBUG_Exit() {
 }
 
 
+// DRAW ================================================================================================================
 void DEBUG_DrawPoint(const SDL_FPoint point) {
     if (!DEBUG_ON) return;
 
     const float w = 8;
     const SDL_FRect rect = {point.x - w, point.y - w, 2 * w, 2 * w};
 
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
-    SDL_RenderFillRect(debug.renderer, &rect);
+    SDL_SetRenderSDLColor(renderer, debug.theme.point);
+    SDL_RenderFillRect(renderer, &rect);
 }
 void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.point);
-    SDL_RenderLine(debug.renderer, point1.x, point1.y, point2.x, point2.y);
+    SDL_SetRenderSDLColor(renderer, debug.theme.point);
+    SDL_RenderLine(renderer, point1.x, point1.y, point2.x, point2.y);
 }
 void DEBUG_DrawRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
-    SDL_RenderRect(debug.renderer, &rect);
+    SDL_SetRenderSDLColor(renderer, debug.theme.rect);
+    SDL_RenderRect(renderer, &rect);
 }
 void DEBUG_FillRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.darkRect);
-    SDL_RenderFillRect(debug.renderer, &rect);
+    SDL_SetRenderSDLColor(renderer, debug.theme.darkRect);
+    SDL_RenderFillRect(renderer, &rect);
 
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.rect);
-    SDL_RenderRect(debug.renderer, &rect);
+    SDL_SetRenderSDLColor(renderer, debug.theme.rect);
+    SDL_RenderRect(renderer, &rect);
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
-    // Pre Condition
-    if (!DEBUG_ON) {return NULL;}
-
-    // Req Condition
-    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return NULL;}
-
-    // Req Condition
+    if (text == NULL) {
+        printf("%s: text == NULL.\n", __func__);
+        return NULL;
+    }
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
-        debug.renderer, debug.theme.font, text, debug.theme.light, debug.theme.dark, aligned
+        renderer, debug.theme.font, text, debug.theme.light, debug.theme.dark, aligned
         );
-    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return NULL;}
+    if (textTexture == NULL) {printf("%s: textTexture == NULL.\n", __func__); return NULL;}
 
     return textTexture;
 }
 void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return;
 
     // Req Condition
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
@@ -141,12 +136,11 @@ void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     SDL_GetTextureSize(textTexture, &dst_rect.w, &dst_rect.h);
 
     // text
-    SDL_RenderTexture(debug.renderer, textTexture, NULL, &dst_rect);
+    SDL_RenderTexture(renderer, textTexture, NULL, &dst_rect);
     SDL_DestroyTexture(textTexture);
 }
 void DEBUG_DrawTextAligned(const char* text, const char aligned) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return;
 
     // Req Condition
     if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
@@ -157,9 +151,10 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 
     //
     const int anchor = aligned == 'R' ? 20 : -20;
-    SDL_RenderTextureAligned(debug.renderer, textTexture, NULL, NULL, NULL, anchor);
+    SDL_RenderTextureAligned(renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
 }
+
 
 void DEBUG_DrawGeometry(
     SDL_Renderer *renderer,
@@ -168,9 +163,7 @@ void DEBUG_DrawGeometry(
     const int num_vertices,
     const int *indices,
     const int num_indices) {
-    if (DEBUG_ON == false) {
-        return;
-    }
+    if (!DEBUG_ON) return;
 
     SDL_Vertex debugVertices[num_vertices];
     for (int i = 0; i < num_vertices; i++) {
@@ -178,7 +171,7 @@ void DEBUG_DrawGeometry(
         debugVertices[i].color = SDL_GetFColorFromColor(debug.theme.darkFace);
     }
     SDL_RenderGeometry(renderer, NULL, debugVertices, num_vertices, indices, num_indices);
-    SDL_SetRenderSDLColor(debug.renderer, debug.theme.face);
+    SDL_SetRenderSDLColor(renderer, debug.theme.face);
     for (int i = 0; i < num_indices; i += 3) {
         const SDL_FPoint points[4] = {
             debugVertices[indices[i]].position,
