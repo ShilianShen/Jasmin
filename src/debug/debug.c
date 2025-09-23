@@ -210,7 +210,7 @@ void DEBUG_DrawGeometry(
         debugVertices[i] = vertices[i];
         debugVertices[i].color = SDL_GetFColorFromColor(debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_DARK]);
     }
-    SDL_RenderGeometry(renderer, NULL, debugVertices, num_vertices, indices, num_indices);
+    SDL_RenderGeometry(renderer, texture, debugVertices, num_vertices, indices, num_indices);
     SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_LIGHT]);
     for (int i = 0; i < num_indices; i += 3) {
         const SDL_FPoint points[4] = {
