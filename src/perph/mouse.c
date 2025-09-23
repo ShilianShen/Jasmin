@@ -1,7 +1,7 @@
 #include "mouse.h"
 
 
-static struct Mouse {
+static struct {
     struct {
         SDL_FPoint pos, leftPos, rightPos;
         bool leftPressed, rightPressed;
