@@ -1,5 +1,6 @@
 #include "page.h"
 
+
 // PAGE PARA ===========================================================================================================
 const SDL_FRect* publicBck = NULL;
 
@@ -13,15 +14,7 @@ struct Page {
     SDL_Color color;
 };
 
-//
-void TEMPO_PrintPage(const Page* page) {
-    printf("TEMPO_Page:");
-    if (page == NULL) {
-        printf("NULL\n");
-        return;
-    }
-    printf("%d\n", page->elemTable.len);
-}
+
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
@@ -163,7 +156,7 @@ bool TEMPO_RenewPage(Page *page) {
     //
     TEMPO_SetElemPublicBck(&page->dst_rect);
     {
-        DEVICE_SetMouseLeftTrig(NULL);
+        PERPH_SetMouseLeftTrig(NULL);
         for (int i = 0; i < page->elemTable.len; i++) {
             const bool renew = TEMPO_RenewElem(page->elemTable.kv[i].val);
             if (renew == false) {

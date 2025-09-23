@@ -2,7 +2,7 @@
 #define VILLA_H
 
 
-#include "../device/device.h"
+#include "../perph/perph.h"
 #include "../tempo/tempo.h"
 #include "../lotri/lotri.h"
 

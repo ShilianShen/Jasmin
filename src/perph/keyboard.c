@@ -9,16 +9,16 @@ static struct {
 
 
 // SET & GET ===========================================================================================================
-bool DEVICE_GetKeyPressed(const SDL_Scancode key) {
+bool PERPH_GetKeyPressed(const SDL_Scancode key) {
     return keyboard.state2.pressed[key];
 }
-bool DEVICE_GetKeyPress(const SDL_Scancode key) {
+bool PERPH_GetKeyPress(const SDL_Scancode key) {
     return keyboard.state1.pressed[key] == false && keyboard.state2.pressed[key] == true;
 }
 
 
 // RENEW ===============================================================================================================
-bool DEVICE_RenewKeyboard() {
+bool PERPH_RenewKeyboard() {
     const bool* state = SDL_GetKeyboardState(NULL);
     keyboard.state1 = keyboard.state2;
     for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
@@ -29,6 +29,6 @@ bool DEVICE_RenewKeyboard() {
 
 
 // DRAW ================================================================================================================
-bool DEVICE_DrawKeyboard() {
+bool PERPH_DrawKeyboard() {
     return true;
 }

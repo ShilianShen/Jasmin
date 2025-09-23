@@ -6,7 +6,7 @@
 
 #include "../../src/basic/basic.h"
 #include "../../src/debug/debug.h"
-#include "../../src/device/device.h"
+#include "../../src/perph/perph.h"
 
 #include "../../src/tempo/tempo.h"
 #include "../../src/lotri/lotri.h"

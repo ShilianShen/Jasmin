@@ -207,6 +207,9 @@ bool BASIC_Renew() {
     windowRect = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
     return true;
 }
+bool BASIC_Draw() {
+    return true;
+}
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
     // N-Condition
     if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}

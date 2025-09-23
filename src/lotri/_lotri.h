@@ -2,7 +2,7 @@
 #define _LOTRI_H
 
 
-#include "../device/device.h"
+#include "../perph/perph.h"
 
 
 bool LOTRI_Init();

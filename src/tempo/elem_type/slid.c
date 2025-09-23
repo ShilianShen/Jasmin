@@ -114,7 +114,7 @@ void TrigFunc_Slid(const ElemSlidInfo* slid, const SDL_FRect dst_rect) {
     }
     const float min = dst_rect.x + A + B;
     const float max = dst_rect.x + dst_rect.w - A - B;
-    const float now = DEVICE_GetMousePos().x;
+    const float now = PERPH_GetMousePos().x;
     if (slid->discrete) {
         if (now <= min)
             *(int*)slid->now = (int)slid->min;

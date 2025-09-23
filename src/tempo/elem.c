@@ -242,8 +242,8 @@ bool TEMPO_RenewElem(Elem *elem) {
         return false;
     }
 
-    const bool mouseIn = DEVICE_GetMouseInRect(elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_GetMouseLeftInRect(elem->dst_rect);
+    const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
+    const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
@@ -257,10 +257,10 @@ bool TEMPO_RenewElem(Elem *elem) {
 
     if (elem->trig.func != NULL) {
         if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            DEVICE_SetMouseLeftTrig(&elem->trig);
+            PERPH_SetMouseLeftTrig(&elem->trig);
         }
         if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            DEVICE_SetMouseLeftTrig(&elem->trig);
+            PERPH_SetMouseLeftTrig(&elem->trig);
         }
     }
 
@@ -275,8 +275,8 @@ bool TEMPO_DrawElem(const Elem *elem) {
         DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
         return false;
     }
-    const bool mouseIn = DEVICE_GetMouseInRect(elem->dst_rect);
-    const bool mouseLeftIn = DEVICE_GetMouseLeftInRect(elem->dst_rect);
+    const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
+    const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
     if (mouseLeftIn) {
         DEBUG_FillRect(elem->dst_rect);
     }

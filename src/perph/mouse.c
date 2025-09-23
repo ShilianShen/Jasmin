@@ -14,22 +14,22 @@ static struct Mouse {
 bool SLD_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
     return rect.x <= point.x && point.x < rect.x + rect.w && rect.y <= point.y && point.y < rect.y + rect.h;
 } // remember to put it in BASIC
-SDL_FPoint DEVICE_GetMousePos() {
+SDL_FPoint PERPH_GetMousePos() {
     return mouse.state2.pos;
 }
-void DEVICE_SetMouseLeftTrig(const Trig *trig) {
+void PERPH_SetMouseLeftTrig(const Trig *trig) {
     mouse.left_trig = trig;
 }
-bool DEVICE_GetMouseLeftInRect(const SDL_FRect rect) {
+bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
     return SLD_GetPointInRect(mouse.state2.leftPos, rect);
 }
-bool DEVICE_GetMouseInRect(const SDL_FRect rect) {
+bool PERPH_GetMouseInRect(const SDL_FRect rect) {
     return SLD_GetPointInRect(mouse.state2.pos, rect);
 }
 
 
 // RENEW ===============================================================================================================
-static void DEVICE_RenewMouse_State() {
+static void PERPH_RenewMouse_State() {
     mouse.state1 = mouse.state2;
 
     float x, y;
@@ -43,7 +43,7 @@ static void DEVICE_RenewMouse_State() {
     else if (mouse.state1.leftPressed && !mouse.state2.leftPressed)
         mouse.state2.leftPos = (SDL_FPoint){-255, -245};
 }
-static void DEVICE_RenewMouse_Trig() {
+static void PERPH_RenewMouse_Trig() {
     if (mouse.left_trig != NULL
         && mouse.left_trig->sustain == false
         && mouse.state1.leftPressed == true
@@ -62,15 +62,15 @@ static void DEVICE_RenewMouse_Trig() {
         }
     mouse.left_trig = NULL;
 }
-bool DEVICE_RenewMouse() {
-    DEVICE_RenewMouse_State();
-    DEVICE_RenewMouse_Trig();
+bool PERPH_RenewMouse() {
+    PERPH_RenewMouse_State();
+    PERPH_RenewMouse_Trig();
     return true;
 }
 
 
 // DRAW ================================================================================================================
-bool DEVICE_DrawMouse() {
+bool PERPH_DrawMouse() {
     DEBUG_SendMessageL("mouse: %.2f, %.2f\n", mouse.state2.pos.x, mouse.state2.pos.y);
     if (mouse.left_trig != NULL) {
         DEBUG_SendMessageL("mouse.left_trig != NULL\n");

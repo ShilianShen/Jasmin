@@ -39,17 +39,17 @@ static bool VILLA_Renew_Camera() {
     {
         const float angle = M_PI_4 * 0.5;
         Vec3f v = {0, 0.5f, 0.3f};
-        if (DEVICE_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
-        if (DEVICE_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
-        if (DEVICE_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
-        if (DEVICE_GetKeyPressed(SDL_SCANCODE_RIGHT)) v.v.z -= angle;
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_RIGHT)) v.v.z -= angle;
         LOTRI_SetDelayVec(&smallRotate, v, 1.f);
     }
     {
         static float k = 2;
         Vec3f v = {0, 0, 0};
-        if (DEVICE_GetKeyPress(SDL_SCANCODE_Q)) k += 1;
-        if (DEVICE_GetKeyPress(SDL_SCANCODE_E)) k -= 1;
+        if (PERPH_GetKeyPress(SDL_SCANCODE_Q)) k += 1;
+        if (PERPH_GetKeyPress(SDL_SCANCODE_E)) k -= 1;
         v.v.z += k * (float)M_PI_2;
         LOTRI_SetDelayVec(&bigRotate, v, 0.5f);
     }
@@ -66,10 +66,10 @@ static bool VILLA_Renew_Camera() {
 static bool VILLA_Renew_You() {
     if (you == NULL) return false;
 
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_W);
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_A);
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_S);
-    if (DEVICE_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_D);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_W);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_A);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_S);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_D);
     return true;
 }
 bool VILLA_Renew() {
