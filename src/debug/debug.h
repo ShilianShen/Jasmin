@@ -9,8 +9,8 @@
 
 
 bool DEBUG_Init();
-
 bool DEBUG_Renew();
+bool DEBUG_Draw();
 void DEBUG_Exit();
 
 
@@ -29,8 +29,6 @@ void DEBUG_DrawGeometry(
 
 void DEBUG_SendMessageL(const char* format, ...);
 void DEBUG_SendMessageR(const char* format, ...);
-
-bool DEBUG_Draw();
 
 
 #endif //JASMIN_DEBUG_H

@@ -1,0 +1,13 @@
+{
+  "font_path": "../res/font/JetBrainsMono-Regular.ttf",
+  "font_size": 24,
+
+  "color_point": [246, 202, 124, 255],
+  "color_rect" : [241, 155, 153, 255],
+  "color_face" : [158, 189, 127, 255],
+  "color_text" : [116, 173, 220, 255],
+  "color_dark" : [  0,   0,   0, 255],
+  "color_light": [255, 255, 255, 255],
+  "alpha_dark" :  64,
+  "alpha_light": 255
+}

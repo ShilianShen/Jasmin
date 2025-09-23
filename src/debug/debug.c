@@ -1,6 +1,14 @@
 #include "debug.h"
 
 
+
+// PARA ================================================================================================================
+enum DEBUG_DRAW_SHAPE {
+    DEBUG_DRAW_SHAPE_POINT,
+    DEBUG_DRAW_SHAPE_RECT,
+    DEBUG_DRAW_SHAPE_FACE,
+    DEBUG_DRAW_SHAPE_TEXT,
+};
 typedef struct Debug Debug;
 struct Debug {
     struct {
@@ -9,10 +17,12 @@ struct Debug {
         SDL_Color darkPoint, darkRect, darkFace, darkText;
         int alphaLight, alphaDark;
     } theme;
-    char* message[2];  // malloc or NULL
-} debug;
+    char* message[2];
+};
+static Debug debug;
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
+
 
 const bool DEBUG_ON = true;
 static void DEBUG_LoadTheme() {
