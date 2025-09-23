@@ -5,9 +5,6 @@
 #include "../basic/basic.h"
 
 
-#define DEBUG_THEME_JSON "../config/debug_theme.json"
-
-
 bool DEBUG_Init();
 bool DEBUG_Renew();
 bool DEBUG_Draw();

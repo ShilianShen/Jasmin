@@ -3,19 +3,30 @@
 
 
 // PARA ================================================================================================================
-enum DEBUG_DRAW_SHAPE {
-    DEBUG_DRAW_SHAPE_POINT,
-    DEBUG_DRAW_SHAPE_RECT,
-    DEBUG_DRAW_SHAPE_FACE,
-    DEBUG_DRAW_SHAPE_TEXT,
+enum DEBUG_COLOR {
+    DEBUG_COLOR_POINT,
+    DEBUG_COLOR_RECT,
+    DEBUG_COLOR_FACE,
+    DEBUG_COLOR_TEXT,
+    DEBUG_COLOR_DARK,
+    DEBUG_COLOR_LIGHT,
+    DEBUG_NUM_COLORS,
 };
+enum DEBUG_ALPHA {
+    DEBUG_ALPHA_DARK,
+    DEBUG_ALPHA_LIGHT,
+    DEBUG_NUM_ALPHAS,
+};
+
+const char* DEBUG_JSON = "../config/debug_theme.json";
+
+
 typedef struct Debug Debug;
 struct Debug {
+    TTF_Font *font;
+    SDL_Color colors[DEBUG_NUM_COLORS][DEBUG_NUM_ALPHAS];
     struct {
         TTF_Font *font;
-        SDL_Color point, rect, face, text, dark, light;
-        SDL_Color darkPoint, darkRect, darkFace, darkText;
-        int alphaLight, alphaDark;
     } theme;
     char* message[2];
 };
@@ -25,30 +36,78 @@ const int DETAIL_SIZE_MAX = 64;
 
 
 const bool DEBUG_ON = true;
+static void DEBUG_II_RK(const cJSON* debug_json) {
+    if (cJSON_IsObject(debug_json) == false) {
+        printf("%s: cJSON_IsObject(debug_json).\n", __func__);
+        return;
+    }
+
+    char* key = NULL;
+    char* font_path = NULL;
+    float font_size = 0;
+    if (cJSON_LoadFromObj(debug_json, key = "font_path", JSM_STRING, &font_path) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "font_size", JSM_FLOAT, &font_size) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+
+    SDL_Color colors[DEBUG_NUM_COLORS];
+    if (cJSON_LoadFromObj(debug_json, key = "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "color_rect", JSM_COLOR, &colors[DEBUG_COLOR_RECT]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "color_face", JSM_COLOR, &colors[DEBUG_COLOR_FACE]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "color_text", JSM_COLOR, &colors[DEBUG_COLOR_TEXT]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "color_dark", JSM_COLOR, &colors[DEBUG_COLOR_DARK]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+
+    int alphas[DEBUG_NUM_ALPHAS];
+    if (cJSON_LoadFromObj(debug_json, key = "alpha_dark", JSM_INT, &alphas[DEBUG_ALPHA_DARK]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+    if (cJSON_LoadFromObj(debug_json, key = "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]) == false) {
+        printf("%s: cJSON_LoadFromObj failed.\n", __func__);
+        return;
+    }
+
+    for (int i = 0; i < DEBUG_NUM_COLORS; i++) {
+        for (int j = 0; j < DEBUG_NUM_ALPHAS; j++) {
+            debug.colors[i][j] = colors[i];
+            debug.colors[i][j].a = alphas[j];
+        }
+    }
+}
+static void DEBUG_II() {
+    cJSON* debug_json = getJson(DEBUG_JSON);
+    if (debug_json == NULL) {
+        printf("%s: debug_json == NULL.\n", __func__);
+        return;
+    }
+    DEBUG_II_RK(debug_json);
+    cJSON_Delete(debug_json);
+}
 static void DEBUG_LoadTheme() {
     debug.theme.font = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
-
-    // color
-    debug.theme.point = (SDL_Color){246, 202, 124, 255};
-    debug.theme.rect = (SDL_Color){241, 155, 153, 255};
-    debug.theme.face = (SDL_Color){158, 189, 127, 255};
-    debug.theme.text = (SDL_Color){116, 173, 220, 255};
-    debug.theme.dark = (SDL_Color){0, 0, 0, 128};
-    debug.theme.light = (SDL_Color){255, 255, 255, 255};
-
-    // alpha
-    debug.theme.alphaLight = 255;
-    debug.theme.alphaDark = 64;
-
-    debug.theme.darkPoint = debug.theme.point;
-    debug.theme.darkRect = debug.theme.rect;
-    debug.theme.darkFace = debug.theme.face;
-    debug.theme.darkText = debug.theme.text;
-
-    debug.theme.darkPoint.a = debug.theme.alphaDark;
-    debug.theme.darkRect.a = debug.theme.alphaDark;
-    debug.theme.darkFace.a = debug.theme.alphaDark;
-    debug.theme.darkText.a = debug.theme.alphaDark;
 }
 static void DEBUG_Load() {
     DEBUG_LoadTheme();
@@ -59,6 +118,7 @@ bool DEBUG_Init() {
 
     //
     debug = (Debug){0};
+    DEBUG_II();
     // 设置渲染器的混合模式（启用 Alpha 混合）
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     DEBUG_Load();
@@ -95,28 +155,28 @@ void DEBUG_DrawPoint(const SDL_FPoint point) {
     const float w = 8;
     const SDL_FRect rect = {point.x - w, point.y - w, 2 * w, 2 * w};
 
-    SDL_SetRenderSDLColor(renderer, debug.theme.point);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderFillRect(renderer, &rect);
 }
 void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.theme.point);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderLine(renderer, point1.x, point1.y, point2.x, point2.y);
 }
 void DEBUG_DrawRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.theme.rect);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
 void DEBUG_FillRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.theme.darkRect);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_DARK]);
     SDL_RenderFillRect(renderer, &rect);
 
-    SDL_SetRenderSDLColor(renderer, debug.theme.rect);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
@@ -125,7 +185,12 @@ static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
         return NULL;
     }
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
-        renderer, debug.theme.font, text, debug.theme.light, debug.theme.dark, aligned
+        renderer,
+        debug.theme.font,
+        text,
+        debug.colors[DEBUG_COLOR_LIGHT][DEBUG_ALPHA_LIGHT],
+        debug.colors[DEBUG_COLOR_DARK][DEBUG_ALPHA_DARK],
+        aligned
         );
     if (textTexture == NULL) {printf("%s: textTexture == NULL.\n", __func__); return NULL;}
 
@@ -178,10 +243,10 @@ void DEBUG_DrawGeometry(
     SDL_Vertex debugVertices[num_vertices];
     for (int i = 0; i < num_vertices; i++) {
         debugVertices[i] = vertices[i];
-        debugVertices[i].color = SDL_GetFColorFromColor(debug.theme.darkFace);
+        debugVertices[i].color = SDL_GetFColorFromColor(debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_DARK]);
     }
     SDL_RenderGeometry(renderer, NULL, debugVertices, num_vertices, indices, num_indices);
-    SDL_SetRenderSDLColor(renderer, debug.theme.face);
+    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_LIGHT]);
     for (int i = 0; i < num_indices; i += 3) {
         const SDL_FPoint points[4] = {
             debugVertices[indices[i]].position,

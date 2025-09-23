@@ -360,12 +360,12 @@ void free2DArray(void** array, size_t w) {
 }
 
 char* SDL_GetStringFromSDLColor(const SDL_Color color) {
-    static char string[] = "00FF00FF";
+    static char string[] = "[255, 255, 255, 255]";
     static size_t len = 0;
     if (len == 0) {
         len = sizeof(string);
     }
-    snprintf(string, len, "%02X%02X%02X%02X", color.r, color.g, color.b, color.a);
+    snprintf(string, len, "[%3d, %3d, %3d, %3d]", color.r, color.g, color.b, color.a);
     return string;
 }
 char* SDL_GetStringFromFRect(const SDL_FRect rect) {
