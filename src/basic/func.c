@@ -1,10 +1,11 @@
 #include "func.h"
-#include "setting.h"
 
 #define MAX_MATERIALS 128
 
 
-
+bool SLD_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
+    return rect.x <= point.x && point.x < rect.x + rect.w && rect.y <= point.y && point.y < rect.y + rect.h;
+}
 int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials) {
     FILE* file = fopen(path, "r");
     if (!file) {
@@ -17,7 +18,6 @@ int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials) 
     MTLMaterial* current = NULL;
 
     while (fgets(line, sizeof(line), file)) {
-        // 去除前导空格
         char* ptr = line;
         while (isspace(*ptr)) ptr++;
 
@@ -176,29 +176,6 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DataType type, v
 }
 
 
-bool GetSurfacePixel(SDL_Surface *surface, int x, int y, SDL_Color *outColor) {
-    if (!surface || !outColor) return false;
-    if (x < 0 || x >= surface->w || y < 0 || y >= surface->h) return false;
-
-    if (SDL_LockSurface(surface) < 0) return false;
-
-    const SDL_PixelFormatDetails *fmt = SDL_GetPixelFormatDetails(surface->format);
-    const SDL_Palette *palette = SDL_GetSurfacePalette(surface);
-
-    int bpp = fmt->bytes_per_pixel;
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-
-    Uint32 pixelValue = 0;
-    memcpy(&pixelValue, p, bpp);  // 把实际的像素字节复制到低位
-
-    SDL_GetRGBA(pixelValue, fmt, palette,
-                &outColor->r, &outColor->g, &outColor->b, &outColor->a);
-
-    SDL_UnlockSurface(surface);
-    return true;
-}
-
-
 bool BASIC_Renew() {
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
@@ -294,7 +271,7 @@ SDL_Texture* TXT_LoadTextureWithLines(
     SDL_RenderClear(renderer);
 
     // updateTexture
-    SDL_SetRenderSDLColor(renderer, colorBack);
+    SDL_SetRenderColor(renderer, colorBack);
     for (int i = 0; i < num_lines; i++) {
         SDL_FRect dst_rect = {0, line_height * (float)i, line_widths[i], line_height};
         switch (aligned) {
@@ -315,10 +292,10 @@ SDL_Texture* TXT_LoadTextureWithLines(
 SDL_FColor SDL_GetFColorFromColor(const SDL_Color color) {
     return (SDL_FColor){(float)color.r / 255, (float)color.g / 255, (float)color.b / 255, (float)color.a / 255};
 }
-bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, const SDL_Color color) {
+bool SDL_SetRenderColor(SDL_Renderer* renderer, const SDL_Color color) {
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
-bool SDL_CompareSDLColor(const SDL_Color x, const SDL_Color y) {
+bool SDL_GetColorEqual(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
 
@@ -362,7 +339,7 @@ void free2DArray(void** array, size_t w) {
     free(array);
 }
 
-char* SDL_GetStringFromSDLColor(const SDL_Color color) {
+char* SDL_GetStrColor(const SDL_Color color) {
     static char string[] = "[255, 255, 255, 255]";
     static size_t len = 0;
     if (len == 0) {
@@ -371,12 +348,12 @@ char* SDL_GetStringFromSDLColor(const SDL_Color color) {
     snprintf(string, len, "[%3d, %3d, %3d, %3d]", color.r, color.g, color.b, color.a);
     return string;
 }
-char* SDL_GetStringFromFRect(const SDL_FRect rect) {
+char* SDL_GetStrFRect(const SDL_FRect rect) {
     static char string[32];
     snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
     return string;
 }
-bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
+bool SDL_GetSurfaceColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
     if (surface == NULL) {
         printf("%s: surface is null.\n", __func__);
         return false;

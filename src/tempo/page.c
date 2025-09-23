@@ -206,7 +206,7 @@ bool TEMPO_DrawPage(const Page* page) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 64);
     SDL_RenderFillRect(renderer, NULL);
 
-    SDL_SetRenderSDLColor(renderer, page->color);
+    SDL_SetRenderColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);
 
     for (int i = 0; i < page->elemTable.len; i++) {

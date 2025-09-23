@@ -11,9 +11,6 @@ static struct {
 
 
 // SET & GET ===========================================================================================================
-bool SLD_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
-    return rect.x <= point.x && point.x < rect.x + rect.w && rect.y <= point.y && point.y < rect.y + rect.h;
-} // remember to put it in BASIC
 SDL_FPoint PERPH_GetMousePos() {
     return mouse.state2.pos;
 }

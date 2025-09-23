@@ -132,28 +132,28 @@ void DEBUG_DrawPoint(const SDL_FPoint point) {
     const float w = 8;
     const SDL_FRect rect = {point.x - w, point.y - w, 2 * w, 2 * w};
 
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderFillRect(renderer, &rect);
 }
 void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderLine(renderer, point1.x, point1.y, point2.x, point2.y);
 }
 void DEBUG_DrawRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
 void DEBUG_FillRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
 
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_DARK]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_DARK]);
     SDL_RenderFillRect(renderer, &rect);
 
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
@@ -211,7 +211,7 @@ void DEBUG_DrawGeometry(
         debugVertices[i].color = SDL_GetFColorFromColor(debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_DARK]);
     }
     SDL_RenderGeometry(renderer, texture, debugVertices, num_vertices, indices, num_indices);
-    SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_LIGHT]);
+    SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_FACE][DEBUG_ALPHA_LIGHT]);
     for (int i = 0; i < num_indices; i += 3) {
         const SDL_FPoint points[4] = {
             debugVertices[indices[i]].position,

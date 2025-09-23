@@ -117,11 +117,11 @@ static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
             SDL_Color color;
-            if (GetSurfacePixel(room->maskSur, i, j, &color) == false) {
+            if (SDL_GetSurfaceColor(room->maskSur, i, j, &color) == false) {
                 printf("%s: failed in %s\n", __func__, key);
                 return false;
             }
-            if (SDL_CompareSDLColor(color, colors[VILLA_DATA_NONE]) == false) {
+            if (SDL_GetColorEqual(color, colors[VILLA_DATA_NONE]) == false) {
                 room->cells[i][j].dataType = VILLA_DATA_WALL;
             }
             else {
@@ -188,7 +188,7 @@ static bool VILLA_RenewRoomCells(Room* room) {
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
             RoomCell* cell = &room->cells[i][j];
-            SDL_SetRenderSDLColor(renderer, colors[cell->dataType]);
+            SDL_SetRenderColor(renderer, colors[cell->dataType]);
             SDL_RenderPoint(renderer, (float)i, (float)j);
 
 

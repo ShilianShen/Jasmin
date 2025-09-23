@@ -9,19 +9,21 @@ float clip(float min, float value, float max);
 float loop(float min, float value, float max);
 
 
-// 2D-ARRAY ============================================================================================================
+// 2D ARRAY ============================================================================================================
 void** allocate2DArray(size_t w, size_t h, size_t elementSize);
 void free2DArray(void** array, size_t w);
 
 
 // SDL =================================================================================================================
-bool GetSurfacePixel(SDL_Surface *surface, int x, int y, SDL_Color *outColor);
-char* SDL_GetStringFromSDLColor(SDL_Color color);
-char* SDL_GetStringFromFRect(SDL_FRect rect);
-bool SDL_CompareSDLColor(SDL_Color x, SDL_Color y);
-bool SDL_ReadSurfaceSDLColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
+bool SLD_GetPointInRect(SDL_FPoint point, SDL_FRect rect);
+char*SDL_GetStrColor(SDL_Color color);
+char*SDL_GetStrFRect(SDL_FRect rect);
+bool SDL_GetColorEqual(SDL_Color x, SDL_Color y);
+bool SDL_GetSurfaceColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
+bool SDL_SetRenderColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
-bool SDL_SetRenderSDLColor(SDL_Renderer* renderer, SDL_Color color);
+
+
 SDL_Texture* TXT_LoadTexture(
     SDL_Renderer* renderer,
     TTF_Font* font,
@@ -53,7 +55,8 @@ bool SDL_RenderTextureAligned(
     int anchor
     );
 
-//
+
+// OBJ & MTL ===========================================================================================================
 typedef struct {
     char name[64];
     char map_Kd[256];
@@ -61,6 +64,7 @@ typedef struct {
     char map_Ks[256];
 } MTLMaterial;
 int parse_mtl_file(const char* path, MTLMaterial* materials, int max_materials);
+
 
 // JSON ================================================================================================================
 cJSON* getJson(const char* path);

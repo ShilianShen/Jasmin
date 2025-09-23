@@ -1,7 +1,4 @@
-#include "setting.h"
-
-
-
+#include "basic.h"
 
 
 

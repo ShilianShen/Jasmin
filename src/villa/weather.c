@@ -48,7 +48,7 @@ bool VILLA_RenewRain() {
 bool VILLA_DrawRain() {
     const float dx = rainTheme.len * SDL_sinf(rainTheme.arg);
     const float dy = rainTheme.len * SDL_cosf(rainTheme.arg);
-    SDL_SetRenderSDLColor(renderer, rainTheme.color);
+    SDL_SetRenderColor(renderer, rainTheme.color);
     for (int i = 0; i < NUM_RAIN; i++) {
         SDL_RenderLine(renderer,
             rainPos[i].x, rainPos[i].y,

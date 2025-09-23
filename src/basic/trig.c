@@ -1,4 +1,4 @@
-#include "trigger.h"
+#include "trig.h"
 
 
 void PullTrig(const Trig* trig) {

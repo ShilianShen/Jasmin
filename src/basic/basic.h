@@ -4,10 +4,9 @@
 
 #include "_basic.h"
 #include "atv.h"
-#include "setting.h"
 #include "func.h"
 #include "table.h"
-#include "trigger.h"
+#include "trig.h"
 #include "env.h"
 #include "matrix.h"
 

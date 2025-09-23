@@ -252,7 +252,7 @@ bool TEMPO_RenewElem(Elem *elem) {
         if (elem->trig.func != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
         }
-        DEBUG_SendMessageL("    dst: %s\n", SDL_GetStringFromFRect(elem->dst_rect));
+        DEBUG_SendMessageL("    dst: %s\n", SDL_GetStrFRect(elem->dst_rect));
     }
 
     if (elem->trig.func != NULL) {
