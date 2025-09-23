@@ -1,7 +1,6 @@
 #include "debug.h"
 
 
-
 // PARA ================================================================================================================
 enum DEBUG_COLOR {
     DEBUG_COLOR_POINT,
@@ -22,7 +21,7 @@ enum DEBUG_ALPHA {
 const char* DEBUG_JSON = "../config/debug_theme.json";
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
-const bool DEBUG_ON = true;
+bool DEBUG_ON = true;
 
 
 struct {
@@ -114,6 +113,19 @@ bool DEBUG_Renew() {
 
 
 // DRAW ================================================================================================================
+bool DEBUG_Draw() {
+    if (!DEBUG_ON) return true;
+
+    const bool* state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_LSHIFT] == false) { return true; }
+
+    // Opt Condition
+    if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
+    if (debug.message[1] != NULL) {DEBUG_DrawTextAligned(debug.message[1], 'R');}
+    return true;
+}
+
+
 void DEBUG_DrawPoint(const SDL_FPoint point) {
     if (!DEBUG_ON) return;
 
@@ -144,7 +156,6 @@ void DEBUG_FillRect(const SDL_FRect rect) {
     SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
-
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
         renderer,
@@ -157,7 +168,7 @@ static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     REQ_CONDITION(textTexture != NULL, return NULL);
     return textTexture;
 }
-void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
+void DEBUG_DrawText(float x, float y, const char* text) {
     if (!DEBUG_ON) return;
 
     REQ_CONDITION(text != NULL, return);
@@ -186,11 +197,12 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 
 void DEBUG_DrawGeometry(
     SDL_Renderer *renderer,
-    SDL_Texture*,
+    SDL_Texture* texture,
     const SDL_Vertex *vertices,
     const int num_vertices,
     const int *indices,
-    const int num_indices) {
+    const int num_indices
+    ) {
     if (!DEBUG_ON) return;
 
     SDL_Vertex debugVertices[num_vertices];
@@ -212,6 +224,7 @@ void DEBUG_DrawGeometry(
 }
 
 
+// MESSAGE =============================================================================================================
 static void DEBUG_SendMessage(const int i, const char* newMessage) {
     if (!DEBUG_ON) return;
 
@@ -258,16 +271,4 @@ void DEBUG_SendMessageR(const char* format, ...) {
 
     //
     DEBUG_SendMessage(1, newMessage);
-}
-
-bool DEBUG_Draw() {
-    if (!DEBUG_ON) return true;
-
-    const bool* state = SDL_GetKeyboardState(NULL);
-    if (state[SDL_SCANCODE_LSHIFT] == false) { return true; }
-
-    // Opt Condition
-    if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
-    if (debug.message[1] != NULL) {DEBUG_DrawTextAligned(debug.message[1], 'R');}
-    return true;
 }
