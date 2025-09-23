@@ -7,16 +7,14 @@ bool DEVICE_Init() {
 void DEVICE_Exit() {
 }
 bool DEVICE_Renew() {
-    return true
-    && DEVICE_RenewMouse()
-    && DEVICE_RenewKeyboard()
-    ;
+    REQ_CONDITION(DEVICE_RenewMouse(), return false);
+    REQ_CONDITION(DEVICE_RenewKeyboard(), return false);
+    return true;
 }
 bool DEVICE_Draw() {
-    return true
-    && DEVICE_DrawMouse()
-    && DEVICE_DrawKeyboard()
-    ;
+    REQ_CONDITION(DEVICE_DrawMouse(), return false);
+    REQ_CONDITION(DEVICE_DrawKeyboard(), return false);
+    return true;
 }
 
 

@@ -1,15 +1,11 @@
 #include "keyboard.h"
 
 
-typedef struct KeyboardState {
-    bool pressed[SDL_SCANCODE_COUNT];
-} KeyboardState;
-
-typedef struct Keyboard {
-    KeyboardState state1, state2;
-} Keyboard;
-
-Keyboard keyboard;
+static struct {
+    struct {
+        bool pressed[SDL_SCANCODE_COUNT];
+    } state1, state2;
+} keyboard;
 
 
 // SET & GET ===========================================================================================================

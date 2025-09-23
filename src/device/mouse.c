@@ -1,22 +1,19 @@
 #include "mouse.h"
 
 
-typedef struct MouseState {
-    SDL_FPoint pos, leftPos, rightPos;
-    bool leftPressed, rightPressed;
-} MouseState;
-typedef struct Mouse {
-    MouseState state1, state2;
+static struct Mouse {
+    struct {
+        SDL_FPoint pos, leftPos, rightPos;
+        bool leftPressed, rightPressed;
+    } state1, state2;
     const Trig* left_trig;
-} Mouse;
-
-static Mouse mouse;
+} mouse;
 
 
 // SET & GET ===========================================================================================================
 bool SLD_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
     return rect.x <= point.x && point.x < rect.x + rect.w && rect.y <= point.y && point.y < rect.y + rect.h;
-}
+} // remember to put it in BASIC
 SDL_FPoint DEVICE_GetMousePos() {
     return mouse.state2.pos;
 }
@@ -33,12 +30,14 @@ bool DEVICE_GetMouseInRect(const SDL_FRect rect) {
 
 // RENEW ===============================================================================================================
 static void DEVICE_RenewMouse_State() {
+    mouse.state1 = mouse.state2;
+
     float x, y;
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&x, &y);
-    mouse.state1 = mouse.state2;
     mouse.state2.pos = (SDL_FPoint){x * scale_x, y * scale_y};
     mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
     mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
+
     if (!mouse.state1.leftPressed && mouse.state2.leftPressed)
         mouse.state2.leftPos = mouse.state2.pos;
     else if (mouse.state1.leftPressed && !mouse.state2.leftPressed)
@@ -46,14 +45,13 @@ static void DEVICE_RenewMouse_State() {
 }
 static void DEVICE_RenewMouse_Trig() {
     if (mouse.left_trig != NULL
-           && mouse.left_trig->sustain == false
-           && mouse.state1.leftPressed == true
-           && mouse.state2.leftPressed == false
-           ) {
+        && mouse.left_trig->sustain == false
+        && mouse.state1.leftPressed == true
+        && mouse.state2.leftPressed == false
+        ) {
         ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
         PullTrig(mouse.left_trig);
-           }
-
+        }
     if (mouse.left_trig != NULL
         && mouse.left_trig->sustain == true
         && mouse.state1.leftPressed == true

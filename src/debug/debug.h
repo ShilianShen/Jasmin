@@ -15,7 +15,7 @@ void DEBUG_DrawPoint(SDL_FPoint point);
 void DEBUG_DrawLine(SDL_FPoint point1, SDL_FPoint point2);
 void DEBUG_DrawRect(SDL_FRect rect);
 void DEBUG_FillRect(SDL_FRect rect);
-void DEBUG_DrawText(float x, float y, const char* text);
+void DEBUG_DrawText(SDL_FPoint point, const char* text);
 void DEBUG_DrawTextAligned(const char* text, char aligned);
 void DEBUG_DrawGeometry(
     SDL_Renderer *renderer,

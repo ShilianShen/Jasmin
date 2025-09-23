@@ -168,7 +168,7 @@ static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
     REQ_CONDITION(textTexture != NULL, return NULL);
     return textTexture;
 }
-void DEBUG_DrawText(float x, float y, const char* text) {
+void DEBUG_DrawText(const SDL_FPoint point, const char* text) {
     if (!DEBUG_ON) return;
 
     REQ_CONDITION(text != NULL, return);
@@ -176,7 +176,7 @@ void DEBUG_DrawText(float x, float y, const char* text) {
     SDL_Texture* textTexture = DEBUG_GetTextTexture(text, 'L');
     REQ_CONDITION(textTexture != NULL, return);
 
-    SDL_FRect dst_rect = {x, y};
+    SDL_FRect dst_rect = {point.x, point.y};
     SDL_GetTextureSize(textTexture, &dst_rect.w, &dst_rect.h);
     SDL_RenderTexture(renderer, textTexture, NULL, &dst_rect);
     SDL_DestroyTexture(textTexture);

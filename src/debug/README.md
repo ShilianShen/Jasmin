@@ -1,7 +1,8 @@
 # Debug
 ```mermaid
 graph
-    subgraph DEBUG 
+    subgraph MODULE
         debug.h --> debug.c
     end
+    in --> debug.h --> out
 ```
