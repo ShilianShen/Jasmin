@@ -18,46 +18,50 @@ enum DEBUG_ALPHA {
     DEBUG_NUM_ALPHAS,
 };
 
+
 const char* DEBUG_JSON = "../config/debug_theme.json";
-
-
-typedef struct Debug Debug;
-struct Debug {
-    TTF_Font *font;
-    SDL_Color colors[DEBUG_NUM_COLORS][DEBUG_NUM_ALPHAS];
-    struct {
-        TTF_Font *font;
-    } theme;
-    char* message[2];
-};
-static Debug debug;
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
-
-
 const bool DEBUG_ON = true;
-static bool DEBUG_II_RK(const cJSON* debug_json) {
-    REQ_CONDITION(cJSON_IsObject(debug_json), return false);
+
+
+struct {
+    cJSON* json;
+    TTF_Font *font;
+    SDL_Color colors[DEBUG_NUM_COLORS][DEBUG_NUM_ALPHAS];
+    char* message[2];
+} debug;
+
+
+// INIT & EXIT =========================================================================================================
+bool DEBUG_Init() {
+    if (!DEBUG_ON) return true;
+
+    memset(&debug, 0, sizeof(debug));
+
+    debug.json = getJson(DEBUG_JSON);
+    REQ_CONDITION(debug.json != NULL, return false);
+    REQ_CONDITION(cJSON_IsObject(debug.json), return false);
 
     char* font_path = NULL;
     float font_size = 0;
-    REQ_CONDITION(cJSON_Load(debug_json, "font_path", JSM_STRING, &font_path), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "font_size", JSM_FLOAT, &font_size), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "font_path", JSM_STRING, &font_path), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "font_size", JSM_FLOAT, &font_size), return false);
 
     debug.font = TTF_OpenFont(font_path, font_size);
     REQ_CONDITION(debug.font != NULL, return false);
 
     SDL_Color colors[DEBUG_NUM_COLORS];
-    REQ_CONDITION(cJSON_Load(debug_json, "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "color_rect" , JSM_COLOR, &colors[DEBUG_COLOR_RECT ]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "color_face" , JSM_COLOR, &colors[DEBUG_COLOR_FACE ]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "color_text" , JSM_COLOR, &colors[DEBUG_COLOR_TEXT ]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "color_dark" , JSM_COLOR, &colors[DEBUG_COLOR_DARK ]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_rect" , JSM_COLOR, &colors[DEBUG_COLOR_RECT ]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_face" , JSM_COLOR, &colors[DEBUG_COLOR_FACE ]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_text" , JSM_COLOR, &colors[DEBUG_COLOR_TEXT ]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_dark" , JSM_COLOR, &colors[DEBUG_COLOR_DARK ]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]), return false);
 
     int alphas[DEBUG_NUM_ALPHAS];
-    REQ_CONDITION(cJSON_Load(debug_json, "alpha_dark" , JSM_INT, &alphas[DEBUG_ALPHA_DARK ]), return false);
-    REQ_CONDITION(cJSON_Load(debug_json, "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "alpha_dark" , JSM_INT, &alphas[DEBUG_ALPHA_DARK ]), return false);
+    REQ_CONDITION(cJSON_Load(debug.json, "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]), return false);
 
     for (int i = 0; i < DEBUG_NUM_COLORS; i++) {
         for (int j = 0; j < DEBUG_NUM_ALPHAS; j++) {
@@ -65,39 +69,28 @@ static bool DEBUG_II_RK(const cJSON* debug_json) {
             debug.colors[i][j].a = alphas[j];
         }
     }
-}
-static void DEBUG_II() {
-    cJSON* debug_json = getJson(DEBUG_JSON);
-    if (debug_json == NULL) {
-        printf("%s: debug_json == NULL.\n", __func__);
-        return;
-    }
-    DEBUG_II_RK(debug_json);
-    cJSON_Delete(debug_json);
-}
-static void DEBUG_LoadTheme() {
-    debug.theme.font = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
-}
-static void DEBUG_Load() {
-    DEBUG_LoadTheme();
-}
-bool DEBUG_Init() {
-    // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return false;}
 
-    //
-    debug = (Debug){0};
-    DEBUG_II();
-    // 设置渲染器的混合模式（启用 Alpha 混合）
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    DEBUG_Load();
+    cJSON_Delete(debug.json);
+    debug.json = NULL;
+
     return true;
 }
-bool DEBUG_Renew() {
-    // Pre Condition
-    if (!DEBUG_ON) {return true;}
+void DEBUG_Exit() {
+    if (debug.font != NULL) {
+        TTF_CloseFont(debug.font);
+        debug.font = NULL;
+    }
+    if (debug.json != NULL) {
+        cJSON_Delete(debug.json);
+        debug.json = NULL;
+    }
+}
 
-    //
+
+// RENEW ===============================================================================================================
+bool DEBUG_Renew() {
+    if (!DEBUG_ON) return true;
+
     for (int i = 0; i < 2; i++) {
         if (debug.message[i] != NULL) {
             free(debug.message[i]);
@@ -105,15 +98,18 @@ bool DEBUG_Renew() {
         }
     }
 
-    //
     static Uint64 t1 = 0, t2 = 0;
     t2 = SDL_GetTicks();
-    DEBUG_SendMessageL("FPS: %4.2f\n", 1000.f / (float)(t2 - t1));
+    if (t2 / 1000 > 2) {
+        static float fps_min = 9999.f;
+        static float fps_max = 0.0f;
+        const float fps = 1000.f / (float)(t2 - t1);
+        fps_min = SDL_min(fps, fps_min);
+        fps_max = SDL_max(fps, fps_max);
+        DEBUG_SendMessageL("%s: FPS: %4.2f <= %4.2f <= %4.2f\n", __func__, fps_min, fps, fps_max);
+    }
     t1 = SDL_GetTicks();
     return true;
-}
-void DEBUG_Exit() {
-    TTF_CloseFont(debug.theme.font);
 }
 
 
@@ -148,52 +144,40 @@ void DEBUG_FillRect(const SDL_FRect rect) {
     SDL_SetRenderSDLColor(renderer, debug.colors[DEBUG_COLOR_RECT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderRect(renderer, &rect);
 }
+
 static SDL_Texture* DEBUG_GetTextTexture(const char* text, const char aligned) {
-    if (text == NULL) {
-        printf("%s: text == NULL.\n", __func__);
-        return NULL;
-    }
     SDL_Texture* textTexture = TXT_LoadTextureWithLines(
         renderer,
-        debug.theme.font,
+        debug.font,
         text,
         debug.colors[DEBUG_COLOR_LIGHT][DEBUG_ALPHA_LIGHT],
         debug.colors[DEBUG_COLOR_DARK][DEBUG_ALPHA_DARK],
         aligned
         );
-    if (textTexture == NULL) {printf("%s: textTexture == NULL.\n", __func__); return NULL;}
-
+    REQ_CONDITION(textTexture != NULL, return NULL);
     return textTexture;
 }
 void DEBUG_DrawText(const Sint16 x, const Sint16 y, const char* text) {
     if (!DEBUG_ON) return;
 
-    // Req Condition
-    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
+    REQ_CONDITION(text != NULL, return);
 
-    // Req Condition
     SDL_Texture* textTexture = DEBUG_GetTextTexture(text, 'L');
-    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
+    REQ_CONDITION(textTexture != NULL, return);
 
-    // rect
     SDL_FRect dst_rect = {x, y};
     SDL_GetTextureSize(textTexture, &dst_rect.w, &dst_rect.h);
-
-    // text
     SDL_RenderTexture(renderer, textTexture, NULL, &dst_rect);
     SDL_DestroyTexture(textTexture);
 }
 void DEBUG_DrawTextAligned(const char* text, const char aligned) {
     if (!DEBUG_ON) return;
 
-    // Req Condition
-    if (text == NULL) {printf("%s: text is NULL.\n", __func__); return;}
+    REQ_CONDITION(text != NULL, return);
 
-    // Req Condition
     SDL_Texture* textTexture = DEBUG_GetTextTexture(text, aligned);
-    if (textTexture == NULL) {printf("%s: texture is NULL.\n", __func__); return;}
+    REQ_CONDITION(textTexture != NULL, return);
 
-    //
     const int anchor = aligned == 'R' ? 20 : -20;
     SDL_RenderTextureAligned(renderer, textTexture, NULL, NULL, NULL, anchor);
     SDL_DestroyTexture(textTexture);
@@ -202,7 +186,7 @@ void DEBUG_DrawTextAligned(const char* text, const char aligned) {
 
 void DEBUG_DrawGeometry(
     SDL_Renderer *renderer,
-    SDL_Texture *texture,
+    SDL_Texture*,
     const SDL_Vertex *vertices,
     const int num_vertices,
     const int *indices,
@@ -229,15 +213,12 @@ void DEBUG_DrawGeometry(
 
 
 static void DEBUG_SendMessage(const int i, const char* newMessage) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return;
 
     // getMessage
     if (debug.message[i] == NULL) {
         debug.message[i] = strdup(newMessage); // malloc
-        if (debug.message[i] == NULL) {
-            printf("%s: failed to malloc.\n", __func__);
-        }
+        REQ_CONDITION(debug.message[i] != NULL, return);
     }
     else {
         // getOldMessage
@@ -245,17 +226,15 @@ static void DEBUG_SendMessage(const int i, const char* newMessage) {
 
         // getAllMessage
         debug.message[i] = malloc(strlen(newMessage) + strlen(oldMessage) + 1); // malloc
-        if (debug.message[i] == NULL) {
-            printf("%s: failed to malloc.\n", __func__);
-        }
+        REQ_CONDITION(debug.message[i] != NULL, );
+
         strcpy(debug.message[i], oldMessage);
         strcat(debug.message[i], newMessage);
         free(oldMessage); // free
     }
 }
 void DEBUG_SendMessageL(const char* format, ...) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return;
 
     // getNewMessage
     char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
@@ -268,8 +247,7 @@ void DEBUG_SendMessageL(const char* format, ...) {
     DEBUG_SendMessage(0, newMessage);
 }
 void DEBUG_SendMessageR(const char* format, ...) {
-    // Pre Condition
-    if (!DEBUG_ON) {return;}
+    if (!DEBUG_ON) return;
 
     // getNewMessage
     char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
@@ -283,8 +261,8 @@ void DEBUG_SendMessageR(const char* format, ...) {
 }
 
 bool DEBUG_Draw() {
-    // Pre Condition
-    if (!DEBUG_ON) {return true;}
+    if (!DEBUG_ON) return true;
+
     const bool* state = SDL_GetKeyboardState(NULL);
     if (state[SDL_SCANCODE_LSHIFT] == false) { return true; }
 

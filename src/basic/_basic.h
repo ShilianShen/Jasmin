@@ -5,7 +5,7 @@
 #define REQ_CONDITION(expr, stmt)                            \
     do {                                                     \
         if (!(expr)) {                                       \
-            printf("%s: (%s) == false.\n", __func__, #expr); \
+            printf("%s: %s == false.\n", __func__, #expr); \
             stmt;                                            \
         }                                                    \
     } while (0)
