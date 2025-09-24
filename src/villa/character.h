@@ -6,15 +6,23 @@
 #include "room.h"
 
 
-typedef enum VILLA_Direct {
+typedef enum {
     VILLA_DIRECT_W,
-    VILLA_DIRECT_A,
     VILLA_DIRECT_S,
+    VILLA_DIRECT_A,
     VILLA_DIRECT_D,
     VILLA_NUM_DIRECTS,
 } VILLA_Direct;
+typedef enum {
+    VILLA_ACT_NONE,
+    VILLA_ACT_WALK_1,
+    VILLA_ACT_WALK_2,
+    VILLA_ACT_MOVE_aa,
+    VILLA_NUM_ACTS,
+} VILLA_Action;
 
 
+extern SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];
 typedef struct Character Character;
 
 bool VILLA_SetCharacterCoord(Character* character, Coord coord);

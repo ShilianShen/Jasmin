@@ -2,6 +2,9 @@
 
 
 
+const float WALK_TIME_PER_CELL = 0.1f;
+
+
 SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
     [VILLA_DIRECT_W] = {0, 0, 0.25f, 0.25f},
     [VILLA_DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
@@ -36,7 +39,7 @@ bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
         default: return false;
     }
     character->delay.block = true;
-    if (BASIC_SetDelay(&character->delay, 0.2f)) {
+    if (BASIC_SetDelay(&character->delay, WALK_TIME_PER_CELL)) {
         VILLA_SetCharacterCoord(character, coord);
     }
     return true;
@@ -84,10 +87,24 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     float a = 0;
     LOTRI_GetModelCZ(character->model, &a);
     a = loop(0, a, M_PI * 2);
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_W]);
-    if (1 * M_PI_4 < a && a <= 3 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_A]);
-    if (3 * M_PI_4 < a && a <= 5 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_S]);
-    if (5 * M_PI_4 < a && a <= 7 * M_PI_4) return LOTRI_SetModelSrc(character->model, &direct2rect2[VILLA_DIRECT_D]);
+    VILLA_Action action = VILLA_ACT_NONE;
+    const float time = (float)SDL_GetTicks() / 1000;
+    if (time < character->delay.t2) {
+        switch (SDL_GetTicks() / 70 % 4) {
+            case 1: action = VILLA_ACT_WALK_1; break;
+            case 3: action = VILLA_ACT_WALK_2; break;
+            default: break;
+        }
+    }
+
+    if (7 * M_PI_4 < a || a <= 1 * M_PI_4)
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_W][action]);
+    if (1 * M_PI_4 < a && a <= 3 * M_PI_4)
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_A][action]);
+    if (3 * M_PI_4 < a && a <= 5 * M_PI_4)
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_S][action]);
+    if (5 * M_PI_4 < a && a <= 7 * M_PI_4)
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_D][action]);
     return false;
 }
 bool VILLA_RenewCharacter(void *character_void) {

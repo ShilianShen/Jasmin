@@ -11,6 +11,7 @@ const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
 
 Table characterTable;
 Table roomTable;
+SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];
 
 
 Character* you = NULL;
@@ -33,6 +34,15 @@ bool VILLA_Init() {
     you = characterTable.kv[1].val;
 
     VILLA_InitRain();
+
+    for (int i = 0; i < VILLA_NUM_DIRECTS; i++) {
+        for (int j = 0; j < VILLA_NUM_ACTS; j++) {
+            TEX_SRC[i][j] = (SDL_FRect){
+                (float)j / VILLA_NUM_ACTS, (float)i / VILLA_NUM_DIRECTS,
+                (float)1 / VILLA_NUM_ACTS, (float)1 / VILLA_NUM_DIRECTS,
+            };
+        }
+    }
     return true;
 }
 static bool VILLA_Renew_Camera() {
