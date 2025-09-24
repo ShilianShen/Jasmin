@@ -108,18 +108,12 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 
         const char* para_json = NULL;
         if (cJSON_ExistKey(elem_json, "para")) {
-            if (cJSON_Load(elem_json, "para", JSM_STRING, &para_json) == false) {
-                printf("%s: para == NULL, %s.\n", __func__, key);
-                return false;
-            }
+            REQ_CONDITION(cJSON_Load(elem_json, "para", JSM_STRING, &para_json), return false);
         }
 
         if (para_json != NULL) {
             elem->para_string = strdup(para_json);
-            if (elem->para_string == NULL) {
-                printf("%s: failed in %s.\n", __func__, key);
-                return false;
-            }
+            REQ_CONDITION(elem->para_string != NULL, return false);
         }
 
         if (elem->trig.func ==  NULL) {
@@ -142,7 +136,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     return true;
 }
-Elem* TEMPO_CreateElem(const cJSON *elem_json) {
+void *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
 
     Elem* elem = calloc(1, sizeof(Elem));
@@ -150,7 +144,8 @@ Elem* TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
     return elem;
 }
-Elem* TEMPO_DeleteElem(Elem *elem) {
+void *TEMPO_DeleteElem(void *elem_void) {
+    Elem* elem = elem_void;
     if (elem == NULL) return elem;
 
     if (ELEM_INFO_DETAIL[elem->type].delete != NULL) {

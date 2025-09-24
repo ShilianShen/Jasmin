@@ -14,8 +14,8 @@ bool TEMPO_SetElemPublicBck(const SDL_FRect* bck);
 bool TEMPO_SetElemPublicTable(const Table *table);
 
 
-Elem* TEMPO_CreateElem(const cJSON *elem_json);
-Elem* TEMPO_DeleteElem(Elem* elem);
+void *TEMPO_CreateElem(const cJSON *elem_json);
+void *TEMPO_DeleteElem(void *elem_void);
 bool TEMPO_RenewElem(Elem* elem);
 bool TEMPO_DrawElem(const Elem* elem);
 

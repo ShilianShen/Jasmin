@@ -21,42 +21,24 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     const char* key;
     if (cJSON_ExistKey(page_json, key = "elemTable")) {
         const cJSON* elemTable_json = cJSON_GetObjectItem(page_json, key);
-        if (elemTable_json == NULL) {
-            printf("%s: tomlElems not exists, %s.\n", __func__, key);
-            return false;
-        } // Req Condition
+        REQ_CONDITION(elemTable_json != NULL, return false);
 
         page->elemTable.len = cJSON_GetArraySize(elemTable_json);
-        if (page->elemTable.len == 0) {
-            printf("%s: failed malloc page.lenElemSet.\n", __func__);
-            return false;
-        } // Req Condition
+        REQ_CONDITION(page->elemTable.len > 0, return false);
 
         page->elemTable.kv = calloc(page->elemTable.len, sizeof(KeyVal));
-        if (page->elemTable.kv == NULL) {
-            printf("%s: failed malloc page.elemSet.\n", __func__);
-            return false;
-        } // Req Condition
+        REQ_CONDITION(page->elemTable.kv != NULL, return false);
 
         TEMPO_SetElemPublicTable(&page->elemTable);
         for (int i = 0; i < page->elemTable.len; i++) {
             const cJSON* elem_json = cJSON_GetArrayItem(elemTable_json, i);
-            if (elem_json == NULL) {
-                printf("%s: failed malloc page.elemSet.\n", __func__);
-                return false;
-            } // Req Condition
+            REQ_CONDITION(elem_json != NULL, return false);
 
             page->elemTable.kv[i].key = strdup(elem_json->string);
-            if (page->elemTable.kv[i].key == NULL) {
-                printf("%s: failed malloc page.elemSet.\n", __func__);
-                return false;
-            } // Req Condition
+            REQ_CONDITION(page->elemTable.kv[i].key != NULL, return false);
 
             page->elemTable.kv[i].val = TEMPO_CreateElem(elem_json); // malloc
-            if (page->elemTable.kv[i].val == NULL) {
-                printf("%s: failed malloc page.elemSet, %s.\n", __func__, page->elemTable.kv[i].key);
-                return false;
-            } // Req Condition
+            REQ_CONDITION(page->elemTable.kv[i].val != NULL, return false);
         }
         TEMPO_SetElemPublicTable(NULL);
     }
@@ -67,30 +49,21 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         }
     }
     if (cJSON_ExistKey(page_json, key = "src")) {
-        if (cJSON_Load(page_json, key, JSM_FRECT, &page->src_rect) == true) {
-            page->src = &page->src_rect;
-        }
-        else {
-            printf("%s: failed malloc page.src.\n", __func__);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(page_json, key, JSM_FRECT, &page->src_rect), return false);
+        page->src = &page->src_rect;
     }
     if (cJSON_ExistKey(page_json, key = "color")) {
-        if (cJSON_Load(page_json, key, JSM_COLOR, &page->color) == false) {
-            printf("%s: failed malloc page.color.\n", __func__);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(page_json, key, JSM_COLOR, &page->color), return false);
     }
     return true;
 }
-static bool TEMPO_CreatePage_CK(const Page* page) {
-    for (int i = 0; i < page->elemTable.len; i++) {
-        if (page->elemTable.kv[i].key == NULL || page->elemTable.kv[i].val == NULL) {
-            printf("%s: elemSet[%d] == NULL.\n", __func__, i);
-            return false;
-        }
-    }
-    return true;
+Page* TEMPO_CreatePage(const cJSON* page_json) {
+    REQ_CONDITION(page_json != NULL, return NULL);
+
+    Page* page = calloc(1, sizeof(Page));
+    REQ_CONDITION(page != NULL, return NULL);
+    REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), page = TEMPO_DeletePage(page));
+    return page;
 }
 Page* TEMPO_DeletePage(Page* page) {
     if (page != NULL) {
@@ -110,22 +83,6 @@ Page* TEMPO_DeletePage(Page* page) {
         free(page);
         page = NULL;
     }
-    return page;
-}
-Page* TEMPO_CreatePage(const cJSON* page_json) {
-    if (page_json == NULL) {
-        printf("%s: tomlPage == NULL.\n", __func__);
-        return NULL;
-    } // Req Condition
-    Page* page = calloc(1, sizeof(Page));
-    if (page == NULL) {
-        printf("%s: page == NULL.\n", __func__);
-        return page;
-    } // Req Condition
-    if (TEMPO_CreatePage_RK(page, page_json) == false || TEMPO_CreatePage_CK(page) == false) {
-        printf("%s: RK or CK == false.\n", __func__);
-        page = TEMPO_DeletePage(page);
-    } // Req Condition
     return page;
 }
 
