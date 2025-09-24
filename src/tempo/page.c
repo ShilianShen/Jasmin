@@ -74,24 +74,11 @@ static bool TEMPO_RenewPage_DstRect(Page* page) {
 }
 bool TEMPO_RenewPage(Page *page) {
     REQ_CONDITION(page != NULL, return false);
+    REQ_CONDITION(TEMPO_RenewPage_DstRect(page), return false);
 
-    if (TEMPO_RenewPage_DstRect(page) == false) {
-        DEBUG_SendMessageR("%s: TEMPO_RenewPage_DstRect(page) == false.\n", __func__);
-        return false;
-    }
-
-    //
     TEMPO_SetElemPublicBck(&page->dst_rect);
-    {
-        PERPH_SetMouseLeftTrig(NULL);
-        for (int i = 0; i < page->elemTable.len; i++) {
-            const bool renew = TEMPO_RenewElem(page->elemTable.kv[i].val);
-            if (renew == false) {
-                DEBUG_SendMessageR("%s: renew == false.\n", __func__);
-                return false;
-            }
-        }
-    }
+    PERPH_SetMouseLeftTrig(NULL);
+    BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
     TEMPO_SetElemPublicBck(NULL);
     return true;
 }
