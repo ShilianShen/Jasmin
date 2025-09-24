@@ -16,8 +16,8 @@ bool TEMPO_SetElemPublicTable(const Table *table);
 
 void *TEMPO_CreateElem(const cJSON *elem_json);
 void *TEMPO_DeleteElem(void *elem_void);
-bool TEMPO_RenewElem(Elem* elem);
-bool TEMPO_DrawElem(const Elem* elem);
+bool TEMPO_RenewElem(void* elem_void);
+bool TEMPO_DrawElem(const void* elem_void);
 
 
 void TEMPO_TrigFuncBool(const void *para);

@@ -190,7 +190,8 @@ static bool TEMPO_RenewElem_DstRect(Elem *elem) {
         );
     return result;
 }
-bool TEMPO_RenewElem(Elem *elem) {
+bool TEMPO_RenewElem(void *elem_void) {
+    Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
     REQ_CONDITION(TEMPO_RenewElem_Tex(elem), return false);
     REQ_CONDITION(TEMPO_RenewElem_DstRect(elem), return false);
@@ -221,7 +222,8 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 
 // DRAW ================================================================================================================
-bool TEMPO_DrawElem(const Elem *elem) {
+bool TEMPO_DrawElem(const void *elem_void) {
+    const Elem *elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
 
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);

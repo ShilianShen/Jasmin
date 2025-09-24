@@ -40,7 +40,6 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     }
     return true;
 }
-
 void *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
 
@@ -74,11 +73,7 @@ static bool TEMPO_RenewPage_DstRect(Page* page) {
     );
 }
 bool TEMPO_RenewPage(Page *page) {
-    // Req Condition
-    if (page == NULL) {
-        DEBUG_SendMessageR("%s: page not exists.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(page != NULL, return false);
 
     if (TEMPO_RenewPage_DstRect(page) == false) {
         DEBUG_SendMessageR("%s: TEMPO_RenewPage_DstRect(page) == false.\n", __func__);
@@ -128,27 +123,15 @@ static bool TEMPO_DrawPage_Frame(const Page* page) {
     return true;
 }
 bool TEMPO_DrawPage(const Page* page) {
-    // Req Condition
-    if (page == NULL) {
-        DEBUG_SendMessageR("%s: page not exists.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(page != NULL, return false);
 
-    //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 64);
     SDL_RenderFillRect(renderer, NULL);
-
     SDL_SetRenderColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);
 
-    for (int i = 0; i < page->elemTable.len; i++) {
-        const bool draw = TEMPO_DrawElem(page->elemTable.kv[i].val);
-        if (draw == false) {
-            DEBUG_SendMessageR("%s: draw[%d] == false.\n", __func__, i);
-            return false;
-        }
-    }
+    REQ_CONDITION(BASIC_DrawTable(&page->elemTable, TEMPO_DrawElem), return false);
 
-    // TEMPO_DrawPage_Frame(page);
+    TEMPO_DrawPage_Frame(page);
     return true;
 }
