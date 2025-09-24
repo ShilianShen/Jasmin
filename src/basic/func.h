@@ -5,6 +5,7 @@
 #include "_basic.h"
 
 
+// NORMAL ==============================================================================================================
 float clip(float min, float value, float max);
 float loop(float min, float value, float max);
 
@@ -15,7 +16,7 @@ void free2DArray(void** array, size_t w);
 
 
 // SDL =================================================================================================================
-bool SLD_GetPointInRect(SDL_FPoint point, SDL_FRect rect);
+bool SDL_GetPointInRect(SDL_FPoint point, SDL_FRect rect);
 char*SDL_GetStrColor(SDL_Color color);
 char*SDL_GetStrFRect(SDL_FRect rect);
 bool SDL_GetColorEqual(SDL_Color x, SDL_Color y);

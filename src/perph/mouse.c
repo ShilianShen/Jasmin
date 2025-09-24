@@ -18,10 +18,10 @@ void PERPH_SetMouseLeftTrig(const Trig *trig) {
     mouse.left_trig = trig;
 }
 bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
-    return SLD_GetPointInRect(mouse.state2.leftPos, rect);
+    return SDL_GetPointInRect(mouse.state2.leftPos, rect);
 }
 bool PERPH_GetMouseInRect(const SDL_FRect rect) {
-    return SLD_GetPointInRect(mouse.state2.pos, rect);
+    return SDL_GetPointInRect(mouse.state2.pos, rect);
 }
 
 
