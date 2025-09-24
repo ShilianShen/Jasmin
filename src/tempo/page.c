@@ -53,17 +53,7 @@ void *TEMPO_DeletePage(void *page_void) {
     Page* page = page_void;
     if (page != NULL) {
         if (page->elemTable.kv != NULL) {
-            for (int i = 0; i < page->elemTable.len; i++) {
-                if (page->elemTable.kv[i].key != NULL) {
-                    free(page->elemTable.kv[i].key); // free
-                    page->elemTable.kv[i].key = NULL;
-                }
-                if (page->elemTable.kv[i].val != NULL) {
-                    page->elemTable.kv[i].val = TEMPO_DeleteElem(page->elemTable.kv[i].val); // free
-                }
-            }
-            free(page->elemTable.kv);
-            page->elemTable.kv = NULL;
+            BASIC_DeleteTable(&page->elemTable, TEMPO_DeleteElem);
         }
         free(page);
         page = NULL;

@@ -42,33 +42,18 @@ Menu menu;
 
 
 // LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadMenu_PageTable(const cJSON* pageTable_json) {
-    REQ_CONDITION(pageTable_json != NULL, return false);
-    REQ_CONDITION(BASIC_CreateTable(&menu.pageTable, pageTable_json, TEMPO_CreatePage), return false);
-    menu.pageRoot = BASIC_GetTableValByKey(menu.pageTable, MENU_ROOT_NAME);
-    menu.pageEdge = BASIC_GetTableValByKey(menu.pageTable, MENU_EDGE_NAME);
-    return true;
-}
 static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
-
     const char *key = NULL, *subkey = NULL;
     if (cJSON_ExistKey(menu_json, key = "pageTable")) {
-        const cJSON* pageSet_json = cJSON_GetObjectItem(menu_json, key);
-        if (pageSet_json == NULL) {
-            printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
-            return false;
-        } // Req Condition
-        if (TEMPO_LoadMenu_PageTable(pageSet_json) == false) {
-            printf("%s: TEMPO_LoadMenu_PageSet == false.\n", __func__);
-            return false;
-        } // Req Condition
+        const cJSON* pageTable_json = cJSON_GetObjectItem(menu_json, key);
+        REQ_CONDITION(pageTable_json != NULL, return false);
+        REQ_CONDITION(BASIC_CreateTable(&menu.pageTable, pageTable_json, TEMPO_CreatePage), return false);
+        menu.pageRoot = BASIC_GetTableValByKey(menu.pageTable, MENU_ROOT_NAME);
+        menu.pageEdge = BASIC_GetTableValByKey(menu.pageTable, MENU_EDGE_NAME);
     }
     if (cJSON_ExistKey(menu_json, key = "path")) {
         const cJSON* path_json = cJSON_GetObjectItem(menu_json, key);
-        if (path_json == NULL) {
-            printf("%s: cJSON_GetObjectItem == NULL.\n", __func__);
-            return false;
-        }
+        REQ_CONDITION(path_json != NULL, return false);
         if (cJSON_ExistKey(path_json, subkey = "pageNow")) {
             const char* pageNow_json = NULL;
             if (cJSON_Load(path_json, subkey, JSM_STRING, &pageNow_json)) {
@@ -86,10 +71,7 @@ bool TEMPO_LoadMenu() {
 #else
     cJSON* menu_json = getJson(TEMPO_DEFAULT_MENU_JSON);
 #endif
-    if (menu_json == NULL) {
-        printf("%s: getJson == NULL.\n", __func__);
-        return false;
-    } // Req Condition
+    REQ_CONDITION(menu_json != NULL, return false);
 
     const bool rk = TEMPO_LoadMenu_RK(menu_json);
     cJSON_Delete(menu_json);
@@ -240,6 +222,6 @@ static KeyVal TEMPO_MENU_TRIG_SET[] = {
     {NULL, NULL}
 };
 const Table TEMPO_StaticTrigTable = {
-    .len = sizeof(TEMPO_MENU_TRIG_SET) / sizeof(KeyVal),
+    .len = len_of(TEMPO_MENU_TRIG_SET),
     .kv = TEMPO_MENU_TRIG_SET
 };
