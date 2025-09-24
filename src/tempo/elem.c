@@ -171,12 +171,8 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
     }
-
-    if (ELEM_INFO_DETAIL[elem->type].renew == NULL || ELEM_INFO_DETAIL[elem->type].renew(&elem->info, &elem->tex) == false) {
-        printf("%s: failed in %s.\n", __func__, "asd");
-        return false;
-    }
-
+    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].renew != NULL, return false);
+    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].renew(&elem->info, &elem->tex), return false);
     return true;
 }
 static bool TEMPO_RenewElem_DstRect(Elem *elem) {

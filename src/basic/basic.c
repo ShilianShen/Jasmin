@@ -19,52 +19,47 @@ float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
 
 
-ma_result result;
+
 ma_engine engine;
 
 
 bool BASIC_Init() {
-    // miniaudio
-    result = ma_engine_init(NULL, &engine);
-    if (result != MA_SUCCESS) {
-        return false;
-    }
+    const ma_result result = ma_engine_init(NULL, &engine);
+    REQ_CONDITION(result == MA_SUCCESS, return false);
 
-    // SDL
-    if (SDL_Init(SDL_INIT_VIDEO) == false) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
-        return false;
-    }
-    if (TTF_Init() == false) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", SDL_GetError());
-        return false;
-    }
+    REQ_CONDITION(SDL_Init(SDL_INIT_VIDEO), return false);
+    REQ_CONDITION(TTF_Init(), return false);
 
     window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAG);
-    if (window == NULL) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize window and render: %s", SDL_GetError());
-        return false;
-    }
+    REQ_CONDITION(window != NULL, return false);
 
     renderer = SDL_CreateRenderer(window, NULL);
-    if (renderer == NULL) {
-        printf("渲染器创建失败: %s\n", SDL_GetError());
-        return false;
-    }
-
+    REQ_CONDITION(renderer != NULL, return false);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_HideCursor();
-    // SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    return true;
+}
+bool BASIC_Renew() {
+    SDL_GetWindowSize(window, &logical_w, &logical_h);
+    SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
+    scale_x = (float)windowWidth / (float)logical_w;
+    scale_y = (float)windowHeight / (float)logical_h;
+    windowRect = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
+    return true;
+}
+bool BASIC_Draw() {
     return true;
 }
 void BASIC_Exit() {
-    // SDL
     SDL_GL_DestroyContext(content);
     content = NULL;
+
     SDL_DestroyWindow(window);
     window = NULL;
+
     SDL_Quit();
-    // miniaudio
+
     ma_engine_uninit(&engine);
 }
 

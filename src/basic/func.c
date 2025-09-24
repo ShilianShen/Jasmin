@@ -172,17 +172,6 @@ bool cJSON_Load(const cJSON* object, const char* key, const JSM_DataType type, v
 }
 
 
-bool BASIC_Renew() {
-    SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
-    scale_x = (float)windowWidth / (float)logical_w;
-    scale_y = (float)windowHeight / (float)logical_h;
-    windowRect = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
-    return true;
-}
-bool BASIC_Draw() {
-    return true;
-}
 float clip(const float min, const float value, const float max) {
     if (value < min) return min;
     if (value > max) return max;

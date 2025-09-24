@@ -28,7 +28,6 @@ typedef enum {
 
 
 extern SDL_FRect windowRect;
-extern ma_result result;
 extern ma_engine engine;
 
 
