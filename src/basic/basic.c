@@ -1,23 +1,21 @@
 #include "basic.h"
 
 
-
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_FRect windowRect = {0, 0, 0, 0};
+
 
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 1200, WINDOW_HEIGHT = 800;
 bool running = true;
 const SDL_WindowFlags FLAG = SDL_WINDOW_METAL | SDL_WINDOW_HIGH_PIXEL_DENSITY;
-SDL_GLContext content;
 
 
 int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0};
-
 
 
 ma_engine engine;
@@ -52,9 +50,6 @@ bool BASIC_Draw() {
     return true;
 }
 void BASIC_Exit() {
-    SDL_GL_DestroyContext(content);
-    content = NULL;
-
     SDL_DestroyWindow(window);
     window = NULL;
 

@@ -10,22 +10,24 @@ SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
 };
 struct Character {
     Model* model;
-    Coord coord;
-    DelayVec3f delay;
+    Coord coord1, coord2;
+    Delay delay;
 };
 
 
 // SET & GET ===========================================================================================================
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
-    if (character == NULL || VILLA_GetRoomCellEmpty(coord) == false) return false;
+    REQ_CONDITION(character != NULL, return false);
+    character->coord1 = character->coord2;
+    if (VILLA_GetRoomCellEmpty(coord) == false) return false;
 
-    character->coord = coord;
+    character->coord2 = coord;
     return true;
 }
 bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
-    if (character == NULL) return false;
+    REQ_CONDITION(character != NULL, return false);
 
-    Coord coord = character->coord;
+    Coord coord = character->coord2;
     switch (direct) {
         case VILLA_DIRECT_W: coord.y--; break;
         case VILLA_DIRECT_A: coord.x--; break;
@@ -33,7 +35,10 @@ bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
         case VILLA_DIRECT_D: coord.x++; break;
         default: return false;
     }
-    VILLA_SetCharacterCoord(character, coord);
+    character->delay.block = true;
+    if (BASIC_SetDelay(&character->delay, 0.2f)) {
+        VILLA_SetCharacterCoord(character, coord);
+    }
     return true;
 }
 
@@ -41,52 +46,28 @@ bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
 // CREATE & DELETE =====================================================================================================
 static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* character_json) {
     memset(character, 0, sizeof(*character));
-    if (cJSON_IsObject(character_json) == false) {
-        printf("cJSON_IsObject() failed\n");
-        return false;
-    }
+    REQ_CONDITION(cJSON_IsObject(character_json), return false);
 
-    char* key = NULL;
     char* model_json = NULL;
-    char* material_json = NULL;
+    REQ_CONDITION(cJSON_Load(character_json, "model", JSM_STRING, &model_json), return false);
 
-    if (cJSON_Load(character_json, key = "model", JSM_STRING, &model_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
-    if (cJSON_Load(character_json, key = "material", JSM_STRING, &material_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
+    char* material_json = NULL;
+    REQ_CONDITION(cJSON_Load(character_json, "material", JSM_STRING, &material_json), return false);
 
     character->model = LOTRI_CreateModel(model_json, material_json, MODEL_SIDE_CAMERA);
-    if (character->model == NULL) {
-        printf("%s: character->model == NULL\n", __func__);
-        return false;
-    }
-
-    character->delay.block = true;
+    REQ_CONDITION(character->model != NULL, return false);
 
 	return true;
 }
-void*VILLA_CreateCharacter(const cJSON *character_json) {
-    if (character_json == NULL) {
-        printf("%s: character_json == NULL.\n", __func__);
-        return NULL;
-    }
+void* VILLA_CreateCharacter(const cJSON *character_json) {
+    REQ_CONDITION(character_json != NULL, return NULL);
+
     Character* character = malloc(sizeof(Character));
-    if (character == NULL) {
-    	printf("%s: character == NULL.\n", __func__);
-        return character;
-    }
-    if (VILLA_CreateCharacter_RK(character, character_json) == false) {
-    	printf("%s: VILLA_CreateCharacter_RK failed.\n", __func__);
-        VILLA_DeleteCharacter(character);
-    }
+    REQ_CONDITION(character != NULL, return NULL);
+    REQ_CONDITION(VILLA_CreateCharacter_RK(character, character_json), character = VILLA_DeleteCharacter(character));
     return character;
 }
-
-void*VILLA_DeleteCharacter(void *character_void) {
+void* VILLA_DeleteCharacter(void *character_void) {
     Character* character = character_void;
   	if (character != NULL) {
   	    LOTRI_DestroyModel(character->model);
@@ -111,21 +92,22 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
 }
 bool VILLA_RenewCharacter(void *character_void) {
     Character* character = character_void;
-    if (character == NULL) {
-        printf("%s: character == NULL.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(character != NULL, return false);
+
+
+    DEBUG_SendMessageR("%.2f, %.2f\n", character->delay.t1, character->delay.t2);
+
 
     VILLA_RenewCharacter_Src(character);
 
-    Vec3f position = {0};
-    if (character->coord.room != NULL) {
-        if (VILLA_GetRoomCellPosition(character->coord, &position) == false) {
-            printf("%s: failed in \n", __func__);
-            return false;
-        }
-        LOTRI_SetDelayVec(&character->delay, position, 0.9f);
-        LOTRI_SetModelPosition(character->model, LOTRI_GetDelayVecVec(character->delay));
+    if (character->coord2.room != NULL) {
+        Vec3f position1, position2;
+        REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord1, &position1), return false);
+        REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord2, &position2), return false);
+        float rate;
+        REQ_CONDITION(BASIC_GetDelay(&character->delay, &rate), return false);
+        Vec3f position = LOTRI_AtvVec(position1, position2, rate, BASIC_AtvLinear);
+        LOTRI_SetModelPosition(character->model, position);
     }
     LOTRI_RenewModel(character->model);
     return true;
@@ -135,10 +117,7 @@ bool VILLA_RenewCharacter(void *character_void) {
 // DRAW ================================================================================================================
 bool VILLA_DrawCharacter(const void *character_void) {
     const Character* character = (Character*)character_void;
-    if (character == NULL) {
-        printf("%s: character == NULL.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(character != NULL, return false);
 
     LOTRI_DrawModel(character->model);
     return true;

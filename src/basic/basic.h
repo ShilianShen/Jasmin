@@ -4,6 +4,7 @@
 
 #include "_basic.h"
 #include "atv.h"
+#include "delay.h"
 #include "func.h"
 #include "table.h"
 #include "trig.h"
