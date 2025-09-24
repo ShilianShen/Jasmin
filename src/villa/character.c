@@ -85,13 +85,16 @@ void*VILLA_CreateCharacter(const cJSON *character_json) {
     }
     return character;
 }
-void VILLA_DeleteCharacter(void *character_void) {
+
+void*VILLA_DeleteCharacter(void *character_void) {
     Character* character = character_void;
   	if (character != NULL) {
   	    LOTRI_DestroyModel(character->model);
   	    character->model = NULL;
         free(character);
   	}
+    character = NULL;
+    return NULL;
 }
 
 

@@ -17,7 +17,8 @@ bool VILLA_GetRoomCellEmpty(Coord coord);
 bool VILLA_GetRoomCellPosition(Coord coord, Vec3f* position);
 
 void *VILLA_CreateRoom(const cJSON *room_json);
-void VILLA_DestroyRoom_V(void* room_void);
+
+void *VILLA_DestroyRoom_V(void *room_void);
 
 void VILLA_DeleteRoom(void *room_void);
 bool VILLA_RenewRoom(void *room_void);

@@ -88,8 +88,7 @@ void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
             }
 
             if (table->kv[i].val != NULL) {
-                func(table->kv[i].val);
-                table->kv[i].val = NULL;
+                table->kv[i].val = func(table->kv[i].val);
             }
         }
         free(table->kv);

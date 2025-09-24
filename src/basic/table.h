@@ -9,10 +9,10 @@ typedef struct KeyVal {char* key; void* val;} KeyVal;
 typedef struct Table {int len; KeyVal* kv;} Table;
 
 
-typedef void* (*CreateFunc)(const cJSON*);
+typedef void*(*CreateFunc)(const cJSON*);
 typedef bool (*RenewFunc)(void*);
 typedef bool (*DrawFunc)(const void*);
-typedef void (*DeleteFunc)(void*);
+typedef void*(*DeleteFunc)(void*);
 
 
 void* BASIC_GetTableValByKey(Table table, const char* key);

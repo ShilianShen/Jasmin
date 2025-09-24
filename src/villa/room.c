@@ -148,9 +148,11 @@ void *VILLA_CreateRoom(const cJSON *room_json) {
     }
     return room;
 }
-void VILLA_DestroyRoom_V(void* room_void) {
+
+void *VILLA_DestroyRoom_V(void *room_void) {
     Room* room = room_void;
     VILLA_DeleteRoom(room);
+    return NULL;
 }
 void VILLA_DeleteRoom(void *room_void) {
     Room* room = room_void;

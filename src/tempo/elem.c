@@ -29,13 +29,13 @@ typedef union ElemInfo {
     ElemSlidInfo slid;
     ElemBoolInfo bool_;
 } ElemInfo;
-struct {
+static const struct {
     const char* name;
     bool (*create)(void*, const cJSON*);
     bool (*renew)(const void*, SDL_Texture**);
     void (*delete)(void*);
     Trig trig;
-} arrElem[ELEM_NUM_TYPES] = {
+} ELEM_INFO_DETAIL[ELEM_NUM_TYPES] = {
     [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL, 0},
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
@@ -44,7 +44,7 @@ struct {
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
-        if (strcmp(string, arrElem[i].name) == 0) {
+        if (strcmp(string, ELEM_INFO_DETAIL[i].name) == 0) {
             return i;
         }
     }
@@ -77,58 +77,34 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         if (cJSON_Load(elem_json, key, JSM_STRING, &type_json) == true) {
             elem->type = TEMPO_GetElemTypeFromString(type_json);
         }
-        if (elem->type == ELEM_TYPE_NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        } // Req Condition
+        REQ_CONDITION(elem->type != ELEM_TYPE_NULL, return false);
     }
     if (cJSON_ExistKey(elem_json, key = "info")) {
         const cJSON* info_json = cJSON_GetObjectItem(elem_json, key);
-        if (info_json == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        } // Req Condition
-        if (arrElem[elem->type].create(&elem->info, info_json) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
-        if (arrElem[elem->type].trig.func != NULL) {
-            elem->trig = arrElem[elem->type].trig;
+        REQ_CONDITION(info_json != NULL, return false);
+        REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
+        if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
+            elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
             elem->trig.para = elem;
         }
     }
     if (cJSON_ExistKey(elem_json, key = "anchor")) {
-        if (cJSON_Load(elem_json, key, JSM_INT, &elem->anchor) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(elem_json, key, JSM_INT, &elem->anchor), return false);
     }
     if (cJSON_ExistKey(elem_json, key = "gid")) {
-        if (cJSON_Load(elem_json, key, JSM_FRECT, &elem->gid_rect) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(elem_json, key, JSM_FRECT, &elem->gid_rect), return false);
         elem->gid = &elem->gid_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "src")) {
-        if (cJSON_Load(elem_json, key, JSM_FRECT, &elem->src_rect) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(elem_json, key, JSM_FRECT, &elem->src_rect), return false);
         elem->src = &elem->src_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "func") && elem->trig.func == NULL) {
         const char* func_json = NULL;
-        if (cJSON_Load(elem_json, key, JSM_STRING, &func_json) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(elem_json, key, JSM_STRING, &func_json), return false);
 
         const TrigFunc func = BASIC_GetTableValByKey(TEMPO_StaticTrigTable, func_json);
-        if (func == NULL) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(func != NULL, return false);
 
         const char* para_json = NULL;
         if (cJSON_ExistKey(elem_json, "para")) {
@@ -152,10 +128,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     if (cJSON_ExistKey(elem_json, key = "bck")) {
         const char* bck_json = NULL;
-        if (cJSON_Load(elem_json, key, JSM_STRING, &bck_json) == false) {
-            printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(elem_json, key, JSM_STRING, &bck_json), return false);
         if (publicElemTable != NULL) {
             for (int i = 0; i < publicElemTable->len; i++) {
                 const char* subkey = publicElemTable->kv[i].key;
@@ -169,13 +142,19 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     return true;
 }
-Elem* TEMPO_DeleteElem(Elem *elem) {
-    if (elem == NULL) {
-        return elem;
-    } // Opt Condition
+Elem* TEMPO_CreateElem(const cJSON *elem_json) {
+    REQ_CONDITION(elem_json != NULL, return NULL);
 
-    if (arrElem[elem->type].delete != NULL) {
-        arrElem[elem->type].delete(&elem->info);
+    Elem* elem = calloc(1, sizeof(Elem));
+    REQ_CONDITION(elem != NULL, return NULL);
+    REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
+    return elem;
+}
+Elem* TEMPO_DeleteElem(Elem *elem) {
+    if (elem == NULL) return elem;
+
+    if (ELEM_INFO_DETAIL[elem->type].delete != NULL) {
+        ELEM_INFO_DETAIL[elem->type].delete(&elem->info);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -189,22 +168,6 @@ Elem* TEMPO_DeleteElem(Elem *elem) {
     elem = NULL;
     return elem;
 }
-Elem* TEMPO_CreateElem(const cJSON *elem_json) {
-    if (elem_json == NULL) {
-        printf("%s: tomlElem == NULL\n", __func__);
-        return NULL;
-    } // Req Condition
-    Elem* elem = calloc(1, sizeof(Elem));
-    if (elem == NULL) {
-        printf("%s: elem == NULL.\n", __func__);
-        return elem;
-    } // Req Condition
-    if (TEMPO_CreateElem_RK(elem, elem_json) == false) {
-        printf("%s: RK == false.\n", __func__);
-        elem = TEMPO_DeleteElem(elem);
-    } // Req Condition
-    return elem;
-}
 
 
 // RENEW ===============================================================================================================
@@ -214,7 +177,7 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         elem->tex = NULL;
     }
 
-    if (arrElem[elem->type].renew == NULL || arrElem[elem->type].renew(&elem->info, &elem->tex) == false) {
+    if (ELEM_INFO_DETAIL[elem->type].renew == NULL || ELEM_INFO_DETAIL[elem->type].renew(&elem->info, &elem->tex) == false) {
         printf("%s: failed in %s.\n", __func__, "asd");
         return false;
     }
@@ -233,22 +196,16 @@ static bool TEMPO_RenewElem_DstRect(Elem *elem) {
     return result;
 }
 bool TEMPO_RenewElem(Elem *elem) {
-    if (TEMPO_RenewElem_Tex(elem) == false) {
-        printf("%s: TEMPO_RenewElemTex(elem) == false\n", __func__);
-        return false;
-    }
-    if (TEMPO_RenewElem_DstRect(elem) == false) {
-        printf("%s: TEMPO_RenewElemDstRect(elem) == false\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(elem != NULL, return false);
+    REQ_CONDITION(TEMPO_RenewElem_Tex(elem), return false);
+    REQ_CONDITION(TEMPO_RenewElem_DstRect(elem), return false);
 
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
     const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    type: %s\n", arrElem[elem->type].name);
-        // DEBUG_SendMessageL("    info: %s\n", elem->info);
+        DEBUG_SendMessageL("    type: %s\n", ELEM_INFO_DETAIL[elem->type].name);
         if (elem->trig.func != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_StaticTrigTable, elem->trig.func), elem->trig.para);
         }
@@ -270,27 +227,22 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 // DRAW ================================================================================================================
 bool TEMPO_DrawElem(const Elem *elem) {
-    // Req Condition
-    if (renderer == NULL) {
-        DEBUG_SendMessageR("%s: menu.renderer is NULL.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(elem != NULL, return false);
+
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
     const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
-    if (mouseLeftIn) {
-        DEBUG_FillRect(elem->dst_rect);
-    }
+    if (mouseLeftIn) DEBUG_FillRect(elem->dst_rect);
+
     const SDL_FRect dst = {
         roundf(elem->dst_rect.x),
         roundf(elem->dst_rect.y),
         roundf(elem->dst_rect.w),
         roundf(elem->dst_rect.h),
     };
-    SDL_RenderTexture(renderer, elem->tex, elem->src, &dst);
-    if (mouseIn || mouseLeftIn) {
-        DEBUG_DrawRect(elem->dst_rect);
-    }
-    return true;
+    const bool result = SDL_RenderTexture(renderer, elem->tex, elem->src, &dst);
+    if (mouseIn || mouseLeftIn) DEBUG_DrawRect(elem->dst_rect);
+
+    return result;
 }
 
 
