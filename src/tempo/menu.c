@@ -43,58 +43,10 @@ Menu menu;
 
 // LOAD & UNLOAD =======================================================================================================
 static bool TEMPO_LoadMenu_PageTable(const cJSON* pageTable_json) {
-    if (pageTable_json == NULL) {
-        printf("%s: tomlMenu == NULL.\n", __func__);
-        return false;
-    } // Req Condition
-
-    menu.pageTable.len = cJSON_GetArraySize(pageTable_json);
-    if (menu.pageTable.len == 0) {
-        printf("%s: menu.lenPageSet == 0.\n", __func__);
-        return false;
-    } // Req Condition
-
-    menu.pageTable.kv = calloc(menu.pageTable.len, sizeof(KeyVal));
-    if (menu.pageTable.kv == NULL) {
-        printf("%s: menu.pageSet == NULL.\n", __func__);
-        return false;
-    } // Req Condition
-
-    for (int i = 0; i < menu.pageTable.len; i++) {
-        const cJSON *item = cJSON_GetArrayItem(pageTable_json, i);
-        if (item == NULL) {
-            printf("%s: item == NULL.\n", __func__);
-            return false;
-        } // Req Condition
-
-        const char* key = item->string;
-
-        menu.pageTable.kv[i].key = strdup(key);
-        if (menu.pageTable.kv[i].key == NULL) {
-            printf("%s: menu.pageTable[i].key == NULL.\n", __func__);
-            return false;
-        } // Req Condition
-
-        const cJSON* page_json = cJSON_GetObjectItem(pageTable_json, key);
-        if (page_json == NULL) {
-            printf("%s: tomlPage == NULL.\n", __func__);
-            return false;
-        } // Req Condition
-
-        menu.pageTable.kv[i].val = TEMPO_CreatePage(page_json);
-        if (menu.pageTable.kv[i].val == NULL) {
-            printf("%s: menu.pageTable.kv[i].val == NULL.\n", __func__);
-            return false;
-        } // Req Condition
-
-        if (strcmp(key, MENU_ROOT_NAME) == 0) {
-            menu.pageRoot = menu.pageTable.kv[i].val;
-        } // Opt Condition
-        if (strcmp(key, MENU_EDGE_NAME) == 0) {
-            menu.pageEdge = menu.pageTable.kv[i].val;
-        } // Opt Condition
-    }
-
+    REQ_CONDITION(pageTable_json != NULL, return false);
+    REQ_CONDITION(BASIC_CreateTable(&menu.pageTable, pageTable_json, TEMPO_CreatePage), return false);
+    menu.pageRoot = BASIC_GetTableValByKey(menu.pageTable, MENU_ROOT_NAME);
+    menu.pageEdge = BASIC_GetTableValByKey(menu.pageTable, MENU_EDGE_NAME);
     return true;
 }
 static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {

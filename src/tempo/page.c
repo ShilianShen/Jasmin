@@ -40,7 +40,8 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     }
     return true;
 }
-Page* TEMPO_CreatePage(const cJSON* page_json) {
+
+void *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
 
     Page* page = calloc(1, sizeof(Page));
@@ -48,7 +49,8 @@ Page* TEMPO_CreatePage(const cJSON* page_json) {
     REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), page = TEMPO_DeletePage(page));
     return page;
 }
-Page* TEMPO_DeletePage(Page* page) {
+void *TEMPO_DeletePage(void *page_void) {
+    Page* page = page_void;
     if (page != NULL) {
         if (page->elemTable.kv != NULL) {
             for (int i = 0; i < page->elemTable.len; i++) {
