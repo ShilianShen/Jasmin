@@ -24,28 +24,23 @@ const char* BASIC_GetTableKeyByVal(const Table table, const void* val) {
 
 // CREATE & DELETE =====================================================================================================
 bool BASIC_CreateTable(Table* table, const cJSON* table_json, const CreateFunc func) {
-    if (table_json == NULL) {
-        printf("%s: table_json == NULL.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(table_json != NULL, return false);
 
     table->len = cJSON_GetArraySize(table_json);
-    if (table->len <= 0) {
-        printf("%s: table->len <= 0.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(table->len > 0, return false);
 
     table->kv = calloc(table->len, sizeof(KeyVal));
-    if (table->kv == NULL) {printf("%s: table->kv == NULL.\n", __func__); return false;}
+    REQ_CONDITION(table->kv != NULL, return false);
 
     for (int i = 0; i < table->len; i++) {
-        const cJSON* keyval_json = cJSON_GetArrayItem(table_json, i);
+        const cJSON* kv_json = cJSON_GetArrayItem(table_json, i);
+        REQ_CONDITION(kv_json != NULL, return false);
 
-        table->kv[i].key = strdup(keyval_json->string);
-        if (table->kv[i].key == NULL) {printf("%s: table->kv[i].key == NULL.\n", __func__); return false;}
+        table->kv[i].key = strdup(kv_json->string);
+        REQ_CONDITION(table->kv[i].key != NULL, return false);
 
-        table->kv[i].val = func(keyval_json);
-        if (table->kv[i].val == NULL) {printf("%s: table->kv[i].val == NULL.\n", __func__); return false;}
+        table->kv[i].val = func(kv_json);
+        REQ_CONDITION(table->kv[i].val != NULL, return false);
     }
     return true;
 }

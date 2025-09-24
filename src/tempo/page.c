@@ -20,33 +20,16 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
     const char* key;
     if (cJSON_ExistKey(page_json, key = "elemTable")) {
-        const cJSON* elemTable_json = cJSON_GetObjectItem(page_json, key);
-        REQ_CONDITION(elemTable_json != NULL, return false);
-
-        page->elemTable.len = cJSON_GetArraySize(elemTable_json);
-        REQ_CONDITION(page->elemTable.len > 0, return false);
-
-        page->elemTable.kv = calloc(page->elemTable.len, sizeof(KeyVal));
-        REQ_CONDITION(page->elemTable.kv != NULL, return false);
-
         TEMPO_SetElemPublicTable(&page->elemTable);
-        for (int i = 0; i < page->elemTable.len; i++) {
-            const cJSON* elem_json = cJSON_GetArrayItem(elemTable_json, i);
-            REQ_CONDITION(elem_json != NULL, return false);
 
-            page->elemTable.kv[i].key = strdup(elem_json->string);
-            REQ_CONDITION(page->elemTable.kv[i].key != NULL, return false);
+        const cJSON* table_json = cJSON_GetObjectItem(page_json, key);
+        REQ_CONDITION(table_json != NULL, return false);
+        REQ_CONDITION(BASIC_CreateTable(&page->elemTable, table_json, TEMPO_CreateElem), return false);
 
-            page->elemTable.kv[i].val = TEMPO_CreateElem(elem_json); // malloc
-            REQ_CONDITION(page->elemTable.kv[i].val != NULL, return false);
-        }
         TEMPO_SetElemPublicTable(NULL);
     }
     if (cJSON_ExistKey(page_json, key = "anchor")) {
-        if (cJSON_Load(page_json, key, JSM_INT, &page->anchor) == false) {
-            printf("%s: failed malloc page.anchor.\n", __func__);
-            return false;
-        }
+        REQ_CONDITION(cJSON_Load(page_json, key, JSM_INT, &page->anchor), return false);
     }
     if (cJSON_ExistKey(page_json, key = "src")) {
         REQ_CONDITION(cJSON_Load(page_json, key, JSM_FRECT, &page->src_rect), return false);
