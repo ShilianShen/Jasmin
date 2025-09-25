@@ -2,71 +2,77 @@
 
 
 
-const float WALK_TIME_PER_CELL = 0.1f;
+const float WALK_TIME_PER_CELL = 0.3f;
 
 
 SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
-    [VILLA_DIRECT_W] = {0, 0, 0.25f, 0.25f},
-    [VILLA_DIRECT_S] = {0, 0.25f, 0.25f, 0.25f},
-    [VILLA_DIRECT_A] = {0, 0.5f, 0.25f, 0.25f},
-    [VILLA_DIRECT_D] = {0, 0.75f, 0.25f, 0.25f},
+    [VILLA_DIRECT_PX] = {0, 0, 0.25f, 0.25f},
+    [VILLA_DIRECT_NX] = {0, 0.25f, 0.25f, 0.25f},
+    [VILLA_DIRECT_PY] = {0, 0.5f, 0.25f, 0.25f},
+    [VILLA_DIRECT_NY] = {0, 0.75f, 0.25f, 0.25f},
 };
 struct Character {
     Model* model;
     Coord coord1, coord2;
-    VILLA_Direct direct;
-    Delay delay;
+    float t1, t2;
 };
 
 
 // SET & GET ===========================================================================================================
 VILLA_Direct VILLA_GetRelativeDirect(const VILLA_Direct observedDirect, const VILLA_Direct observerDirect) {
     static const VILLA_Direct RULE[VILLA_NUM_DIRECTS][VILLA_NUM_DIRECTS] = {
-        [VILLA_DIRECT_W][VILLA_DIRECT_W] = VILLA_DIRECT_W,
-        [VILLA_DIRECT_W][VILLA_DIRECT_A] = VILLA_DIRECT_D,
-        [VILLA_DIRECT_W][VILLA_DIRECT_S] = VILLA_DIRECT_S,
-        [VILLA_DIRECT_W][VILLA_DIRECT_D] = VILLA_DIRECT_A,
+        [VILLA_DIRECT_PX][VILLA_DIRECT_PX] = VILLA_DIRECT_PX,
+        [VILLA_DIRECT_PX][VILLA_DIRECT_PY] = VILLA_DIRECT_NY,
+        [VILLA_DIRECT_PX][VILLA_DIRECT_NX] = VILLA_DIRECT_NX,
+        [VILLA_DIRECT_PX][VILLA_DIRECT_NY] = VILLA_DIRECT_PY,
 
-        [VILLA_DIRECT_A][VILLA_DIRECT_W] = VILLA_DIRECT_A,
-        [VILLA_DIRECT_A][VILLA_DIRECT_A] = VILLA_DIRECT_W,
-        [VILLA_DIRECT_A][VILLA_DIRECT_S] = VILLA_DIRECT_D,
-        [VILLA_DIRECT_A][VILLA_DIRECT_D] = VILLA_DIRECT_S,
+        [VILLA_DIRECT_PY][VILLA_DIRECT_PX] = VILLA_DIRECT_PY,
+        [VILLA_DIRECT_PY][VILLA_DIRECT_PY] = VILLA_DIRECT_PX,
+        [VILLA_DIRECT_PY][VILLA_DIRECT_NX] = VILLA_DIRECT_NY,
+        [VILLA_DIRECT_PY][VILLA_DIRECT_NY] = VILLA_DIRECT_NX,
 
-        [VILLA_DIRECT_S][VILLA_DIRECT_W] = VILLA_DIRECT_S,
-        [VILLA_DIRECT_S][VILLA_DIRECT_A] = VILLA_DIRECT_A,
-        [VILLA_DIRECT_S][VILLA_DIRECT_S] = VILLA_DIRECT_W,
-        [VILLA_DIRECT_S][VILLA_DIRECT_D] = VILLA_DIRECT_D,
+        [VILLA_DIRECT_NX][VILLA_DIRECT_PX] = VILLA_DIRECT_NX,
+        [VILLA_DIRECT_NX][VILLA_DIRECT_PY] = VILLA_DIRECT_PY,
+        [VILLA_DIRECT_NX][VILLA_DIRECT_NX] = VILLA_DIRECT_PX,
+        [VILLA_DIRECT_NX][VILLA_DIRECT_NY] = VILLA_DIRECT_NY,
 
-        [VILLA_DIRECT_D][VILLA_DIRECT_W] = VILLA_DIRECT_D,
-        [VILLA_DIRECT_D][VILLA_DIRECT_A] = VILLA_DIRECT_S,
-        [VILLA_DIRECT_D][VILLA_DIRECT_S] = VILLA_DIRECT_A,
-        [VILLA_DIRECT_D][VILLA_DIRECT_D] = VILLA_DIRECT_W,
+        [VILLA_DIRECT_NY][VILLA_DIRECT_PX] = VILLA_DIRECT_NY,
+        [VILLA_DIRECT_NY][VILLA_DIRECT_PY] = VILLA_DIRECT_NX,
+        [VILLA_DIRECT_NY][VILLA_DIRECT_NX] = VILLA_DIRECT_PY,
+        [VILLA_DIRECT_NY][VILLA_DIRECT_NY] = VILLA_DIRECT_PX,
     };
     return RULE[observedDirect][observerDirect];
 }
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     REQ_CONDITION(character != NULL, return false);
-    character->coord1 = character->coord2;
     if (VILLA_GetRoomCellEmpty(coord) == false) return false;
-
+    character->coord1 = coord;
     character->coord2 = coord;
     return true;
 }
 bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
     REQ_CONDITION(character != NULL, return false);
 
+    const float time = (float)SDL_GetTicks() / 1000;
+    if (time < character->t2) return false;
+
+    character->coord2.direct = direct;
     Coord coord = character->coord2;
     switch (direct) {
-        case VILLA_DIRECT_W: coord.y--; break;
-        case VILLA_DIRECT_A: coord.x--; break;
-        case VILLA_DIRECT_S: coord.y++; break;
-        case VILLA_DIRECT_D: coord.x++; break;
+        case VILLA_DIRECT_PX: coord.y--; break;
+        case VILLA_DIRECT_PY: coord.x--; break;
+        case VILLA_DIRECT_NX: coord.y++; break;
+        case VILLA_DIRECT_NY: coord.x++; break;
         default: return false;
     }
-    character->delay.block = true;
-    if (BASIC_SetDelay(&character->delay, WALK_TIME_PER_CELL)) {
-        VILLA_SetCharacterCoord(character, coord);
-    }
+
+    if (VILLA_GetRoomCellEmpty(coord) == false) return false;
+
+    character->coord1 = character->coord2;
+    character->t1 = time;
+    character->coord2 = coord;
+    character->t2 = time + WALK_TIME_PER_CELL;
+
     return true;
 }
 
@@ -113,8 +119,9 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     LOTRI_GetModelCZ(character->model, &a);
     a = loop(0, a, M_PI * 2);
     VILLA_Action action = VILLA_ACT_NONE;
+    VILLA_Direct direct = character->coord2.direct;
     const float time = (float)SDL_GetTicks() / 1000;
-    if (time < character->delay.t2) {
+    if (time < character->t2) {
         switch (SDL_GetTicks() / 70 % 4) {
             case 1: action = VILLA_ACT_WALK_1; break;
             case 3: action = VILLA_ACT_WALK_2; break;
@@ -123,13 +130,13 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     }
 
     if (7 * M_PI_4 < a || a <= 1 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_W][action]);
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
     if (1 * M_PI_4 < a && a <= 3 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_A][action]);
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
     if (3 * M_PI_4 < a && a <= 5 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_S][action]);
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
     if (5 * M_PI_4 < a && a <= 7 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[VILLA_DIRECT_D][action]);
+        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
     return false;
 }
 bool VILLA_RenewCharacter(void *character_void) {
@@ -137,18 +144,18 @@ bool VILLA_RenewCharacter(void *character_void) {
     REQ_CONDITION(character != NULL, return false);
 
 
-    DEBUG_SendMessageR("%.2f, %.2f\n", character->delay.t1, character->delay.t2);
+    DEBUG_SendMessageR("%.2f, %.2f\n", character->t1, character->t2);
 
 
     VILLA_RenewCharacter_Src(character);
 
+    const float time = (float)SDL_GetTicks() / 1000;
     if (character->coord2.room != NULL) {
         Vec3f position1, position2;
         REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord1, &position1), return false);
         REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord2, &position2), return false);
-        float rate;
-        REQ_CONDITION(BASIC_GetDelay(&character->delay, &rate), return false);
-        Vec3f position = LOTRI_AtvVec(position1, position2, rate, BASIC_AtvLinear);
+        const float rate = (time - character->t1) / (character->t2 - character->t1);
+        const Vec3f position = LOTRI_AtvVec(position1, position2, rate, BASIC_AtvLinear);
         LOTRI_SetModelPosition(character->model, position);
     }
     LOTRI_RenewModel(character->model);
@@ -162,5 +169,10 @@ bool VILLA_DrawCharacter(const void *character_void) {
     REQ_CONDITION(character != NULL, return false);
 
     LOTRI_DrawModel(character->model);
+
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord1.x, character->coord1.y, VILLA_GetStrDirect(character->coord1.direct));
+    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord2.x, character->coord2.y, VILLA_GetStrDirect(character->coord2.direct));
+
     return true;
 }

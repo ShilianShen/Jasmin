@@ -1,6 +1,16 @@
 #include "room.h"
 
 
+const char* VILLA_GetStrDirect(const VILLA_Direct direct) {
+    static const char* strings[VILLA_NUM_DIRECTS] = {
+        [VILLA_DIRECT_PX] = "+X",
+        [VILLA_DIRECT_PY] = "+Y",
+        [VILLA_DIRECT_NX] = "-X",
+        [VILLA_DIRECT_NY] = "-Y"
+    };
+    if (direct >= VILLA_NUM_DIRECTS) return NULL;
+    return strings[direct];
+}
 const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
     [VILLA_DATA_NONE] = {255, 255, 255, 255},
     [VILLA_DATA_ROOM] = {255, 0, 0, 255},
