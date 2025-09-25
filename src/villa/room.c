@@ -1,7 +1,7 @@
 #include "room.h"
 
 
-const char* VILLA_GetStrDirect(const VILLA_Direct direct) {
+const char* VILLA_GetStrDirect(const int direct) {
     static const char* strings[VILLA_NUM_DIRECTS] = {
         [VILLA_DIRECT_PX] = "+X",
         [VILLA_DIRECT_PY] = "+Y",

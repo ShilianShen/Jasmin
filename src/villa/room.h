@@ -4,14 +4,12 @@
 
 #include "villa.h"
 
-typedef enum {
-    VILLA_DIRECT_PX,
-    VILLA_DIRECT_NX,
-    VILLA_DIRECT_PY,
-    VILLA_DIRECT_NY,
-    VILLA_NUM_DIRECTS,
-} VILLA_Direct;
-const char* VILLA_GetStrDirect(VILLA_Direct direct);
+#define VILLA_DIRECT_PX 0
+#define VILLA_DIRECT_PY 1
+#define VILLA_DIRECT_NX 2
+#define VILLA_DIRECT_NY 3
+#define VILLA_NUM_DIRECTS 4
+const char* VILLA_GetStrDirect(int direct);
 
 
 
@@ -27,7 +25,7 @@ typedef struct Coord Coord;
 struct Coord {
     Room *room;
     int x, y;
-    VILLA_Direct direct;
+    int direct;
 };
 
 

@@ -29,12 +29,12 @@ bool BASIC_GetVecEqual(const Vec3f A, const Vec3f B) {
     return A.v.x == B.v.x && A.v.y == B.v.y && A.v.z == B.v.z;
 }
 const char* BASIC_GetStrVec3f(const Vec3f vec) {
-    static char string[20];
+    static char string[] = "[9999.99, 9999.99, 9999.99]";
     static size_t len = 0;
     if (len == 0) {
         len = sizeof(string);
     }
-    snprintf(string, len, "[%.2f, %.2f, %.2f]", vec.v.x, vec.v.y, vec.v.z);
+    snprintf(string, len, "[%04.2f, %04.2f, %04.2f]", vec.v.x, vec.v.y, vec.v.z);
     return string;
 
 }

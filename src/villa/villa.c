@@ -12,6 +12,7 @@ const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
 Table characterTable;
 Table roomTable;
 SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];
+int cameraDirect;
 
 
 Character* you = NULL;
@@ -46,17 +47,49 @@ bool VILLA_Init() {
     return true;
 }
 static bool VILLA_Renew_Camera() {
-    static DelayVec3f smallRotate = {0}, bigRotate = {0};
-    bigRotate.block = true;
+    static Vec3f rotateSmall = {0}, rotateLarge = {0};
+    const float t = (float)SDL_GetTicks() / 1000;
     {
         const float angle = M_PI_4 * 0.5;
+        static Vec3f v1 = {0}, v2 = {0};
+        static float t1 = 0, t2 = 0;
+
+        rotateSmall = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
+
         Vec3f v = {0, 0.5f, 0.3f};
         if (PERPH_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
         if (PERPH_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
         if (PERPH_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
         if (PERPH_GetKeyPressed(SDL_SCANCODE_RIGHT)) v.v.z -= angle;
-        LOTRI_SetDelayVec(&smallRotate, v, 1.f);
+
+        if (BASIC_GetVecEqual(v, v2) == false) {
+            v1 = rotateSmall;
+            t1 = t;
+            v2 = v;
+            t2 = t + 0.8f;
+        }
     }
+    {
+        const float angle = M_PI_4 * 0.5;
+        static Vec3f v1 = {0}, v2 = {0};
+        static float t1 = 0, t2 = 0;
+
+        rotateLarge = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
+
+        Vec3f v = {0, 0.5f, 0.3f};
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_Q)) cameraDirect = (cameraDirect + 1) % VILLA_NUM_DIRECTS;
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_E)) cameraDirect = (cameraDirect + VILLA_NUM_DIRECTS - 1) % VILLA_NUM_DIRECTS;
+
+        if (BASIC_GetVecEqual(v, v2) == false) {
+            v1 = rotateSmall;
+            t1 = t;
+            v2 = v;
+            t2 = t + 0.8f;
+        }
+    }
+
+    static DelayVec3f bigRotate = {0};
+    bigRotate.block = true;
     {
         static float k = 2;
         Vec3f v = {0, 0, 0};
@@ -65,12 +98,11 @@ static bool VILLA_Renew_Camera() {
         v.v.z += k * (float)M_PI_2;
         LOTRI_SetDelayVec(&bigRotate, v, 0.5f);
     }
-    const Vec3f vs = LOTRI_GetDelayVecVec(smallRotate);
     const Vec3f vd = LOTRI_GetDelayVecVec(bigRotate);
     const Vec3f rotate = (Vec3f){
-        vs.v.x + vd.v.x,
-        vs.v.y + vd.v.y,
-        vs.v.z + vd.v.z
+        rotateSmall.v.x + vd.v.x,
+        rotateSmall.v.y + vd.v.y,
+        rotateSmall.v.z + vd.v.z
     };
     LOTRI_SetCamera(rotate);
     return true;

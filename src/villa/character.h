@@ -7,14 +7,14 @@
 
 
 
-extern VILLA_Direct cameraDirect;
+extern int cameraDirect;
 
 
 extern SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];
 typedef struct Character Character;
 
 bool VILLA_SetCharacterCoord(Character* character, Coord coord);
-bool VILLA_SetCharacterMove(Character* character, VILLA_Direct direct);
+bool VILLA_SetCharacterMove(Character* character, int direct);
 void *VILLA_CreateCharacter(const cJSON *character_json);
 
 void *VILLA_DeleteCharacter(void *character_void);

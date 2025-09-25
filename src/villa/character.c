@@ -19,8 +19,8 @@ struct Character {
 
 
 // SET & GET ===========================================================================================================
-VILLA_Direct VILLA_GetRelativeDirect(const VILLA_Direct observedDirect, const VILLA_Direct observerDirect) {
-    static const VILLA_Direct RULE[VILLA_NUM_DIRECTS][VILLA_NUM_DIRECTS] = {
+int VILLA_GetRelativeDirect(const int observedDirect, const int observerDirect) {
+    static const int RULE[VILLA_NUM_DIRECTS][VILLA_NUM_DIRECTS] = {
         [VILLA_DIRECT_PX][VILLA_DIRECT_PX] = VILLA_DIRECT_PX,
         [VILLA_DIRECT_PX][VILLA_DIRECT_PY] = VILLA_DIRECT_NY,
         [VILLA_DIRECT_PX][VILLA_DIRECT_NX] = VILLA_DIRECT_NX,
@@ -50,7 +50,7 @@ bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     character->coord2 = coord;
     return true;
 }
-bool VILLA_SetCharacterMove(Character* character, const VILLA_Direct direct) {
+bool VILLA_SetCharacterMove(Character* character, const int direct) {
     REQ_CONDITION(character != NULL, return false);
 
     const float time = (float)SDL_GetTicks() / 1000;
@@ -119,10 +119,10 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
     LOTRI_GetModelCZ(character->model, &a);
     a = loop(0, a, M_PI * 2);
     VILLA_Action action = VILLA_ACT_NONE;
-    VILLA_Direct direct = character->coord2.direct;
+    int direct = character->coord2.direct;
     const float time = (float)SDL_GetTicks() / 1000;
     if (time < character->t2) {
-        switch (SDL_GetTicks() / 70 % 4) {
+        switch (SDL_GetTicks() / 100 % 4) {
             case 1: action = VILLA_ACT_WALK_1; break;
             case 3: action = VILLA_ACT_WALK_2; break;
             default: break;
