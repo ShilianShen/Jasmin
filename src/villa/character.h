@@ -20,6 +20,7 @@ typedef enum {
     VILLA_ACT_MOVE_aa,
     VILLA_NUM_ACTS,
 } VILLA_Action;
+extern VILLA_Direct cameraDirect;
 
 
 extern SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];

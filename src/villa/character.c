@@ -14,11 +14,36 @@ SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
 struct Character {
     Model* model;
     Coord coord1, coord2;
+    VILLA_Direct direct;
     Delay delay;
 };
 
 
 // SET & GET ===========================================================================================================
+VILLA_Direct VILLA_GetRelativeDirect(const VILLA_Direct observedDirect, const VILLA_Direct observerDirect) {
+    static const VILLA_Direct RULE[VILLA_NUM_DIRECTS][VILLA_NUM_DIRECTS] = {
+        [VILLA_DIRECT_W][VILLA_DIRECT_W] = VILLA_DIRECT_W,
+        [VILLA_DIRECT_W][VILLA_DIRECT_A] = VILLA_DIRECT_D,
+        [VILLA_DIRECT_W][VILLA_DIRECT_S] = VILLA_DIRECT_S,
+        [VILLA_DIRECT_W][VILLA_DIRECT_D] = VILLA_DIRECT_A,
+
+        [VILLA_DIRECT_A][VILLA_DIRECT_W] = VILLA_DIRECT_A,
+        [VILLA_DIRECT_A][VILLA_DIRECT_A] = VILLA_DIRECT_W,
+        [VILLA_DIRECT_A][VILLA_DIRECT_S] = VILLA_DIRECT_D,
+        [VILLA_DIRECT_A][VILLA_DIRECT_D] = VILLA_DIRECT_S,
+
+        [VILLA_DIRECT_S][VILLA_DIRECT_W] = VILLA_DIRECT_S,
+        [VILLA_DIRECT_S][VILLA_DIRECT_A] = VILLA_DIRECT_A,
+        [VILLA_DIRECT_S][VILLA_DIRECT_S] = VILLA_DIRECT_W,
+        [VILLA_DIRECT_S][VILLA_DIRECT_D] = VILLA_DIRECT_D,
+
+        [VILLA_DIRECT_D][VILLA_DIRECT_W] = VILLA_DIRECT_D,
+        [VILLA_DIRECT_D][VILLA_DIRECT_A] = VILLA_DIRECT_S,
+        [VILLA_DIRECT_D][VILLA_DIRECT_S] = VILLA_DIRECT_A,
+        [VILLA_DIRECT_D][VILLA_DIRECT_D] = VILLA_DIRECT_W,
+    };
+    return RULE[observedDirect][observerDirect];
+}
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     REQ_CONDITION(character != NULL, return false);
     character->coord1 = character->coord2;
