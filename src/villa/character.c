@@ -19,30 +19,6 @@ struct Character {
 
 
 // SET & GET ===========================================================================================================
-int VILLA_GetRelativeDirect(const int observedDirect, const int observerDirect) {
-    static const int RULE[VILLA_NUM_DIRECTS][VILLA_NUM_DIRECTS] = {
-        [VILLA_DIRECT_PX][VILLA_DIRECT_PX] = VILLA_DIRECT_PX,
-        [VILLA_DIRECT_PX][VILLA_DIRECT_PY] = VILLA_DIRECT_NY,
-        [VILLA_DIRECT_PX][VILLA_DIRECT_NX] = VILLA_DIRECT_NX,
-        [VILLA_DIRECT_PX][VILLA_DIRECT_NY] = VILLA_DIRECT_PY,
-
-        [VILLA_DIRECT_PY][VILLA_DIRECT_PX] = VILLA_DIRECT_PY,
-        [VILLA_DIRECT_PY][VILLA_DIRECT_PY] = VILLA_DIRECT_PX,
-        [VILLA_DIRECT_PY][VILLA_DIRECT_NX] = VILLA_DIRECT_NY,
-        [VILLA_DIRECT_PY][VILLA_DIRECT_NY] = VILLA_DIRECT_NX,
-
-        [VILLA_DIRECT_NX][VILLA_DIRECT_PX] = VILLA_DIRECT_NX,
-        [VILLA_DIRECT_NX][VILLA_DIRECT_PY] = VILLA_DIRECT_PY,
-        [VILLA_DIRECT_NX][VILLA_DIRECT_NX] = VILLA_DIRECT_PX,
-        [VILLA_DIRECT_NX][VILLA_DIRECT_NY] = VILLA_DIRECT_NY,
-
-        [VILLA_DIRECT_NY][VILLA_DIRECT_PX] = VILLA_DIRECT_NY,
-        [VILLA_DIRECT_NY][VILLA_DIRECT_PY] = VILLA_DIRECT_NX,
-        [VILLA_DIRECT_NY][VILLA_DIRECT_NX] = VILLA_DIRECT_PY,
-        [VILLA_DIRECT_NY][VILLA_DIRECT_NY] = VILLA_DIRECT_PX,
-    };
-    return RULE[observedDirect][observerDirect];
-}
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     REQ_CONDITION(character != NULL, return false);
     if (VILLA_GetRoomCellEmpty(coord) == false) return false;
@@ -127,17 +103,11 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
         }
     }
 
-    DEBUG_SendMessageL("%s:\n", __func__);
-    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord1.x, character->coord1.y, VILLA_GetStrDirect(character->coord1.direct));
-    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord2.x, character->coord2.y, VILLA_GetStrDirect(character->coord2.direct));
-
     return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
 }
 bool VILLA_RenewCharacter(void *character_void) {
     Character* character = character_void;
     REQ_CONDITION(character != NULL, return false);
-
-    DEBUG_SendMessageR("%.2f, %.2f\n", character->t1, character->t2);
 
     VILLA_RenewCharacter_Src(character);
 

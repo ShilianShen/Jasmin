@@ -56,71 +56,42 @@ bool VILLA_GetRoomCellPosition(const Coord coord, Vec3f* position) {
 // CREATE & DELETE =====================================================================================================
 static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
     memset(room, 0, sizeof(*room));
-    if (cJSON_IsObject(room_json) == false) {
-        printf("cJSON_IsObject() failed\n");
-        return false;
-    }
+    REQ_CONDITION(cJSON_IsObject(room_json), return false);
 
     char* key = NULL;
     char* model_json = NULL;
     char* material_json = NULL;
     char* mask_json = NULL;
 
-    if (cJSON_Load(room_json, key = "model", JSM_STRING, &model_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
-    if (cJSON_Load(room_json, key = "material", JSM_STRING, &material_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
-    if (cJSON_Load(room_json, key = "mask", JSM_STRING, &mask_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
-    if (cJSON_Load(room_json, key = "rect", JSM_RECT, &room->mask_indices) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
+    REQ_CONDITION(cJSON_Load(room_json, "model", JSM_STRING, &model_json), return false);
+    REQ_CONDITION(cJSON_Load(room_json, "material", JSM_STRING, &material_json), return false);
+    REQ_CONDITION(cJSON_Load(room_json, key = "mask", JSM_STRING, &mask_json), return false);
+    REQ_CONDITION(cJSON_Load(room_json, key = "rect", JSM_RECT, &room->mask_indices), return false);
 
     room->model = LOTRI_CreateModel(model_json, material_json, MODEL_SIDE_IN);
-    if (room->model == NULL) {
-        printf("%s: room->model == NULL\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(room->model != NULL, return false);
 
     room->maskSur = IMG_Load(mask_json);
-    if (room->maskSur == NULL) {
-        printf("%s: IMG_Load() failed\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(room->maskSur != NULL, return false);
+
     room->w = room->maskSur->w;
     room->h = room->maskSur->h;
-
     room->maskTex = SDL_CreateTexture(
         renderer,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
         room->w, room->h
         );
-    if (room->maskTex == NULL) {
-        printf("%s: room->maskTex == NULL\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(room->maskTex != NULL, return false);
     SDL_SetTextureScaleMode(room->maskTex, SDL_SCALEMODE_NEAREST);
 
     room->cells = (RoomCell**)allocate2DArray(room->w, room->h, sizeof(RoomCell));
-    if (room->cells == NULL) {
-        printf("%s: room->cells == NULL\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(room->cells != NULL, return false);
+
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
             SDL_Color color;
-            if (SDL_GetSurfaceColor(room->maskSur, j, i, &color) == false) {
-                printf("%s: failed in %s\n", __func__, key);
-                return false;
-            }
+            REQ_CONDITION(SDL_GetSurfaceColor(room->maskSur, j, i, &color), return false);
             if (SDL_GetColorEqual(color, colors[VILLA_DATA_NONE]) == false) {
                 room->cells[i][j].dataType = VILLA_DATA_WALL;
             }
