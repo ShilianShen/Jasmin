@@ -5,17 +5,20 @@
 #include "../basic/basic.h"
 
 
-typedef struct {
-    int subject;
-    int action;
-    int object;
-} intelligence;
+typedef struct Intel Intel;
+typedef struct IntelNet IntelNet;
+struct Intel {bool yes; int subject; int action; int object;};
+struct IntelNet {int len; Intel* intelSet;};
 
 
-bool I_ENG_Init();
-bool I_ENG_Renew();
-bool I_ENG_Draw();
-void I_ENG_Exit();
+IntelNet* INTEL_CreateIntelNet();
+IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet);
+
+
+bool INTEL_Init();
+bool INTEL_Renew();
+bool INTEL_Draw();
+void INTEL_Exit();
 
 
 #endif //I_ENG_H

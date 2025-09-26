@@ -9,7 +9,7 @@ static const Env ENV_ARRAY[] = {
     {"PERPH", PERPH_Init, PERPH_Renew, PERPH_Draw, PERPH_Exit},
     {"TEMPO", TEMPO_Init, TEMPO_Renew, TEMPO_Draw, TEMPO_Exit},
     {"LOTRI", LOTRI_Init, LOTRI_Renew, LOTRI_Draw, LOTRI_Exit},
-    {"I-ENG", I_ENG_Init, I_ENG_Renew, I_ENG_Draw, I_ENG_Exit},
+    {"I-ENG", INTEL_Init, INTEL_Renew, INTEL_Draw, INTEL_Exit},
     {"VILLA", VILLA_Init, VILLA_Renew, VILLA_Draw, VILLA_Exit},
 };
 static const int LEN_ENV_ARRAY = len_of(ENV_ARRAY);
