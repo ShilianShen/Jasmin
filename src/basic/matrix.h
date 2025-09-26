@@ -14,6 +14,7 @@ typedef union {struct {int i, j, k;} v; int arr[3];} Vec3i;
 Vec3f BASIC_GetNormal(Vec3f A, Vec3f B, Vec3f C);
 Vec3f BASIC_GetSum(Vec3f A, Vec3f B, Vec3f C);
 float BASIC_GetDot(Vec3f A, Vec3f B);
+Vec3f BASIC_GetAdd(Vec3f A, Vec3f B);
 const char* BASIC_GetStrVec3f(Vec3f vec);
 bool BASIC_GetVecEqual(Vec3f A, Vec3f B);
 

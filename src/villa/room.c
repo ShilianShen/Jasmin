@@ -46,18 +46,8 @@ bool VILLA_GetRoomCellEmpty(const Coord coord) {
     ;
 }
 bool VILLA_GetRoomCellPosition(const Coord coord, Vec3f* position) {
-    if (coord.room == NULL) {
-        printf("%s: room == NULL.\n", __func__);
-        return false;
-    }
-    if (position == NULL) {
-        printf("%s: position == NULL.\n", __func__);
-        return false;
-    }
-    if (0 <= coord.x && coord.x < coord.room->w && 0 <= coord.y && coord.y < coord.room->h == false) {
-        printf("%s: 0 <= x && x < room->w && 0 <= y && y < room->h == false.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(coord.room != NULL && position != NULL, return false);
+    REQ_CONDITION(0 <= coord.x && coord.x < coord.room->w && 0 <= coord.y && coord.y < coord.room->h, return false);
     *position = coord.room->cells[coord.x][coord.y].worldPosition;
     return true;
 }
@@ -127,7 +117,7 @@ static bool VILLA_CreateRoom_RK(Room* room, const cJSON *room_json) {
     for (int i = 0; i < room->w; i++) {
         for (int j = 0; j < room->h; j++) {
             SDL_Color color;
-            if (SDL_GetSurfaceColor(room->maskSur, i, j, &color) == false) {
+            if (SDL_GetSurfaceColor(room->maskSur, j, i, &color) == false) {
                 printf("%s: failed in %s\n", __func__, key);
                 return false;
             }
@@ -158,7 +148,6 @@ void *VILLA_CreateRoom(const cJSON *room_json) {
     }
     return room;
 }
-
 void *VILLA_DestroyRoom_V(void *room_void) {
     Room* room = room_void;
     VILLA_DeleteRoom(room);
@@ -201,14 +190,12 @@ static bool VILLA_RenewRoomCells(Room* room) {
         for (int j = 0; j < room->h; j++) {
             RoomCell* cell = &room->cells[i][j];
             SDL_SetRenderColor(renderer, colors[cell->dataType]);
-            SDL_RenderPoint(renderer, (float)i, (float)j);
-
-
+            SDL_RenderPoint(renderer, (float)j, (float)i);
             for (int k = 0; k < 3; k++) {
                 cell->worldPosition.arr[k]
                 = A.arr[k]
-                + (B.arr[k] - A.arr[k]) * ((float)i + 0.5f) / (float)room->w
-                + (C.arr[k] - A.arr[k]) * ((float)j + 0.5f) / (float)room->h;
+                + (B.arr[k] - A.arr[k]) * ((float)j + 0.5f) / (float)room->h
+                + (C.arr[k] - A.arr[k]) * ((float)i + 0.5f) / (float)room->w;
             }
         }
     }

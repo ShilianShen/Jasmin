@@ -50,19 +50,20 @@ bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     character->coord2 = coord;
     return true;
 }
-bool VILLA_SetCharacterMove(Character* character, const int direct) {
+bool VILLA_SetCharacterMove(Character* character, int direct) {
     REQ_CONDITION(character != NULL, return false);
 
     const float time = (float)SDL_GetTicks() / 1000;
     if (time < character->t2) return false;
 
+    direct = (direct % 4 + 4) % 4;
     character->coord2.direct = direct;
     Coord coord = character->coord2;
     switch (direct) {
-        case VILLA_DIRECT_PX: coord.y--; break;
-        case VILLA_DIRECT_PY: coord.x--; break;
-        case VILLA_DIRECT_NX: coord.y++; break;
-        case VILLA_DIRECT_NY: coord.x++; break;
+        case VILLA_DIRECT_PX: coord.x++; break;
+        case VILLA_DIRECT_PY: coord.y++; break;
+        case VILLA_DIRECT_NX: coord.x--; break;
+        case VILLA_DIRECT_NY: coord.y--; break;
         default: return false;
     }
 
@@ -115,11 +116,8 @@ void* VILLA_DeleteCharacter(void *character_void) {
 
 // RENEW ===============================================================================================================
 static bool VILLA_RenewCharacter_Src(const Character* character) {
-    float a = 0;
-    LOTRI_GetModelCZ(character->model, &a);
-    a = loop(0, a, M_PI * 2);
     VILLA_Action action = VILLA_ACT_NONE;
-    int direct = character->coord2.direct;
+    const int direct = (character->coord2.direct - cameraDirect + 4) % 4;
     const float time = (float)SDL_GetTicks() / 1000;
     if (time < character->t2) {
         switch (SDL_GetTicks() / 100 % 4) {
@@ -129,23 +127,17 @@ static bool VILLA_RenewCharacter_Src(const Character* character) {
         }
     }
 
-    if (7 * M_PI_4 < a || a <= 1 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
-    if (1 * M_PI_4 < a && a <= 3 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
-    if (3 * M_PI_4 < a && a <= 5 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
-    if (5 * M_PI_4 < a && a <= 7 * M_PI_4)
-        return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
-    return false;
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord1.x, character->coord1.y, VILLA_GetStrDirect(character->coord1.direct));
+    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord2.x, character->coord2.y, VILLA_GetStrDirect(character->coord2.direct));
+
+    return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
 }
 bool VILLA_RenewCharacter(void *character_void) {
     Character* character = character_void;
     REQ_CONDITION(character != NULL, return false);
 
-
     DEBUG_SendMessageR("%.2f, %.2f\n", character->t1, character->t2);
-
 
     VILLA_RenewCharacter_Src(character);
 
@@ -169,10 +161,6 @@ bool VILLA_DrawCharacter(const void *character_void) {
     REQ_CONDITION(character != NULL, return false);
 
     LOTRI_DrawModel(character->model);
-
-    DEBUG_SendMessageL("%s:\n", __func__);
-    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord1.x, character->coord1.y, VILLA_GetStrDirect(character->coord1.direct));
-    DEBUG_SendMessageL("%d, %d, %s:\n", character->coord2.x, character->coord2.y, VILLA_GetStrDirect(character->coord2.direct));
 
     return true;
 }

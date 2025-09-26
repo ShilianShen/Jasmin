@@ -32,7 +32,7 @@ bool VILLA_Init() {
     VILLA_SetCharacterCoord(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 0, 3});
     VILLA_SetCharacterCoord(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 0, 3});
 
-    you = characterTable.kv[1].val;
+    you = characterTable.kv[0].val;
 
     VILLA_InitRain();
 
@@ -70,50 +70,40 @@ static bool VILLA_Renew_Camera() {
         }
     }
     {
-        const float angle = M_PI_4 * 0.5;
+        static int direct = 0;
         static Vec3f v1 = {0}, v2 = {0};
         static float t1 = 0, t2 = 0;
-
         rotateLarge = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
-
-        Vec3f v = {0, 0.5f, 0.3f};
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_Q)) cameraDirect = (cameraDirect + 1) % VILLA_NUM_DIRECTS;
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_E)) cameraDirect = (cameraDirect + VILLA_NUM_DIRECTS - 1) % VILLA_NUM_DIRECTS;
-
-        if (BASIC_GetVecEqual(v, v2) == false) {
-            v1 = rotateSmall;
-            t1 = t;
-            v2 = v;
-            t2 = t + 0.8f;
+        if (t >= t2){
+            if (PERPH_GetKeyPressed(SDL_SCANCODE_Q)) direct++;
+            if (PERPH_GetKeyPressed(SDL_SCANCODE_E)) direct--;
+            const Vec3f v = {0, 0, M_PI_2 * direct};
+            if (BASIC_GetVecEqual(v, v2) == false) {
+                v1 = rotateLarge;
+                t1 = t;
+                v2 = v;
+                t2 = t + 0.4f;
+            }
         }
     }
+    const Vec3f cameraRotate = BASIC_GetAdd(rotateSmall, rotateLarge);
+    LOTRI_SetCamera(cameraRotate);
+    const float z = SDL_fmodf(SDL_fmodf(cameraRotate.v.z, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
+    if (7 * M_PI_4 <= z || z < 1 * M_PI_4) cameraDirect = VILLA_DIRECT_PX;
+    else if (1 * M_PI_4 <= z && z < 3 * M_PI_4) cameraDirect = VILLA_DIRECT_PY;
+    else if (3 * M_PI_4 <= z && z < 5 * M_PI_4) cameraDirect = VILLA_DIRECT_NX;
+    else if (5 * M_PI_4 <= z && z < 7 * M_PI_4) cameraDirect = VILLA_DIRECT_NY;
+    DEBUG_SendMessageL("%s: %.2f, %d\n", __func__, z, cameraDirect);
 
-    static DelayVec3f bigRotate = {0};
-    bigRotate.block = true;
-    {
-        static float k = 2;
-        Vec3f v = {0, 0, 0};
-        if (PERPH_GetKeyPress(SDL_SCANCODE_Q)) k += 1;
-        if (PERPH_GetKeyPress(SDL_SCANCODE_E)) k -= 1;
-        v.v.z += k * (float)M_PI_2;
-        LOTRI_SetDelayVec(&bigRotate, v, 0.5f);
-    }
-    const Vec3f vd = LOTRI_GetDelayVecVec(bigRotate);
-    const Vec3f rotate = (Vec3f){
-        rotateSmall.v.x + vd.v.x,
-        rotateSmall.v.y + vd.v.y,
-        rotateSmall.v.z + vd.v.z
-    };
-    LOTRI_SetCamera(rotate);
     return true;
 }
 static bool VILLA_Renew_You() {
-    if (you == NULL) return false;
+    REQ_CONDITION(you != NULL, return false);
 
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PX);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PY);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NX);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NY);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PX + cameraDirect);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PY + cameraDirect);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NX + cameraDirect);
+    if (PERPH_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NY + cameraDirect);
     return true;
 }
 bool VILLA_Renew() {

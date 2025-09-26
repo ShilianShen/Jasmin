@@ -24,6 +24,15 @@ Vec3f BASIC_GetSum(const Vec3f A, const Vec3f B, const Vec3f C) {
 float BASIC_GetDot(const Vec3f A, const Vec3f B) {
     return A.v.x * B.v.x + A.v.y * B.v.y + A.v.z * B.v.z;
 }
+Vec3f BASIC_GetAdd(const Vec3f A, const Vec3f B) {
+    const Vec3f result = {
+        A.v.x + B.v.x,
+        A.v.y + B.v.y,
+        A.v.z + B.v.z,
+    };
+    return result;
+}
+
 
 bool BASIC_GetVecEqual(const Vec3f A, const Vec3f B) {
     return A.v.x == B.v.x && A.v.y == B.v.y && A.v.z == B.v.z;
