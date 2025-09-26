@@ -8,6 +8,7 @@
 #include "../../src/debug/debug.h"
 #include "../../src/perph/perph.h"
 
+#include "../../src/i_eng/i_eng.h"
 #include "../../src/tempo/tempo.h"
 #include "../../src/lotri/lotri.h"
 #include "../../src/villa/villa.h"
