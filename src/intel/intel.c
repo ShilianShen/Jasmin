@@ -1,4 +1,4 @@
-#include "i_eng.h"
+#include "intel.h"
 
 
 static bool INTEL_CreateIntelNet_RK(IntelNet* intelNet, const int len) {
