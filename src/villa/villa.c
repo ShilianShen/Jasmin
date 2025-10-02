@@ -11,6 +11,7 @@ const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
 
 Table characterTable;
 Table roomTable;
+TTF_Font* VILLA_Font = NULL;
 SDL_FRect TEX_SRC[VILLA_NUM_DIRECTS][VILLA_NUM_ACTS];
 int cameraDirect;
 
@@ -28,13 +29,14 @@ bool VILLA_Init() {
     cJSON_Delete(roomTable_json);
 
     VILLA_SetCharacterCoord(characterTable.kv[0].val, (Coord){roomTable.kv[0].val, 3, 0});
-    VILLA_SetCharacterCoord(characterTable.kv[0].val, (Coord){roomTable.kv[0].val, 3, 0});
-    VILLA_SetCharacterCoord(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 0, 3});
-    VILLA_SetCharacterCoord(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 0, 3});
+    VILLA_SetCharacterCoord(characterTable.kv[1].val, (Coord){roomTable.kv[0].val, 2, 4});
 
     you = characterTable.kv[0].val;
 
     VILLA_InitRain();
+
+    VILLA_Font = TTF_OpenFont("../res/font/Times New Roman.ttf", 60);
+    REQ_CONDITION(VILLA_Font != NULL, return false);
 
     for (int i = 0; i < VILLA_NUM_DIRECTS; i++) {
         for (int j = 0; j < VILLA_NUM_ACTS; j++) {
@@ -104,6 +106,7 @@ static bool VILLA_Renew_You() {
     if (PERPH_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PY + cameraDirect);
     if (PERPH_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NX + cameraDirect);
     if (PERPH_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NY + cameraDirect);
+
     return true;
 }
 bool VILLA_Renew() {
@@ -119,6 +122,8 @@ bool VILLA_Draw() {
     && BASIC_DrawTable(&roomTable, VILLA_DrawRoom)
     && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
     && VILLA_DrawRain()
+    && LOTRI_Draw()
+    && VILLA_Ask(NULL, NULL)
     ;
 }
 void VILLA_Exit() {

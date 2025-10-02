@@ -4,11 +4,14 @@
 
 #include "villa.h"
 
-#define VILLA_DIRECT_PX 0
-#define VILLA_DIRECT_PY 1
-#define VILLA_DIRECT_NX 2
-#define VILLA_DIRECT_NY 3
-#define VILLA_NUM_DIRECTS 4
+
+typedef enum {
+    VILLA_DIRECT_PX,
+    VILLA_DIRECT_PY,
+    VILLA_DIRECT_NX,
+    VILLA_DIRECT_NY,
+    VILLA_NUM_DIRECTS,
+} VILLA_DIRECT;
 const char* VILLA_GetStrDirect(int direct);
 
 

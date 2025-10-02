@@ -19,6 +19,17 @@ struct Character {
 
 
 // SET & GET ===========================================================================================================
+bool VILLA_GetIfSomeoneThere(const Coord coord) {
+    for (int i = 0; i < characterTable.len; i++) {
+        const Character* character = characterTable.kv[i].val;
+        if (character->coord2.room == coord.room &&
+            character->coord2.x == coord.x &&
+            character->coord2.y == coord.y) {
+            return true;
+        }
+    }
+    return false;
+}
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     REQ_CONDITION(character != NULL, return false);
     if (VILLA_GetRoomCellEmpty(coord) == false) return false;
@@ -43,7 +54,7 @@ bool VILLA_SetCharacterMove(Character* character, int direct) {
         default: return false;
     }
 
-    if (VILLA_GetRoomCellEmpty(coord) == false) return false;
+    if (VILLA_GetRoomCellEmpty(coord) == false || VILLA_GetIfSomeoneThere(coord) == true) return false;
 
     character->coord1 = character->coord2;
     character->t1 = time;
@@ -132,5 +143,33 @@ bool VILLA_DrawCharacter(const void *character_void) {
 
     LOTRI_DrawModel(character->model);
 
+    return true;
+}
+
+
+// ?
+bool VILLA_Ask(Character* subject, Character* object) {
+    static const char* text = "Do you want to be truly alive?";
+    static float t1 = 0, t2 = 0;
+
+    const float t = (float)SDL_GetTicks() / 1000;
+    const int len = SDL_min(strlen(text), (int)(20 * (t - t1)));
+    char string[len+1];
+    for (int i = 0; i < len; i++) {
+        string[i] = text[i];
+    }
+    string[len] = '\0';
+
+    SDL_Texture* texture = TXT_LoadTexture(renderer, VILLA_Font, string, (SDL_Color){255, 255, 255, 255});
+
+    SDL_FRect dst;
+    const SDL_Color color = {0, 0, 0, 128};
+    const SDL_FRect gid = {0, -160, 1, 1};
+    SDL_LoadDstRectAligned(&dst, texture, NULL, &gid, NULL, 18);
+    SDL_SetRenderColor(renderer, color);
+    SDL_RenderFillRect(renderer, &dst);
+    SDL_RenderTexture(renderer, texture, NULL, &dst);
+
+    SDL_DestroyTexture(texture);
     return true;
 }

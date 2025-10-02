@@ -18,6 +18,8 @@ enum VILLA_DATA_TYPE {
 };
 
 
+
+extern TTF_Font* VILLA_Font;
 bool VILLA_Init();
 bool VILLA_Renew();
 bool VILLA_Draw();
