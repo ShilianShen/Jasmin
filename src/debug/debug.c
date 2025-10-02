@@ -116,9 +116,6 @@ bool DEBUG_Renew() {
 bool DEBUG_Draw() {
     if (!DEBUG_ON) return true;
 
-    const bool* state = SDL_GetKeyboardState(NULL);
-    if (state[SDL_SCANCODE_LSHIFT] == false) { return true; }
-
     // Opt Condition
     if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
     if (debug.message[1] != NULL) {DEBUG_DrawTextAligned(debug.message[1], 'R');}
