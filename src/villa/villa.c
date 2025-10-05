@@ -19,6 +19,16 @@ int cameraDirect;
 Character* you = NULL;
 
 
+void VILLA_MoveYou(const void* direct_void) {
+    const int direct = *(int*)direct_void;
+    VILLA_SetCharacterMove(you, direct);
+}
+void VILLA_MoveCameraSmall(const void* para_void) {
+
+
+}
+
+
 bool VILLA_Init() {
     cJSON* characterTable_json = getJson(CHARACTER_TABLE_JSON_FILE);
     BASIC_CreateTable(&characterTable, characterTable_json, VILLA_CreateCharacter);
@@ -101,12 +111,16 @@ static bool VILLA_Renew_Camera() {
 }
 static bool VILLA_Renew_You() {
     REQ_CONDITION(you != NULL, return false);
-
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_W)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PX + cameraDirect);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_A)) VILLA_SetCharacterMove(you, VILLA_DIRECT_PY + cameraDirect);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_S)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NX + cameraDirect);
-    if (PERPH_GetKeyPressed(SDL_SCANCODE_D)) VILLA_SetCharacterMove(you, VILLA_DIRECT_NY + cameraDirect);
-
+    static int directs[VILLA_NUM_DIRECTS];
+    static Trig trig[VILLA_NUM_DIRECTS];
+    for (int i = 0; i < VILLA_NUM_DIRECTS; i++) {
+        trig[i] = (Trig){VILLA_MoveYou, &directs[i], true},
+        directs[i] = i + cameraDirect;
+    }
+    PERPH_SetKeyTrig(SDL_SCANCODE_W, &trig[VILLA_DIRECT_PX]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_A, &trig[VILLA_DIRECT_PY]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_S, &trig[VILLA_DIRECT_NX]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_D, &trig[VILLA_DIRECT_NY]);
     return true;
 }
 bool VILLA_Renew() {

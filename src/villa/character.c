@@ -5,7 +5,7 @@
 const float WALK_TIME_PER_CELL = 0.3f;
 
 
-SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
+static SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
     [VILLA_DIRECT_PX] = {0, 0, 0.25f, 0.25f},
     [VILLA_DIRECT_NX] = {0, 0.25f, 0.25f, 0.25f},
     [VILLA_DIRECT_PY] = {0, 0.5f, 0.25f, 0.25f},
@@ -149,7 +149,7 @@ bool VILLA_DrawCharacter(const void *character_void) {
 
 // ?
 bool VILLA_Ask(Character* subject, Character* object) {
-    static const char* text = "Do you want to be truly alive?";
+    static const char* text = "Dive?";
     static float t1 = 0, t2 = 0;
 
     const float t = (float)SDL_GetTicks() / 1000;
