@@ -1,13 +1,19 @@
 #include "mouse.h"
 
 
+#define PERPH_MOUSE_JSON "../config/perph_mouse.json"
+
+
 static struct {
     struct {
         SDL_FPoint pos, leftPos, rightPos;
         bool leftPressed, rightPressed;
     } state1, state2;
     const Trig* left_trig;
-} mouse;
+    SDL_Texture* tex;
+    SDL_FRect texDstRect;
+} mouse = {0};
+cJSON* mouse_json = NULL;
 
 
 // SET & GET ===========================================================================================================
@@ -22,6 +28,41 @@ bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
 }
 bool PERPH_GetMouseInRect(const SDL_FRect rect) {
     return SDL_GetPointInRect(mouse.state2.pos, rect);
+}
+
+
+// INIT & EXIR =========================================================================================================
+bool PERPH_InitMouse() {
+    mouse_json = getJson(PERPH_MOUSE_JSON);
+    REQ_CONDITION(mouse_json != NULL, return false);
+
+    char* tex_json = NULL;
+    if (cJSON_Load(mouse_json, "tex", JSM_STRING, &tex_json)) {
+        float scale = 0;
+        REQ_CONDITION(cJSON_Load(mouse_json, "scale", JSM_FLOAT, &scale), return false);
+
+        mouse.tex = IMG_LoadTexture(renderer, tex_json);
+        REQ_CONDITION(mouse.tex != NULL, return false);
+        tex_json = NULL;
+        SDL_SetTextureScaleMode(mouse.tex, SDL_SCALEMODE_NEAREST);
+        SDL_HideCursor();
+
+        mouse.texDstRect.w = scale * (float)mouse.tex->w;
+        mouse.texDstRect.h = scale * (float)mouse.tex->h;
+    }
+    cJSON_Delete(mouse_json);
+    mouse_json = NULL;
+    return true;
+}
+void PERPH_ExitMouse() {
+    if (mouse_json != NULL) {
+        cJSON_Delete(mouse_json);
+        mouse_json = NULL;
+    }
+    if (mouse.tex != NULL) {
+        SDL_DestroyTexture(mouse.tex);
+        mouse.tex = NULL;
+    }
 }
 
 
@@ -75,10 +116,10 @@ bool PERPH_DrawMouse() {
     DEBUG_DrawPoint(mouse.state2.leftPos);
     DEBUG_DrawPoint(mouse.state2.pos);
     if (mouse.state2.leftPressed) {
-        DEBUG_DrawLine(
-            mouse.state2.leftPos,
-            mouse.state2.pos
-            );
+        DEBUG_DrawLine(mouse.state2.leftPos, mouse.state2.pos);
     }
+    mouse.texDstRect.x = mouse.state2.pos.x;
+    mouse.texDstRect.y = mouse.state2.pos.y;
+    SDL_RenderTexture(renderer, mouse.tex, NULL, &mouse.texDstRect);
     return true;
 }

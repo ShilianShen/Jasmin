@@ -2,9 +2,12 @@
 
 
 bool PERPH_Init() {
-    return true;
+    return true
+    && PERPH_InitMouse()
+    ;
 }
 void PERPH_Exit() {
+    PERPH_ExitMouse();
 }
 bool PERPH_Renew() {
     REQ_CONDITION(PERPH_RenewMouse(), return false);

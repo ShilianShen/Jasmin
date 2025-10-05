@@ -34,7 +34,6 @@ bool BASIC_Init() {
     renderer = SDL_CreateRenderer(window, NULL);
     REQ_CONDITION(renderer != NULL, return false);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_HideCursor();
 
     return true;
 }

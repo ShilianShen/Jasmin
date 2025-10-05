@@ -99,13 +99,9 @@ bool DEBUG_Renew() {
 
     static Uint64 t1 = 0, t2 = 0;
     t2 = SDL_GetTicks();
-    if (t2 / 1000 > 2) {
-        static float fps_min = 9999.f;
-        static float fps_max = 0.0f;
+    if (t2 / 1000 > 0) {
         const float fps = 1000.f / (float)(t2 - t1);
-        fps_min = SDL_min(fps, fps_min);
-        fps_max = SDL_max(fps, fps_max);
-        DEBUG_SendMessageL("%s: FPS: %4.2f <= %4.2f <= %4.2f\n", __func__, fps_min, fps, fps_max);
+        DEBUG_SendMessageL("%s: FPS: %4.2f\n", __func__, fps);
     }
     t1 = SDL_GetTicks();
     return true;
@@ -115,6 +111,7 @@ bool DEBUG_Renew() {
 // DRAW ================================================================================================================
 bool DEBUG_Draw() {
     if (!DEBUG_ON) return true;
+    if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_LSHIFT] == false) return true;
 
     // Opt Condition
     if (debug.message[0] != NULL) {DEBUG_DrawTextAligned(debug.message[0], 'L');}
