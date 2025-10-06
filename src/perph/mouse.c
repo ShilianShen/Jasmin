@@ -1,19 +1,17 @@
 #include "mouse.h"
 
 
-#define PERPH_MOUSE_JSON "../config/perph_mouse.json"
-
-
 static struct {
     struct {
         SDL_FPoint pos, leftPos, rightPos;
         bool leftPressed, rightPressed;
     } state1, state2;
     const Trig* left_trig;
+    const Trig* right_trig;
     SDL_Texture* tex;
     SDL_FRect texDstRect;
-} mouse = {0};
-cJSON* mouse_json = NULL;
+    cJSON* json;
+} mouse;
 
 
 // SET & GET ===========================================================================================================
@@ -24,7 +22,7 @@ void PERPH_SetMouseLeftTrig(const Trig *trig) {
     mouse.left_trig = trig;
 }
 bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
-    return SDL_GetPointInRect(mouse.state2.leftPos, rect);
+    return mouse.state2.leftPressed && SDL_GetPointInRect(mouse.state2.leftPos, rect);
 }
 bool PERPH_GetMouseInRect(const SDL_FRect rect) {
     return SDL_GetPointInRect(mouse.state2.pos, rect);
@@ -33,13 +31,14 @@ bool PERPH_GetMouseInRect(const SDL_FRect rect) {
 
 // INIT & EXIR =========================================================================================================
 bool PERPH_InitMouse() {
-    mouse_json = getJson(PERPH_MOUSE_JSON);
-    REQ_CONDITION(mouse_json != NULL, return false);
+    memset(&mouse, 0, sizeof(mouse));
+    mouse.json = getJson(PERPH_MOUSE_JSON);
+    REQ_CONDITION(mouse.json != NULL, return false);
 
     char* tex_json = NULL;
-    if (cJSON_Load(mouse_json, "tex", JSM_STRING, &tex_json)) {
+    if (cJSON_Load(mouse.json, "tex", JSM_STRING, &tex_json)) {
         float scale = 0;
-        REQ_CONDITION(cJSON_Load(mouse_json, "scale", JSM_FLOAT, &scale), return false);
+        REQ_CONDITION(cJSON_Load(mouse.json, "scale", JSM_FLOAT, &scale), return false);
 
         mouse.tex = IMG_LoadTexture(renderer, tex_json);
         REQ_CONDITION(mouse.tex != NULL, return false);
@@ -50,14 +49,14 @@ bool PERPH_InitMouse() {
         mouse.texDstRect.w = scale * (float)mouse.tex->w;
         mouse.texDstRect.h = scale * (float)mouse.tex->h;
     }
-    cJSON_Delete(mouse_json);
-    mouse_json = NULL;
+    cJSON_Delete(mouse.json);
+    mouse.json = NULL;
     return true;
 }
 void PERPH_ExitMouse() {
-    if (mouse_json != NULL) {
-        cJSON_Delete(mouse_json);
-        mouse_json = NULL;
+    if (mouse.json != NULL) {
+        cJSON_Delete(mouse.json);
+        mouse.json = NULL;
     }
     if (mouse.tex != NULL) {
         SDL_DestroyTexture(mouse.tex);
@@ -94,8 +93,7 @@ static void PERPH_RenewMouse_Trig() {
         && mouse.left_trig->sustain == true
         && mouse.state1.leftPressed == true
         ) {
-        if (mouse.state2.leftPressed == false)
-            ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+        if (mouse.state2.leftPressed == false) ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
         PullTrig(mouse.left_trig);
         }
     mouse.left_trig = NULL;
@@ -109,13 +107,14 @@ bool PERPH_RenewMouse() {
 
 // DRAW ================================================================================================================
 bool PERPH_DrawMouse() {
-    DEBUG_SendMessageL("mouse: %.2f, %.2f\n", mouse.state2.pos.x, mouse.state2.pos.y);
-    if (mouse.left_trig != NULL) {
-        DEBUG_SendMessageL("mouse.left_trig != NULL\n");
-    }
-    DEBUG_DrawPoint(mouse.state2.leftPos);
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("    mousePos: %s\n", SDL_GetStrFPoint(mouse.state2.pos));
+    if (mouse.left_trig != NULL) DEBUG_SendMessageL("    mouse.left_trig != NULL\n");
+
     DEBUG_DrawPoint(mouse.state2.pos);
     if (mouse.state2.leftPressed) {
+        DEBUG_SendMessageL("    mouseLeftPos: %s\n", SDL_GetStrFPoint(mouse.state2.leftPos));
+        DEBUG_DrawPoint(mouse.state2.leftPos);
         DEBUG_DrawLine(mouse.state2.leftPos, mouse.state2.pos);
     }
     mouse.texDstRect.x = mouse.state2.pos.x;

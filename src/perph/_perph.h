@@ -5,4 +5,7 @@
 #include "../debug/debug.h"
 
 
+#define PERPH_MOUSE_JSON "../config/perph_mouse.json"
+
+
 #endif //_PERPH_H

@@ -16,6 +16,11 @@ char*SDL_GetStrFRect(const SDL_FRect rect) {
     snprintf(string, 31, "[%.2f, %.2f, %.2f, %.2f]", rect.x, rect.y, rect.w, rect.h);
     return string;
 }
+char*SDL_GetStrFPoint(const SDL_FPoint point) {
+    static char string[32];
+    snprintf(string, 31, "[%.2f, %.2f]", point.x, point.y);
+    return string;
+}
 bool SDL_GetSurfaceColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
     REQ_CONDITION(surface != NULL, return false);
     SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
