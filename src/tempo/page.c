@@ -88,8 +88,6 @@ bool TEMPO_RenewPage(Page *page) {
 bool TEMPO_DrawPage(const Page* page) {
     REQ_CONDITION(page != NULL, return false);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 64);
-    SDL_RenderFillRect(renderer, NULL);
     SDL_SetRenderColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);
 

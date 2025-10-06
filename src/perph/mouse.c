@@ -75,10 +75,7 @@ static void PERPH_RenewMouse_State() {
     mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
     mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
 
-    if (!mouse.state1.leftPressed && mouse.state2.leftPressed)
-        mouse.state2.leftPos = mouse.state2.pos;
-    else if (mouse.state1.leftPressed && !mouse.state2.leftPressed)
-        mouse.state2.leftPos = (SDL_FPoint){-255, -245};
+    if (!mouse.state1.leftPressed && mouse.state2.leftPressed) mouse.state2.leftPos = mouse.state2.pos;
 }
 static void PERPH_RenewMouse_Trig() {
     if (mouse.left_trig != NULL
