@@ -56,6 +56,7 @@ bool SDL_RenderTextureAligned(
     const SDL_FRect* bck_rect,
     int anchor
     );
+bool SDL_RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_FPoint point, SDL_Color color);
 
 
 // OBJ & MTL ===========================================================================================================

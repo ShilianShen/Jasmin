@@ -104,6 +104,14 @@ bool SDL_RenderTextureAligned(
     SDL_LoadDstRectAligned(&dst_rect, texture, src_rect, gid_rect, bck_rect, anchor);
     return SDL_RenderTexture(renderer, texture, src_rect, &dst_rect);
 }
+bool SDL_RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_FPoint point, const SDL_Color color) {
+    REQ_CONDITION(renderer != NULL && text != NULL && font != NULL, return false);
+    SDL_Texture* texture = TXT_LoadTexture(renderer, font, text, color);
+    REQ_CONDITION(texture != NULL, return false);
+    SDL_RenderTexture(renderer, texture, NULL, &(SDL_FRect){point.x, point.y, (float)texture->w, (float)texture->h});
+    SDL_DestroyTexture(texture);
+    return true;
+}
 
 
 bool SDL_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {

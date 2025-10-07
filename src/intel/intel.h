@@ -5,9 +5,17 @@
 #include "../basic/basic.h"
 
 
+typedef enum IntelState IntelState;
+enum IntelState {
+    INTEL_STATE_NULL,
+    INTEL_STATE_SRC_FALSE,
+    INTEL_STATE_SRC_TRUE,
+    INTEL_STATE_UNKNOWN,
+    INTEL_NUM_STATES
+};
 typedef struct Intel Intel;
 typedef struct IntelNet IntelNet;
-struct Intel {bool yes; int subject; int action; int object;};
+struct Intel {IntelState state; int subject; int action; int object;};
 struct IntelNet {int len; Intel* intelSet;};
 
 
