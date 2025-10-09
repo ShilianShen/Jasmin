@@ -1,5 +1,5 @@
-#ifndef I_ENG_H
-#define I_ENG_H
+#ifndef INTEL_H
+#define INTEL_H
 
 
 #include "../basic/basic.h"
@@ -16,7 +16,10 @@ enum IntelState {
 typedef struct Intel Intel;
 typedef struct IntelNet IntelNet;
 struct Intel {IntelState state; int subject; int action; int object;};
-struct IntelNet {int len; Intel* intelSet;};
+struct IntelNet {
+    int len;
+    Intel* intelSet;
+};
 
 
 IntelNet* INTEL_CreateIntelNet();
@@ -29,4 +32,4 @@ bool INTEL_Draw();
 void INTEL_Exit();
 
 
-#endif //I_ENG_H
+#endif //INTEL_H
