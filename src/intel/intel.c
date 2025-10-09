@@ -101,6 +101,7 @@ bool compute_force_layout(
     return true;
 }
 
+
 enum Entity {
     ENTITY_0,
     ENTITY_1,
@@ -108,9 +109,10 @@ enum Entity {
     ENTITY_3,
     NUM_ENTITIES
 };
-SDL_FPoint entityPos[NUM_ENTITIES] = {0};
+SDL_FPoint* entityPos = NULL;
 
 
+// GET & SET ===========================================================================================================
 static Intel* INTEL_GetIntelSet(const int len) {
     REQ_CONDITION(len > 0, return NULL);
 
@@ -119,6 +121,9 @@ static Intel* INTEL_GetIntelSet(const int len) {
 
     return intelSet;
 }
+
+
+// CREATE & DELETE =====================================================================================================
 static bool INTEL_CreateIntelNet_RK(IntelNet* intelNet) {
     memset(intelNet, 0, sizeof(IntelNet));
 
@@ -145,6 +150,9 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
     intelNet = NULL;
     return NULL;
 }
+
+
+// OTHER ===============================================================================================================
 bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
     REQ_CONDITION(intelNet->intelSet != NULL, return false);
 
@@ -170,18 +178,22 @@ bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
 
     return true;
 }
+
+
+// DRAW ================================================================================================================
 bool INTEL_DrawIntelNet(IntelNet* intelNet) {
     REQ_CONDITION(intelNet->intelSet != NULL, return false);
 
     compute_force_layout(
         intelNet->len, intelNet->intelSet,
         NUM_ENTITIES, entityPos,
-        (SDL_FRect){0, 0, (float)windowWidth, (float)windowHeight}
+        windowRect
         );
     SDL_FRect rects[NUM_ENTITIES];
     for (int i = 0; i < NUM_ENTITIES; i++) {
         rects[i] = (SDL_FRect){entityPos[i].x, entityPos[i].y, 20, 20};
     }
+
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderRects(renderer, rects, NUM_ENTITIES);
     SDL_RenderRect(renderer, &windowRect);
@@ -189,22 +201,40 @@ bool INTEL_DrawIntelNet(IntelNet* intelNet) {
 }
 
 
-
-
+// INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
+    entityPos = calloc(NUM_ENTITIES, sizeof(SDL_FPoint));
+    REQ_CONDITION(entityPos != NULL, return false);
+
     testIntelNet = INTEL_CreateIntelNet();
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 1});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 2});
-    return true;
-}
-bool INTEL_Renew() {
-    return true;
-}
-bool INTEL_Draw() {
-    INTEL_DrawIntelNet(testIntelNet);
+    for (int i = 0; i < testIntelNet->len; i++) {
+        printf("%s: %d, %d, %d\n", __func__,
+            testIntelNet->intelSet[i].subject,
+            testIntelNet->intelSet[i].action,
+            testIntelNet->intelSet[i].object
+            );
+    }
 
     return true;
 }
 void INTEL_Exit() {
     testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
+
+    free(entityPos); entityPos = NULL;
+}
+
+
+// RENEW ===============================================================================================================
+bool INTEL_Renew() {
+    return true;
+}
+
+
+// DRAW ================================================================================================================
+bool INTEL_Draw() {
+    INTEL_DrawIntelNet(testIntelNet);
+
+    return true;
 }
