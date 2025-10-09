@@ -27,14 +27,8 @@ typedef enum {
 } JSM_DataType;
 
 
-extern SDL_FRect windowRect;
+extern SDL_FRect windowRectScaled, windowRect;
 extern ma_engine engine;
-
-
-bool BASIC_Init();
-bool BASIC_Renew();
-bool BASIC_Draw();
-void BASIC_Exit();
 
 
 void MA_PlaySound(const char *sound);

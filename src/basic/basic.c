@@ -3,6 +3,7 @@
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+SDL_FRect windowRectScaled = {0, 0, 0, 0};
 SDL_FRect windowRect = {0, 0, 0, 0};
 
 
@@ -42,7 +43,8 @@ bool BASIC_Renew() {
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
     scale_x = (float)windowWidth / (float)logical_w;
     scale_y = (float)windowHeight / (float)logical_h;
-    windowRect = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
+    windowRectScaled = (SDL_FRect){0, 0, (float)windowWidth * scale_x, (float)windowHeight * scale_y};
+    windowRect = (SDL_FRect){0, 0, (float)windowWidth, (float)windowHeight};
     return true;
 }
 bool BASIC_Draw() {

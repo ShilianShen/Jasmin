@@ -12,4 +12,10 @@
 #include "matrix.h"
 
 
+bool BASIC_Init();
+bool BASIC_Renew();
+bool BASIC_Draw();
+void BASIC_Exit();
+
+
 #endif //JASMIN_BASIC_H
