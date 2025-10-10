@@ -126,10 +126,7 @@ bool SDL_GetPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
     return rect.x <= point.x && point.x < rect.x + rect.w && rect.y <= point.y && point.y < rect.y + rect.h;
 }
 SDL_Texture* TXT_LoadTexture(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_Color color) {
-    // N-Condition
-    if (renderer == NULL) {printf("%s: renderer[%p] not exists.\n", __func__, renderer); return NULL;}
-    if (font == NULL) {printf("%s: font[%p] not exists.\n", __func__, font); return NULL;}
-    if (text == NULL) {printf("%s: text[%p] not exists.\n", __func__, text); return NULL;}
+    REQ_CONDITION(renderer != NULL && font != NULL && text != NULL, return NULL);
     if (strlen(text) == 0) {return NULL;} // Opt
 
     // getSurface N-Condition
