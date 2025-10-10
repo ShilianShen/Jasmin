@@ -5,10 +5,16 @@
 #include "../basic/basic.h"
 
 
+extern const bool DEBUG_ON;
+
+
 bool DEBUG_Init();
 bool DEBUG_Renew();
 bool DEBUG_Draw();
 void DEBUG_Exit();
+
+
+bool DEBUG_GetShift();
 
 
 void DEBUG_DrawPoint(SDL_FPoint point);

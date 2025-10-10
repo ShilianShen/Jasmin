@@ -21,7 +21,7 @@ enum DEBUG_ALPHA {
 const char* DEBUG_JSON = "../config/debug.json";
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
-bool DEBUG_ON = true;
+const bool DEBUG_ON = true;
 
 
 struct {
@@ -30,6 +30,14 @@ struct {
     SDL_Color colors[DEBUG_NUM_COLORS][DEBUG_NUM_ALPHAS];
     char* message[2];
 } debug;
+
+
+// GET & SET ===========================================================================================================
+bool DEBUG_GetShift() {
+    if (!DEBUG_ON) return false;
+    return SDL_GetKeyboardState(NULL)[SDL_SCANCODE_LSHIFT];
+}
+
 
 
 // INIT & EXIT =========================================================================================================
