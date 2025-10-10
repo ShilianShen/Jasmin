@@ -103,7 +103,7 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-    font = TTF_OpenFont("../res/font/Courier New.ttf", 64);
+    font = TTF_OpenFont("../res/font/Courier New.ttf", 48);
     testIntelNet = INTEL_CreateIntelNet();
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 1});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 2});
@@ -188,7 +188,7 @@ bool INTEL_Renew() {
             gravity[i]
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
-        const float rate = 0.001f;
+        const float rate = 0.01f;
         entitySet[i].position.x += rate * dv.x;
         entitySet[i].position.y += rate * dv.y;
     }
@@ -206,23 +206,27 @@ bool INTEL_Draw() {
             windowRect.w / 2 + scale * entitySet[i].position.x,
             windowRect.h / 2 + scale * entitySet[i].position.y
         };
-        const SDL_FPoint R = {A.x + scale * repulsion[i].x, A.y + scale * repulsion[i].y};
-        const SDL_FPoint G = {A.x + scale * gravitation[i].x, A.y + scale * gravitation[i].y};
-        const SDL_FPoint B = {A.x + scale * gravity[i].x, A.y + scale * gravity[i].y};
-
+        const float w = (float)entitySet[i].tex->w, h = (float)entitySet[i].tex->h;
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_FRect rect = {A.x - 20, A.y - 20, 40, 40};
+        SDL_FRect rect = {A.x - w / 2, A.y - h / 2, w, h};
         SDL_RenderRect(renderer, &rect);
+        SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &rect);
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 128);
-        SDL_RenderLine(renderer, A.x, A.y, R.x, R.y);
-        DEBUG_SendMessageR("%s: %s\n", __func__, SDL_GetStrFPoint(repulsion[i]));
-
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 128);
-        SDL_RenderLine(renderer, A.x, A.y, G.x, G.y);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 128);
-        SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
+        {
+            const SDL_FPoint R = {A.x + scale * repulsion[i].x, A.y + scale * repulsion[i].y};
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderLine(renderer, A.x, A.y, R.x, R.y);
+        }
+        {
+            const SDL_FPoint G = {A.x + scale * gravitation[i].x, A.y + scale * gravitation[i].y};
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            SDL_RenderLine(renderer, A.x, A.y, G.x, G.y);
+        }
+        {
+            const SDL_FPoint B = {A.x + scale * gravity[i].x, A.y + scale * gravity[i].y};
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
+        }
     }
     return true;
 }
