@@ -25,6 +25,7 @@ typedef struct {
     SDL_FPoint position;
     bool visible;
     SDL_Texture* tex;
+    SDL_FPoint repulsion, gravitation, gravity;
 } Entity;
 Entity entitySet[NUM_ENTITIES] = {
     [ENTITY_0] = {.name = "0000"},
@@ -149,11 +150,6 @@ void INTEL_Exit() {
 
 
 // RENEW ===============================================================================================================
-SDL_FPoint repulsion[NUM_ENTITIES] = {0};
-SDL_FPoint gravitation[NUM_ENTITIES] = {0};
-SDL_FPoint gravity[NUM_ENTITIES] = {0};
-
-
 bool INTEL_Renew() {
     for (int i = 0; i < NUM_ENTITIES; i++) entitySet[i].visible = false;
     for (int i = 0; i < testIntelNet->len; i++) {
@@ -164,7 +160,7 @@ bool INTEL_Renew() {
     // 斥力
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entitySet[i].visible == false) continue;
-        repulsion[i] = (SDL_FPoint){0, 0};
+        entitySet[i].repulsion = (SDL_FPoint){0, 0};
         for (int j = 0; j < NUM_ENTITIES; j++) {
             if (entitySet[j].visible == false || i == j) continue;
             const SDL_FPoint A = entitySet[i].position;
@@ -176,8 +172,8 @@ bool INTEL_Renew() {
             const float normAB = SDL_sqrtf(AB.x * AB.x + AB.y * AB.y);
             const float force = -1 / (normAB * normAB);
 
-            repulsion[i].x += force * AB.x / normAB;
-            repulsion[i].y += force * AB.y / normAB;
+            entitySet[i].repulsion.x += force * AB.x / normAB;
+            entitySet[i].repulsion.y += force * AB.y / normAB;
         }
     }
 
@@ -191,8 +187,8 @@ bool INTEL_Renew() {
         const SDL_FPoint B = entitySet[j].position;
 
         const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-        gravitation[i] = AB;
-        gravitation[j] = (SDL_FPoint){-AB.x, -AB.y};
+        entitySet[i].gravitation = AB;
+        entitySet[j].gravitation = (SDL_FPoint){-AB.x, -AB.y};
     }
 
     // 重力
@@ -201,15 +197,15 @@ bool INTEL_Renew() {
         const SDL_FPoint A = entitySet[i].position;
         const SDL_FPoint B = {0, 0};
         const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-        gravity[i] = AB;
+        entitySet[i].gravity = AB;
     }
 
     // 位移
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const SDL_FPoint points[] = {
-            repulsion[i],
-            gravitation[i],
-            gravity[i],
+            entitySet[i].repulsion,
+            entitySet[i].gravitation,
+            entitySet[i].gravity,
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
         const float rate = 0.001f;
@@ -223,7 +219,7 @@ bool INTEL_Renew() {
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
-    const SDL_FPoint scale = {500, 300};
+    const SDL_FPoint scale = {300, 300};
     for (int k = 0; k < testIntelNet->len; k++) {
         const Intel intel = testIntelNet->intelSet[k];
         if (intel.state == INTEL_STATE_NULL) continue;
@@ -253,15 +249,15 @@ bool INTEL_Draw() {
         SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &rect);
 
         if (DEBUG_GetShift()) {
-            const SDL_FPoint R = {A.x + scale.x * repulsion[i].x, A.y + scale.y * repulsion[i].y};
+            const SDL_FPoint R = {A.x + scale.x * entitySet[i].repulsion.x, A.y + scale.y * entitySet[i].repulsion.y};
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_RenderLine(renderer, A.x, A.y, R.x, R.y);
 
-            const SDL_FPoint G = {A.x + scale.x * gravitation[i].x, A.y + scale.y * gravitation[i].y};
+            const SDL_FPoint G = {A.x + scale.x * entitySet[i].gravitation.x, A.y + scale.y * entitySet[i].gravitation.y};
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
             SDL_RenderLine(renderer, A.x, A.y, G.x, G.y);
 
-            const SDL_FPoint B = {A.x + scale.x * gravity[i].x, A.y + scale.y * gravity[i].y};
+            const SDL_FPoint B = {A.x + scale.x * entitySet[i].gravity.x, A.y + scale.y * entitySet[i].gravity.y};
             SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
             SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
         }
