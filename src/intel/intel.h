@@ -6,26 +6,30 @@
 #include "../debug/debug.h"
 
 
-typedef enum IntelState IntelState;
-enum IntelState {
+typedef enum {
     INTEL_STATE_NULL,
     INTEL_STATE_SRC_FALSE,
     INTEL_STATE_SRC_TRUE,
     INTEL_STATE_UNKNOWN,
     INTEL_NUM_STATES
-};
-typedef struct Intel Intel;
-typedef struct IntelNet IntelNet;
-struct Intel {IntelState state; int subject; int action; int object;};
-struct IntelNet {
+} IntelState;
+typedef struct {
+    IntelState state;
+    int subject, action, object;
+} Intel;
+typedef struct {
     int len;
     Intel* intelSet;
-};
+} IntelNet;
+
+
 extern const SDL_FPoint scale;
+extern IntelNet* intelNetNow;
 
 
 IntelNet* INTEL_CreateIntelNet();
 IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet);
+SDL_FPoint INTEL_GetScaledPos(SDL_FPoint pos);
 
 
 bool INTEL_Init();

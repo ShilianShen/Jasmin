@@ -5,19 +5,18 @@
 #include "intel.h"
 
 
-enum EntityId {
+typedef enum {
     ENTITY_UNKNOWN,
     ENTITY_SOCRATES,
     ENTITY_HUMAN,
     ENTITY_DEATH,
     NUM_ENTITIES
-};
+} EntityId;
 typedef struct {
     const char* name;
-    SDL_FPoint position;
     bool visible;
     SDL_Texture* tex;
-    SDL_FPoint repulsion, gravitation, gravity;
+    SDL_FPoint repulsion, gravitation, gravity, position;
 } Entity;
 
 
@@ -25,9 +24,9 @@ extern Entity entitySet[NUM_ENTITIES];
 
 
 bool INTEL_InitEntity();
-void INTEL_ExitEntity();
-bool INTEL_RenewEntity(const IntelNet* intelNet);
+bool INTEL_RenewEntity();
 bool INTEL_DrawEntity();
+void INTEL_ExitEntity();
 
 
 #endif //ENTITY_H

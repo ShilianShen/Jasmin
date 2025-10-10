@@ -5,13 +5,13 @@
 #include "intel.h"
 
 
-enum ActionId {
+typedef enum {
     ACTION_UNKNOWN,
     ACTION_IS,
     ACTION_BELONG,
     ACTION_WILL,
     NUM_ACTIONS,
-};
+} ActionId;
 typedef struct {
     const char* name;
     SDL_Texture* tex;
@@ -23,7 +23,7 @@ extern Action actionSet[NUM_ACTIONS];
 
 bool INTEL_InitAction();
 void INTEL_ExitAction();
-bool INTEL_DrawAction(const IntelNet* intelNet);
+bool INTEL_DrawAction();
 
 
 #endif //ACTION_H

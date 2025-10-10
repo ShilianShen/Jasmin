@@ -11,6 +11,7 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
 };
 IntelNet* testIntelNet = NULL;
 const SDL_FPoint scale = {300, 300};
+IntelNet* intelNetNow = NULL;
 
 
 // GET & SET ===========================================================================================================
@@ -46,6 +47,13 @@ bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
 
 
     return true;
+}
+SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
+    const SDL_FPoint scaledPos = {
+        windowRect.x + windowRect.w / 2 + scale.x * pos.x,
+        windowRect.y + windowRect.h / 2 + scale.y * pos.y
+    };
+    return scaledPos;
 }
 
 
@@ -84,6 +92,7 @@ bool INTEL_Init() {
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_UNKNOWN, ACTION_IS, ENTITY_SOCRATES});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_FALSE, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
+    intelNetNow = testIntelNet;
     REQ_CONDITION(INTEL_InitEntity(), return false);
     REQ_CONDITION(INTEL_InitAction(), return false);
     return true;
@@ -91,20 +100,21 @@ bool INTEL_Init() {
 void INTEL_Exit() {
     INTEL_ExitEntity();
     INTEL_ExitAction();
+    intelNetNow = NULL;
     testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
 }
 
 
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
-    INTEL_RenewEntity(testIntelNet);
+    INTEL_RenewEntity();
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
-    INTEL_DrawAction(testIntelNet);
+    INTEL_DrawAction();
     INTEL_DrawEntity();
     return true;
 }
