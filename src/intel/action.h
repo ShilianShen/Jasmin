@@ -7,13 +7,9 @@
 
 enum ActionId {
     ACTION_UNKNOWN,
-    ACTION_EQUAL,
+    ACTION_IS,
     ACTION_BELONG,
     ACTION_WILL,
-    ACTION_0,
-    ACTION_1,
-    ACTION_2,
-    ACTION_3,
     NUM_ACTIONS,
 };
 typedef struct {
@@ -27,6 +23,7 @@ extern Action actionSet[NUM_ACTIONS];
 
 bool INTEL_InitAction();
 void INTEL_ExitAction();
+bool INTEL_DrawAction(const IntelNet* intelNet);
 
 
 #endif //ACTION_H

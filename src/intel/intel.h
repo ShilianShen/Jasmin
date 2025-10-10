@@ -21,6 +21,7 @@ struct IntelNet {
     int len;
     Intel* intelSet;
 };
+extern const SDL_FPoint scale;
 
 
 IntelNet* INTEL_CreateIntelNet();

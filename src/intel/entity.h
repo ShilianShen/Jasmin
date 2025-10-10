@@ -10,10 +10,6 @@ enum EntityId {
     ENTITY_SOCRATES,
     ENTITY_HUMAN,
     ENTITY_DEATH,
-    ENTITY_0,
-    ENTITY_1,
-    ENTITY_2,
-    ENTITY_3,
     NUM_ENTITIES
 };
 typedef struct {
@@ -30,6 +26,8 @@ extern Entity entitySet[NUM_ENTITIES];
 
 bool INTEL_InitEntity();
 void INTEL_ExitEntity();
+bool INTEL_RenewEntity(const IntelNet* intelNet);
+bool INTEL_DrawEntity();
 
 
 #endif //ENTITY_H
