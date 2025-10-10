@@ -10,7 +10,8 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
     [INTEL_STATE_UNKNOWN] = "UNKNOWN",
 };
 IntelNet* testIntelNet = NULL;
-TTF_Font* font = NULL;
+TTF_Font* entityFont = NULL;
+TTF_Font* actionFont = NULL;
 
 
 enum EntityId {
@@ -49,7 +50,7 @@ typedef struct {
 Action actionSet[NUM_ACTIONS] = {
     [ACTION_0] = {.name = "ACTION_0"},
     [ACTION_1] = {.name = "ACTION_1"},
-    [ACTION_2] = {.name = "ACTION_2"},
+    // [ACTION_2] = {.name = "ACTION_2"},
     [ACTION_3] = {.name = "ACTION_3"},
 };
 
@@ -123,18 +124,25 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-    font = TTF_OpenFont("../res/font/Courier New.ttf", 48);
+    entityFont = TTF_OpenFont("../res/font/Courier New.ttf", 48);
+    actionFont = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
     testIntelNet = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 1});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 3, 1, 2});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_0, ACTION_0, ENTITY_1});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_2, ACTION_2, ENTITY_3});
 
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        entitySet[i].tex = TXT_LoadTexture(renderer, font, entitySet[i].name, (SDL_Color){255, 255, 255, 255});
+        const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
+        entitySet[i].tex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
+        REQ_CONDITION(entitySet[i].tex != NULL, return false);
     }
     for (int i = 0; i < NUM_ACTIONS; i++) {
-        actionSet[i].tex = TXT_LoadTexture(renderer, font, actionSet[i].name, (SDL_Color){255, 255, 255, 255});
+        const char* string = actionSet[i].name == NULL ? "????" : actionSet[i].name;
+        actionSet[i].tex = TXT_LoadTexture(renderer, actionFont, string, (SDL_Color){0, 0, 0, 255});
+        REQ_CONDITION(actionSet[i].tex != NULL, return false);
     }
 
+    TTF_CloseFont(entityFont); entityFont = NULL;
+    TTF_CloseFont(actionFont); actionFont = NULL;
     return true;
 }
 void INTEL_Exit() {
@@ -145,7 +153,6 @@ void INTEL_Exit() {
         SDL_DestroyTexture(actionSet[i].tex); actionSet[i].tex = NULL;
     }
     testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
-    TTF_CloseFont(font); font = NULL;
 }
 
 
@@ -233,8 +240,14 @@ bool INTEL_Draw() {
             windowRect.w / 2 + scale.x * entitySet[j].position.x,
             windowRect.h / 2 + scale.y * entitySet[j].position.y
         };
+        const SDL_FPoint M = {(A.x + B.x) / 2, (A.y + B.y) / 2};
+        const float w = (float)actionSet[intel.action].tex->w;
+        const float h = (float)actionSet[intel.action].tex->h;
+        const SDL_FRect rect = {M.x - w / 2, M.y - h / 2, w, h};
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
+        SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderTexture(renderer, actionSet[intel.action].tex, NULL, &rect);
     }
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entitySet[i].visible == false) continue;
