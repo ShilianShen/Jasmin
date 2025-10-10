@@ -22,6 +22,7 @@ char*SDL_GetStrFRect(SDL_FRect rect);
 char*SDL_GetStrFPoint(SDL_FPoint point);
 bool SDL_GetColorEqual(SDL_Color x, SDL_Color y);
 bool SDL_GetSurfaceColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
+SDL_FPoint SDL_GetSumFPoint(int N, const SDL_FPoint points[N]);
 bool SDL_SetRenderColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
 

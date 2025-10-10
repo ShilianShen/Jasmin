@@ -26,6 +26,14 @@ bool SDL_GetSurfaceColor(SDL_Surface* surface, const int x, const int y, SDL_Col
     SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
     return true;
 }
+SDL_FPoint SDL_GetSumFPoint(const int N, const SDL_FPoint points[N]) {
+    SDL_FPoint sum = {0, 0};
+    for (int i = 0; i < N; i++) {
+        sum.x += points[i].x;
+        sum.y += points[i].y;
+    }
+    return sum;
+}
 
 bool SDL_LoadDstRectAligned(SDL_FRect *dst_rect, SDL_Texture *texture, const SDL_FRect *src_rect, const SDL_FRect *gid_rect, const SDL_FRect *bck_rect, int anchor) {
     REQ_CONDITION(dst_rect != NULL, return false);

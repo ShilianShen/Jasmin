@@ -12,7 +12,7 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
 IntelNet* testIntelNet = NULL;
 
 
-enum Entity {
+enum EntityId {
     ENTITY_0,
     ENTITY_1,
     ENTITY_2,
@@ -20,11 +20,18 @@ enum Entity {
     NUM_ENTITIES
 };
 typedef struct {
-    bool visible;
     const char* name;
     SDL_FPoint position;
-} EntityInfo;
-EntityInfo* entityInfoSet = NULL;
+    bool visible;
+} Entity;
+
+
+Entity entitySet[NUM_ENTITIES] = {
+    [ENTITY_0] = {.name = "0000"},
+    [ENTITY_1] = {.name = "1111"},
+    [ENTITY_2] = {.name = "2222"},
+    [ENTITY_3] = {.name = "3333"},
+};
 
 
 // GET & SET ===========================================================================================================
@@ -92,27 +99,12 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 }
 
 
-// DRAW ================================================================================================================
-bool INTEL_DrawIntelNet(IntelNet* intelNet) {
-    REQ_CONDITION(intelNet->intelSet != NULL, return false);
-
-    SDL_FRect rects[NUM_ENTITIES];
-
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderRects(renderer, rects, NUM_ENTITIES);
-    SDL_RenderRect(renderer, &windowRect);
-    return true;
-}
-
-
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-    entityInfoSet = calloc(NUM_ENTITIES, sizeof(EntityInfo));
-    REQ_CONDITION(entityInfoSet != NULL, return false);
-
     testIntelNet = INTEL_CreateIntelNet();
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 1});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 0, 1, 2});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, 3, 1, 2});
     for (int i = 0; i < testIntelNet->len; i++) {
         printf("%s: %d, %d, %d\n", __func__,
             testIntelNet->intelSet[i].subject,
@@ -125,20 +117,95 @@ bool INTEL_Init() {
 }
 void INTEL_Exit() {
     testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
-
-    free(entityInfoSet); entityInfoSet = NULL;
 }
 
 
 // RENEW ===============================================================================================================
+SDL_FPoint repulsion[NUM_ENTITIES] = {0};
+SDL_FPoint gravitation[NUM_ENTITIES] = {0};
+SDL_FPoint gravity[NUM_ENTITIES] = {0};
+
+
 bool INTEL_Renew() {
+    for (int i = 0; i < NUM_ENTITIES; i++) entitySet[i].visible = false;
+    for (int i = 0; i < testIntelNet->len; i++) {
+        entitySet[testIntelNet->intelSet[i].subject].visible = true;
+        entitySet[testIntelNet->intelSet[i].object].visible = true;
+    }
+
+    // 斥力
+    // SDL_FPoint repulsion[NUM_ENTITIES] = {0};
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+        const SDL_FPoint A = entitySet[i].position;
+
+        for (int j = 0; j < NUM_ENTITIES; j++) {
+            if (entitySet[j].visible == false) continue;
+            const SDL_FPoint B = entitySet[j].position;
+
+            SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+            if (AB.x == 0 && AB.y == 0) AB = (SDL_FPoint){SDL_randf() - 0.5f, SDL_randf() - 0.5f};
+
+            const float normAB = SDL_sqrtf(AB.x * AB.x + AB.y * AB.y);
+            const float force = -10 / (normAB * normAB);
+            repulsion[i] = (SDL_FPoint){force * AB.x / normAB, force * AB.y / normAB};
+        }
+    }
+
+    // 引力
+    // SDL_FPoint gravitation[NUM_ENTITIES] = {0};
+    for (int k = 0; k < testIntelNet->len; k++) {
+        const Intel intel = testIntelNet->intelSet[k];
+        if (intel.state == INTEL_STATE_NULL) continue;
+
+        const int i = intel.subject, j = intel.object;
+        const SDL_FPoint A = entitySet[i].position;
+        const SDL_FPoint B = entitySet[j].position;
+
+        const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+        const float normAB = SDL_sqrtf(AB.x * AB.x + AB.y * AB.y);
+        const float force = AB.x == 0 && AB.y == 0 ? 0 : normAB;
+        gravitation[i] = (SDL_FPoint){force * AB.x / normAB, force * AB.y / normAB};
+    }
+
+    // 重力
+    // SDL_FPoint gravity[NUM_ENTITIES] = {0};
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+        const SDL_FPoint A = entitySet[i].position;
+        const SDL_FPoint B = {windowRect.w / 2, windowRect.h / 2};
+        const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+        gravity[i] = AB;
+    }
+
+    // 位移
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        const SDL_FPoint points[] = {repulsion[i], gravity[i]};
+        const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
+        entitySet[i].position.x += 0.001f * dv.x;
+        entitySet[i].position.y += 0.001f * dv.y;
+    }
+
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
-    INTEL_DrawIntelNet(testIntelNet);
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+        const SDL_FPoint A = entitySet[i].position;
 
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_FRect rect = {A.x - 20, A.y - 20, 40, 40};
+        SDL_RenderRect(renderer, &rect);
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderLine(renderer, A.x, A.y, A.x + repulsion[i].x, A.y + repulsion[i].y);
+
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_RenderLine(renderer, A.x, A.y, A.x + gravity[i].x, A.y + gravity[i].y);
+    }
     return true;
 }
