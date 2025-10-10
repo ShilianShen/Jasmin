@@ -3,6 +3,7 @@
 
 
 #include "../basic/basic.h"
+#include "../debug/debug.h"
 
 
 typedef enum IntelState IntelState;

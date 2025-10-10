@@ -1,6 +1,6 @@
 #include "intel.h"
-
-#include "../debug/debug.h"
+#include "entity.h"
+#include "action.h"
 
 
 const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
@@ -10,51 +10,6 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
     [INTEL_STATE_UNKNOWN] = "UNKNOWN",
 };
 IntelNet* testIntelNet = NULL;
-TTF_Font* entityFont = NULL;
-TTF_Font* actionFont = NULL;
-
-
-enum EntityId {
-    ENTITY_0,
-    ENTITY_1,
-    ENTITY_2,
-    ENTITY_3,
-    NUM_ENTITIES
-};
-typedef struct {
-    const char* name;
-    SDL_FPoint position;
-    bool visible;
-    SDL_Texture* tex;
-    SDL_FPoint repulsion, gravitation, gravity;
-} Entity;
-Entity entitySet[NUM_ENTITIES] = {
-    [ENTITY_0] = {.name = "0000"},
-    [ENTITY_1] = {.name = "1111"},
-    [ENTITY_2] = {.name = "2222"},
-    [ENTITY_3] = {.name = "3333"},
-};
-
-
-enum ActionId {
-    ACTION_0,
-    ACTION_1,
-    ACTION_2,
-    ACTION_3,
-    NUM_ACTIONS,
-};
-typedef struct {
-    const char* name;
-    SDL_Texture* tex;
-} Action;
-Action actionSet[NUM_ACTIONS] = {
-    [ACTION_0] = {.name = "ACTION_0"},
-    [ACTION_1] = {.name = "ACTION_1"},
-    // [ACTION_2] = {.name = "ACTION_2"},
-    [ACTION_3] = {.name = "ACTION_3"},
-};
-
-
 
 
 // GET & SET ===========================================================================================================
@@ -124,34 +79,18 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-    entityFont = TTF_OpenFont("../res/font/Courier New.ttf", 48);
-    actionFont = TTF_OpenFont("../res/font/JetBrainsMono-Regular.ttf", 24);
+
     testIntelNet = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_0, ACTION_0, ENTITY_1});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_2, ACTION_2, ENTITY_3});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
 
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
-        entitySet[i].tex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(entitySet[i].tex != NULL, return false);
-    }
-    for (int i = 0; i < NUM_ACTIONS; i++) {
-        const char* string = actionSet[i].name == NULL ? "????" : actionSet[i].name;
-        actionSet[i].tex = TXT_LoadTexture(renderer, actionFont, string, (SDL_Color){0, 0, 0, 255});
-        REQ_CONDITION(actionSet[i].tex != NULL, return false);
-    }
-
-    TTF_CloseFont(entityFont); entityFont = NULL;
-    TTF_CloseFont(actionFont); actionFont = NULL;
+    INTEL_InitEntity();
+    INTEL_InitAction();
     return true;
 }
 void INTEL_Exit() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        SDL_DestroyTexture(entitySet[i].tex); entitySet[i].tex = NULL;
-    }
-    for (int i = 0; i < NUM_ACTIONS; i++) {
-        SDL_DestroyTexture(actionSet[i].tex); actionSet[i].tex = NULL;
-    }
+    INTEL_ExitEntity();
+    INTEL_ExitAction();
     testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
 }
 
@@ -160,6 +99,7 @@ void INTEL_Exit() {
 bool INTEL_Renew() {
     for (int i = 0; i < NUM_ENTITIES; i++) entitySet[i].visible = false;
     for (int i = 0; i < testIntelNet->len; i++) {
+        if (testIntelNet->intelSet[i].state == INTEL_STATE_NULL) continue;
         entitySet[testIntelNet->intelSet[i].subject].visible = true;
         entitySet[testIntelNet->intelSet[i].object].visible = true;
     }
@@ -244,7 +184,7 @@ bool INTEL_Draw() {
         const float w = (float)actionSet[intel.action].tex->w;
         const float h = (float)actionSet[intel.action].tex->h;
         const SDL_FRect rect = {M.x - w / 2, M.y - h / 2, w, h};
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 128);
         SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
         SDL_RenderFillRect(renderer, &rect);
         SDL_RenderTexture(renderer, actionSet[intel.action].tex, NULL, &rect);
