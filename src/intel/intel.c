@@ -44,8 +44,7 @@ bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
     free(intelNet->intelSet);
     intelNet->intelSet = intelSet;
     intelNet->len = len;
-
-
+    INTEL_ResetEntity();
     return true;
 }
 SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
@@ -163,14 +162,11 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
     testIntelNet = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_SOMEONE, ACTION_IS, ENTITY_SOCRATES});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_F, ENTITY_SOCRATES, ACTION_CAN, ENTITY_FLY});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
-
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOMEONE, ACTION_BELONG, ENTITY_HUMAN});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOMEONE, ACTION_WILL, ENTITY_DEATH});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY});
     intelNetNow = testIntelNet;
     REQ_CONDITION(INTEL_InitEntity(), return false);
     REQ_CONDITION(INTEL_InitAction(), return false);

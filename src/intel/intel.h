@@ -24,6 +24,8 @@ typedef enum {
 typedef struct {
     IntelState state;
     int subject, action, object;
+    SDL_FRect rect;
+    bool visible;
 } Intel;
 typedef struct {
     int len;

@@ -30,6 +30,14 @@ void TRIG_MoveEntity(const void* para) {
 Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
+// GET & SET ===========================================================================================================
+void INTEL_ResetEntity() {
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        entitySet[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
+    }
+}
+
+
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitEntity() {
     TTF_Font* font = TTF_OpenFont(FONT_PATH, FONT_SIZE);

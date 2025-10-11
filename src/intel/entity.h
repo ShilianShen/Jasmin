@@ -27,6 +27,9 @@ typedef struct {
 extern Entity entitySet[NUM_ENTITIES];
 
 
+void INTEL_ResetEntity();
+
+
 bool INTEL_InitEntity();
 bool INTEL_RenewEntity();
 bool INTEL_DrawEntity();

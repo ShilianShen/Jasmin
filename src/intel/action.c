@@ -47,8 +47,18 @@ void INTEL_ExitAction() {
 }
 bool INTEL_RenewAction() {
     for (int k = 0; k < intelNetNow->len; k++) {
-        if (intelNetNow->intelSet[k].state == INTEL_STATE_AUTO_UNKNOWN)
-            intelNetNow->intelSet[k].state = INTEL_GetAutoState(intelNetNow->intelSet[k]);
+        const Intel intel = intelNetNow->intelSet[k];
+        if (intel.state == INTEL_STATE_AUTO_UNKNOWN) {
+            intelNetNow->intelSet[k].state = INTEL_GetAutoState(intel);
+        }
+
+        const int i = intel.subject, j = intel.object;
+        const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
+        const SDL_FPoint B = INTEL_GetScaledPos(entitySet[j].position);
+        const SDL_FPoint M = {(A.x + B.x) / 2, (A.y + B.y) / 2};
+        const float w = (float)actionSet[intel.action].tex->w;
+        const float h = (float)actionSet[intel.action].tex->h;
+        intelNetNow->intelSet[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
     }
     return true;
 }
@@ -61,10 +71,7 @@ bool INTEL_DrawAction() {
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
         const SDL_FPoint B = INTEL_GetScaledPos(entitySet[j].position);
-        const SDL_FPoint M = {(A.x + B.x) / 2, (A.y + B.y) / 2};
-        const float w = (float)actionSet[intel.action].tex->w;
-        const float h = (float)actionSet[intel.action].tex->h;
-        const SDL_FRect rect = {M.x - w / 2, M.y - h / 2, w, h};
+        const SDL_FRect rect = intelNetNow->intelSet[k].rect;
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         if (actionSet[intel.action].type == ACTION_TYPE_ONE_WAY) {
