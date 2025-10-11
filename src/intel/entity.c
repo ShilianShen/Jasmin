@@ -8,6 +8,7 @@ Entity entitySet[NUM_ENTITIES] = {
     [ENTITY_SOCRATES] = {.name = "Socrates"},
     [ENTITY_HUMAN] = {.name = "Human"},
     [ENTITY_DEATH] = {.name = "Death"},
+    [ENTITY_FLY] = {.name = "Fly"},
 };
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
 static const SDL_Color EDGE_COLOR = {255, 255, 255, 255};

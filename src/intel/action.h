@@ -10,6 +10,7 @@ typedef enum {
     ACTION_IS,
     ACTION_BELONG,
     ACTION_WILL,
+    ACTION_CAN,
     NUM_ACTIONS,
 } ActionId;
 typedef enum {

@@ -289,3 +289,6 @@ bool SDL_RenderDashedLine(SDL_Renderer *renderer, SDL_FPoint A, SDL_FPoint B, fl
     }
     return true;
 }
+bool SDL_SetTextureColorRGB(SDL_Texture* tex, const SDL_Color color) {
+    return SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
+}

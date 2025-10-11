@@ -12,6 +12,7 @@ typedef enum {
     ENTITY_SOCRATES,
     ENTITY_HUMAN,
     ENTITY_DEATH,
+    ENTITY_FLY,
     NUM_ENTITIES
 } EntityId;
 typedef struct {
