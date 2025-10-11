@@ -10,10 +10,12 @@ Action actionSet[NUM_ACTIONS] = {
 };
 static const SDL_Color COLOR_SET[INTEL_NUM_STATES] = {
     [INTEL_STATE_NULL] = {0, 0, 0, 0},
-    [INTEL_STATE_SRC_TRUE] = {32, 128, 32, 192},
-    [INTEL_STATE_SRC_FALSE] = {128, 32, 32, 192},
+    [INTEL_STATE_MANU_T] = {32, 128, 32, 192},
+    [INTEL_STATE_MANU_F] = {128, 32, 32, 192},
     [INTEL_STATE_UNKNOWN] = {64, 64, 64, 192},
     [INTEL_STATE_AUTO_UNKNOWN] = {32, 32, 128, 192},
+    [INTEL_STATE_AUTO_T] = {32, 128, 32, 255},
+    [INTEL_STATE_AUTO_F] = {128, 32, 32, 255},
 };
 static const SDL_Color FONT_COLOR = {255, 255, 255, 255};
 static const char* FONT_PATH = "../res/font/IBMPlexMono-Medium.ttf";
@@ -37,6 +39,12 @@ bool INTEL_InitAction() {
 void INTEL_ExitAction() {
     for (int i = 0; i < NUM_ACTIONS; i++) {
         SDL_DestroyTexture(actionSet[i].tex); actionSet[i].tex = NULL;
+    }
+}
+bool INTEL_RenewAction() {
+    for (int k = 0; k < intelNetNow->len; k++) {
+        if (intelNetNow->intelSet[k].state == INTEL_STATE_AUTO_UNKNOWN)
+            intelNetNow->intelSet[k].state = INTEL_GetAutoState(intelNetNow->intelSet[k]);
     }
 }
 bool INTEL_DrawAction() {

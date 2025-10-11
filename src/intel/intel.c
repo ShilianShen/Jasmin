@@ -5,8 +5,8 @@
 
 const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
     [INTEL_STATE_NULL] = "NULL",
-    [INTEL_STATE_SRC_FALSE] = "SRC_FALSE",
-    [INTEL_STATE_SRC_TRUE] = "SRC_TRUE",
+    [INTEL_STATE_MANU_F] = "SRC_FALSE",
+    [INTEL_STATE_MANU_T] = "SRC_TRUE",
     [INTEL_STATE_UNKNOWN] = "UNKNOWN",
 };
 IntelNet* testIntelNet = NULL;
@@ -65,16 +65,16 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
         // intel2: subject1 --action-> object1
         if (intel1.subject == intel2.subject && intel1.object == intel2.object && intel1.action == intel2.action) {
             switch (intel2.state) {
-                case INTEL_STATE_SRC_TRUE: case INTEL_STATE_AUTO_TRUE: return INTEL_STATE_AUTO_TRUE;
-                case INTEL_STATE_SRC_FALSE: case INTEL_STATE_AUTO_FALSE: return INTEL_STATE_AUTO_FALSE;
+                case INTEL_STATE_MANU_T: case INTEL_STATE_AUTO_T: return INTEL_STATE_AUTO_T;
+                case INTEL_STATE_MANU_F: case INTEL_STATE_AUTO_F: return INTEL_STATE_AUTO_F;
                 default: break;
             }
         }
 
-        if (intel2.state != INTEL_STATE_SRC_TRUE && intel2.state != INTEL_STATE_AUTO_TRUE) continue;
+        if (intel2.state != INTEL_STATE_MANU_T && intel2.state != INTEL_STATE_AUTO_T) continue;
 
         int subject3;
-        switch (actionSet[intel2.action].type) {
+        switch (intel2.action) {
             // intel2: subject1/2 --is-> subject2/1
             case ACTION_IS: {
                 if (intel2.subject == intel1.subject) subject3 = intel2.object;
@@ -85,7 +85,9 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
 
             // intel2: entity1 --belong-> entity2
             case ACTION_BELONG: {
-                if (intel2.subject == intel1.subject) {subject3 = intel2.object;}
+                if (intel2.subject == intel1.subject) {
+                    subject3 = intel2.object;
+                }
                 else continue;
                 break;
             }
@@ -96,20 +98,16 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
             // intel3: subject3 --action-> object1
             const Intel intel3 = intelNetNow->intelSet[n];
 
-            if (intel3.subject != subject3 ||
-                intel3.action != intel1.action ||
-                intel3.object != intel1.object) continue;
+            if (intel3.subject != subject3 || intel3.action != intel1.action || intel3.object != intel1.object) continue;
 
             switch (intel3.state) {
-                case INTEL_STATE_SRC_TRUE:
-                case INTEL_STATE_AUTO_TRUE: return INTEL_STATE_AUTO_TRUE;
-                case INTEL_STATE_SRC_FALSE:
-                case INTEL_STATE_AUTO_FALSE: return INTEL_STATE_AUTO_FALSE;
+                case INTEL_STATE_MANU_T: case INTEL_STATE_AUTO_T: return INTEL_STATE_AUTO_T;
+                case INTEL_STATE_MANU_F: case INTEL_STATE_AUTO_F: return INTEL_STATE_AUTO_F;
                 default: continue;
             }
         }
     }
-    return INTEL_STATE_UNKNOWN;
+    return INTEL_STATE_AUTO_UNKNOWN;
 }
 IntelState INTEL_GetAutoState(const Intel intel1) {
     if (actionSet[intel1.action].type == ACTION_TYPE_TWO_WAY) {
@@ -118,9 +116,9 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
         intel2.object = intel1.subject;
         const IntelState state1 = INTEL_GetAutoState_OneWay(intel1);
         const IntelState state2 = INTEL_GetAutoState_OneWay(intel2);
-        if (state1 == INTEL_STATE_AUTO_TRUE && state2 == INTEL_STATE_AUTO_TRUE) return INTEL_STATE_AUTO_TRUE;
-        if (state1 == INTEL_STATE_AUTO_FALSE || state2 == INTEL_STATE_AUTO_FALSE) return INTEL_STATE_AUTO_FALSE;
-        return INTEL_STATE_UNKNOWN;
+        if (state1 == INTEL_STATE_AUTO_T || state2 == INTEL_STATE_AUTO_T) return INTEL_STATE_AUTO_T;
+        if (state1 == INTEL_STATE_AUTO_F || state2 == INTEL_STATE_AUTO_F) return INTEL_STATE_AUTO_F;
+        return INTEL_STATE_AUTO_UNKNOWN;
     }
     return INTEL_GetAutoState_OneWay(intel1);
 }
@@ -158,11 +156,12 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
     testIntelNet = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_SOMEONE, ACTION_IS, ENTITY_SOCRATES});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_SRC_TRUE, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_SOMEONE, ACTION_IS, ENTITY_SOCRATES});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
 
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOMEONE, ACTION_BELONG, ENTITY_HUMAN});
+    // INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOMEONE, ACTION_BELONG, ENTITY_HUMAN});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOMEONE, ACTION_WILL, ENTITY_DEATH});
     intelNetNow = testIntelNet;
     REQ_CONDITION(INTEL_InitEntity(), return false);
@@ -180,6 +179,7 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewEntity();
+    INTEL_RenewAction();
     return true;
 }
 
