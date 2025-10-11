@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "intel_net.h"
 
 
 Entity entitySet[NUM_ENTITIES] = {
@@ -11,8 +12,7 @@ Entity entitySet[NUM_ENTITIES] = {
     [ENTITY_FLY] = {.name = "Fly"},
 };
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
-static const SDL_Color EDGE_COLOR = {255, 255, 255, 255};
-static const SDL_Color FONT_COLOR = {255, 255, 255, 255};
+static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
 static const char* FONT_PATH = "../res/font/Courier New.ttf";
 static const float FONT_SIZE = 48;
 static const float MOVE_SPEED = 0.001f;
@@ -23,7 +23,6 @@ EntityId entityMoveId = 0;
 bool ifTrigSet = false;
 void TRIG_MoveEntity(const void* para) {
     if (entityMoveId == 0) return;
-    DEBUG_SendMessageR("%s, %d\n", __func__, entityMoveId);
     entitySet[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
 
@@ -44,7 +43,7 @@ bool INTEL_InitEntity() {
     REQ_CONDITION(font != NULL, return false);
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
-        entitySet[i].tex = TXT_LoadTexture(renderer, font, string, FONT_COLOR);
+        entitySet[i].tex = TXT_LoadTexture(renderer, font, string, (SDL_Color){255, 255, 255, 255});
         REQ_CONDITION(entitySet[i].tex != NULL, {
             TTF_CloseFont(font); font = NULL;
             return false;
@@ -154,10 +153,14 @@ bool INTEL_DrawEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entitySet[i].visible == false) continue;
         const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
-        SDL_SetRenderColor(renderer, BACK_COLOR);
+
+        SDL_SetRenderColor(renderer, i == entityMoveId ? TEXT_COLOR : BACK_COLOR);
         SDL_RenderFillRect(renderer, &entitySet[i].rect);
-        SDL_SetRenderColor(renderer, EDGE_COLOR);
+
+        SDL_SetRenderColor(renderer, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
         SDL_RenderRect(renderer, &entitySet[i].rect);
+
+        SDL_SetTextureColorRGB(entitySet[i].tex, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
         SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &entitySet[i].rect);
 
         if (DEBUG_GetShift()) {
@@ -185,4 +188,3 @@ bool INTEL_DrawEntity() {
     }
     return true;
 }
-

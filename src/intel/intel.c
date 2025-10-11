@@ -1,4 +1,5 @@
 #include "intel.h"
+#include "intel_net.h"
 #include "entity.h"
 #include "action.h"
 
@@ -11,10 +12,23 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
 };
 IntelNet* testIntelNet = NULL;
 const SDL_FPoint scale = {500, 300};
-IntelNet* intelNetNow = NULL;
 
 
 // GET & SET ===========================================================================================================
+const char* INTEL_GetStrIntel(Intel intel) {
+    static char string[64];
+    static size_t len = 0;
+    if (len == 0) {
+        len = sizeof(string);
+    }
+    snprintf(string, len, "\"%s %s %s.\": %s",
+        entitySet[intel.subject].name,
+        actionSet[intel.action].name,
+        entitySet[intel.object].name,
+        INTEL_STATE_STRING[intel.state]
+        );
+    return string;
+}
 static Intel* INTEL_GetIntelSet(const int len) {
     REQ_CONDITION(len > 0, return NULL);
 
@@ -183,14 +197,14 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewEntity();
-    INTEL_RenewAction();
+    INTEL_RenewIntelNet();
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
-    INTEL_DrawAction();
+    INTEL_DrawIntelNet();
     INTEL_DrawEntity();
     return true;
 }

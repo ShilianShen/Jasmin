@@ -27,20 +27,12 @@ typedef struct {
     SDL_FRect rect;
     bool visible;
 } Intel;
-typedef struct {
-    int len;
-    Intel* intelSet;
-} IntelNet;
 
 
-extern IntelNet* intelNetNow;
-
-
-IntelNet* INTEL_CreateIntelNet();
-IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet);
 SDL_FPoint INTEL_GetScaledPos(SDL_FPoint pos);
 SDL_FPoint INTEL_GetDescalePos(SDL_FPoint pos);
 IntelState INTEL_GetAutoState(Intel intel1);
+const char* INTEL_GetStrIntel(Intel intel);
 
 
 bool INTEL_Init();

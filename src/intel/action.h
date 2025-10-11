@@ -29,8 +29,6 @@ extern Action actionSet[NUM_ACTIONS];
 
 
 bool INTEL_InitAction();
-bool INTEL_RenewAction();
-bool INTEL_DrawAction();
 void INTEL_ExitAction();
 
 
