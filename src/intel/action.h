@@ -12,9 +12,15 @@ typedef enum {
     ACTION_WILL,
     NUM_ACTIONS,
 } ActionId;
+typedef enum {
+    ACTION_TYPE_ONE_WAY,
+    ACTION_TYPE_TWO_WAY,
+    NUM_ACTION_TYPES,
+} ActionType;
 typedef struct {
     const char* name;
     SDL_Texture* tex;
+    ActionType type;
 } Action;
 
 

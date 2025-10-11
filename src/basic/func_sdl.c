@@ -233,3 +233,59 @@ bool SDL_SetRenderColor(SDL_Renderer* renderer, const SDL_Color color) {
 bool SDL_GetColorEqual(const SDL_Color x, const SDL_Color y) {
     return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
 }
+bool SDL_RenderParallelLine(SDL_Renderer *renderer, const SDL_FPoint A, const SDL_FPoint B, const float offset) {
+    // 计算线段方向
+    const float dx = B.x - A.x, dy = B.y - A.y;
+    const float len = sqrtf(dx * dx + dy * dy);
+    if (len < 1e-6f) return false; // 避免除零
+
+    // 单位法向量（垂直方向）
+    const float nx = -dy / len, ny = dx / len;
+
+    // 平行线偏移向量
+    const float ox = nx * (offset / 2.0f), oy = ny * (offset / 2.0f);
+
+    return true
+    && SDL_RenderLine(renderer, A.x + ox, A.y + oy, B.x + ox, B.y + oy)
+    && SDL_RenderLine(renderer, A.x - ox, A.y - oy, B.x - ox, B.y - oy)
+    ;
+}
+bool SDL_RenderDashedLine(SDL_Renderer *renderer, SDL_FPoint A, SDL_FPoint B, float dash_len, float gap_len, float offset) {
+    // 确保长度参数有效
+    if (dash_len <= 0.0f) dash_len = 1.0f;
+    if (gap_len < 0.0f) gap_len = 0.0f;
+
+    // 计算线段方向和长度
+    float dx = B.x - A.x;
+    float dy = B.y - A.y;
+    float total_len = sqrtf(dx * dx + dy * dy);
+    if (total_len < 1e-6f) return false;
+
+    // 单位方向向量
+    float ux = dx / total_len;
+    float uy = dy / total_len;
+
+    // 从 offset 开始
+    float pos = fmodf(offset, dash_len + gap_len);
+    if (pos < 0.0f) pos += dash_len + gap_len;
+
+    float x = A.x + ux * pos;
+    float y = A.y + uy * pos;
+    float remaining = total_len - pos;
+
+    while (remaining > 0.0f) {
+        float segment = fminf(dash_len, remaining);
+        float x2 = x + ux * segment;
+        float y2 = y + uy * segment;
+
+        // 绘制实线段
+        SDL_RenderLine(renderer, x, y, x2, y2);
+
+        // 跳过空白段
+        x = x2 + ux * gap_len;
+        y = y2 + uy * gap_len;
+
+        remaining -= (dash_len + gap_len);
+    }
+    return true;
+}

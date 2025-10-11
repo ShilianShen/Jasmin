@@ -3,11 +3,13 @@
 
 Entity entitySet[NUM_ENTITIES] = {
     [ENTITY_UNKNOWN] = {.name = "unknown"},
+    [ENTITY_SOMEONE] = {.name = "someone"},
+    [ENTITY_SOMETHING] = {.name = "something"},
     [ENTITY_SOCRATES] = {.name = "Socrates"},
     [ENTITY_HUMAN] = {.name = "Human"},
     [ENTITY_DEATH] = {.name = "Death"},
 };
-static const SDL_Color BACK_COLOR = {64, 64, 64, 128};
+static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
 static const SDL_Color EDGE_COLOR = {255, 255, 255, 255};
 static const SDL_Color FONT_COLOR = {255, 255, 255, 255};
 static const char* FONT_PATH = "../res/font/Courier New.ttf";
@@ -42,7 +44,6 @@ void INTEL_ExitEntity() {
 static void INTEL_RenewEntity_Repulsion() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entitySet[i].visible == false) continue;
-        entitySet[i].repulsion = (SDL_FPoint){0, 0};
         for (int j = 0; j < NUM_ENTITIES; j++) {
             if (entitySet[j].visible == false || i == j) continue;
             const SDL_FPoint A = entitySet[i].position;
@@ -69,8 +70,10 @@ static void INTEL_RenewEntity_Gravitation() {
         const SDL_FPoint B = entitySet[j].position;
 
         const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-        entitySet[i].gravitation = AB;
-        entitySet[j].gravitation = (SDL_FPoint){-AB.x, -AB.y};
+        entitySet[i].gravitation.x += AB.x;
+        entitySet[i].gravitation.y += AB.y;
+        entitySet[j].gravitation.x -= AB.x;
+        entitySet[j].gravitation.y -= AB.y;
     }
 }
 static void INTEL_RenewEntity_Gravity() {
@@ -86,7 +89,7 @@ static void INTEL_RenewEntity_Position() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const SDL_FPoint points[] = {
             entitySet[i].repulsion,
-            // entitySet[i].gravitation,
+            entitySet[i].gravitation,
             entitySet[i].gravity,
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
@@ -95,11 +98,14 @@ static void INTEL_RenewEntity_Position() {
     }
 }
 bool INTEL_RenewEntity() {
-    for (int i = 0; i < NUM_ENTITIES; i++) entitySet[i].visible = false;
-    for (int i = 0; i < intelNetNow->len; i++) {
-        if (intelNetNow->intelSet[i].state == INTEL_STATE_NULL) continue;
-        entitySet[intelNetNow->intelSet[i].subject].visible = true;
-        entitySet[intelNetNow->intelSet[i].object].visible = true;
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        entitySet[i].visible = false;
+        entitySet[i].repulsion = entitySet[i].gravitation = entitySet[i].gravity = (SDL_FPoint){0};
+    }
+    for (int k = 0; k < intelNetNow->len; k++) {
+        if (intelNetNow->intelSet[k].state == INTEL_STATE_NULL) continue;
+        entitySet[intelNetNow->intelSet[k].subject].visible = true;
+        entitySet[intelNetNow->intelSet[k].object].visible = true;
     }
     INTEL_RenewEntity_Repulsion();
     INTEL_RenewEntity_Gravitation();
