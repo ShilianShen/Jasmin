@@ -6,7 +6,7 @@
 
 
 typedef enum {
-    ENTITY_UNKNOWN,
+    ENTITY_NULL,
     ENTITY_SOMEONE,
     ENTITY_SOMETHING,
     ENTITY_SOCRATES,
@@ -20,6 +20,7 @@ typedef struct {
     bool visible;
     SDL_Texture* tex;
     SDL_FPoint repulsion, gravitation, gravity, position;
+    SDL_FRect rect;
 } Entity;
 
 

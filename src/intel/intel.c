@@ -55,6 +55,13 @@ SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
     };
     return scaledPos;
 }
+SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
+    const SDL_FPoint descalePos = {
+        (pos.x - windowRect.x - windowRect.w / 2) / scale.x,
+        (pos.y - windowRect.y - windowRect.h / 2) / scale.y,
+    };
+    return descalePos;
+}
 
 
 static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {

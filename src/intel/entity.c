@@ -2,7 +2,7 @@
 
 
 Entity entitySet[NUM_ENTITIES] = {
-    [ENTITY_UNKNOWN] = {.name = "unknown"},
+    [ENTITY_NULL] = {.name = "unknown"},
     [ENTITY_SOMEONE] = {.name = "someone"},
     [ENTITY_SOMETHING] = {.name = "something"},
     [ENTITY_SOCRATES] = {.name = "Socrates"},
@@ -16,6 +16,18 @@ static const SDL_Color FONT_COLOR = {255, 255, 255, 255};
 static const char* FONT_PATH = "../res/font/Courier New.ttf";
 static const float FONT_SIZE = 48;
 static const float MOVE_SPEED = 0.001f;
+
+
+// TRIG ================================================================================================================
+EntityId entityMoveId = 0;
+bool ifTrigSet = false;
+void TRIG_MoveEntity(const void* para) {
+    if (entityMoveId == 0) return;
+    DEBUG_SendMessageR("%s, %d\n", __func__, entityMoveId);
+    entitySet[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
+}
+
+Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
 // INIT & EXIT =========================================================================================================
@@ -112,6 +124,19 @@ bool INTEL_RenewEntity() {
     INTEL_RenewEntity_Gravitation();
     INTEL_RenewEntity_Gravity();
     INTEL_RenewEntity_Position();
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+
+        const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
+        const float w = (float)entitySet[i].tex->w, h = (float)entitySet[i].tex->h;
+        entitySet[i].rect = (SDL_FRect){A.x - w / 2, A.y - h / 2, w, h};
+
+        if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entitySet[i].rect)) {
+            entityMoveId = i;
+            PERPH_SetMouseLeftTrig(&trigMove);
+        }
+        if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
+    }
     return true;
 }
 
@@ -121,13 +146,11 @@ bool INTEL_DrawEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entitySet[i].visible == false) continue;
         const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
-        const float w = (float)entitySet[i].tex->w, h = (float)entitySet[i].tex->h;
-        SDL_FRect rect = {A.x - w / 2, A.y - h / 2, w, h};
         SDL_SetRenderColor(renderer, BACK_COLOR);
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderFillRect(renderer, &entitySet[i].rect);
         SDL_SetRenderColor(renderer, EDGE_COLOR);
-        SDL_RenderRect(renderer, &rect);
-        SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &rect);
+        SDL_RenderRect(renderer, &entitySet[i].rect);
+        SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &entitySet[i].rect);
 
         if (DEBUG_GetShift()) {
             const SDL_FPoint R = INTEL_GetScaledPos((SDL_FPoint){

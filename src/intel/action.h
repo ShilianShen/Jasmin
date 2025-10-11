@@ -6,7 +6,7 @@
 
 
 typedef enum {
-    ACTION_UNKNOWN,
+    ACTION_NULL,
     ACTION_IS,
     ACTION_BELONG,
     ACTION_WILL,

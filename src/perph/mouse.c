@@ -27,6 +27,12 @@ bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
 bool PERPH_GetMouseInRect(const SDL_FRect rect) {
     return SDL_GetPointInRect(mouse.state2.pos, rect);
 }
+bool PERPH_GetMouseLeftPressed() {
+    return mouse.state2.leftPressed;
+}
+bool PERPH_GetMouseLeftPress() {
+    return mouse.state1.leftPressed == false && mouse.state2.leftPressed == true;
+}
 
 
 // INIT & EXIR =========================================================================================================

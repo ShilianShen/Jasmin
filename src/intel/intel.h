@@ -4,6 +4,7 @@
 
 #include "../basic/basic.h"
 #include "../debug/debug.h"
+#include "../perph/perph.h"
 
 
 typedef enum {
@@ -36,6 +37,7 @@ extern IntelNet* intelNetNow;
 IntelNet* INTEL_CreateIntelNet();
 IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet);
 SDL_FPoint INTEL_GetScaledPos(SDL_FPoint pos);
+SDL_FPoint INTEL_GetDescalePos(SDL_FPoint pos);
 IntelState INTEL_GetAutoState(Intel intel1);
 
 
