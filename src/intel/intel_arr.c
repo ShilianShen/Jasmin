@@ -4,11 +4,11 @@
 
 
 IntelArr* intelArrNow = NULL;
-static const SDL_Color JUDGE_COLOR[NUM_JUDGES] = {
+const SDL_Color JUDGE_COLOR[NUM_JUDGES] = {
     [JUDGE_AUTO] = {255, 215,   0, 192},
     [JUDGE_MANU] = {255, 255, 255, 255},
 };
-static const SDL_Color STATE_COLOR[NUM_STATES] = {
+const SDL_Color STATE_COLOR[NUM_STATES] = {
     [STATE_UNKNOWN] = { 64,  64,  64, 192},
     [STATE_TRUE] = { 32, 128,  32, 192},
     [STATE_FALSE] = {128,  32,  32, 192},

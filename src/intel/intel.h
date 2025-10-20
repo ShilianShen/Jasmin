@@ -10,6 +10,8 @@
 extern bool netMode;
 extern const char* INTEL_JUDGE_STRING[];
 extern const char* INTEL_STATE_STRING[];
+extern const SDL_Color JUDGE_COLOR[];
+extern const SDL_Color STATE_COLOR[];
 
 
 extern TTF_Font *entityFont, *actionFont, *setFont;
