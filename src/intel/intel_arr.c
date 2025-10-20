@@ -30,8 +30,8 @@ static bool INTEL_RenewIntelArr_Net() {
         const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
         const SDL_FPoint B = INTEL_GetScaledPos(entitySet[j].position);
         const SDL_FPoint M = {(A.x + B.x) / 2, (A.y + B.y) / 2};
-        const float w = (float)actionSet[intel.action].tex->w;
-        const float h = (float)actionSet[intel.action].tex->h;
+        const float w = (float)actionSet[intel.action].netTex->w;
+        const float h = (float)actionSet[intel.action].netTex->h;
         intelArrNow->arr[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
     }
     return true;
@@ -78,8 +78,8 @@ static bool INTEL_DrawIntelArr_Net() {
         SDL_SetRenderColor(renderer, back);
         SDL_RenderFillRect(renderer, &rect);
 
-        SDL_SetTextureColorRGB(actionSet[intel.action].tex, text);
-        SDL_RenderTexture(renderer, actionSet[intel.action].tex, NULL, &rect);
+        SDL_SetTextureColorRGB(actionSet[intel.action].netTex, text);
+        SDL_RenderTexture(renderer, actionSet[intel.action].netTex, NULL, &rect);
     }
     INTEL_DrawEntity();
     return true;

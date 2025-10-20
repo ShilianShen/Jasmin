@@ -18,7 +18,7 @@ typedef enum {
 typedef struct {
     const char* name;
     bool visible;
-    SDL_Texture *tex, *set;
+    SDL_Texture *netTex, *setTex;
     SDL_FPoint repulsion, gravitation, gravity, position;
     SDL_FRect rect;
 } Entity;

@@ -20,7 +20,7 @@ typedef enum {
 } ActionType;
 typedef struct {
     const char* name;
-    SDL_Texture* tex;
+    SDL_Texture *netTex, *setTex;
     ActionType type;
 } Action;
 

@@ -15,13 +15,17 @@ Action actionSet[NUM_ACTIONS] = {
 bool INTEL_InitAction() {
     for (int i = 0; i < NUM_ACTIONS; i++) {
         const char* string = actionSet[i].name == NULL ? "????" : actionSet[i].name;
-        actionSet[i].tex = TXT_LoadTexture(renderer, actionFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(actionSet[i].tex != NULL, return false);
+
+        actionSet[i].netTex = TXT_LoadTexture(renderer, actionFont, string, (SDL_Color){255, 255, 255, 255});
+        REQ_CONDITION(actionSet[i].netTex != NULL, return false);
+
+        actionSet[i].setTex = TXT_LoadTexture(renderer, setFont, string, (SDL_Color){255, 255, 255, 255});
+        REQ_CONDITION(actionSet[i].setTex != NULL, return false);
     }
     return true;
 }
 void INTEL_ExitAction() {
     for (int i = 0; i < NUM_ACTIONS; i++) {
-        SDL_DestroyTexture(actionSet[i].tex); actionSet[i].tex = NULL;
+        SDL_DestroyTexture(actionSet[i].netTex); actionSet[i].netTex = NULL;
     }
 }

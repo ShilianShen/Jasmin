@@ -38,15 +38,19 @@ void INTEL_ResetEntity() {
 bool INTEL_InitEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
-        entitySet[i].tex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(entitySet[i].tex != NULL, return false);
+
+        entitySet[i].netTex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
+        REQ_CONDITION(entitySet[i].netTex != NULL, return false);
+
+        entitySet[i].setTex = TXT_LoadTexture(renderer, setFont, string, (SDL_Color){255, 255, 255, 255});
+        REQ_CONDITION(entitySet[i].setTex != NULL, return false);
     }
     return true;
 }
 void INTEL_ExitEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        SDL_DestroyTexture(entitySet[i].tex);
-        entitySet[i].tex = NULL;
+        SDL_DestroyTexture(entitySet[i].netTex);
+        entitySet[i].netTex = NULL;
     }
 }
 
@@ -131,7 +135,7 @@ bool INTEL_RenewEntity() {
         if (entitySet[i].visible == false) continue;
 
         const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
-        const float w = (float)entitySet[i].tex->w, h = (float)entitySet[i].tex->h;
+        const float w = (float)entitySet[i].netTex->w, h = (float)entitySet[i].netTex->h;
         entitySet[i].rect = (SDL_FRect){A.x - w / 2, A.y - h / 2, w, h};
 
         if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entitySet[i].rect)) {
@@ -156,8 +160,8 @@ bool INTEL_DrawEntity() {
         SDL_SetRenderColor(renderer, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
         SDL_RenderRect(renderer, &entitySet[i].rect);
 
-        SDL_SetTextureColorRGB(entitySet[i].tex, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
-        SDL_RenderTexture(renderer, entitySet[i].tex, NULL, &entitySet[i].rect);
+        SDL_SetTextureColorRGB(entitySet[i].netTex, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
+        SDL_RenderTexture(renderer, entitySet[i].netTex, NULL, &entitySet[i].rect);
 
         if (DEBUG_GetShift()) {
             const SDL_FPoint R = INTEL_GetScaledPos((SDL_FPoint){
