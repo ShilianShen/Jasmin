@@ -1,4 +1,6 @@
 #include "intel_arr.h"
+#include "set.h"
+#include "net.h"
 #include "entity.h"
 #include "action.h"
 
@@ -85,36 +87,33 @@ static bool INTEL_DrawIntelArr_Net() {
     return true;
 }
 static bool INTEL_DrawIntelArr_Set() {
-    // visible subject action object judge state
-    int n = 1;
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
-        n++;
-    }
+    float x = 0;
+    for (int i = 0; i < 6; i++) {
+        const float dx = 20, dy = 10;
+        float y = 0, w = 0;
 
-    SetData strings[n];
-    strings[0] = (SetData){"VISIBLE", "SUBJECT", "ACTION", "OBJECT", "JUDGE", "STATE"};
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
+        SDL_RenderTexture(renderer, setHeads[i], NULL, &(SDL_FRect){x, y, setHeads[i]->w, setHeads[i]->h});
+        y += (float)setHeads[i]->h + dy;
+        w = SDL_max(w, (float)setHeads[i]->w);
 
-        strings[k+1] = (SetData){
-            intel.visible ? "1" : "0",
-            entitySet[intel.subject].name,
-            actionSet[intel.action].name,
-            entitySet[intel.object].name,
-            INTEL_JUDGE_STRING[intel.judge],
-            INTEL_STATE_STRING[intel.state],
-        };
-    }
-
-    float x = 0, y = 0, w = 400, h = 48;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < 6; j++) {
-            const SDL_FPoint point = {x + (float)j * w, y + (float)i * h};
-            SDL_RenderText(renderer, entityFont, strings[i].s[j], point, (SDL_Color){255, 255, 255, 255});
+        for (int j = 0; j < intelArrNow->len; j++) {
+            const Intel intel = intelArrNow->arr[j];
+            if (intel.effective == false) continue;
+            SDL_Texture* tex = NULL;
+            switch (i) {
+                case 0: tex = setHeads[i]; break;
+                case 1: tex = entitySet[intel.subject].setTex; break;
+                case 2: tex = actionSet[intel.action].setTex; break;
+                case 3: tex = entitySet[intel.object].setTex; break;
+                case 4: tex = setHeads[i]; break;
+                case 5: tex = setHeads[i]; break;
+                default: continue;
+            }
+            SDL_RenderTexture(renderer, tex, NULL, &(SDL_FRect){x, y, (float)tex->w, (float)tex->h});
+            y += (float)tex->h + dy;
+            w = SDL_max(w, (float)tex->w);
         }
+        x += w + dx;
     }
     return true;
 }

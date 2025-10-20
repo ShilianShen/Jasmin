@@ -20,6 +20,9 @@ extern TTF_Font *entityFont, *actionFont, *setFont;
 #define SET_FONT "../res/font/Courier New.ttf", 48
 
 
+extern SDL_Texture* setHeads[];
+
+
 typedef enum {
     STATE_UNKNOWN,
     STATE_TRUE,
