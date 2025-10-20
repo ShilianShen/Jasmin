@@ -2,6 +2,7 @@
 #include "intel_arr.h"
 #include "entity.h"
 #include "action.h"
+#include "net.h"
 
 
 TTF_Font *entityFont = NULL, *actionFont = NULL, *setFont = NULL;
@@ -198,6 +199,7 @@ bool INTEL_Init() {
     actionFont = TTF_OpenFont(ACTION_FONT); REQ_CONDITION(actionFont != NULL, return false);
     setFont = TTF_OpenFont(SET_FONT); REQ_CONDITION(setFont != NULL, return false);
 
+    INTEL_InitIntelNet();
     INTEL_Init_SetHeads();
 
     testIntelArr = INTEL_CreateIntelArr();
@@ -233,6 +235,7 @@ bool INTEL_Init() {
     return true;
 }
 void INTEL_Exit() {
+    INTEL_ExitIntelNet();
     INTEL_ExitEntity();
     INTEL_ExitAction();
     intelArrNow = NULL;
