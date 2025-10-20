@@ -100,12 +100,12 @@ static bool INTEL_DrawIntelArr_Set() {
         if (intel.effective == false) continue;
 
         strings[k+1] = (SetData){
-            "1",
+            intel.visible ? "1" : "0",
             entitySet[intel.subject].name,
             actionSet[intel.action].name,
             entitySet[intel.object].name,
             INTEL_JUDGE_STRING[intel.judge],
-            "aa"//INTEL_STATE_STRING[intel.state],
+            INTEL_STATE_STRING[intel.state],
         };
     }
 

@@ -13,11 +13,6 @@ Entity entitySet[NUM_ENTITIES] = {
 };
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
 static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
-
-
-TTF_Font* entityFont = NULL;
-static const char* FONT_PATH = "../res/font/Courier New.ttf";
-static const float FONT_SIZE = 48;
 static const float MOVE_SPEED = 1.f;
 
 
@@ -41,12 +36,10 @@ void INTEL_ResetEntity() {
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitEntity() {
-    entityFont = TTF_OpenFont(FONT_PATH, FONT_SIZE);
-    REQ_CONDITION(entityFont != NULL, return false);
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
         entitySet[i].tex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(entitySet[i].tex != NULL, return false;);
+        REQ_CONDITION(entitySet[i].tex != NULL, return false);
     }
     return true;
 }
@@ -55,7 +48,6 @@ void INTEL_ExitEntity() {
         SDL_DestroyTexture(entitySet[i].tex);
         entitySet[i].tex = NULL;
     }
-    TTF_CloseFont(entityFont); entityFont = NULL;
 }
 
 

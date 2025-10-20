@@ -18,13 +18,12 @@ typedef enum {
 typedef struct {
     const char* name;
     bool visible;
-    SDL_Texture* tex;
+    SDL_Texture *tex, *set;
     SDL_FPoint repulsion, gravitation, gravity, position;
     SDL_FRect rect;
 } Entity;
 
 
-extern TTF_Font* entityFont;
 extern Entity entitySet[NUM_ENTITIES];
 
 

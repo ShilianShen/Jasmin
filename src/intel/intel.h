@@ -12,6 +12,12 @@ extern const char* INTEL_JUDGE_STRING[];
 extern const char* INTEL_STATE_STRING[];
 
 
+extern TTF_Font *entityFont, *actionFont, *setFont;
+#define ACTION_FONT "../res/font/IBMPlexMono-Medium.ttf", 24
+#define ENTITY_FONT "../res/font/Courier New.ttf", 48
+#define SET_FONT "../res/font/Courier New.ttf", 48
+
+
 typedef enum {
     STATE_UNKNOWN,
     STATE_TRUE,
@@ -24,8 +30,6 @@ typedef enum {
     JUDGE_AUTO,
     NUM_JUDGES,
 } IntelJudge;
-
-
 typedef struct {
     bool effective;
     int subject, action, object;

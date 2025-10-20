@@ -4,6 +4,11 @@
 #include "action.h"
 
 
+TTF_Font* entityFont = NULL;
+TTF_Font* actionFont = NULL;
+TTF_Font* setFont = NULL;
+
+
 bool netMode = true;
 const char* INTEL_JUDGE_STRING[NUM_JUDGES] = {
     [JUDGE_AUTO] = "AUTO",
@@ -149,19 +154,19 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool INTEL_CreateIntelNet_RK(IntelArr* intelNet) {
-    memset(intelNet, 0, sizeof(IntelArr));
+static bool INTEL_CreateIntelArr_RK(IntelArr* intelArr) {
+    memset(intelArr, 0, sizeof(IntelArr));
 
-    intelNet->len = 10;
-    intelNet->arr = INTEL_GetIntelSet(intelNet->len);
-    REQ_CONDITION(intelNet->arr != NULL, return false);
+    intelArr->len = 10;
+    intelArr->arr = INTEL_GetIntelSet(intelArr->len);
+    REQ_CONDITION(intelArr->arr != NULL, return false);
 
     return true;
 }
 IntelArr* INTEL_CreateIntelArr() {
     IntelArr* intelNet = malloc(sizeof(IntelArr));
     REQ_CONDITION(intelNet != NULL, return NULL);
-    REQ_CONDITION(INTEL_CreateIntelNet_RK(intelNet), intelNet = INTEL_DeleteIntelArr(intelNet));
+    REQ_CONDITION(INTEL_CreateIntelArr_RK(intelNet), intelNet = INTEL_DeleteIntelArr(intelNet));
     return intelNet;
 }
 IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr) {
@@ -184,6 +189,10 @@ const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
+    entityFont = TTF_OpenFont(ENTITY_FONT); REQ_CONDITION(entityFont != NULL, return false);
+    actionFont = TTF_OpenFont(ACTION_FONT); REQ_CONDITION(actionFont != NULL, return false);
+    setFont = TTF_OpenFont(SET_FONT); REQ_CONDITION(setFont != NULL, return false);
+
     testIntelArr = INTEL_CreateIntelArr();
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
@@ -221,6 +230,10 @@ void INTEL_Exit() {
     INTEL_ExitAction();
     intelArrNow = NULL;
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
+
+    TTF_CloseFont(entityFont); entityFont = NULL;
+    TTF_CloseFont(actionFont); actionFont = NULL;
+    TTF_CloseFont(setFont); setFont = NULL;
 }
 
 
