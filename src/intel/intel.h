@@ -8,24 +8,30 @@
 
 
 typedef enum {
-    INTEL_STATE_NULL,
+    STATE_NULL,
 
-    INTEL_STATE_MANU_U,
-    INTEL_STATE_MANU_T,
-    INTEL_STATE_MANU_F,
+    STATE_MANU_U,
+    STATE_MANU_T,
+    STATE_MANU_F,
 
-    INTEL_STATE_AUTO_U,
-    INTEL_STATE_AUTO_T,
-    INTEL_STATE_AUTO_F,
-    INTEL_STATE_AUTO_P,
+    STATE_AUTO_U,
+    STATE_AUTO_T,
+    STATE_AUTO_F,
+    STATE_AUTO_P,
 
-    INTEL_NUM_STATES
+    NUM_STATES
 } IntelState;
+typedef enum {
+    JUDGE_MANU,
+    JUDGE_AUTO,
+    NUM_JUDGES,
+} IntelJudge;
 
 
 typedef struct {
-    IntelState state;
     int subject, action, object;
+    IntelJudge judge;
+    IntelState state;
     SDL_FRect rect;
     bool visible;
 } Intel;

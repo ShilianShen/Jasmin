@@ -21,7 +21,6 @@ static const Env ENV_ARRAY[] = {
 static const int LEN_ENV_ARRAY = len_of(ENV_ARRAY);
 
 
-
 int main() {
     running = BASIC_InitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 

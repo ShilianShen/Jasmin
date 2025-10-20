@@ -15,7 +15,7 @@ static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
 static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
 static const char* FONT_PATH = "../res/font/Courier New.ttf";
 static const float FONT_SIZE = 48;
-static const float MOVE_SPEED = 0.001f;
+static const float MOVE_SPEED = 1.f;
 
 
 // TRIG ================================================================================================================
@@ -83,7 +83,7 @@ static void INTEL_RenewEntity_Repulsion() {
 static void INTEL_RenewEntity_Gravitation() {
     for (int k = 0; k < intelNetNow->len; k++) {
         const Intel intel = intelNetNow->intelSet[k];
-        if (intel.state == INTEL_STATE_NULL) continue;
+        if (intel.state == STATE_NULL) continue;
 
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = entitySet[i].position;
@@ -106,6 +106,9 @@ static void INTEL_RenewEntity_Gravity() {
     }
 }
 static void INTEL_RenewEntity_Position() {
+    static float t1 = 0;
+    const float t2 = (float)SDL_GetTicks() / 1000;
+    const float dt = t2 - t1;
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const SDL_FPoint points[] = {
             entitySet[i].repulsion,
@@ -113,9 +116,10 @@ static void INTEL_RenewEntity_Position() {
             entitySet[i].gravity,
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
-        entitySet[i].position.x += MOVE_SPEED * dv.x;
-        entitySet[i].position.y += MOVE_SPEED * dv.y;
+        entitySet[i].position.x += MOVE_SPEED * dv.x * dt;
+        entitySet[i].position.y += MOVE_SPEED * dv.y * dt;
     }
+    t1 = t2;
 }
 bool INTEL_RenewEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
@@ -123,7 +127,7 @@ bool INTEL_RenewEntity() {
         entitySet[i].repulsion = entitySet[i].gravitation = entitySet[i].gravity = (SDL_FPoint){0};
     }
     for (int k = 0; k < intelNetNow->len; k++) {
-        if (intelNetNow->intelSet[k].state == INTEL_STATE_NULL) continue;
+        if (intelNetNow->intelSet[k].state == STATE_NULL) continue;
         entitySet[intelNetNow->intelSet[k].subject].visible = true;
         entitySet[intelNetNow->intelSet[k].object].visible = true;
     }
