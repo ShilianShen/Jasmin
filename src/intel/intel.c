@@ -8,9 +8,9 @@ const char* INTEL_STATE_STRING[INTEL_NUM_STATES] = {
     [INTEL_STATE_NULL] = "NULL",
     [INTEL_STATE_MANU_F] = "SRC_FALSE",
     [INTEL_STATE_MANU_T] = "SRC_TRUE",
-    [INTEL_STATE_MANU_UNKNOWN] = "UNKNOWN",
+    [INTEL_STATE_MANU_U] = "UNKNOWN",
 };
-IntelNet* testIntelNet = NULL;
+static IntelNet* testIntelNet = NULL;
 const SDL_FPoint scale = {500, 300};
 
 
@@ -127,7 +127,7 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
             }
         }
     }
-    return INTEL_STATE_AUTO_UNKNOWN;
+    return INTEL_STATE_AUTO_U;
 }
 IntelState INTEL_GetAutoState(const Intel intel1) {
     if (actionSet[intel1.action].type == ACTION_TYPE_TWO_WAY) {
@@ -138,7 +138,7 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
         const IntelState state2 = INTEL_GetAutoState_OneWay(intel2);
         if (state1 == INTEL_STATE_AUTO_T || state2 == INTEL_STATE_AUTO_T) return INTEL_STATE_AUTO_T;
         if (state1 == INTEL_STATE_AUTO_F || state2 == INTEL_STATE_AUTO_F) return INTEL_STATE_AUTO_F;
-        return INTEL_STATE_AUTO_UNKNOWN;
+        return INTEL_STATE_AUTO_U;
     }
     return INTEL_GetAutoState_OneWay(intel1);
 }
@@ -175,12 +175,14 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
+
     testIntelNet = INTEL_CreateIntelNet();
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_F, ENTITY_SOCRATES, ACTION_CAN, ENTITY_FLY});
     INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_MANU_T, ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH});
-    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_UNKNOWN, ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_U, ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH});
+    INTEL_AppendIntelNet(testIntelNet, (Intel){INTEL_STATE_AUTO_U, ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY});
+
     intelNetNow = testIntelNet;
     REQ_CONDITION(INTEL_InitEntity(), return false);
     REQ_CONDITION(INTEL_InitAction(), return false);

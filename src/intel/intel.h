@@ -10,17 +10,19 @@
 typedef enum {
     INTEL_STATE_NULL,
 
-    INTEL_STATE_MANU_UNKNOWN,
+    INTEL_STATE_MANU_U,
     INTEL_STATE_MANU_T,
     INTEL_STATE_MANU_F,
 
-    INTEL_STATE_AUTO_UNKNOWN,
+    INTEL_STATE_AUTO_U,
     INTEL_STATE_AUTO_T,
     INTEL_STATE_AUTO_F,
-    INTEL_STATE_AUTO_PARADOX,
+    INTEL_STATE_AUTO_P,
 
     INTEL_NUM_STATES
 } IntelState;
+
+
 typedef struct {
     IntelState state;
     int subject, action, object;

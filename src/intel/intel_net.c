@@ -12,7 +12,7 @@ static const SDL_Color COLOR_AUTO = {255, 215, 0, 192};
 static const struct {SDL_Color back, text;} CSET[INTEL_NUM_STATES] = {
     [INTEL_STATE_MANU_T] = {COLOR_T, COLOR_LIGHT},
     [INTEL_STATE_MANU_F] = {COLOR_F, COLOR_LIGHT},
-    [INTEL_STATE_AUTO_UNKNOWN] = {COLOR_DARK, COLOR_AUTO},
+    [INTEL_STATE_AUTO_U] = {COLOR_DARK, COLOR_AUTO},
     [INTEL_STATE_AUTO_T] = {COLOR_T, COLOR_AUTO},
     [INTEL_STATE_AUTO_F] = {COLOR_F, COLOR_AUTO},
 };
@@ -24,7 +24,7 @@ bool INTEL_RenewIntelNet() {
         if (intel.subject == ENTITY_NULL && intel.action == ACTION_NULL && intel.object == ENTITY_NULL) {
             intelNetNow->intelSet[k].state = INTEL_STATE_NULL;
         }
-        if (intel.state == INTEL_STATE_AUTO_UNKNOWN) {
+        if (intel.state == INTEL_STATE_AUTO_U) {
             intelNetNow->intelSet[k].state = INTEL_GetAutoState(intel);
         }
         const int i = intel.subject, j = intel.object;
