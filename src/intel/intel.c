@@ -14,9 +14,6 @@ const char* INTEL_STATE_STRING[NUM_STATES] = {
     [STATE_TRUE] = "TRUE",
     [STATE_FALSE] = "FALSE",
     [STATE_PARADOX] = "PARADOX",
-    [STATE_MANU_F] = "SRC_FALSE",
-    [STATE_MANU_T] = "SRC_TRUE",
-    [STATE_MANU_U] = "aaUNKNOWN",
 };
 static IntelArr* testIntelArr = NULL;
 const SDL_FPoint scale = {500, 300};
@@ -44,27 +41,27 @@ static Intel* INTEL_GetIntelSet(const int len) {
 
     return intelSet;
 }
-bool INTEL_AppendIntelNet(IntelArr* intelNet, const Intel intel) {
-    REQ_CONDITION(intelNet->arr != NULL, return false);
+bool INTEL_AppendIntelArr(IntelArr* intelArr, const Intel intel) {
+    REQ_CONDITION(intelArr->arr != NULL, return false);
 
-    for (int i = 0; i < intelNet->len; i++) {
-        if (intelNet->arr[i].effective == false) {
-            intelNet->arr[i] = intel;
+    for (int i = 0; i < intelArr->len; i++) {
+        if (intelArr->arr[i].effective == false) {
+            intelArr->arr[i] = intel;
             return true;
         }
     }
-    const int len = (int)(intelNet->len * 1.5);
+    const int len = (int)(intelArr->len * 1.5);
     Intel* intelSet = INTEL_GetIntelSet(len);
     REQ_CONDITION(intelSet != NULL, return false);
 
-    for (int i = 0; i < intelNet->len; i++) {
-        intelSet[i] = intelNet->arr[i];
+    for (int i = 0; i < intelArr->len; i++) {
+        intelSet[i] = intelArr->arr[i];
     }
-    intelSet[intelNet->len] = intel;
+    intelSet[intelArr->len] = intel;
 
-    free(intelNet->arr);
-    intelNet->arr = intelSet;
-    intelNet->len = len;
+    free(intelArr->arr);
+    intelArr->arr = intelSet;
+    intelArr->len = len;
     INTEL_ResetEntity();
     return true;
 }
@@ -91,14 +88,14 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
 
         // intel2: subject1 --action-> object1
         if (intel1.subject == intel2.subject && intel1.object == intel2.object && intel1.action == intel2.action) {
-            switch (intel2.state) {
-                case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
-                case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
-                default: break;
-            }
+            // switch (intel2.state) {
+            //     case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
+            //     case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
+            //     default: break;
+            // }
         }
 
-        if (intel2.state != STATE_MANU_T && intel2.state != STATE_AUTO_T) continue;
+        // if (intel2.state != STATE_MANU_T && intel2.state != STATE_AUTO_T) continue;
 
         int subject3;
         switch (intel2.action) {
@@ -127,14 +124,14 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
 
             if (intel3.subject != subject3 || intel3.action != intel1.action || intel3.object != intel1.object) continue;
 
-            switch (intel3.state) {
-                case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
-                case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
-                default: continue;
-            }
+            // switch (intel3.state) {
+            //     case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
+            //     case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
+            //     default: continue;
+            // }
         }
     }
-    return STATE_AUTO_U;
+    return STATE_UNKNOWN;
 }
 IntelState INTEL_GetAutoState(const Intel intel1) {
     if (actionSet[intel1.action].type == ACTION_TYPE_TWO_WAY) {
@@ -143,9 +140,9 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
         intel2.object = intel1.subject;
         const IntelState state1 = INTEL_GetAutoState_OneWay(intel1);
         const IntelState state2 = INTEL_GetAutoState_OneWay(intel2);
-        if (state1 == STATE_AUTO_T || state2 == STATE_AUTO_T) return STATE_AUTO_T;
-        if (state1 == STATE_AUTO_F || state2 == STATE_AUTO_F) return STATE_AUTO_F;
-        return STATE_AUTO_U;
+        // if (state1 == STATE_AUTO_T || state2 == STATE_AUTO_T) return STATE_AUTO_T;
+        // if (state1 == STATE_AUTO_F || state2 == STATE_AUTO_F) return STATE_AUTO_F;
+        // return STATE_AUTO_U;
     }
     return INTEL_GetAutoState_OneWay(intel1);
 }
@@ -161,57 +158,54 @@ static bool INTEL_CreateIntelNet_RK(IntelArr* intelNet) {
 
     return true;
 }
-IntelArr* INTEL_CreateIntelNet() {
+IntelArr* INTEL_CreateIntelArr() {
     IntelArr* intelNet = malloc(sizeof(IntelArr));
     REQ_CONDITION(intelNet != NULL, return NULL);
-    REQ_CONDITION(INTEL_CreateIntelNet_RK(intelNet), intelNet = INTEL_DeleteIntelNet(intelNet));
+    REQ_CONDITION(INTEL_CreateIntelNet_RK(intelNet), intelNet = INTEL_DeleteIntelArr(intelNet));
     return intelNet;
 }
-IntelArr* INTEL_DeleteIntelNet(IntelArr* intelNet) {
-    if (intelNet != NULL) {
-        if (intelNet->arr != NULL) {
-            free(intelNet->arr);
-            intelNet->arr = NULL;
+IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr) {
+    if (intelArr != NULL) {
+        if (intelArr->arr != NULL) {
+            free(intelArr->arr);
+            intelArr->arr = NULL;
         }
-        free(intelNet);
+        free(intelArr);
     }
-    intelNet = NULL;
+    intelArr = NULL;
     return NULL;
 }
 
 
 // TRIG ================================================================================================================
-static void INTEL_ChangeMode(const void* para) {
-    netMode = !netMode;
-}
+static void INTEL_ChangeMode(const void* para) {netMode = !netMode;}
 const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
 
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-
-    testIntelArr = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelArr, (Intel){
+    testIntelArr = INTEL_CreateIntelArr();
+    INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN,
         JUDGE_MANU, STATE_TRUE
     });
-    INTEL_AppendIntelNet(testIntelArr, (Intel){
+    INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_CAN, ENTITY_FLY,
         JUDGE_MANU, STATE_FALSE
     });
-    INTEL_AppendIntelNet(testIntelArr, (Intel){
+    INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH,
         JUDGE_MANU, STATE_TRUE
     });
-    INTEL_AppendIntelNet(testIntelArr, (Intel){
+    INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH,
         JUDGE_AUTO, STATE_UNKNOWN
     });
-    INTEL_AppendIntelNet(testIntelArr, (Intel){
+    INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY,
         JUDGE_AUTO, STATE_UNKNOWN
@@ -226,13 +220,12 @@ void INTEL_Exit() {
     INTEL_ExitEntity();
     INTEL_ExitAction();
     intelArrNow = NULL;
-    testIntelArr = INTEL_DeleteIntelNet(testIntelArr);
+    testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
 }
 
 
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
-    INTEL_RenewEntity();
     INTEL_RenewIntelArr();
     PERPH_SetKeyTrig(SDL_SCANCODE_TAB, &trigChangeMode);
     return true;

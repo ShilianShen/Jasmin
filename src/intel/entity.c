@@ -28,7 +28,6 @@ void TRIG_MoveEntity(const void* para) {
     if (entityMoveId == 0) return;
     entitySet[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
-
 Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 

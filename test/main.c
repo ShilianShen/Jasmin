@@ -34,6 +34,7 @@ int main() {
         running = running && BASIC_RenewEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
         running = running && BASIC_DrawEnv(LEN_ENV_ARRAY, ENV_ARRAY);

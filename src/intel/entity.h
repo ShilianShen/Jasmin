@@ -5,9 +5,6 @@
 #include "intel.h"
 
 
-extern TTF_Font* entityFont;
-
-
 typedef enum {
     ENTITY_NULL,
     ENTITY_SOMEONE,
@@ -27,6 +24,7 @@ typedef struct {
 } Entity;
 
 
+extern TTF_Font* entityFont;
 extern Entity entitySet[NUM_ENTITIES];
 
 

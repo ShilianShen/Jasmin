@@ -17,7 +17,7 @@ static const SDL_Color STATE_COLOR[NUM_STATES] = {
 
 
 // RENEW ===============================================================================================================
-bool INTEL_RenewIntelArr() {
+static bool INTEL_RenewIntelArr_Net() {
     for (int k = 0; k < intelArrNow->len; k++) {
         const Intel intel = intelArrNow->arr[k];
         if (intel.subject == ENTITY_NULL && intel.action == ACTION_NULL && intel.object == ENTITY_NULL) {
@@ -33,6 +33,13 @@ bool INTEL_RenewIntelArr() {
         const float w = (float)actionSet[intel.action].tex->w;
         const float h = (float)actionSet[intel.action].tex->h;
         intelArrNow->arr[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
+    }
+    return true;
+}
+bool INTEL_RenewIntelArr() {
+    if (netMode) {
+        INTEL_RenewEntity();
+        INTEL_RenewIntelArr_Net();
     }
     return true;
 }

@@ -5,22 +5,19 @@
 #include "intel.h"
 
 
-typedef struct {
-    int len;
-    Intel* arr;
-} IntelArr;
+typedef struct {int len; Intel* arr;} IntelArr;
 
 
 extern IntelArr* intelArrNow;
 
 
-IntelArr* INTEL_CreateIntelNet();
-IntelArr* INTEL_DeleteIntelNet(IntelArr* intelNet);
+IntelArr* INTEL_CreateIntelArr();
+IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr);
 bool INTEL_RenewIntelArr();
 bool INTEL_DrawIntelArr();
 
 
-bool INTEL_AppendIntelNet(IntelArr* intelNet, Intel intel);
+bool INTEL_AppendIntelArr(IntelArr* intelArr, Intel intel);
 
 
 #endif //INTEL_NET_H

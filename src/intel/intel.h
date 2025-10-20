@@ -17,16 +17,6 @@ typedef enum {
     STATE_TRUE,
     STATE_FALSE,
     STATE_PARADOX,
-
-    STATE_MANU_U,
-    STATE_MANU_T,
-    STATE_MANU_F,
-
-    STATE_AUTO_U,
-    STATE_AUTO_T,
-    STATE_AUTO_F,
-    STATE_AUTO_P,
-
     NUM_STATES
 } IntelState;
 typedef enum {
@@ -41,6 +31,7 @@ typedef struct {
     int subject, action, object;
     IntelJudge judge;
     IntelState state;
+
     SDL_FRect rect;
     bool visible;
 } Intel;
@@ -48,7 +39,7 @@ typedef struct {
 
 SDL_FPoint INTEL_GetScaledPos(SDL_FPoint pos);
 SDL_FPoint INTEL_GetDescalePos(SDL_FPoint pos);
-IntelState INTEL_GetAutoState(Intel intel1);
+IntelState INTEL_GetAutoState(Intel intel);
 const char* INTEL_GetStrIntel(Intel intel);
 
 
