@@ -1,5 +1,5 @@
 #include "intel.h"
-#include "intel_net.h"
+#include "intel_arr.h"
 #include "entity.h"
 #include "action.h"
 
@@ -10,12 +10,15 @@ const char* INTEL_JUDGE_STRING[NUM_JUDGES] = {
     [JUDGE_MANU] = "MANU",
 };
 const char* INTEL_STATE_STRING[NUM_STATES] = {
-    [STATE_NULL] = "NULL",
+    [STATE_UNKNOWN] = "UNKNOWN",
+    [STATE_TRUE] = "TRUE",
+    [STATE_FALSE] = "FALSE",
+    [STATE_PARADOX] = "PARADOX",
     [STATE_MANU_F] = "SRC_FALSE",
     [STATE_MANU_T] = "SRC_TRUE",
-    [STATE_MANU_U] = "UNKNOWN",
+    [STATE_MANU_U] = "aaUNKNOWN",
 };
-static IntelNet* testIntelNet = NULL;
+static IntelArr* testIntelArr = NULL;
 const SDL_FPoint scale = {500, 300};
 
 
@@ -41,12 +44,12 @@ static Intel* INTEL_GetIntelSet(const int len) {
 
     return intelSet;
 }
-bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
-    REQ_CONDITION(intelNet->intelSet != NULL, return false);
+bool INTEL_AppendIntelNet(IntelArr* intelNet, const Intel intel) {
+    REQ_CONDITION(intelNet->arr != NULL, return false);
 
     for (int i = 0; i < intelNet->len; i++) {
-        if (intelNet->intelSet[i].state == STATE_NULL) {
-            intelNet->intelSet[i] = intel;
+        if (intelNet->arr[i].effective == false) {
+            intelNet->arr[i] = intel;
             return true;
         }
     }
@@ -55,12 +58,12 @@ bool INTEL_AppendIntelNet(IntelNet* intelNet, const Intel intel) {
     REQ_CONDITION(intelSet != NULL, return false);
 
     for (int i = 0; i < intelNet->len; i++) {
-        intelSet[i] = intelNet->intelSet[i];
+        intelSet[i] = intelNet->arr[i];
     }
     intelSet[intelNet->len] = intel;
 
-    free(intelNet->intelSet);
-    intelNet->intelSet = intelSet;
+    free(intelNet->arr);
+    intelNet->arr = intelSet;
     intelNet->len = len;
     INTEL_ResetEntity();
     return true;
@@ -83,8 +86,8 @@ SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
 
 static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
     // intel1: subject1 --action-> object1
-    for (int k = 0; k < intelNetNow->len; k++) {
-        const Intel intel2 = intelNetNow->intelSet[k];
+    for (int k = 0; k < intelArrNow->len; k++) {
+        const Intel intel2 = intelArrNow->arr[k];
 
         // intel2: subject1 --action-> object1
         if (intel1.subject == intel2.subject && intel1.object == intel2.object && intel1.action == intel2.action) {
@@ -118,9 +121,9 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
             default: continue;
         }
 
-        for (int n = 0; n < intelNetNow->len; n++) {
+        for (int n = 0; n < intelArrNow->len; n++) {
             // intel3: subject3 --action-> object1
-            const Intel intel3 = intelNetNow->intelSet[n];
+            const Intel intel3 = intelArrNow->arr[n];
 
             if (intel3.subject != subject3 || intel3.action != intel1.action || intel3.object != intel1.object) continue;
 
@@ -149,26 +152,26 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool INTEL_CreateIntelNet_RK(IntelNet* intelNet) {
-    memset(intelNet, 0, sizeof(IntelNet));
+static bool INTEL_CreateIntelNet_RK(IntelArr* intelNet) {
+    memset(intelNet, 0, sizeof(IntelArr));
 
     intelNet->len = 10;
-    intelNet->intelSet = INTEL_GetIntelSet(intelNet->len);
-    REQ_CONDITION(intelNet->intelSet != NULL, return false);
+    intelNet->arr = INTEL_GetIntelSet(intelNet->len);
+    REQ_CONDITION(intelNet->arr != NULL, return false);
 
     return true;
 }
-IntelNet* INTEL_CreateIntelNet() {
-    IntelNet* intelNet = malloc(sizeof(IntelNet));
+IntelArr* INTEL_CreateIntelNet() {
+    IntelArr* intelNet = malloc(sizeof(IntelArr));
     REQ_CONDITION(intelNet != NULL, return NULL);
     REQ_CONDITION(INTEL_CreateIntelNet_RK(intelNet), intelNet = INTEL_DeleteIntelNet(intelNet));
     return intelNet;
 }
-IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
+IntelArr* INTEL_DeleteIntelNet(IntelArr* intelNet) {
     if (intelNet != NULL) {
-        if (intelNet->intelSet != NULL) {
-            free(intelNet->intelSet);
-            intelNet->intelSet = NULL;
+        if (intelNet->arr != NULL) {
+            free(intelNet->arr);
+            intelNet->arr = NULL;
         }
         free(intelNet);
     }
@@ -187,29 +190,34 @@ const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
 
-    testIntelNet = INTEL_CreateIntelNet();
-    INTEL_AppendIntelNet(testIntelNet, (Intel){
+    testIntelArr = INTEL_CreateIntelNet();
+    INTEL_AppendIntelNet(testIntelArr, (Intel){
+        true,
         ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN,
-        JUDGE_MANU, STATE_MANU_T
+        JUDGE_MANU, STATE_TRUE
     });
-    INTEL_AppendIntelNet(testIntelNet, (Intel){
+    INTEL_AppendIntelNet(testIntelArr, (Intel){
+        true,
         ENTITY_SOCRATES, ACTION_CAN, ENTITY_FLY,
-        JUDGE_MANU, STATE_MANU_F
+        JUDGE_MANU, STATE_FALSE
     });
-    INTEL_AppendIntelNet(testIntelNet, (Intel){
+    INTEL_AppendIntelNet(testIntelArr, (Intel){
+        true,
         ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH,
-        JUDGE_MANU, STATE_MANU_T
+        JUDGE_MANU, STATE_TRUE
     });
-    INTEL_AppendIntelNet(testIntelNet, (Intel){
+    INTEL_AppendIntelNet(testIntelArr, (Intel){
+        true,
         ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH,
-        JUDGE_AUTO, STATE_AUTO_U
+        JUDGE_AUTO, STATE_UNKNOWN
     });
-    INTEL_AppendIntelNet(testIntelNet, (Intel){
+    INTEL_AppendIntelNet(testIntelArr, (Intel){
+        true,
         ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY,
-        JUDGE_AUTO, STATE_AUTO_U
+        JUDGE_AUTO, STATE_UNKNOWN
     });
 
-    intelNetNow = testIntelNet;
+    intelArrNow = testIntelArr;
     REQ_CONDITION(INTEL_InitEntity(), return false);
     REQ_CONDITION(INTEL_InitAction(), return false);
     return true;
@@ -217,15 +225,15 @@ bool INTEL_Init() {
 void INTEL_Exit() {
     INTEL_ExitEntity();
     INTEL_ExitAction();
-    intelNetNow = NULL;
-    testIntelNet = INTEL_DeleteIntelNet(testIntelNet);
+    intelArrNow = NULL;
+    testIntelArr = INTEL_DeleteIntelNet(testIntelArr);
 }
 
 
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewEntity();
-    INTEL_RenewIntelNet();
+    INTEL_RenewIntelArr();
     PERPH_SetKeyTrig(SDL_SCANCODE_TAB, &trigChangeMode);
     return true;
 }
@@ -234,6 +242,6 @@ bool INTEL_Renew() {
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
     DEBUG_SendMessageL("%s: mode: %s\n", __func__, netMode ? "NET" : "SET");
-    INTEL_DrawIntelNet();
+    INTEL_DrawIntelArr();
     return true;
 }

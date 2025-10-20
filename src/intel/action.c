@@ -1,6 +1,6 @@
 #include "action.h"
 #include "entity.h"
-#include "intel_net.h"
+#include "intel_arr.h"
 
 
 Action actionSet[NUM_ACTIONS] = {

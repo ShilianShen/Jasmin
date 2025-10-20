@@ -13,7 +13,10 @@ extern const char* INTEL_STATE_STRING[];
 
 
 typedef enum {
-    STATE_NULL,
+    STATE_UNKNOWN,
+    STATE_TRUE,
+    STATE_FALSE,
+    STATE_PARADOX,
 
     STATE_MANU_U,
     STATE_MANU_T,
@@ -34,6 +37,7 @@ typedef enum {
 
 
 typedef struct {
+    bool effective;
     int subject, action, object;
     IntelJudge judge;
     IntelState state;

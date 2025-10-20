@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "intel_net.h"
+#include "intel_arr.h"
 
 
 Entity entitySet[NUM_ENTITIES] = {
@@ -81,9 +81,9 @@ static void INTEL_RenewEntity_Repulsion() {
     }
 }
 static void INTEL_RenewEntity_Gravitation() {
-    for (int k = 0; k < intelNetNow->len; k++) {
-        const Intel intel = intelNetNow->intelSet[k];
-        if (intel.state == STATE_NULL) continue;
+    for (int k = 0; k < intelArrNow->len; k++) {
+        const Intel intel = intelArrNow->arr[k];
+        if (intel.effective == false) continue;
 
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = entitySet[i].position;
@@ -127,10 +127,10 @@ bool INTEL_RenewEntity() {
         entitySet[i].visible = false;
         entitySet[i].repulsion = entitySet[i].gravitation = entitySet[i].gravity = (SDL_FPoint){0};
     }
-    for (int k = 0; k < intelNetNow->len; k++) {
-        if (intelNetNow->intelSet[k].state == STATE_NULL) continue;
-        entitySet[intelNetNow->intelSet[k].subject].visible = true;
-        entitySet[intelNetNow->intelSet[k].object].visible = true;
+    for (int k = 0; k < intelArrNow->len; k++) {
+        if (intelArrNow->arr[k].effective == false) continue;
+        entitySet[intelArrNow->arr[k].subject].visible = true;
+        entitySet[intelArrNow->arr[k].object].visible = true;
     }
     INTEL_RenewEntity_Repulsion();
     INTEL_RenewEntity_Gravitation();
