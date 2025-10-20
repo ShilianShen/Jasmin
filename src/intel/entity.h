@@ -5,6 +5,9 @@
 #include "intel.h"
 
 
+extern TTF_Font* entityFont;
+
+
 typedef enum {
     ENTITY_NULL,
     ENTITY_SOMEONE,

@@ -7,6 +7,11 @@
 #include "../perph/perph.h"
 
 
+extern bool netMode;
+extern const char* INTEL_JUDGE_STRING[];
+extern const char* INTEL_STATE_STRING[];
+
+
 typedef enum {
     STATE_NULL,
 

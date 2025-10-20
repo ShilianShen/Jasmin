@@ -37,7 +37,13 @@ bool INTEL_RenewIntelNet() {
     }
     return true;
 }
-bool INTEL_DrawIntelNet() {
+
+
+
+typedef struct {
+    const char* s[6];
+} SetData;
+static bool INTEL_DrawIntelNet_Net() {
     const float time = (float)SDL_GetTicks();
     for (int k = 0; k < intelNetNow->len; k++) {
         const Intel intel = intelNetNow->intelSet[k];
@@ -63,5 +69,43 @@ bool INTEL_DrawIntelNet() {
         SDL_SetTextureColorRGB(actionSet[intel.action].tex, PERPH_GetMouseLeftInRect(rect) ? CSET[intel.state].back : CSET[intel.state].text);
         SDL_RenderTexture(renderer, actionSet[intel.action].tex, NULL, &rect);
     }
+    INTEL_DrawEntity();
     return true;
+}
+static bool INTEL_DrawIntelNet_Set() {
+    // visible subject action object judge state
+    int n = 1;
+    for (int k = 0; k < intelNetNow->len; k++) {
+        const Intel intel = intelNetNow->intelSet[k];
+        if (intel.state == STATE_NULL) continue;
+        n++;
+    }
+
+    SetData strings[n];
+    strings[0] = (SetData){"VISIBLE", "SUBJECT", "ACTION", "OBJECT", "JUDGE", "STATE"};
+    for (int k = 0; k < intelNetNow->len; k++) {
+        const Intel intel = intelNetNow->intelSet[k];
+        if (intel.state == STATE_NULL) continue;
+
+        strings[k+1] = (SetData){
+            "1",
+            entitySet[intel.subject].name,
+            actionSet[intel.action].name,
+            entitySet[intel.object].name,
+            INTEL_JUDGE_STRING[intel.judge],
+            "aa"//INTEL_STATE_STRING[intel.state],
+        };
+    }
+
+    float x = 0, y = 0, w = 400, h = 48;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < 6; j++) {
+            const SDL_FPoint point = {x + (float)j * w, y + (float)i * h};
+            SDL_RenderText(renderer, entityFont, strings[i].s[j], point, (SDL_Color){255, 255, 255, 255});
+        }
+    }
+    return true;
+}
+bool INTEL_DrawIntelNet() {
+    return netMode ? INTEL_DrawIntelNet_Net() : INTEL_DrawIntelNet_Set();
 }

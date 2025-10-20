@@ -4,6 +4,7 @@
 #include "action.h"
 
 
+bool netMode = true;
 const char* INTEL_JUDGE_STRING[NUM_JUDGES] = {
     [JUDGE_AUTO] = "AUTO",
     [JUDGE_MANU] = "MANU",
@@ -176,6 +177,13 @@ IntelNet* INTEL_DeleteIntelNet(IntelNet* intelNet) {
 }
 
 
+// TRIG ================================================================================================================
+static void INTEL_ChangeMode(const void* para) {
+    netMode = !netMode;
+}
+const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
+
+
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
 
@@ -218,13 +226,14 @@ void INTEL_Exit() {
 bool INTEL_Renew() {
     INTEL_RenewEntity();
     INTEL_RenewIntelNet();
+    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, &trigChangeMode);
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
+    DEBUG_SendMessageL("%s: mode: %s\n", __func__, netMode ? "NET" : "SET");
     INTEL_DrawIntelNet();
-    INTEL_DrawEntity();
     return true;
 }
