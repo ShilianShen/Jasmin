@@ -16,7 +16,6 @@ typedef enum {
     NUM_ENTITIES
 } EntityId;
 typedef struct {
-    const char* name;
     bool visible;
     SDL_Texture *netTex, *setTex;
     SDL_FPoint repulsion, gravitation, gravity, position;

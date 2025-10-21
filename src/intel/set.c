@@ -27,7 +27,7 @@ bool INTEL_InitIntelSet() {
     REQ_CONDITION(font != NULL, return false);
 
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityTex[i] = TXT_LoadTexture(renderer, font, entitySet[i].name, WHITE);
+        entityTex[i] = TXT_LoadTexture(renderer, font, ENTITY_NAMES[i], WHITE);
         REQ_CONDITION(entityTex[i] != NULL, return false);
         unitW[HEAD_SUBJECT] = unitW[HEAD_OBJECT] = SDL_max(unitW[HEAD_OBJECT], entityTex[i]->w);
     }

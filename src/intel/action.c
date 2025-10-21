@@ -4,11 +4,11 @@
 
 
 Action actionSet[NUM_ACTIONS] = {
-    [ACTION_NULL] = {.name = "unknown", .type = ACTION_TYPE_ONE_WAY},
-    [ACTION_IS] = {.name = "is", .type = ACTION_TYPE_TWO_WAY},
-    [ACTION_BELONG] = {.name = "belong", .type = ACTION_TYPE_ONE_WAY},
-    [ACTION_WILL] = {.name = "will", .type = ACTION_TYPE_ONE_WAY},
-    [ACTION_CAN] = {.name = "can", .type = ACTION_TYPE_ONE_WAY},
+    [ACTION_NULL] = {.type = ACTION_TYPE_ONE_WAY},
+    [ACTION_IS] = {.type = ACTION_TYPE_TWO_WAY},
+    [ACTION_BELONG] = {.type = ACTION_TYPE_ONE_WAY},
+    [ACTION_WILL] = {.type = ACTION_TYPE_ONE_WAY},
+    [ACTION_CAN] = {.type = ACTION_TYPE_ONE_WAY},
 };
 const char* ACTION_NAMES[NUM_ACTIONS] = {
     [ACTION_NULL] = "unknown",
@@ -17,10 +17,3 @@ const char* ACTION_NAMES[NUM_ACTIONS] = {
     [ACTION_WILL] = "will",
     [ACTION_CAN] = "can",
 };
-
-
-bool INTEL_InitAction() {
-    return true;
-}
-void INTEL_ExitAction() {
-}

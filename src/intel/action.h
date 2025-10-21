@@ -13,23 +13,12 @@ typedef enum {
     ACTION_CAN,
     NUM_ACTIONS,
 } ActionId;
-typedef enum {
-    ACTION_TYPE_ONE_WAY,
-    ACTION_TYPE_TWO_WAY,
-    NUM_ACTION_TYPES,
-} ActionType;
-typedef struct {
-    const char* name;
-    ActionType type;
-} Action;
+typedef enum {ACTION_TYPE_ONE_WAY, ACTION_TYPE_TWO_WAY, NUM_ACTION_TYPES} ActionType;
+typedef struct {ActionType type;} Action;
 
 
 extern Action actionSet[NUM_ACTIONS];
 extern const char* ACTION_NAMES[NUM_ACTIONS];
-
-
-bool INTEL_InitAction();
-void INTEL_ExitAction();
 
 
 #endif //ACTION_H

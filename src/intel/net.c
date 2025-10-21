@@ -25,7 +25,7 @@ bool INTEL_InitIntelNet() {
     REQ_CONDITION(action_font != NULL, return false);
 
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityTex[i] = TXT_LoadTexture(renderer, entity_font, entitySet[i].name, WHITE);
+        entityTex[i] = TXT_LoadTexture(renderer, entity_font, ENTITY_NAMES[i], WHITE);
         REQ_CONDITION(entityTex[i] != NULL, return false);
     }
 

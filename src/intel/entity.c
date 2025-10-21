@@ -2,15 +2,7 @@
 #include "intel_arr.h"
 
 
-Entity entitySet[NUM_ENTITIES] = {
-    [ENTITY_NULL] = {.name = "unknown"},
-    [ENTITY_SOMEONE] = {.name = "someone"},
-    [ENTITY_SOMETHING] = {.name = "something"},
-    [ENTITY_SOCRATES] = {.name = "Socrates"},
-    [ENTITY_HUMAN] = {.name = "Human"},
-    [ENTITY_DEATH] = {.name = "Death"},
-    [ENTITY_FLY] = {.name = "Fly"},
-};
+Entity entitySet[NUM_ENTITIES] = {};
 const char* ENTITY_NAMES[NUM_ENTITIES] = {
     [ENTITY_NULL] = "unknown",
     [ENTITY_SOMEONE] = "someone",
@@ -42,7 +34,7 @@ Trig trigMove = {TRIG_MoveEntity, NULL, true};
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
+        const char* string = ENTITY_NAMES[i] == NULL ? "????" : ENTITY_NAMES[i];
         entitySet[i].netTex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
         REQ_CONDITION(entitySet[i].netTex != NULL, return false);
         entitySet[i].setTex = NULL;

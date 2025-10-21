@@ -28,9 +28,9 @@ const char* INTEL_GetStrIntel(const Intel intel) {
     static size_t len = 0;
     if (len == 0) len = len_of(string);
     snprintf(string, len, "\"%s %s %s.\" is %s by %s",
-        entitySet[intel.subject].name,
-        actionSet[intel.action].name,
-        entitySet[intel.object].name,
+        ENTITY_NAMES[intel.subject],
+        ACTION_NAMES[intel.action],
+        ENTITY_NAMES[intel.object],
         INTEL_STATE_STRING[intel.state],
         INTEL_JUDGE_STRING[intel.judge]
         );
@@ -126,12 +126,6 @@ static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
             const Intel intel3 = intelArrNow->arr[n];
 
             if (intel3.subject != subject3 || intel3.action != intel1.action || intel3.object != intel1.object) continue;
-
-            // switch (intel3.state) {
-            //     case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
-            //     case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
-            //     default: continue;
-            // }
         }
     }
     return STATE_UNKNOWN;
@@ -222,14 +216,12 @@ bool INTEL_Init() {
 
     intelArrNow = testIntelArr;
     REQ_CONDITION(INTEL_InitEntity(), return false);
-    REQ_CONDITION(INTEL_InitAction(), return false);
     return true;
 }
 void INTEL_Exit() {
     INTEL_ExitIntelNet();
     INTEL_ExitIntelSet();
     INTEL_ExitEntity();
-    INTEL_ExitAction();
     intelArrNow = NULL;
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
 
