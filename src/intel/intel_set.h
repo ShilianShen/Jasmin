@@ -7,7 +7,7 @@
 
 bool INTEL_InitIntelSet();
 bool INTEL_RenewIntelSet(IntelArr* intelArr);
-bool INTEL_DrawIntelSet(IntelArr* intelArr);
+bool INTEL_DrawIntelSet();
 void INTEL_ExitIntelSet();
 
 

@@ -19,9 +19,7 @@ void INTEL_ExitIntelArr() {
 
 // RENEW ===============================================================================================================
 bool INTEL_RenewIntelArr(IntelArr* intelArr) {
-    if (netMode) {
-        INTEL_RenewIntelNet(intelArr);
-    }
+    (netMode ? INTEL_RenewIntelNet : INTEL_RenewIntelSet)(intelArr);
     return true;
 }
 
@@ -29,5 +27,6 @@ bool INTEL_RenewIntelArr(IntelArr* intelArr) {
 // DRAW ================================================================================================================
 typedef struct {const char* s[6];} SetData;
 bool INTEL_DrawIntelArr(IntelArr* intelArr) {
-    return netMode ? INTEL_DrawIntelNet(intelArr) : INTEL_DrawIntelSet(intelArr);
+    netMode ? INTEL_DrawIntelNet(intelArr) : INTEL_DrawIntelSet();
+    return true;
 }
