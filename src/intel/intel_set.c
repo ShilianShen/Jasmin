@@ -22,7 +22,7 @@ static const float dx = 10, dy = 5;
 static const SDL_Color backColor = {64, 64, 64, 128};
 
 static const int LEN_BUFFER = 100;
-static Intel buffer[LEN_BUFFER];
+static struct {Intel* intel; SDL_FRect rect[NUM_HEADS];} buffer[LEN_BUFFER];
 static int bufferHead = 0;
 
 
@@ -127,11 +127,11 @@ static bool INTEL_DrawIntelSet_Head(const SDL_FRect bckRect) {
     SDL_RenderLine(renderer, bckRect.x, y, x, y);
     return true;
 }
-static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const SDL_FRect bckRect) {
-    for (int i = 0; i < N; i++) {
-        float y = bckRect.y + (float)(i + 1) * (unitH + 2 * dy) + dy;
+static bool INTEL_DrawIntelSet_Body(const SDL_FRect bckRect) {
+    for (int i = 0; i < bufferHead; i++) {
+        const float y = bckRect.y + (float)(i + 1) * (unitH + 2 * dy) + dy;
         float x = bckRect.x;
-        const Intel intel = intelSet[i];
+        const Intel intel = *buffer[i].intel;
 
         for (int j = 0; j < NUM_HEADS; j++) {
             x += dx;
@@ -157,7 +157,7 @@ static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const 
             }
             const SDL_FRect rect = {x, y, (float)tx->w, (float)tx->h};
             if (PERPH_GetMouseInRect(rect)) {
-                SDL_Color temp = text;
+                const SDL_Color temp = text;
                 text = back;
                 back = temp;
             }
@@ -171,21 +171,15 @@ static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const 
     return true;
 }
 bool INTEL_DrawIntelSet(IntelArr* intelArr) {
-    int N = 0;
-    for (int k = 0; k < intelArr->len; k++) {
-        const Intel intel = intelArr->arr[k];
-        if (intel.effective == false) continue;
-        N++;
-    }
-    Intel intelSet[N];
-    for (int k = 0, i = 0; k < intelArr->len; k++) {
-        const Intel intel = intelArr->arr[k];
-        if (intel.effective == false) continue;
-        intelSet[i] = intel;
-        i++;
+    bufferHead = 0;
+    for (int k = 0; k < intelArr->len && bufferHead < LEN_BUFFER; k++) {
+        Intel* intel = &intelArr->arr[k];
+        if (intel->effective == false) continue;
+        buffer[bufferHead].intel = intel;
+        bufferHead++;
     }
 
-    SDL_FRect bckRect = {0, 0, 0, (float)(N + 1) * (unitH + 2 * dy)};
+    SDL_FRect bckRect = {0, 0, 0, (float)(bufferHead + 1) * (unitH + 2 * dy)};
     for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
     bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
@@ -193,7 +187,7 @@ bool INTEL_DrawIntelSet(IntelArr* intelArr) {
     SDL_SetRenderColor(renderer, backColor);
     SDL_RenderFillRect(renderer, &bckRect);
     INTEL_DrawIntelSet_Head(bckRect);
-    INTEL_DrawIntelSet_Body(N, intelSet, bckRect);
+    INTEL_DrawIntelSet_Body(bckRect);
 
     return true;
 }

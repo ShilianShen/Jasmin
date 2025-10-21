@@ -8,9 +8,6 @@
 typedef struct {int len; Intel* arr;} IntelArr;
 
 
-// extern IntelArr* intelArrNow;
-
-
 IntelArr* INTEL_CreateIntelArr();
 IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr);
 

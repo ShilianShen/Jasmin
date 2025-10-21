@@ -5,9 +5,6 @@
 #include "intel_arr.h"
 
 
-extern Trig trigMove;
-
-
 void INTEL_ResetIntelNet();
 
 

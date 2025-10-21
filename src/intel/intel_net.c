@@ -9,7 +9,7 @@ static TTF_Font *entityFont = NULL, *actionFont = NULL;
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192}, TEXT_COLOR = {255, 255, 255, 255};
 static struct {bool visible; SDL_FRect rect; SDL_FPoint repulsion, gravitation, gravity, position;} entityInfo[NUM_ENTITIES];
 static const float MOVE_SPEED = 1.f;
-const SDL_FPoint scale = {500, 300};
+static const SDL_FPoint scale = {500, 300};
 
 
 // GET & SET ===========================================================================================================
@@ -18,14 +18,14 @@ void INTEL_ResetIntelNet() {
         entityInfo[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
     }
 }
-SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
+static SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
     const SDL_FPoint scaledPos = {
         windowRect.x + windowRect.w / 2 + scale.x * pos.x,
         windowRect.y + windowRect.h / 2 + scale.y * pos.y
     };
     return scaledPos;
 }
-SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
+static SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
     const SDL_FPoint descalePos = {
         (pos.x - windowRect.x - windowRect.w / 2) / scale.x,
         (pos.y - windowRect.y - windowRect.h / 2) / scale.y,
@@ -35,12 +35,12 @@ SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
 
 
 // TRIG ================================================================================================================
-EntityId entityMoveId = 0;
-void TRIG_MoveEntity(const void* para) {
+static EntityId entityMoveId = 0;
+static void TRIG_MoveEntity(const void* para) {
     if (entityMoveId == 0) return;
     entityInfo[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
-Trig trigMove = {TRIG_MoveEntity, NULL, true};
+static Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
 // INIT & EXIT =========================================================================================================
