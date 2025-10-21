@@ -1,11 +1,11 @@
-#include "set.h"
+#include "intel_set.h"
 #include "entity.h"
 #include "action.h"
 #include "intel_arr.h"
 
 
 static TTF_Font *font = NULL;
-static enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} Head;
+enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS};
 static const char* HEAD_SET[NUM_HEADS] = {
     [HEAD_VISIBLE] = "VISIBLE",
     [HEAD_SUBJECT] = "SUBJECT",
@@ -20,6 +20,14 @@ static SDL_Texture *visibleTex[2];
 static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color backColor = {64, 64, 64, 128};
+
+
+// GET & SET ===========================================================================================================
+
+
+
+// TRIG ================================================================================================================
+
 
 
 // INIT & EXIT =========================================================================================================
@@ -100,7 +108,7 @@ bool INTEL_RenewIntelSet() {
 
 // DRAW ================================================================================================================
 static bool INTEL_DrawIntelSet_Head(const SDL_FRect bckRect) {
-    const float y = bckRect.y + dy;
+    float y = bckRect.y + dy;
     float x = bckRect.x;
     for (int i = 0; i < NUM_HEADS; i++) {
         x += dx;
@@ -108,6 +116,9 @@ static bool INTEL_DrawIntelSet_Head(const SDL_FRect bckRect) {
         SDL_RenderTexture(renderer, headTex[i], NULL, &rect);
         x += unitW[i] + dx;
     }
+    y += unitH + dy;
+    SDL_SetRenderColor(renderer, WHITE);
+    SDL_RenderLine(renderer, bckRect.x, y, x, y);
     return true;
 }
 static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const SDL_FRect bckRect) {

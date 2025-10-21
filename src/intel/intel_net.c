@@ -1,4 +1,4 @@
-#include "net.h"
+#include "intel_net.h"
 #include "entity.h"
 #include "action.h"
 #include "intel_arr.h"

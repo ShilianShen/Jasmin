@@ -2,8 +2,8 @@
 #include "intel_arr.h"
 #include "entity.h"
 #include "action.h"
-#include "net.h"
-#include "set.h"
+#include "intel_net.h"
+#include "intel_set.h"
 
 
 TTF_Font *entityFont = NULL, *setFont = NULL;

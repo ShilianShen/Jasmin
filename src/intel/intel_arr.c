@@ -1,6 +1,6 @@
 #include "intel_arr.h"
-#include "set.h"
-#include "net.h"
+#include "intel_set.h"
+#include "intel_net.h"
 #include "entity.h"
 #include "action.h"
 
