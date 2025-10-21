@@ -18,7 +18,7 @@ static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
 static SDL_Texture *judgeTex[NUM_JUDGES], *stateTex[NUM_STATES], *headTex[NUM_HEADS];
 static SDL_Texture *visibleTex[2];
 static float unitW[NUM_HEADS] = {0}, unitH = 0;
-static const float dx = 5, dy = 5;
+static const float dx = 10, dy = 5;
 static const SDL_Color backColor = {64, 64, 64, 128};
 
 
@@ -99,42 +99,18 @@ bool INTEL_RenewIntelSet() {
 
 
 // DRAW ================================================================================================================
-
-bool INTEL_DrawIntelSet() {
-    int N = 0;
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
-        N++;
+static bool INTEL_DrawIntelSet_Head(const SDL_FRect bckRect) {
+    const float y = bckRect.y + dy;
+    float x = bckRect.x;
+    for (int i = 0; i < NUM_HEADS; i++) {
+        x += dx;
+        SDL_FRect rect = {x, y, (float)headTex[i]->w, (float)headTex[i]->h};
+        SDL_RenderTexture(renderer, headTex[i], NULL, &rect);
+        x += unitW[i] + dx;
     }
-
-    Intel intelSet[N];
-    for (int k = 0, i = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
-
-        intelSet[i] = intel;
-        i++;
-    }
-
-    SDL_FRect bckRect = {0, 0, 0, (float)(N + 1) * (unitH + 2 * dy)};
-    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
-    bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
-    bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
-
-    SDL_SetRenderColor(renderer, backColor);
-    SDL_RenderFillRect(renderer, &bckRect);
-
-    {
-        float x = bckRect.x, y = bckRect.y + dy;
-        for (int i = 0; i < NUM_HEADS; i++) {
-            x += dx;
-            SDL_FRect rect = {x, y, (float)headTex[i]->w, (float)headTex[i]->h};
-            SDL_RenderTexture(renderer, headTex[i], NULL, &rect);
-            x += unitW[i] + dx;
-        }
-    }
-
+    return true;
+}
+static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const SDL_FRect bckRect) {
     for (int i = 0; i < N; i++) {
         float y = bckRect.y + (float)(i + 1) * (unitH + 2 * dy) + dy;
         float x = bckRect.x;
@@ -142,14 +118,18 @@ bool INTEL_DrawIntelSet() {
 
         for (int j = 0; j < NUM_HEADS; j++) {
             x += dx;
-            SDL_Color back = backColor, text = WHITE;
+            SDL_Color back = EMPTY, text = WHITE;
             SDL_Texture* tx = NULL;
             switch (j) {
                 case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
                 case HEAD_SUBJECT: tx = entityTex[intel.subject]; break;
                 case HEAD_ACTION: tx = actionTex[intel.action]; break;
                 case HEAD_OBJECT: tx = entityTex[intel.object]; break;
-                case HEAD_JUDGE: tx = judgeTex[intel.judge]; break;
+                case HEAD_JUDGE: {
+                    back = backColor;
+                    tx = judgeTex[intel.judge];
+                    break;
+                }
                 case HEAD_STATE: {
                     tx = stateTex[intel.state];
                     back = STATE_COLOR[intel.state];
@@ -171,6 +151,32 @@ bool INTEL_DrawIntelSet() {
             x += unitW[j] + dx;
         }
     }
+    return true;
+}
+bool INTEL_DrawIntelSet() {
+    int N = 0;
+    for (int k = 0; k < intelArrNow->len; k++) {
+        const Intel intel = intelArrNow->arr[k];
+        if (intel.effective == false) continue;
+        N++;
+    }
+    Intel intelSet[N];
+    for (int k = 0, i = 0; k < intelArrNow->len; k++) {
+        const Intel intel = intelArrNow->arr[k];
+        if (intel.effective == false) continue;
+        intelSet[i] = intel;
+        i++;
+    }
+
+    SDL_FRect bckRect = {0, 0, 0, (float)(N + 1) * (unitH + 2 * dy)};
+    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
+    bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
+    bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
+
+    SDL_SetRenderColor(renderer, backColor);
+    SDL_RenderFillRect(renderer, &bckRect);
+    INTEL_DrawIntelSet_Head(bckRect);
+    INTEL_DrawIntelSet_Body(N, intelSet, bckRect);
 
     return true;
 }
