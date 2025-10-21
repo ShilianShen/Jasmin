@@ -49,7 +49,7 @@ extern SDL_GLContext content;
 extern int logical_w, logical_h;
 extern int windowWidth, windowHeight;
 extern float scale_x, scale_y;
-extern SDL_Color EMPTY;
+extern SDL_Color EMPTY, BLACK, WHITE;
 
 
 #endif //JASMIN__BASIC_H

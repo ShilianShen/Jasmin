@@ -38,12 +38,9 @@ void INTEL_ResetEntity() {
 bool INTEL_InitEntity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         const char* string = entitySet[i].name == NULL ? "????" : entitySet[i].name;
-
         entitySet[i].netTex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
         REQ_CONDITION(entitySet[i].netTex != NULL, return false);
-
-        entitySet[i].setTex = TXT_LoadTexture(renderer, setFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(entitySet[i].setTex != NULL, return false);
+        entitySet[i].setTex = NULL;
     }
     return true;
 }
