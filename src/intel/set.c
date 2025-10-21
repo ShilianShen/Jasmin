@@ -19,6 +19,7 @@ static SDL_Texture *judgeTex[NUM_JUDGES], *stateTex[NUM_STATES], *headTex[NUM_HE
 static SDL_Texture *visibleTex[2];
 static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 5, dy = 5;
+static const SDL_Color backColor = {64, 64, 64, 128};
 
 
 // INIT & EXIT =========================================================================================================
@@ -98,70 +99,77 @@ bool INTEL_RenewIntelSet() {
 
 
 // DRAW ================================================================================================================
+
 bool INTEL_DrawIntelSet() {
-    int n = 1;
+    int N = 0;
     for (int k = 0; k < intelArrNow->len; k++) {
         const Intel intel = intelArrNow->arr[k];
         if (intel.effective == false) continue;
-        n++;
+        N++;
     }
 
-    SDL_Texture* tex[n][NUM_HEADS];
-    for (int j = 0; j < n; j++) {
-        for (int i = 0; i < 6; i++) {
-            tex[j][i] = NULL;
-        }
-    }
-    for (int i = 0; i < NUM_HEADS; i++) {
-        tex[0][i] = headTex[i];
+    Intel intelSet[N];
+    for (int k = 0, i = 0; k < intelArrNow->len; k++) {
+        const Intel intel = intelArrNow->arr[k];
+        if (intel.effective == false) continue;
+
+        intelSet[i] = intel;
+        i++;
     }
 
-    SDL_FRect bckRect = {0, 0, 0, (float)n * (unitH + 2 * dy)};
+    SDL_FRect bckRect = {0, 0, 0, (float)(N + 1) * (unitH + 2 * dy)};
     for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
     bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
 
-    for (int k = 0, j = 1; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
-
-        tex[j][HEAD_VISIBLE] = visibleTex[intel.visible];
-        tex[j][HEAD_SUBJECT] = entityTex[intel.subject];
-        tex[j][HEAD_ACTION] = actionTex[intel.action];
-        tex[j][HEAD_OBJECT] = entityTex[intel.object];
-        tex[j][HEAD_JUDGE] = judgeTex[intel.judge];
-        tex[j][HEAD_STATE] = stateTex[intel.state];
-        n++;
-    }
-
-    SDL_SetRenderColor(renderer, (SDL_Color){64, 64, 64, 224});
+    SDL_SetRenderColor(renderer, backColor);
     SDL_RenderFillRect(renderer, &bckRect);
 
-    float y = bckRect.y;
-    for (int k = 0, j = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
-        if (intel.effective == false) continue;
-
-        float x = bckRect.x;
-        y += dy;
+    {
+        float x = bckRect.x, y = bckRect.y + dy;
         for (int i = 0; i < NUM_HEADS; i++) {
             x += dx;
-            if (tex[j][i] == NULL) continue;
-            const SDL_FRect rect = {x, y, (float)tex[j][i]->w, (float)tex[j][i]->h};
-            SDL_Color back = BLACK, text = WHITE;
-            if (j != 0 && i == HEAD_JUDGE) text = JUDGE_COLOR[intel.judge];
-            if (j != 0 && i == HEAD_STATE) back = STATE_COLOR[intel.state];
-
-            SDL_SetRenderColor(renderer, back);
-            SDL_RenderFillRect(renderer, &rect);
-
-            SDL_SetTextureColorRGB(tex[j][i], text);
-            SDL_RenderTexture(renderer, tex[j][i], NULL, &rect);
-
+            SDL_FRect rect = {x, y, (float)headTex[i]->w, (float)headTex[i]->h};
+            SDL_RenderTexture(renderer, headTex[i], NULL, &rect);
             x += unitW[i] + dx;
         }
-        y += unitH + dy;
-        j++;
+    }
+
+    for (int i = 0; i < N; i++) {
+        float y = bckRect.y + (float)(i + 1) * (unitH + 2 * dy) + dy;
+        float x = bckRect.x;
+        const Intel intel = intelSet[i];
+
+        for (int j = 0; j < NUM_HEADS; j++) {
+            x += dx;
+            SDL_Color back = backColor, text = WHITE;
+            SDL_Texture* tx = NULL;
+            switch (j) {
+                case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
+                case HEAD_SUBJECT: tx = entityTex[intel.subject]; break;
+                case HEAD_ACTION: tx = actionTex[intel.action]; break;
+                case HEAD_OBJECT: tx = entityTex[intel.object]; break;
+                case HEAD_JUDGE: tx = judgeTex[intel.judge]; break;
+                case HEAD_STATE: {
+                    tx = stateTex[intel.state];
+                    back = STATE_COLOR[intel.state];
+                    text = JUDGE_COLOR[intel.judge];
+                    break;
+                }
+                default: continue;
+            }
+            const SDL_FRect rect = {x, y, (float)tx->w, (float)tx->h};
+            if (PERPH_GetMouseInRect(rect)) {
+                SDL_Color temp = text;
+                text = back;
+                back = temp;
+            }
+            SDL_SetRenderColor(renderer, back);
+            SDL_RenderFillRect(renderer, &rect);
+            SDL_SetTextureColorRGB(tx, text);
+            SDL_RenderTexture(renderer, tx, NULL, &rect);
+            x += unitW[j] + dx;
+        }
     }
 
     return true;
