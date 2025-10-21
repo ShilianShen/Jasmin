@@ -36,7 +36,6 @@ SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
 
 // TRIG ================================================================================================================
 EntityId entityMoveId = 0;
-bool ifTrigSet = false;
 void TRIG_MoveEntity(const void* para) {
     if (entityMoveId == 0) return;
     entityInfo[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
@@ -79,15 +78,15 @@ void INTEL_ExitIntelNet() {
 
 
 // RENEW ===============================================================================================================
-static void INTEL_RenewIntelNet_EntityInfoVisible() {
+static void INTEL_RenewIntelNet_EntityInfoVisible(IntelArr* intelArr) {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         entityInfo[i].visible = false;
         entityInfo[i].repulsion = entityInfo[i].gravitation = entityInfo[i].gravity = (SDL_FPoint){0};
     }
-    for (int k = 0; k < intelArrNow->len; k++) {
-        if (intelArrNow->arr[k].effective == false) continue;
-        entityInfo[intelArrNow->arr[k].subject].visible = true;
-        entityInfo[intelArrNow->arr[k].object].visible = true;
+    for (int k = 0; k < intelArr->len; k++) {
+        if (intelArr->arr[k].effective == false) continue;
+        entityInfo[intelArr->arr[k].subject].visible = true;
+        entityInfo[intelArr->arr[k].object].visible = true;
     }
 }
 static void INTEL_RenewIntelNet_EntityInfoRepulsion() {
@@ -109,9 +108,9 @@ static void INTEL_RenewIntelNet_EntityInfoRepulsion() {
         }
     }
 }
-static void INTEL_RenewIntelNet_EntityInfoGravitation() {
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
+static void INTEL_RenewIntelNet_EntityInfoGravitation(IntelArr* intelArr) {
+    for (int k = 0; k < intelArr->len; k++) {
+        const Intel intel = intelArr->arr[k];
         if (intel.effective == false) continue;
 
         const int i = intel.subject, j = intel.object;
@@ -168,23 +167,23 @@ static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
         if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
     }
 }
-static bool INTEL_RenewIntelNet_EntityInfo() {
-    INTEL_RenewIntelNet_EntityInfoVisible();
+static bool INTEL_RenewIntelNet_EntityInfo(IntelArr* intelArr) {
+    INTEL_RenewIntelNet_EntityInfoVisible(intelArr);
     INTEL_RenewIntelNet_EntityInfoRepulsion();
-    INTEL_RenewIntelNet_EntityInfoGravitation();
+    INTEL_RenewIntelNet_EntityInfoGravitation(intelArr);
     INTEL_RenewIntelNet_EntityInfoGravity();
     INTEL_RenewIntelNet_EntityInfoPosition();
     INTEL_RenewIntelNet_EntityInfoRectTrig();
     return true;
 }
-bool INTEL_RenewIntelNet() {
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
+bool INTEL_RenewIntelNet(IntelArr* intelArr) {
+    for (int k = 0; k < intelArr->len; k++) {
+        const Intel intel = intelArr->arr[k];
         if (intel.subject == ENTITY_NULL && intel.action == ACTION_NULL && intel.object == ENTITY_NULL) {
             // intelArrNow->arr[k].effective == false;
         }
         if (intel.judge == JUDGE_AUTO) {
-            intelArrNow->arr[k].state = INTEL_GetAutoState(intel);
+            intelArr->arr[k].state = INTEL_GetAutoState(intel);
         }
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = INTEL_GetScaledPos(entityInfo[i].position);
@@ -192,24 +191,24 @@ bool INTEL_RenewIntelNet() {
         const SDL_FPoint M = {(A.x + B.x) / 2, (A.y + B.y) / 2};
         const float w = (float)actionTex[intel.action]->w;
         const float h = (float)actionTex[intel.action]->h;
-        intelArrNow->arr[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
+        intelArr->arr[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
     }
-    INTEL_RenewIntelNet_EntityInfo();
+    INTEL_RenewIntelNet_EntityInfo(intelArr);
     return true;
 }
 
 
 // DRAW ================================================================================================================
-bool INTEL_DrawIntelNet() {
+bool INTEL_DrawIntelNet(IntelArr* intelArr) {
     const float time = (float)SDL_GetTicks();
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
+    for (int k = 0; k < intelArr->len; k++) {
+        const Intel intel = intelArr->arr[k];
         if (intel.effective == false) continue;
 
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = INTEL_GetScaledPos(entityInfo[i].position);
         const SDL_FPoint B = INTEL_GetScaledPos(entityInfo[j].position);
-        const SDL_FRect rect = intelArrNow->arr[k].rect;
+        const SDL_FRect rect = intelArr->arr[k].rect;
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         if (actionSet[intel.action].type == ACTION_TYPE_ONE_WAY) {

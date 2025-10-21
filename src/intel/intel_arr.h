@@ -8,15 +8,16 @@
 typedef struct {int len; Intel* arr;} IntelArr;
 
 
-extern IntelArr* intelArrNow;
+// extern IntelArr* intelArrNow;
 
 
 IntelArr* INTEL_CreateIntelArr();
 IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr);
 
+
 bool INTEL_InitIntelArr();
-bool INTEL_RenewIntelArr();
-bool INTEL_DrawIntelArr();
+bool INTEL_RenewIntelArr(IntelArr* intelArr);
+bool INTEL_DrawIntelArr(IntelArr* intelArr);
 void INTEL_ExitIntelArr();
 
 

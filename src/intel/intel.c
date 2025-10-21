@@ -79,49 +79,7 @@ bool INTEL_AppendIntelArr(IntelArr* intelArr, const Intel intel) {
 
 
 static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
-    // intel1: subject1 --action-> object1
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel2 = intelArrNow->arr[k];
 
-        // intel2: subject1 --action-> object1
-        if (intel1.subject == intel2.subject && intel1.object == intel2.object && intel1.action == intel2.action) {
-            // switch (intel2.state) {
-            //     case STATE_MANU_T: case STATE_AUTO_T: return STATE_AUTO_T;
-            //     case STATE_MANU_F: case STATE_AUTO_F: return STATE_AUTO_F;
-            //     default: break;
-            // }
-        }
-
-        // if (intel2.state != STATE_MANU_T && intel2.state != STATE_AUTO_T) continue;
-
-        int subject3;
-        switch (intel2.action) {
-            // intel2: subject1/2 --is-> subject2/1
-            case ACTION_IS: {
-                if (intel2.subject == intel1.subject) subject3 = intel2.object;
-                else if (intel2.object == intel1.subject) subject3 = intel2.subject;
-                else continue;
-                break;
-            }
-
-            // intel2: entity1 --belong-> entity2
-            case ACTION_BELONG: {
-                if (intel2.subject == intel1.subject) {
-                    subject3 = intel2.object;
-                }
-                else continue;
-                break;
-            }
-            default: continue;
-        }
-
-        for (int n = 0; n < intelArrNow->len; n++) {
-            // intel3: subject3 --action-> object1
-            const Intel intel3 = intelArrNow->arr[n];
-
-            if (intel3.subject != subject3 || intel3.action != intel1.action || intel3.object != intel1.object) continue;
-        }
-    }
     return STATE_UNKNOWN;
 }
 IntelState INTEL_GetAutoState(const Intel intel1) {
@@ -204,20 +162,17 @@ bool INTEL_Init() {
         JUDGE_AUTO, STATE_UNKNOWN
     });
 
-    intelArrNow = testIntelArr;
-
     return true;
 }
 void INTEL_Exit() {
     INTEL_ExitIntelArr();
-    intelArrNow = NULL;
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
 }
 
 
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
-    INTEL_RenewIntelArr();
+    INTEL_RenewIntelArr(testIntelArr);
     PERPH_SetKeyTrig(SDL_SCANCODE_TAB, &trigChangeMode);
     return true;
 }
@@ -226,6 +181,6 @@ bool INTEL_Renew() {
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
     DEBUG_SendMessageL("%s: mode: %s\n", __func__, netMode ? "NET" : "SET");
-    INTEL_DrawIntelArr();
+    INTEL_DrawIntelArr(testIntelArr);
     return true;
 }

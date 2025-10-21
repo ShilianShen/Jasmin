@@ -5,13 +5,10 @@
 #include "action.h"
 
 
-IntelArr* intelArrNow = NULL;
-
-
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitIntelArr() {
-    INTEL_InitIntelNet();
-    INTEL_InitIntelSet();
+    REQ_CONDITION(INTEL_InitIntelNet(), return false);
+    REQ_CONDITION(INTEL_InitIntelSet(), return false);
     return true;
 }
 void INTEL_ExitIntelArr() {
@@ -21,9 +18,9 @@ void INTEL_ExitIntelArr() {
 
 
 // RENEW ===============================================================================================================
-bool INTEL_RenewIntelArr() {
+bool INTEL_RenewIntelArr(IntelArr* intelArr) {
     if (netMode) {
-        INTEL_RenewIntelNet();
+        INTEL_RenewIntelNet(intelArr);
     }
     return true;
 }
@@ -31,6 +28,6 @@ bool INTEL_RenewIntelArr() {
 
 // DRAW ================================================================================================================
 typedef struct {const char* s[6];} SetData;
-bool INTEL_DrawIntelArr() {
-    return netMode ? INTEL_DrawIntelNet() : INTEL_DrawIntelSet();
+bool INTEL_DrawIntelArr(IntelArr* intelArr) {
+    return netMode ? INTEL_DrawIntelNet(intelArr) : INTEL_DrawIntelSet(intelArr);
 }

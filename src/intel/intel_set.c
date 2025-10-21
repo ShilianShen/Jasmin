@@ -21,6 +21,10 @@ static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color backColor = {64, 64, 64, 128};
 
+static const int LEN_BUFFER = 100;
+static Intel buffer[LEN_BUFFER];
+static int bufferHead = 0;
+
 
 // GET & SET ===========================================================================================================
 
@@ -103,7 +107,7 @@ void INTEL_ExitIntelSet() {
 
 
 // RENEW ===============================================================================================================
-bool INTEL_RenewIntelSet() {
+bool INTEL_RenewIntelSet(IntelArr* intelArr) {
     return true;
 }
 
@@ -166,16 +170,16 @@ static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const 
     }
     return true;
 }
-bool INTEL_DrawIntelSet() {
+bool INTEL_DrawIntelSet(IntelArr* intelArr) {
     int N = 0;
-    for (int k = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
+    for (int k = 0; k < intelArr->len; k++) {
+        const Intel intel = intelArr->arr[k];
         if (intel.effective == false) continue;
         N++;
     }
     Intel intelSet[N];
-    for (int k = 0, i = 0; k < intelArrNow->len; k++) {
-        const Intel intel = intelArrNow->arr[k];
+    for (int k = 0, i = 0; k < intelArr->len; k++) {
+        const Intel intel = intelArr->arr[k];
         if (intel.effective == false) continue;
         intelSet[i] = intel;
         i++;
