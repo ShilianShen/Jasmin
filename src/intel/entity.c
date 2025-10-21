@@ -32,21 +32,7 @@ Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
 // INIT & EXIT =========================================================================================================
-bool INTEL_InitEntity() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        const char* string = ENTITY_NAMES[i] == NULL ? "????" : ENTITY_NAMES[i];
-        entitySet[i].netTex = TXT_LoadTexture(renderer, entityFont, string, (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(entitySet[i].netTex != NULL, return false);
-        entitySet[i].setTex = NULL;
-    }
-    return true;
-}
-void INTEL_ExitEntity() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        SDL_DestroyTexture(entitySet[i].netTex);
-        entitySet[i].netTex = NULL;
-    }
-}
+
 
 
 // RENEW ===============================================================================================================
@@ -125,60 +111,7 @@ bool INTEL_RenewEntity() {
     INTEL_RenewEntity_Gravitation();
     INTEL_RenewEntity_Gravity();
     INTEL_RenewEntity_Position();
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        if (entitySet[i].visible == false) continue;
 
-        const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
-        const float w = (float)entitySet[i].netTex->w, h = (float)entitySet[i].netTex->h;
-        entitySet[i].rect = (SDL_FRect){A.x - w / 2, A.y - h / 2, w, h};
-
-        if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entitySet[i].rect)) {
-            entityMoveId = i;
-            PERPH_SetMouseLeftTrig(&trigMove);
-        }
-        if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
-    }
     return true;
 }
 
-
-// DRAW ================================================================================================================
-bool INTEL_DrawEntity() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        if (entitySet[i].visible == false) continue;
-        const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
-
-        SDL_SetRenderColor(renderer, i == entityMoveId ? TEXT_COLOR : BACK_COLOR);
-        SDL_RenderFillRect(renderer, &entitySet[i].rect);
-
-        SDL_SetRenderColor(renderer, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
-        SDL_RenderRect(renderer, &entitySet[i].rect);
-
-        SDL_SetTextureColorRGB(entitySet[i].netTex, i == entityMoveId ? BACK_COLOR : TEXT_COLOR);
-        SDL_RenderTexture(renderer, entitySet[i].netTex, NULL, &entitySet[i].rect);
-
-        if (DEBUG_GetShift()) {
-            const SDL_FPoint R = INTEL_GetScaledPos((SDL_FPoint){
-                entitySet[i].position.x + entitySet[i].repulsion.x,
-                entitySet[i].position.y + entitySet[i].repulsion.y
-            });
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            SDL_RenderLine(renderer, A.x, A.y, R.x, R.y);
-
-            const SDL_FPoint G = INTEL_GetScaledPos((SDL_FPoint){
-                entitySet[i].position.x + entitySet[i].gravitation.x,
-                entitySet[i].position.y + entitySet[i].gravitation.y
-            });
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            SDL_RenderLine(renderer, A.x, A.y, G.x, G.y);
-
-            const SDL_FPoint B = INTEL_GetScaledPos((SDL_FPoint){
-                entitySet[i].position.x + entitySet[i].gravity.x,
-                entitySet[i].position.y + entitySet[i].gravity.y
-            });
-            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-            SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
-        }
-    }
-    return true;
-}

@@ -17,10 +17,12 @@ typedef enum {
 } EntityId;
 typedef struct {
     bool visible;
-    SDL_Texture *netTex, *setTex;
     SDL_FPoint repulsion, gravitation, gravity, position;
     SDL_FRect rect;
 } Entity;
+
+extern EntityId entityMoveId;
+extern Trig trigMove;
 
 
 extern Entity entitySet[NUM_ENTITIES];
@@ -30,10 +32,9 @@ extern const char* ENTITY_NAMES[NUM_ENTITIES];
 void INTEL_ResetIntelNet();
 
 
-bool INTEL_InitEntity();
+
 bool INTEL_RenewEntity();
-bool INTEL_DrawEntity();
-void INTEL_ExitEntity();
+
 
 
 #endif //ENTITY_H

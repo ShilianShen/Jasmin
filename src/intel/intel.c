@@ -215,13 +215,13 @@ bool INTEL_Init() {
     });
 
     intelArrNow = testIntelArr;
-    REQ_CONDITION(INTEL_InitEntity(), return false);
+
     return true;
 }
 void INTEL_Exit() {
     INTEL_ExitIntelNet();
     INTEL_ExitIntelSet();
-    INTEL_ExitEntity();
+
     intelArrNow = NULL;
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
 

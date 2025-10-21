@@ -6,6 +6,9 @@
 
 static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
 static TTF_Font *entity_font = NULL, *action_font = NULL;
+static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
+static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
+static struct {SDL_FRect rect;} entityInfo[NUM_ENTITIES];
 
 
 // GET & SET ===========================================================================================================
@@ -51,6 +54,24 @@ void INTEL_ExitIntelNet() {
 
 
 // RENEW ===============================================================================================================
+static bool INTEL_RenewIntelNet_EntityInfo() {
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+
+        const SDL_FPoint position = INTEL_GetScaledPos(entitySet[i].position);
+        entityInfo[i].rect.w = (float)entityTex[i]->w;
+        entityInfo[i].rect.h = (float)entityTex[i]->h;
+        entityInfo[i].rect.x = position.x - entityInfo[i].rect.w / 2;
+        entityInfo[i].rect.y = position.y - entityInfo[i].rect.h / 2;
+
+        if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entityInfo[i].rect)) {
+            entityMoveId = i;
+            PERPH_SetMouseLeftTrig(&trigMove);
+        }
+        if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
+    }
+    return true;
+}
 bool INTEL_RenewIntelNet() {
     for (int k = 0; k < intelArrNow->len; k++) {
         const Intel intel = intelArrNow->arr[k];
@@ -68,6 +89,7 @@ bool INTEL_RenewIntelNet() {
         const float h = (float)actionTex[intel.action]->h;
         intelArrNow->arr[k].rect = (SDL_FRect){M.x - w / 2, M.y - h / 2, w, h};
     }
+    INTEL_RenewIntelNet_EntityInfo();
     return true;
 }
 
@@ -107,7 +129,50 @@ bool INTEL_DrawIntelNet() {
         SDL_SetTextureColorRGB(actionTex[intel.action], text);
         SDL_RenderTexture(renderer, actionTex[intel.action], NULL, &rect);
     }
-    INTEL_DrawEntity();
+
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        if (entitySet[i].visible == false) continue;
+
+        SDL_Color back = BACK_COLOR, text = TEXT_COLOR;
+        if (i == entityMoveId) {
+            const SDL_Color temp = text;
+            text = back;
+            back = temp;
+        }
+
+        SDL_SetRenderColor(renderer, back);
+        SDL_RenderFillRect(renderer, &entityInfo[i].rect);
+
+        SDL_SetRenderColor(renderer, text);
+        SDL_RenderRect(renderer, &entityInfo[i].rect);
+
+        SDL_SetTextureColorRGB(entityTex[i], text);
+        SDL_RenderTexture(renderer, entityTex[i], NULL, &entityInfo[i].rect);
+
+        const SDL_FPoint A = INTEL_GetScaledPos(entitySet[i].position);
+        if (DEBUG_GetShift()) {
+            const SDL_FPoint R = INTEL_GetScaledPos((SDL_FPoint){
+                entitySet[i].position.x + entitySet[i].repulsion.x,
+                entitySet[i].position.y + entitySet[i].repulsion.y
+            });
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderLine(renderer, A.x, A.y, R.x, R.y);
+
+            const SDL_FPoint G = INTEL_GetScaledPos((SDL_FPoint){
+                entitySet[i].position.x + entitySet[i].gravitation.x,
+                entitySet[i].position.y + entitySet[i].gravitation.y
+            });
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            SDL_RenderLine(renderer, A.x, A.y, G.x, G.y);
+
+            const SDL_FPoint B = INTEL_GetScaledPos((SDL_FPoint){
+                entitySet[i].position.x + entitySet[i].gravity.x,
+                entitySet[i].position.y + entitySet[i].gravity.y
+            });
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
+        }
+    }
     return true;
 }
 
