@@ -10,28 +10,17 @@
 extern bool netMode;
 extern const char* JUDGE_NAMES[];
 extern const char* STATE_NAMES[];
-extern const SDL_Color JUDGE_COLOR[];
-extern const SDL_Color STATE_COLOR[];
+extern const SDL_Color JUDGE_COLORS[];
+extern const SDL_Color STATE_COLORS[];
 
 
-extern TTF_Font *entityFont, *setFont;
 #define ACTION_FONT "../res/font/IBMPlexMono-Medium.ttf", 24
 #define ENTITY_FONT "../res/font/Courier New.ttf", 48
 #define SET_FONT "../res/font/Courier New.ttf", 48
 
 
-typedef enum {
-    STATE_UNKNOWN,
-    STATE_TRUE,
-    STATE_FALSE,
-    STATE_PARADOX,
-    NUM_STATES
-} IntelState;
-typedef enum {
-    JUDGE_MANU,
-    JUDGE_AUTO,
-    NUM_JUDGES,
-} IntelJudge;
+typedef enum {STATE_UNKNOWN, STATE_TRUE, STATE_FALSE, STATE_PARADOX, NUM_STATES} IntelState;
+typedef enum {JUDGE_MANU, JUDGE_AUTO, NUM_JUDGES} IntelJudge;
 typedef struct {
     bool effective;
     int subject, action, object;
@@ -43,8 +32,6 @@ typedef struct {
 } Intel;
 
 
-SDL_FPoint INTEL_GetScaledPos(SDL_FPoint pos);
-SDL_FPoint INTEL_GetDescalePos(SDL_FPoint pos);
 IntelState INTEL_GetAutoState(Intel intel);
 const char* INTEL_GetStrIntel(Intel intel);
 

@@ -5,14 +5,33 @@
 
 
 static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
-static TTF_Font *entity_font = NULL, *action_font = NULL;
-static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
-static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
-static struct {
-    bool visible; SDL_FRect rect;
-    SDL_FPoint repulsion, gravitation, gravity, position;
-} entityInfo[NUM_ENTITIES];
+static TTF_Font *entityFont = NULL, *actionFont = NULL;
+static const SDL_Color BACK_COLOR = {32, 32, 32, 192}, TEXT_COLOR = {255, 255, 255, 255};
+static struct {bool visible; SDL_FRect rect; SDL_FPoint repulsion, gravitation, gravity, position;} entityInfo[NUM_ENTITIES];
 static const float MOVE_SPEED = 1.f;
+const SDL_FPoint scale = {500, 300};
+
+
+// GET & SET ===========================================================================================================
+void INTEL_ResetIntelNet() {
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        entityInfo[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
+    }
+}
+SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
+    const SDL_FPoint scaledPos = {
+        windowRect.x + windowRect.w / 2 + scale.x * pos.x,
+        windowRect.y + windowRect.h / 2 + scale.y * pos.y
+    };
+    return scaledPos;
+}
+SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
+    const SDL_FPoint descalePos = {
+        (pos.x - windowRect.x - windowRect.w / 2) / scale.x,
+        (pos.y - windowRect.y - windowRect.h / 2) / scale.y,
+    };
+    return descalePos;
+}
 
 
 // TRIG ================================================================================================================
@@ -25,29 +44,21 @@ void TRIG_MoveEntity(const void* para) {
 Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
-// GET & SET ===========================================================================================================
-void INTEL_ResetIntelNet() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityInfo[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
-    }
-}
-
-
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitIntelNet() {
-    entity_font = TTF_OpenFont(ENTITY_FONT);
-    REQ_CONDITION(entity_font != NULL, return false);
+    entityFont = TTF_OpenFont(ENTITY_FONT);
+    REQ_CONDITION(entityFont != NULL, return false);
 
-    action_font = TTF_OpenFont(ACTION_FONT);
-    REQ_CONDITION(action_font != NULL, return false);
+    actionFont = TTF_OpenFont(ACTION_FONT);
+    REQ_CONDITION(actionFont != NULL, return false);
 
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityTex[i] = TXT_LoadTexture(renderer, entity_font, ENTITY_NAMES[i], WHITE);
+        entityTex[i] = TXT_LoadTexture(renderer, entityFont, ENTITY_NAMES[i], WHITE);
         REQ_CONDITION(entityTex[i] != NULL, return false);
     }
 
     for (int i = 0; i < NUM_ACTIONS; i++) {
-        actionTex[i] = TXT_LoadTexture(renderer, action_font, ACTION_NAMES[i], WHITE);
+        actionTex[i] = TXT_LoadTexture(renderer, actionFont, ACTION_NAMES[i], WHITE);
         REQ_CONDITION(actionTex[i] != NULL, return false);
     }
 
@@ -62,13 +73,24 @@ void INTEL_ExitIntelNet() {
         SDL_DestroyTexture(actionTex[i]);
         actionTex[i] = NULL;
     }
-    TTF_CloseFont(entity_font); entity_font = NULL;
-    TTF_CloseFont(action_font); action_font = NULL;
+    TTF_CloseFont(entityFont); entityFont = NULL;
+    TTF_CloseFont(actionFont); actionFont = NULL;
 }
 
 
 // RENEW ===============================================================================================================
-static void INTEL_RenewEntity_Repulsion() {
+static void INTEL_RenewIntelNet_EntityInfoVisible() {
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        entityInfo[i].visible = false;
+        entityInfo[i].repulsion = entityInfo[i].gravitation = entityInfo[i].gravity = (SDL_FPoint){0};
+    }
+    for (int k = 0; k < intelArrNow->len; k++) {
+        if (intelArrNow->arr[k].effective == false) continue;
+        entityInfo[intelArrNow->arr[k].subject].visible = true;
+        entityInfo[intelArrNow->arr[k].object].visible = true;
+    }
+}
+static void INTEL_RenewIntelNet_EntityInfoRepulsion() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entityInfo[i].visible == false) continue;
         for (int j = 0; j < NUM_ENTITIES; j++) {
@@ -87,7 +109,7 @@ static void INTEL_RenewEntity_Repulsion() {
         }
     }
 }
-static void INTEL_RenewEntity_Gravitation() {
+static void INTEL_RenewIntelNet_EntityInfoGravitation() {
     for (int k = 0; k < intelArrNow->len; k++) {
         const Intel intel = intelArrNow->arr[k];
         if (intel.effective == false) continue;
@@ -103,7 +125,7 @@ static void INTEL_RenewEntity_Gravitation() {
         entityInfo[j].gravitation.y -= AB.y;
     }
 }
-static void INTEL_RenewEntity_Gravity() {
+static void INTEL_RenewIntelNet_EntityInfoGravity() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entityInfo[i].visible == false) continue;
         const SDL_FPoint A = entityInfo[i].position;
@@ -112,7 +134,7 @@ static void INTEL_RenewEntity_Gravity() {
         entityInfo[i].gravity = AB;
     }
 }
-static void INTEL_RenewEntity_Position() {
+static void INTEL_RenewIntelNet_EntityInfoPosition() {
     static float t1 = 0;
     const float t2 = (float)SDL_GetTicks() / 1000;
     const float dt = t2 - t1;
@@ -129,20 +151,7 @@ static void INTEL_RenewEntity_Position() {
     }
     t1 = t2;
 }
-static bool INTEL_RenewIntelNet_EntityInfo() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityInfo[i].visible = false;
-        entityInfo[i].repulsion = entityInfo[i].gravitation = entityInfo[i].gravity = (SDL_FPoint){0};
-    }
-    for (int k = 0; k < intelArrNow->len; k++) {
-        if (intelArrNow->arr[k].effective == false) continue;
-        entityInfo[intelArrNow->arr[k].subject].visible = true;
-        entityInfo[intelArrNow->arr[k].object].visible = true;
-    }
-    INTEL_RenewEntity_Repulsion();
-    INTEL_RenewEntity_Gravitation();
-    INTEL_RenewEntity_Gravity();
-    INTEL_RenewEntity_Position();
+static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entityInfo[i].visible == false) continue;
 
@@ -158,6 +167,14 @@ static bool INTEL_RenewIntelNet_EntityInfo() {
         }
         if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
     }
+}
+static bool INTEL_RenewIntelNet_EntityInfo() {
+    INTEL_RenewIntelNet_EntityInfoVisible();
+    INTEL_RenewIntelNet_EntityInfoRepulsion();
+    INTEL_RenewIntelNet_EntityInfoGravitation();
+    INTEL_RenewIntelNet_EntityInfoGravity();
+    INTEL_RenewIntelNet_EntityInfoPosition();
+    INTEL_RenewIntelNet_EntityInfoRectTrig();
     return true;
 }
 bool INTEL_RenewIntelNet() {
@@ -204,7 +221,7 @@ bool INTEL_DrawIntelNet() {
             DEBUG_SendMessageR("%s: %s.\n", __func__, INTEL_GetStrIntel(intel));
         }
 
-        SDL_Color text = JUDGE_COLOR[intel.judge], back = STATE_COLOR[intel.state];
+        SDL_Color text = JUDGE_COLORS[intel.judge], back = STATE_COLORS[intel.state];
         if (PERPH_GetMouseLeftInRect(rect)) {
             const SDL_Color temp = text;
             text = back;

@@ -6,8 +6,17 @@
 #include "intel_set.h"
 
 
-TTF_Font *entityFont = NULL, *setFont = NULL;
 bool netMode = true;
+const SDL_Color JUDGE_COLORS[NUM_JUDGES] = {
+    [JUDGE_AUTO] = {255, 215,   0, 192},
+    [JUDGE_MANU] = {255, 255, 255, 255},
+};
+const SDL_Color STATE_COLORS[NUM_STATES] = {
+    [STATE_UNKNOWN] = { 64,  64,  64, 192},
+    [STATE_TRUE] = { 32, 128,  32, 192},
+    [STATE_FALSE] = {128,  32,  32, 192},
+    [STATE_PARADOX] = {  0,   0, 255,   0},
+};
 const char* JUDGE_NAMES[NUM_JUDGES] = {
     [JUDGE_AUTO] = "AUTO",
     [JUDGE_MANU] = "MANU",
@@ -19,7 +28,6 @@ const char* STATE_NAMES[NUM_STATES] = {
     [STATE_PARADOX] = "PARADOX",
 };
 static IntelArr* testIntelArr = NULL;
-const SDL_FPoint scale = {500, 300};
 
 
 // GET & SET ===========================================================================================================
@@ -67,20 +75,6 @@ bool INTEL_AppendIntelArr(IntelArr* intelArr, const Intel intel) {
     intelArr->len = len;
     INTEL_ResetIntelNet();
     return true;
-}
-SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
-    const SDL_FPoint scaledPos = {
-        windowRect.x + windowRect.w / 2 + scale.x * pos.x,
-        windowRect.y + windowRect.h / 2 + scale.y * pos.y
-    };
-    return scaledPos;
-}
-SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
-    const SDL_FPoint descalePos = {
-        (pos.x - windowRect.x - windowRect.w / 2) / scale.x,
-        (pos.y - windowRect.y - windowRect.h / 2) / scale.y,
-    };
-    return descalePos;
 }
 
 
@@ -181,11 +175,7 @@ const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
 
 // INIT & EXIT =========================================================================================================
 bool INTEL_Init() {
-    entityFont = TTF_OpenFont(ENTITY_FONT); REQ_CONDITION(entityFont != NULL, return false);
-    setFont = TTF_OpenFont(SET_FONT); REQ_CONDITION(setFont != NULL, return false);
-
-    INTEL_InitIntelNet();
-    INTEL_InitIntelSet();
+    INTEL_InitIntelArr();
 
     testIntelArr = INTEL_CreateIntelArr();
     INTEL_AppendIntelArr(testIntelArr, (Intel){
@@ -219,14 +209,9 @@ bool INTEL_Init() {
     return true;
 }
 void INTEL_Exit() {
-    INTEL_ExitIntelNet();
-    INTEL_ExitIntelSet();
-
+    INTEL_ExitIntelArr();
     intelArrNow = NULL;
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
-
-    TTF_CloseFont(entityFont); entityFont = NULL;
-    TTF_CloseFont(setFont); setFont = NULL;
 }
 
 

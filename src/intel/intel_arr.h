@@ -13,8 +13,11 @@ extern IntelArr* intelArrNow;
 
 IntelArr* INTEL_CreateIntelArr();
 IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr);
+
+bool INTEL_InitIntelArr();
 bool INTEL_RenewIntelArr();
 bool INTEL_DrawIntelArr();
+void INTEL_ExitIntelArr();
 
 
 bool INTEL_AppendIntelArr(IntelArr* intelArr, Intel intel);

@@ -27,7 +27,9 @@ static const SDL_Color backColor = {64, 64, 64, 128};
 
 
 // TRIG ================================================================================================================
+void TRIG_ChangeVisible(const void* para) {
 
+}
 
 
 // INIT & EXIT =========================================================================================================
@@ -143,8 +145,8 @@ static bool INTEL_DrawIntelSet_Body(const int N, const Intel intelSet[N], const 
                 }
                 case HEAD_STATE: {
                     tx = stateTex[intel.state];
-                    back = STATE_COLOR[intel.state];
-                    text = JUDGE_COLOR[intel.judge];
+                    back = STATE_COLORS[intel.state];
+                    text = JUDGE_COLORS[intel.judge];
                     break;
                 }
                 default: continue;
