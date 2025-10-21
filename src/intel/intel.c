@@ -8,11 +8,11 @@
 
 TTF_Font *entityFont = NULL, *setFont = NULL;
 bool netMode = true;
-const char* INTEL_JUDGE_STRING[NUM_JUDGES] = {
+const char* JUDGE_NAMES[NUM_JUDGES] = {
     [JUDGE_AUTO] = "AUTO",
     [JUDGE_MANU] = "MANU",
 };
-const char* INTEL_STATE_STRING[NUM_STATES] = {
+const char* STATE_NAMES[NUM_STATES] = {
     [STATE_UNKNOWN] = "UNKNOWN",
     [STATE_TRUE] = "TRUE",
     [STATE_FALSE] = "FALSE",
@@ -31,8 +31,8 @@ const char* INTEL_GetStrIntel(const Intel intel) {
         ENTITY_NAMES[intel.subject],
         ACTION_NAMES[intel.action],
         ENTITY_NAMES[intel.object],
-        INTEL_STATE_STRING[intel.state],
-        INTEL_JUDGE_STRING[intel.judge]
+        STATE_NAMES[intel.state],
+        JUDGE_NAMES[intel.judge]
         );
     return string;
 }
