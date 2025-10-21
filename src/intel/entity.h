@@ -15,26 +15,9 @@ typedef enum {
     ENTITY_FLY,
     NUM_ENTITIES
 } EntityId;
-typedef struct {
-    bool visible;
-    SDL_FPoint repulsion, gravitation, gravity, position;
-    SDL_FRect rect;
-} Entity;
-
-extern EntityId entityMoveId;
-extern Trig trigMove;
 
 
-extern Entity entitySet[NUM_ENTITIES];
 extern const char* ENTITY_NAMES[NUM_ENTITIES];
-
-
-void INTEL_ResetIntelNet();
-
-
-
-bool INTEL_RenewEntity();
-
 
 
 #endif //ENTITY_H

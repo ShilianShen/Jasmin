@@ -21,7 +21,7 @@ const SDL_Color STATE_COLOR[NUM_STATES] = {
 // RENEW ===============================================================================================================
 bool INTEL_RenewIntelArr() {
     if (netMode) {
-        INTEL_RenewEntity();
+
         INTEL_RenewIntelNet();
     }
     return true;

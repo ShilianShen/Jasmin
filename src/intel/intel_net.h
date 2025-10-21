@@ -5,6 +5,12 @@
 #include "intel.h"
 
 
+extern Trig trigMove;
+
+
+void INTEL_ResetIntelNet();
+
+
 bool INTEL_InitIntelNet();
 bool INTEL_RenewIntelNet();
 bool INTEL_DrawIntelNet();
