@@ -8,6 +8,14 @@ static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
 static TTF_Font *entity_font = NULL, *action_font = NULL;
 
 
+// GET & SET ===========================================================================================================
+void INTEL_ResetIntelNet() {
+    for (int i = 0; i < NUM_ENTITIES; i++) {
+        entitySet[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
+    }
+}
+
+
 // INIT & EXIT =========================================================================================================
 bool INTEL_InitIntelNet() {
     entity_font = TTF_OpenFont(ENTITY_FONT);
@@ -17,12 +25,12 @@ bool INTEL_InitIntelNet() {
     REQ_CONDITION(action_font != NULL, return false);
 
     for (int i = 0; i < NUM_ENTITIES; i++) {
-        entityTex[i] = TXT_LoadTexture(renderer, entity_font, entitySet[i].name, (SDL_Color){255, 255, 255, 255});
+        entityTex[i] = TXT_LoadTexture(renderer, entity_font, entitySet[i].name, WHITE);
         REQ_CONDITION(entityTex[i] != NULL, return false);
     }
 
     for (int i = 0; i < NUM_ACTIONS; i++) {
-        actionTex[i] = TXT_LoadTexture(renderer, action_font, actionSet[i].name, (SDL_Color){255, 255, 255, 255});
+        actionTex[i] = TXT_LoadTexture(renderer, action_font, ACTION_NAMES[i], WHITE);
         REQ_CONDITION(actionTex[i] != NULL, return false);
     }
 

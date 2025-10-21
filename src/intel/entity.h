@@ -25,9 +25,10 @@ typedef struct {
 
 
 extern Entity entitySet[NUM_ENTITIES];
+extern const char* ENTITY_NAMES[NUM_ENTITIES];
 
 
-void INTEL_ResetEntity();
+void INTEL_ResetIntelNet();
 
 
 bool INTEL_InitEntity();

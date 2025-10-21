@@ -6,7 +6,7 @@
 #include "set.h"
 
 
-TTF_Font *entityFont = NULL, *actionFont = NULL, *setFont = NULL;
+TTF_Font *entityFont = NULL, *setFont = NULL;
 bool netMode = true;
 const char* INTEL_JUDGE_STRING[NUM_JUDGES] = {
     [JUDGE_AUTO] = "AUTO",
@@ -20,7 +20,6 @@ const char* INTEL_STATE_STRING[NUM_STATES] = {
 };
 static IntelArr* testIntelArr = NULL;
 const SDL_FPoint scale = {500, 300};
-SDL_Texture* setHeads[6];
 
 
 // GET & SET ===========================================================================================================
@@ -66,7 +65,7 @@ bool INTEL_AppendIntelArr(IntelArr* intelArr, const Intel intel) {
     free(intelArr->arr);
     intelArr->arr = intelSet;
     intelArr->len = len;
-    INTEL_ResetEntity();
+    INTEL_ResetIntelNet();
     return true;
 }
 SDL_FPoint INTEL_GetScaledPos(const SDL_FPoint pos) {
@@ -187,22 +186,12 @@ const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
 
 
 // INIT & EXIT =========================================================================================================
-static bool INTEL_Init_SetHeads() {
-    const char* head[6] = {"VISIBLE", "SUBJECT", "ACTION", "OBJECT", "JUDGE", "STATE"};
-    for (int i = 0; i < 6; i++) {
-        setHeads[i] = TXT_LoadTexture(renderer, setFont, head[i], (SDL_Color){255, 255, 255, 255});
-        REQ_CONDITION(setHeads[i] != NULL, return false);
-    }
-    return true;
-}
 bool INTEL_Init() {
     entityFont = TTF_OpenFont(ENTITY_FONT); REQ_CONDITION(entityFont != NULL, return false);
-    actionFont = TTF_OpenFont(ACTION_FONT); REQ_CONDITION(actionFont != NULL, return false);
     setFont = TTF_OpenFont(SET_FONT); REQ_CONDITION(setFont != NULL, return false);
 
     INTEL_InitIntelNet();
     INTEL_InitIntelSet();
-    INTEL_Init_SetHeads();
 
     testIntelArr = INTEL_CreateIntelArr();
     INTEL_AppendIntelArr(testIntelArr, (Intel){
@@ -245,11 +234,7 @@ void INTEL_Exit() {
     testIntelArr = INTEL_DeleteIntelArr(testIntelArr);
 
     TTF_CloseFont(entityFont); entityFont = NULL;
-    TTF_CloseFont(actionFont); actionFont = NULL;
     TTF_CloseFont(setFont); setFont = NULL;
-    for (int i = 0; i < 6; i++) {
-        SDL_DestroyTexture(setHeads[i]); setHeads[i] = NULL;
-    }
 }
 
 

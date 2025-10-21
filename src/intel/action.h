@@ -25,6 +25,7 @@ typedef struct {
 
 
 extern Action actionSet[NUM_ACTIONS];
+extern const char* ACTION_NAMES[NUM_ACTIONS];
 
 
 bool INTEL_InitAction();

@@ -32,7 +32,7 @@ bool INTEL_InitIntelSet() {
         unitW[HEAD_SUBJECT] = unitW[HEAD_OBJECT] = SDL_max(unitW[HEAD_OBJECT], entityTex[i]->w);
     }
     for (int i = 0; i < NUM_ACTIONS; i++) {
-        actionTex[i] = TXT_LoadTexture(renderer, font, actionSet[i].name, WHITE);
+        actionTex[i] = TXT_LoadTexture(renderer, font, ACTION_NAMES[i], WHITE);
         REQ_CONDITION(actionTex[i] != NULL, return false);
         unitW[HEAD_ACTION] = SDL_max(unitW[HEAD_ACTION], actionTex[i]->w);
     }

@@ -10,6 +10,13 @@ Action actionSet[NUM_ACTIONS] = {
     [ACTION_WILL] = {.name = "will", .type = ACTION_TYPE_ONE_WAY},
     [ACTION_CAN] = {.name = "can", .type = ACTION_TYPE_ONE_WAY},
 };
+const char* ACTION_NAMES[NUM_ACTIONS] = {
+    [ACTION_NULL] = "unknown",
+    [ACTION_IS] = "is",
+    [ACTION_BELONG] = "belong",
+    [ACTION_WILL] = "will",
+    [ACTION_CAN] = "can",
+};
 
 
 bool INTEL_InitAction() {

@@ -11,6 +11,15 @@ Entity entitySet[NUM_ENTITIES] = {
     [ENTITY_DEATH] = {.name = "Death"},
     [ENTITY_FLY] = {.name = "Fly"},
 };
+const char* ENTITY_NAMES[NUM_ENTITIES] = {
+    [ENTITY_NULL] = "unknown",
+    [ENTITY_SOMEONE] = "someone",
+    [ENTITY_SOMETHING] = "something",
+    [ENTITY_SOCRATES] = "Socrates",
+    [ENTITY_HUMAN] = "Human",
+    [ENTITY_DEATH] = "Death",
+    [ENTITY_FLY] = "Fly",
+};
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192};
 static const SDL_Color TEXT_COLOR = {255, 255, 255, 255};
 static const float MOVE_SPEED = 1.f;
@@ -27,11 +36,7 @@ Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
 // GET & SET ===========================================================================================================
-void INTEL_ResetEntity() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        entitySet[i].position = (SDL_FPoint){2 * SDL_randf() - 1, 2 * SDL_randf() - 1};
-    }
-}
+
 
 
 // INIT & EXIT =========================================================================================================

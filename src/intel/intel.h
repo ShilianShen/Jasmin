@@ -14,13 +14,10 @@ extern const SDL_Color JUDGE_COLOR[];
 extern const SDL_Color STATE_COLOR[];
 
 
-extern TTF_Font *entityFont, *actionFont, *setFont;
+extern TTF_Font *entityFont, *setFont;
 #define ACTION_FONT "../res/font/IBMPlexMono-Medium.ttf", 24
 #define ENTITY_FONT "../res/font/Courier New.ttf", 48
 #define SET_FONT "../res/font/Courier New.ttf", 48
-
-
-extern SDL_Texture* setHeads[];
 
 
 typedef enum {
