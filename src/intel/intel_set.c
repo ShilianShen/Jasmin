@@ -4,9 +4,9 @@
 #include "intel_arr.h"
 
 
-
-enum {TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES};
-static struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
+typedef enum {TYPE_VISIBLE, TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES} SetType;
+static struct {const int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
+    [TYPE_VISIBLE] = {2, (const char*[]){"FALSE", "TRUE"}, (SDL_Texture*[2]){}, 0},
     [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, (SDL_Texture*[NUM_ENTITIES]){}, 0},
     [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, (SDL_Texture*[NUM_ACTIONS]){}, 0},
     [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, (SDL_Texture*[NUM_JUDGES]){}, 0},
@@ -14,28 +14,22 @@ static struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo
 };
 
 
-enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS};
-static const char* HEAD_SET[NUM_HEADS] = {
-    [HEAD_VISIBLE] = "VISIBLE",
-    [HEAD_SUBJECT] = "SUBJECT",
-    [HEAD_ACTION] = "ACTION",
-    [HEAD_OBJECT] = "OBJECT",
-    [HEAD_JUDGE] = "JUDGE",
-    [HEAD_STATE] = "STATE"
+typedef enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} SetHead;
+static struct {const char* name; SetType type; SDL_Texture* tex;} HEAD_SET[NUM_HEADS] = {
+    [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE, NULL},
+    [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY, NULL},
+    [HEAD_ACTION] = {"ACTION", TYPE_ACTION, NULL},
+    [HEAD_OBJECT] = {"OBJECT", TYPE_ENTITY, NULL},
+    [HEAD_JUDGE] = {"JUDGE", TYPE_JUDGE, NULL},
+    [HEAD_STATE] = {"STATE", TYPE_STATE, NULL},
 };
-
-static SDL_Texture *headTex[NUM_HEADS];
-static SDL_Texture *visibleTex[2];
+// static SDL_Texture *headTex[NUM_HEADS];
 
 
 static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color BACK_C = {64, 64, 64, 128};
 static SDL_FRect headRect[NUM_HEADS];
-
-
-
-
 
 
 static const int LEN_BUFFER = 100;
@@ -54,16 +48,16 @@ SDL_FRect INTEL_GetIntelSetBckRect() {
 
 
 // TRIG ================================================================================================================
-static void Intel_TrigChangeVisible(void* para) {
+void Intel_TrigChangeVisible(void* para) {
     Intel* intel = para;
     intel->visible = !intel->visible;
 }
-static void Intel_TrigChangeJudge(void* para) {
+void Intel_TrigChangeJudge(void* para) {
     Intel* intel = para;
     intel->judge = (intel->judge + 1) % NUM_JUDGES;
     intel->state = STATE_UNKNOWN;
 }
-static void Intel_TrigChangeState(void* para) {
+void Intel_TrigChangeState(void* para) {
     Intel* intel = para;
     if (intel->judge != JUDGE_MANU) return;
     intel->state = (intel->state + 1) % NUM_STATES;
@@ -95,17 +89,12 @@ static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
     unitW[HEAD_OBJECT] = setInfo[TYPE_ENTITY].w;
     unitW[HEAD_JUDGE] = setInfo[TYPE_JUDGE].w;
     unitW[HEAD_STATE] = setInfo[TYPE_STATE].w;
-
-    visibleTex[true] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
-    visibleTex[false] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
-    REQ_CONDITION(visibleTex[0] != NULL, return false);
-    REQ_CONDITION(visibleTex[1] != NULL, return false);
-    unitW[HEAD_VISIBLE] = (float)SDL_max(visibleTex[0]->w, visibleTex[1]->w);
+    unitW[HEAD_VISIBLE] = setInfo[TYPE_VISIBLE].w;
 
     for (int i = 0; i < NUM_HEADS; i++) {
-        headTex[i] = TXT_LoadTexture(renderer, font, HEAD_SET[i], WHITE);
-        REQ_CONDITION(headTex[i] != NULL, return false);
-        unitW[i] = SDL_max(unitW[i], headTex[i]->w);
+        HEAD_SET[i].tex = TXT_LoadTexture(renderer, font, HEAD_SET[i].name, WHITE);
+        REQ_CONDITION(HEAD_SET[i].tex != NULL, return false);
+        unitW[i] = SDL_max(unitW[i], HEAD_SET[i].tex->w);
     }
     unitH = (float)TTF_GetFontHeight(font);
     return true;
@@ -131,11 +120,9 @@ void INTEL_ExitIntelSet() {
     }
 
     for (int i = 0; i < NUM_HEADS; i++) {
-        SDL_DestroyTexture(headTex[i]);
-        headTex[i] = NULL;
+        SDL_DestroyTexture(HEAD_SET[i].tex);
+        HEAD_SET[i].tex = NULL;
     }
-    SDL_DestroyTexture(visibleTex[0]); visibleTex[0] = NULL;
-    SDL_DestroyTexture(visibleTex[1]); visibleTex[1] = NULL;
 }
 
 
@@ -155,7 +142,7 @@ static bool INTEL_RenewIntelSet_Head(const SDL_FRect bckRect) {
     float x = bckRect.x;
     for (int i = 0; i < NUM_HEADS; i++) {
         x += dx;
-        headRect[i] = (SDL_FRect){x, y, (float)headTex[i]->w, (float)headTex[i]->h};
+        headRect[i] = (SDL_FRect){x, y, (float)HEAD_SET[i].tex->w, (float)HEAD_SET[i].tex->h};
         x += unitW[i] + dx;
     }
     return true;
@@ -170,7 +157,7 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
             x += dx;
             const SDL_Texture* tx = NULL;
             switch (j) {
-                case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
+                case HEAD_VISIBLE: tx = setInfo[TYPE_VISIBLE].tex[intel.visible]; break;
                 case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
                 case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
                 case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
@@ -212,7 +199,7 @@ bool INTEL_RenewIntelSet(IntelArr* intelArr) {
 static bool INTEL_DrawIntelSet_Head() {
     for (int i = 0; i < NUM_HEADS; i++) {
         SDL_FRect rect = headRect[i];
-        SDL_RenderTexture(renderer, headTex[i], NULL, &rect);
+        SDL_RenderTexture(renderer, HEAD_SET[i].tex, NULL, &rect);
     }
     return true;
 }
@@ -223,7 +210,7 @@ static bool INTEL_DrawIntelSet_Body() {
             SDL_Color back = EMPTY, text = WHITE;
             SDL_Texture* tx = NULL;
             switch (j) {
-                case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
+                case HEAD_VISIBLE: tx = setInfo[TYPE_VISIBLE].tex[intel.visible]; break;
                 case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
                 case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
                 case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
