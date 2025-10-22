@@ -4,6 +4,16 @@
 #include "intel_arr.h"
 
 
+
+enum {TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES};
+static struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
+    [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, (SDL_Texture*[NUM_ENTITIES]){}, 0},
+    [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, (SDL_Texture*[NUM_ACTIONS]){}, 0},
+    [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, (SDL_Texture*[NUM_JUDGES]){}, 0},
+    [TYPE_STATE] = {NUM_STATES, STATE_NAMES, (SDL_Texture*[NUM_STATES]){}, 0},
+};
+
+
 enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS};
 static const char* HEAD_SET[NUM_HEADS] = {
     [HEAD_VISIBLE] = "VISIBLE",
@@ -13,10 +23,6 @@ static const char* HEAD_SET[NUM_HEADS] = {
     [HEAD_JUDGE] = "JUDGE",
     [HEAD_STATE] = "STATE"
 };
-static SDL_Texture *entityTex[NUM_ENTITIES];
-static SDL_Texture *actionTex[NUM_ACTIONS];
-static SDL_Texture *judgeTex[NUM_JUDGES];
-static SDL_Texture *stateTex[NUM_STATES];
 
 static SDL_Texture *headTex[NUM_HEADS];
 static SDL_Texture *visibleTex[2];
@@ -29,19 +35,7 @@ static SDL_FRect headRect[NUM_HEADS];
 
 
 
-enum {TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES};
-// static struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
-//     [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, (SDL_Texture*[NUM_ENTITIES]){}, 0},
-//     [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, (SDL_Texture*[NUM_ACTIONS]){}, 0},
-//     [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, (SDL_Texture*[NUM_JUDGES]){}, 0},
-//     [TYPE_STATE] = {NUM_STATES, STATE_NAMES, (SDL_Texture*[NUM_STATES]){}, 0},
-// };
-struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
-    [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, entityTex, 0},
-    [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, actionTex, 0},
-    [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, judgeTex, 0},
-    [TYPE_STATE] = {NUM_STATES, STATE_NAMES, stateTex, 0},
-};
+
 
 
 static const int LEN_BUFFER = 100;
@@ -85,7 +79,7 @@ static const TrigFunc HEAD_TRIG[NUM_HEADS] = {
 static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
     REQ_CONDITION(font != NULL, return false);
 
-    for (int I = 0; I < len_of(setInfo); I++) {
+    for (int I = 0; I < NUM_TYPES; I++) {
         const int num = setInfo[I].num;
         const char** names = setInfo[I].names;
         SDL_Texture** tex = setInfo[I].tex;
@@ -96,10 +90,11 @@ static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
             setInfo[I].w = SDL_max(setInfo[I].w, tex[i]->w);
         }
     }
-    unitW[HEAD_SUBJECT] = unitW[HEAD_OBJECT] = setInfo[0].w;
-    unitW[HEAD_ACTION] = setInfo[1].w;
-    unitW[HEAD_JUDGE] = setInfo[2].w;
-    unitW[HEAD_STATE] = setInfo[3].w;
+    unitW[HEAD_SUBJECT] = setInfo[TYPE_ENTITY].w;
+    unitW[HEAD_ACTION] = setInfo[TYPE_ACTION].w;
+    unitW[HEAD_OBJECT] = setInfo[TYPE_ENTITY].w;
+    unitW[HEAD_JUDGE] = setInfo[TYPE_JUDGE].w;
+    unitW[HEAD_STATE] = setInfo[TYPE_STATE].w;
 
     visibleTex[true] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
     visibleTex[false] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
@@ -125,15 +120,9 @@ bool INTEL_InitIntelSet() {
     return true;
 }
 void INTEL_ExitIntelSet() {
-    const struct {int num; SDL_Texture** tex;} NUMS[] = {
-        {NUM_ENTITIES, entityTex},
-        {NUM_ACTIONS, actionTex},
-        {NUM_JUDGES, judgeTex},
-        {NUM_STATES, stateTex},
-    };
-    for (int I = 0; I < len_of(NUMS); I++) {
-        const int num = NUMS[I].num;
-        SDL_Texture** tex = NUMS[I].tex;
+    for (int I = 0; I < NUM_TYPES; I++) {
+        const int num = setInfo[I].num;
+        SDL_Texture** tex = setInfo[I].tex;
 
         for (int i = 0; i < num; i++) {
             SDL_DestroyTexture(tex[i]);
@@ -182,11 +171,11 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
             const SDL_Texture* tx = NULL;
             switch (j) {
                 case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
-                case HEAD_SUBJECT: tx = entityTex[intel.subject]; break;
-                case HEAD_ACTION: tx = actionTex[intel.action]; break;
-                case HEAD_OBJECT: tx = entityTex[intel.object]; break;
-                case HEAD_JUDGE: tx = judgeTex[intel.judge]; break;
-                case HEAD_STATE: tx = stateTex[intel.state]; break;
+                case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
+                case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
+                case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
+                case HEAD_JUDGE: tx = setInfo[TYPE_JUDGE].tex[intel.judge]; break;
+                case HEAD_STATE: tx = setInfo[TYPE_STATE].tex[intel.state]; break;
                 default: continue;
             }
             buffer[i].rect[j] = (SDL_FRect){x, y, (float)tx->w, (float)tx->h};
@@ -235,16 +224,16 @@ static bool INTEL_DrawIntelSet_Body() {
             SDL_Texture* tx = NULL;
             switch (j) {
                 case HEAD_VISIBLE: tx = visibleTex[intel.visible]; break;
-                case HEAD_SUBJECT: tx = entityTex[intel.subject]; break;
-                case HEAD_ACTION: tx = actionTex[intel.action]; break;
-                case HEAD_OBJECT: tx = entityTex[intel.object]; break;
+                case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
+                case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
+                case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
                 case HEAD_JUDGE: {
                     back = BACK_C;
-                    tx = judgeTex[intel.judge];
+                    tx = setInfo[TYPE_JUDGE].tex[intel.judge];
                     break;
                 }
                 case HEAD_STATE: {
-                    tx = stateTex[intel.state];
+                    tx = setInfo[TYPE_STATE].tex[intel.state];
                     back = STATE_COLORS[intel.state];
                     text = JUDGE_COLORS[intel.judge];
                     break;
