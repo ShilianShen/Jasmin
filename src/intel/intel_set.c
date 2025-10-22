@@ -13,12 +13,17 @@ static const char* HEAD_SET[NUM_HEADS] = {
     [HEAD_JUDGE] = "JUDGE",
     [HEAD_STATE] = "STATE"
 };
-static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
-static SDL_Texture *judgeTex[NUM_JUDGES], *stateTex[NUM_STATES], *headTex[NUM_HEADS];
+static SDL_Texture *entityTex[NUM_ENTITIES];
+static SDL_Texture *actionTex[NUM_ACTIONS];
+static SDL_Texture *judgeTex[NUM_JUDGES];
+static SDL_Texture *stateTex[NUM_STATES];
+static SDL_Texture *headTex[NUM_HEADS];
 static SDL_Texture *visibleTex[2];
+
+
 static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 10, dy = 5;
-static const SDL_Color backColor = {64, 64, 64, 128};
+static const SDL_Color BACK_C = {64, 64, 64, 128};
 static SDL_FRect headRect[NUM_HEADS];
 
 
@@ -28,7 +33,13 @@ static int bufferHead = 0;
 
 
 // GET & SET ===========================================================================================================
-
+SDL_FRect INTEL_GetIntelSetBckRect() {
+    SDL_FRect bckRect = {0, 0, 0, (float)(bufferHead + 1) * (unitH + 2 * dy)};
+    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
+    bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
+    bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
+    return bckRect;
+}
 
 
 // TRIG ================================================================================================================
@@ -129,6 +140,16 @@ void INTEL_ExitIntelSet() {
 
 
 // RENEW ===============================================================================================================
+static bool INTEL_RenewIntelSet_Buffer(IntelArr* intelArr) {
+    bufferHead = 0;
+    for (int k = 0; k < intelArr->len && bufferHead < LEN_BUFFER; k++) {
+        Intel* intel = &intelArr->arr[k];
+        if (intel->effective == false) continue;
+        buffer[bufferHead].intel = intel;
+        bufferHead++;
+    }
+    return true;
+}
 static bool INTEL_RenewIntelSet_Head(const SDL_FRect bckRect) {
     const float y = bckRect.y + dy;
     float x = bckRect.x;
@@ -163,30 +184,26 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
     }
     return true;
 }
-bool INTEL_RenewIntelSet(IntelArr* intelArr) {
-    bufferHead = 0;
-    for (int k = 0; k < intelArr->len && bufferHead < LEN_BUFFER; k++) {
-        Intel* intel = &intelArr->arr[k];
-        if (intel->effective == false) continue;
-        buffer[bufferHead].intel = intel;
-        bufferHead++;
-    }
-    SDL_FRect bckRect = {0, 0, 0, (float)(bufferHead + 1) * (unitH + 2 * dy)};
-    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
-    bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
-    bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
-    INTEL_RenewIntelSet_Head(bckRect);
-    INTEL_RenewIntelSet_Body(bckRect);
+static bool INTEL_RenewIntelSet_Trig() {
     for (int i = 0; i < bufferHead; i++) {
         Intel* intel = buffer[i].intel;
         for (int j = 0; j < NUM_HEADS; j++) {
             const SDL_FRect rect = buffer[i].rect[j];
             if (PERPH_GetMouseInRect(rect) == false) continue;
             if (PERPH_GetMouseLeftInRect(rect) == false) continue;
-
             PERPH_SetMouseLeftTrig((Trig){HEAD_TRIG[j], intel, false});
         }
     }
+    return true;
+}
+bool INTEL_RenewIntelSet(IntelArr* intelArr) {
+    REQ_CONDITION(INTEL_RenewIntelSet_Buffer(intelArr), return false);
+
+    const SDL_FRect bckRect = INTEL_GetIntelSetBckRect();
+
+    REQ_CONDITION(INTEL_RenewIntelSet_Head(bckRect), return false);
+    REQ_CONDITION(INTEL_RenewIntelSet_Body(bckRect), return false);
+    REQ_CONDITION(INTEL_RenewIntelSet_Trig(), return false);
     return true;
 }
 
@@ -211,7 +228,7 @@ static bool INTEL_DrawIntelSet_Body() {
                 case HEAD_ACTION: tx = actionTex[intel.action]; break;
                 case HEAD_OBJECT: tx = entityTex[intel.object]; break;
                 case HEAD_JUDGE: {
-                    back = backColor;
+                    back = BACK_C;
                     tx = judgeTex[intel.judge];
                     break;
                 }
@@ -243,7 +260,7 @@ bool INTEL_DrawIntelSet() {
     bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
 
-    SDL_SetRenderColor(renderer, backColor);
+    SDL_SetRenderColor(renderer, BACK_C);
     SDL_RenderFillRect(renderer, &bckRect);
     INTEL_DrawIntelSet_Head();
     INTEL_DrawIntelSet_Body();
