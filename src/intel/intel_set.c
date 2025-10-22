@@ -17,6 +17,7 @@ static SDL_Texture *entityTex[NUM_ENTITIES];
 static SDL_Texture *actionTex[NUM_ACTIONS];
 static SDL_Texture *judgeTex[NUM_JUDGES];
 static SDL_Texture *stateTex[NUM_STATES];
+
 static SDL_Texture *headTex[NUM_HEADS];
 static SDL_Texture *visibleTex[2];
 
@@ -25,6 +26,22 @@ static float unitW[NUM_HEADS] = {0}, unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color BACK_C = {64, 64, 64, 128};
 static SDL_FRect headRect[NUM_HEADS];
+
+
+
+enum {TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES};
+// static struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
+//     [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, (SDL_Texture*[NUM_ENTITIES]){}, 0},
+//     [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, (SDL_Texture*[NUM_ACTIONS]){}, 0},
+//     [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, (SDL_Texture*[NUM_JUDGES]){}, 0},
+//     [TYPE_STATE] = {NUM_STATES, STATE_NAMES, (SDL_Texture*[NUM_STATES]){}, 0},
+// };
+struct {int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
+    [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, entityTex, 0},
+    [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, actionTex, 0},
+    [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, judgeTex, 0},
+    [TYPE_STATE] = {NUM_STATES, STATE_NAMES, stateTex, 0},
+};
 
 
 static const int LEN_BUFFER = 100;
@@ -68,27 +85,21 @@ static const TrigFunc HEAD_TRIG[NUM_HEADS] = {
 static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
     REQ_CONDITION(font != NULL, return false);
 
-    struct {int num; const char** names; SDL_Texture** tex; float w;} NUMS[] = {
-        {NUM_ENTITIES, ENTITY_NAMES, entityTex, 0},
-        {NUM_ACTIONS, ACTION_NAMES, actionTex, 0},
-        {NUM_JUDGES, JUDGE_NAMES, judgeTex, 0},
-        {NUM_STATES, STATE_NAMES, stateTex, 0},
-    };
-    for (int I = 0; I < len_of(NUMS); I++) {
-        const int num = NUMS[I].num;
-        const char** names = NUMS[I].names;
-        SDL_Texture** tex = NUMS[I].tex;
+    for (int I = 0; I < len_of(setInfo); I++) {
+        const int num = setInfo[I].num;
+        const char** names = setInfo[I].names;
+        SDL_Texture** tex = setInfo[I].tex;
 
         for (int i = 0; i < num; i++) {
             tex[i] = TXT_LoadTexture(renderer, font, names[i], WHITE);
             REQ_CONDITION(tex[i] != NULL, return false);
-            NUMS[I].w = SDL_max(NUMS[I].w, tex[i]->w);
+            setInfo[I].w = SDL_max(setInfo[I].w, tex[i]->w);
         }
     }
-    unitW[HEAD_SUBJECT] = unitW[HEAD_OBJECT] = NUMS[0].w;
-    unitW[HEAD_ACTION] = NUMS[1].w;
-    unitW[HEAD_JUDGE] = NUMS[2].w;
-    unitW[HEAD_STATE] = NUMS[3].w;
+    unitW[HEAD_SUBJECT] = unitW[HEAD_OBJECT] = setInfo[0].w;
+    unitW[HEAD_ACTION] = setInfo[1].w;
+    unitW[HEAD_JUDGE] = setInfo[2].w;
+    unitW[HEAD_STATE] = setInfo[3].w;
 
     visibleTex[true] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
     visibleTex[false] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
@@ -267,3 +278,4 @@ bool INTEL_DrawIntelSet() {
 
     return true;
 }
+
