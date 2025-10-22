@@ -34,6 +34,7 @@ static int bufferHead = 0;
 
 // TRIG ================================================================================================================
 void TRIG_ChangeVisible(const void* para) {}
+Trig trigCV = {TRIG_ChangeVisible, NULL, false};
 
 
 // INIT & EXIT =========================================================================================================
@@ -155,6 +156,11 @@ bool INTEL_RenewIntelSet(IntelArr* intelArr) {
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
     INTEL_RenewIntelSet_Head(bckRect);
     INTEL_RenewIntelSet_Body(bckRect);
+    for (int i = 0; i < bufferHead; i++) {
+        if (PERPH_GetMouseLeftInRect(buffer[i].rect[HEAD_VISIBLE]) && PERPH_GetMouseInRect(buffer[i].rect[HEAD_VISIBLE])) {
+            PERPH_SetMouseLeftTrig(trigCV);
+        }
+    }
     return true;
 }
 

@@ -5,7 +5,7 @@ static struct {
     struct {
         bool pressed[SDL_SCANCODE_COUNT];
     } state1, state2;
-    const Trig* trigArray[SDL_SCANCODE_COUNT];
+    Trig trigArray[SDL_SCANCODE_COUNT];
 } keyboard;
 
 
@@ -16,7 +16,7 @@ bool PERPH_GetKeyPressed(const SDL_Scancode key) {
 bool PERPH_GetKeyPress(const SDL_Scancode key) {
     return keyboard.state1.pressed[key] == false && keyboard.state2.pressed[key] == true;
 }
-bool PERPH_SetKeyTrig(const SDL_Scancode key, const Trig* trig) {
+bool PERPH_SetKeyTrig(const SDL_Scancode key, const Trig trig) {
     keyboard.trigArray[key] = trig;
     return true;
 }
@@ -33,16 +33,16 @@ static bool PERPH_RenewKeyboard_State() {
 }
 static bool PERPH_RenewKeyboard_TrigArray() {
     for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
-        const Trig* trig = keyboard.trigArray[i];
-        if (trig == NULL) continue;
-        if (trig->sustain) {
+        if (keyboard.trigArray[i].func == NULL) continue;
+        const Trig trig = keyboard.trigArray[i];
+        if (trig.sustain) {
             if (keyboard.state2.pressed[i]) {
-                PullTrig(trig);
+                BASIC_PullTrig(trig);
             }
         }
         else {
             if (keyboard.state1.pressed[i] == false && keyboard.state2.pressed[i] == true) {
-                PullTrig(trig);
+                BASIC_PullTrig(trig);
             }
         }
     }
@@ -60,7 +60,7 @@ bool PERPH_RenewKeyboard() {
 bool PERPH_DrawKeyboard() {
     DEBUG_SendMessageL("%s: [", __func__);
     for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
-        if (keyboard.state2.pressed[i] == true && keyboard.trigArray[i] != NULL) {
+        if (keyboard.state2.pressed[i] == true && keyboard.trigArray[i].func != NULL) {
             DEBUG_SendMessageL("%s, ", SDL_GetScancodeName(i));
         }
     }

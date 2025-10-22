@@ -117,10 +117,10 @@ static bool VILLA_Renew_You() {
         trig[i] = (Trig){VILLA_MoveYou, &directs[i], true},
         directs[i] = i + cameraDirect;
     }
-    PERPH_SetKeyTrig(SDL_SCANCODE_W, &trig[VILLA_DIRECT_PX]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_A, &trig[VILLA_DIRECT_PY]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_S, &trig[VILLA_DIRECT_NX]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_D, &trig[VILLA_DIRECT_NY]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_W, trig[VILLA_DIRECT_PX]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_A, trig[VILLA_DIRECT_PY]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_S, trig[VILLA_DIRECT_NX]);
+    PERPH_SetKeyTrig(SDL_SCANCODE_D, trig[VILLA_DIRECT_NY]);
     return true;
 }
 bool VILLA_Renew() {

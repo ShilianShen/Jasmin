@@ -45,8 +45,8 @@ bool LOTRI_RenewCamera() {
 
 // DRAW ================================================================================================================
 bool LOTRI_DrawCamera() {
-    DEBUG_SendMessageL("%s\n", __func__);
-    DEBUG_SendMessageL(".position: %s\n", BASIC_GetStrVec3f(camera.position));
-    DEBUG_SendMessageL(".rotation: %s\n", BASIC_GetStrVec3f(camera.rotation));
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("    position: %s\n", BASIC_GetStrVec3f(camera.position));
+    DEBUG_SendMessageL("    rotation: %s\n", BASIC_GetStrVec3f(camera.rotation));
     return true;
 }

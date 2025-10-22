@@ -173,7 +173,7 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewIntelArr(testIntelArr);
-    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, &trigChangeMode);
+    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, trigChangeMode);
     return true;
 }
 

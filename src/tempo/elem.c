@@ -206,10 +206,10 @@ bool TEMPO_RenewElem(void *elem_void) {
 
     if (elem->trig.func != NULL) {
         if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseLeftTrig(&elem->trig);
+            PERPH_SetMouseLeftTrig(elem->trig);
         }
         if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseLeftTrig(&elem->trig);
+            PERPH_SetMouseLeftTrig(elem->trig);
         }
     }
 

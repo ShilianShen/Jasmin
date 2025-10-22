@@ -6,8 +6,8 @@ static struct {
         SDL_FPoint pos, leftPos, rightPos;
         bool leftPressed, rightPressed;
     } state1, state2;
-    const Trig* left_trig;
-    const Trig* right_trig;
+    Trig left_trig;
+    Trig right_trig;
     SDL_Texture* tex;
     SDL_FRect texDstRect;
     cJSON* json;
@@ -18,7 +18,7 @@ static struct {
 SDL_FPoint PERPH_GetMousePos() {
     return mouse.state2.pos;
 }
-void PERPH_SetMouseLeftTrig(const Trig *trig) {
+void PERPH_SetMouseLeftTrig(const Trig trig) {
     mouse.left_trig = trig;
 }
 bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
@@ -84,22 +84,23 @@ static void PERPH_RenewMouse_State() {
     if (!mouse.state1.leftPressed && mouse.state2.leftPressed) mouse.state2.leftPos = mouse.state2.pos;
 }
 static void PERPH_RenewMouse_Trig() {
-    if (mouse.left_trig != NULL
-        && mouse.left_trig->sustain == false
+    if (mouse.left_trig.func == NULL) return;
+
+    if (mouse.left_trig.sustain == false
         && mouse.state1.leftPressed == true
         && mouse.state2.leftPressed == false
         ) {
         ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        PullTrig(mouse.left_trig);
+        BASIC_PullTrig(mouse.left_trig);
         }
-    if (mouse.left_trig != NULL
-        && mouse.left_trig->sustain == true
+
+    if (mouse.left_trig.sustain == true
         && mouse.state1.leftPressed == true
         ) {
         if (mouse.state2.leftPressed == false) ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        PullTrig(mouse.left_trig);
+        BASIC_PullTrig(mouse.left_trig);
         }
-    mouse.left_trig = NULL;
+    mouse.left_trig = (Trig){0};
 }
 bool PERPH_RenewMouse() {
     PERPH_RenewMouse_State();
@@ -112,7 +113,7 @@ bool PERPH_RenewMouse() {
 bool PERPH_DrawMouse() {
     DEBUG_SendMessageL("%s:\n", __func__);
     DEBUG_SendMessageL("    mousePos: %s\n", SDL_GetStrFPoint(mouse.state2.pos));
-    if (mouse.left_trig != NULL) DEBUG_SendMessageL("    mouse.left_trig != NULL\n");
+    if (mouse.left_trig.func != NULL) DEBUG_SendMessageL("    mouse.left_trig != NULL\n");
 
     DEBUG_DrawPoint(mouse.state2.pos);
     if (mouse.state2.leftPressed) {

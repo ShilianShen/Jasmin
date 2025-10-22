@@ -15,7 +15,7 @@ bool PERPH_GetMouseInRect(SDL_FRect rect);
 bool PERPH_GetMouseLeftPressed();
 bool PERPH_GetMouseLeftPress();
 bool PERPH_GetMouseLeftInRect(SDL_FRect rect);
-void PERPH_SetMouseLeftTrig(const Trig *trig);
+void PERPH_SetMouseLeftTrig(Trig trig);
 SDL_FPoint PERPH_GetMousePos();
 
 

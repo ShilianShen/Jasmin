@@ -162,7 +162,7 @@ static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
 
         if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entityInfo[i].rect)) {
             entityMoveId = i;
-            PERPH_SetMouseLeftTrig(&trigMove);
+            PERPH_SetMouseLeftTrig(trigMove);
         }
         if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
     }
