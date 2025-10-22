@@ -57,7 +57,6 @@ void INTEL_TrigChangeState(void* para) {
 }
 
 
-
 void INTEL_TrigSortVisible(void* para) {
     const IntelArr* intelArr = para;
     for (int i = 0; i < intelArr->len; i++) {
@@ -213,7 +212,10 @@ static bool INTEL_RenewIntelSet_Head(const SDL_FRect bckRect) {
     float x = bckRect.x;
     for (int i = 0; i < NUM_HEADS; i++) {
         x += dx;
-        headInfos[i].rect = (SDL_FRect){x, y, (float)headInfos[i].tex->w, (float)headInfos[i].tex->h};
+        SDL_FRect rect = {.w = (float)headInfos[i].tex->w, .h = (float)headInfos[i].tex->h};
+        rect.x = x + (headInfos[i].w - rect.w) / 2;
+        rect.y = y + (unitH - rect.h) / 2;
+        headInfos[i].rect = rect;
         x += headInfos[i].w + dx;
     }
     return true;
@@ -226,17 +228,21 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
 
         for (int j = 0; j < NUM_HEADS; j++) {
             x += dx;
-            const SDL_Texture* tx = NULL;
+            int index;
             switch (j) {
-                case HEAD_VISIBLE: tx = typeInfos[TYPE_VISIBLE].tex[intel.visible]; break;
-                case HEAD_SUBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.subject]; break;
-                case HEAD_ACTION: tx = typeInfos[TYPE_ACTION].tex[intel.action]; break;
-                case HEAD_OBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.object]; break;
-                case HEAD_JUDGE: tx = typeInfos[TYPE_JUDGE].tex[intel.judge]; break;
-                case HEAD_STATE: tx = typeInfos[TYPE_STATE].tex[intel.state]; break;
+                case HEAD_VISIBLE: index = intel.visible; break;
+                case HEAD_SUBJECT: index = intel.subject; break;
+                case HEAD_ACTION: index = intel.action; break;
+                case HEAD_OBJECT: index = intel.object; break;
+                case HEAD_JUDGE: index = intel.judge; break;
+                case HEAD_STATE: index = intel.state; break;
                 default: continue;
             }
-            buffer[i].rect[j] = (SDL_FRect){x, y, (float)tx->w, (float)tx->h};
+            const SDL_Texture* tx = typeInfos[headInfos[j].type].tex[index];
+            SDL_FRect rect = {.w = (float)tx->w, .h = (float)tx->h};
+            rect.x = x + (headInfos[j].w - rect.w) / 2;
+            rect.y = y + (unitH - rect.h) / 2;
+            buffer[i].rect[j] = rect;
             x += headInfos[j].w + dx;
         }
     }

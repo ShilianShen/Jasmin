@@ -44,40 +44,6 @@ const char* INTEL_GetStrIntel(const Intel intel) {
         );
     return string;
 }
-static Intel* INTEL_GetIntelSet(const int len) {
-    REQ_CONDITION(len > 0, return NULL);
-
-    Intel* intelSet = calloc(len, sizeof(Intel));
-    REQ_CONDITION(intelSet != NULL, return NULL);
-
-    return intelSet;
-}
-bool INTEL_AppendIntelArr(IntelArr* intelArr, const Intel intel) {
-    REQ_CONDITION(intelArr->arr != NULL, return false);
-
-    for (int i = 0; i < intelArr->len; i++) {
-        if (intelArr->arr[i].effective == false) {
-            intelArr->arr[i] = intel;
-            return true;
-        }
-    }
-    const int len = (int)(intelArr->len * 1.5);
-    Intel* intelSet = INTEL_GetIntelSet(len);
-    REQ_CONDITION(intelSet != NULL, return false);
-
-    for (int i = 0; i < intelArr->len; i++) {
-        intelSet[i] = intelArr->arr[i];
-    }
-    intelSet[intelArr->len] = intel;
-
-    free(intelArr->arr);
-    intelArr->arr = intelSet;
-    intelArr->len = len;
-    INTEL_ResetIntelNet();
-    return true;
-}
-
-
 static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
 
     return STATE_UNKNOWN;
@@ -94,35 +60,6 @@ IntelState INTEL_GetAutoState(const Intel intel1) {
         // return STATE_AUTO_U;
     }
     return INTEL_GetAutoState_OneWay(intel1);
-}
-
-
-// CREATE & DELETE =====================================================================================================
-static bool INTEL_CreateIntelArr_RK(IntelArr* intelArr) {
-    memset(intelArr, 0, sizeof(IntelArr));
-
-    intelArr->len = 10;
-    intelArr->arr = INTEL_GetIntelSet(intelArr->len);
-    REQ_CONDITION(intelArr->arr != NULL, return false);
-
-    return true;
-}
-IntelArr* INTEL_CreateIntelArr() {
-    IntelArr* intelNet = malloc(sizeof(IntelArr));
-    REQ_CONDITION(intelNet != NULL, return NULL);
-    REQ_CONDITION(INTEL_CreateIntelArr_RK(intelNet), intelNet = INTEL_DeleteIntelArr(intelNet));
-    return intelNet;
-}
-IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr) {
-    if (intelArr != NULL) {
-        if (intelArr->arr != NULL) {
-            free(intelArr->arr);
-            intelArr->arr = NULL;
-        }
-        free(intelArr);
-    }
-    intelArr = NULL;
-    return NULL;
 }
 
 
