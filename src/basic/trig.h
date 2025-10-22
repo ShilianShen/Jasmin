@@ -5,10 +5,10 @@
 #include "_basic.h"
 
 
-typedef void (*TrigFunc)(const void*);
+typedef void (*TrigFunc)(void*);
 struct Trig {
     TrigFunc func;
-    const void* para;
+    void* para;
     bool sustain;
 };
 typedef struct Trig Trig;

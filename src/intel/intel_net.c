@@ -36,7 +36,7 @@ static SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
 
 // TRIG ================================================================================================================
 static EntityId entityMoveId = 0;
-static void TRIG_MoveEntity(const void* para) {
+static void TRIG_MoveEntity(void* para) {
     if (entityMoveId == 0) return;
     entityInfo[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
@@ -134,9 +134,7 @@ static void INTEL_RenewIntelNet_EntityInfoGravity() {
     }
 }
 static void INTEL_RenewIntelNet_EntityInfoPosition() {
-    static float t1 = 0;
-    const float t2 = (float)SDL_GetTicks() / 1000;
-    const float dt = t2 - t1;
+    const float dt = BASIC_T2 - BASIC_T1;
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (i == entityMoveId) continue;
         const SDL_FPoint points[] = {
@@ -148,7 +146,6 @@ static void INTEL_RenewIntelNet_EntityInfoPosition() {
         entityInfo[i].position.x += MOVE_SPEED * dv.x * dt;
         entityInfo[i].position.y += MOVE_SPEED * dv.y * dt;
     }
-    t1 = t2;
 }
 static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
     for (int i = 0; i < NUM_ENTITIES; i++) {

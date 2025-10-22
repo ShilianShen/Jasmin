@@ -127,8 +127,10 @@ IntelArr* INTEL_DeleteIntelArr(IntelArr* intelArr) {
 
 
 // TRIG ================================================================================================================
-static void INTEL_ChangeMode(const void* para) {netMode = !netMode;}
-const Trig trigChangeMode = {INTEL_ChangeMode, NULL, false};
+static void INTEL_ChangeMode(void* para) {
+    netMode = !netMode;
+    INTEL_ResetIntelNet();
+}
 
 
 // INIT & EXIT =========================================================================================================
@@ -173,7 +175,7 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewIntelArr(testIntelArr);
-    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, trigChangeMode);
+    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, (Trig){INTEL_ChangeMode, NULL, false});
     return true;
 }
 

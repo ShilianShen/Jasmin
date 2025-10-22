@@ -17,6 +17,7 @@ int logical_w, logical_h;
 int windowWidth, windowHeight;
 float scale_x = 1, scale_y = 1;
 SDL_Color EMPTY = {0, 0, 0, 0}, BLACK = {0, 0, 0, 255}, WHITE = {255, 255, 255, 255};
+float BASIC_T1 = 0, BASIC_T2 = 0;
 
 
 ma_engine engine;
@@ -36,9 +37,13 @@ bool BASIC_Init() {
     REQ_CONDITION(renderer != NULL, return false);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+    BASIC_T2 = (float)SDL_GetTicks() / 1000;
     return true;
 }
 bool BASIC_Renew() {
+    BASIC_T1 = BASIC_T2;
+    BASIC_T2 = (float)SDL_GetTicks() / 1000;
+
     SDL_GetWindowSize(window, &logical_w, &logical_h);
     SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
     scale_x = (float)windowWidth / (float)logical_w;

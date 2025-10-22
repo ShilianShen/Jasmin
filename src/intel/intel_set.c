@@ -33,8 +33,25 @@ static int bufferHead = 0;
 
 
 // TRIG ================================================================================================================
-void TRIG_ChangeVisible(const void* para) {}
-Trig trigCV = {TRIG_ChangeVisible, NULL, false};
+static void Intel_TrigChangeVisible(void* para) {
+    Intel* intel = para;
+    intel->visible = !intel->visible;
+}
+static void Intel_TrigChangeJudge(void* para) {
+    Intel* intel = para;
+    intel->judge = (intel->judge + 1) % NUM_JUDGES;
+    intel->state = STATE_UNKNOWN;
+}
+static void Intel_TrigChangeState(void* para) {
+    Intel* intel = para;
+    if (intel->judge != JUDGE_MANU) return;
+    intel->state = (intel->state + 1) % NUM_STATES;
+}
+static const TrigFunc HEAD_TRIG[NUM_HEADS] = {
+    [HEAD_VISIBLE] = Intel_TrigChangeVisible,
+    [HEAD_JUDGE] = Intel_TrigChangeJudge,
+    [HEAD_STATE] = Intel_TrigChangeState,
+};
 
 
 // INIT & EXIT =========================================================================================================
@@ -64,8 +81,8 @@ bool INTEL_InitIntelSet() {
     unitW[HEAD_JUDGE] = NUMS[2].w;
     unitW[HEAD_STATE] = NUMS[3].w;
 
-    visibleTex[0] = TXT_LoadTexture(renderer, font, "1", WHITE);
-    visibleTex[1] = TXT_LoadTexture(renderer, font, "0", WHITE);
+    visibleTex[0] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
+    visibleTex[1] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
     REQ_CONDITION(visibleTex[0] != NULL, return false);
     REQ_CONDITION(visibleTex[1] != NULL, return false);
     unitW[HEAD_VISIBLE] = (float)SDL_max(visibleTex[0]->w, visibleTex[1]->w);
@@ -157,8 +174,13 @@ bool INTEL_RenewIntelSet(IntelArr* intelArr) {
     INTEL_RenewIntelSet_Head(bckRect);
     INTEL_RenewIntelSet_Body(bckRect);
     for (int i = 0; i < bufferHead; i++) {
-        if (PERPH_GetMouseLeftInRect(buffer[i].rect[HEAD_VISIBLE]) && PERPH_GetMouseInRect(buffer[i].rect[HEAD_VISIBLE])) {
-            PERPH_SetMouseLeftTrig(trigCV);
+        Intel* intel = buffer[i].intel;
+        for (int j = 0; j < NUM_HEADS; j++) {
+            const SDL_FRect rect = buffer[i].rect[j];
+            if (PERPH_GetMouseInRect(rect) == false) continue;
+            if (PERPH_GetMouseLeftInRect(rect) == false) continue;
+
+            PERPH_SetMouseLeftTrig((Trig){HEAD_TRIG[j], intel, false});
         }
     }
     return true;
@@ -198,7 +220,7 @@ static bool INTEL_DrawIntelSet_Body() {
                 default: continue;
             }
             const SDL_FRect rect = buffer[i].rect[j];
-            if (PERPH_GetMouseInRect(rect)) {
+            if (PERPH_GetMouseInRect(rect) && PERPH_GetMouseLeftInRect(rect)) {
                 const SDL_Color temp = text;
                 text = back;
                 back = temp;

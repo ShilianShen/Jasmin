@@ -44,6 +44,7 @@ extern bool running;
 extern const SDL_WindowFlags FLAG;
 SDL_Event sdl_event;
 extern SDL_GLContext content;
+extern float BASIC_T1, BASIC_T2;
 
 
 extern int logical_w, logical_h;

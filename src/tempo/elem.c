@@ -240,14 +240,14 @@ bool TEMPO_DrawElem(const void *elem_void) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncBool(const void *para) {
+void TEMPO_TrigFuncBool(void *para) {
     const Elem* elem = para;
     bool* now = elem->info.bool_.now;
     if (now != NULL) {
         *now = !*now;
     }
 }
-void TEMPO_TrigFuncSlid(const void *para) {
+void TEMPO_TrigFuncSlid(void *para) {
     const Elem* elem = para;
     const SDL_FRect dst_rect = elem->dst_rect;
     const ElemSlidInfo* slid = &elem->info.slid;

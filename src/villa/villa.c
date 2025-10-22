@@ -19,7 +19,7 @@ int cameraDirect;
 Character* you = NULL;
 
 
-void VILLA_MoveYou(const void* direct_void) {
+void VILLA_MoveYou(void* direct_void) {
     const int direct = *(int*)direct_void;
     VILLA_SetCharacterMove(you, direct);
 }
