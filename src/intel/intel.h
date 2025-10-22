@@ -27,8 +27,8 @@ typedef struct {
     IntelJudge judge;
     IntelState state;
 
-    SDL_FRect rect;
     bool visible;
+    SDL_FRect rect;
 } Intel;
 
 

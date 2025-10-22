@@ -5,10 +5,12 @@
 
 
 static SDL_Texture *entityTex[NUM_ENTITIES], *actionTex[NUM_ACTIONS];
-static TTF_Font *entityFont = NULL, *actionFont = NULL;
 static const SDL_Color BACK_COLOR = {32, 32, 32, 192}, TEXT_COLOR = {255, 255, 255, 255};
-static struct {bool visible; SDL_FRect rect; SDL_FPoint repulsion, gravitation, gravity, position;} entityInfo[NUM_ENTITIES];
-static const float MOVE_SPEED = 1.f;
+static struct {
+    bool visible;
+    SDL_FRect rect;
+    SDL_FPoint repulsion, gravitation, gravity, position;
+} entityInfo[NUM_ENTITIES];
 static const SDL_FPoint scale = {500, 300};
 
 
@@ -40,26 +42,33 @@ static void TRIG_MoveEntity(void* para) {
     if (entityMoveId == 0) return;
     entityInfo[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
-static Trig trigMove = {TRIG_MoveEntity, NULL, true};
+// static Trig trigMove = {TRIG_MoveEntity, NULL, true};
 
 
 // INIT & EXIT =========================================================================================================
-bool INTEL_InitIntelNet() {
-    entityFont = TTF_OpenFont(ENTITY_FONT);
+static bool INTEL_InitIntelNet_RK(TTF_Font* entityFont, TTF_Font* actionFont) {
     REQ_CONDITION(entityFont != NULL, return false);
-
-    actionFont = TTF_OpenFont(ACTION_FONT);
     REQ_CONDITION(actionFont != NULL, return false);
-
     for (int i = 0; i < NUM_ENTITIES; i++) {
         entityTex[i] = TXT_LoadTexture(renderer, entityFont, ENTITY_NAMES[i], WHITE);
         REQ_CONDITION(entityTex[i] != NULL, return false);
     }
-
     for (int i = 0; i < NUM_ACTIONS; i++) {
         actionTex[i] = TXT_LoadTexture(renderer, actionFont, ACTION_NAMES[i], WHITE);
         REQ_CONDITION(actionTex[i] != NULL, return false);
     }
+    return true;
+}
+bool INTEL_InitIntelNet() {
+    TTF_Font* entityFont = TTF_OpenFont(ENTITY_FONT);
+    TTF_Font* actionFont = TTF_OpenFont(ACTION_FONT);
+
+    const bool rk = INTEL_InitIntelNet_RK(entityFont, actionFont);
+
+    TTF_CloseFont(entityFont); entityFont = NULL;
+    TTF_CloseFont(actionFont); actionFont = NULL;
+
+    REQ_CONDITION(rk, return false);
 
     return true;
 }
@@ -72,8 +81,6 @@ void INTEL_ExitIntelNet() {
         SDL_DestroyTexture(actionTex[i]);
         actionTex[i] = NULL;
     }
-    TTF_CloseFont(entityFont); entityFont = NULL;
-    TTF_CloseFont(actionFont); actionFont = NULL;
 }
 
 
@@ -85,6 +92,7 @@ static void INTEL_RenewIntelNet_EntityInfoVisible(IntelArr* intelArr) {
     }
     for (int k = 0; k < intelArr->len; k++) {
         if (intelArr->arr[k].effective == false) continue;
+        if (intelArr->arr[k].visible == false) continue;
         entityInfo[intelArr->arr[k].subject].visible = true;
         entityInfo[intelArr->arr[k].object].visible = true;
     }
@@ -111,9 +119,11 @@ static void INTEL_RenewIntelNet_EntityInfoRepulsion() {
 static void INTEL_RenewIntelNet_EntityInfoGravitation(IntelArr* intelArr) {
     for (int k = 0; k < intelArr->len; k++) {
         const Intel intel = intelArr->arr[k];
-        if (intel.effective == false) continue;
+        if (intel.effective == false || intel.visible == false) continue;
 
         const int i = intel.subject, j = intel.object;
+        if (entityInfo[i].visible == false || entityInfo[j].visible == false) continue;
+
         const SDL_FPoint A = entityInfo[i].position;
         const SDL_FPoint B = entityInfo[j].position;
 
@@ -143,8 +153,8 @@ static void INTEL_RenewIntelNet_EntityInfoPosition() {
             entityInfo[i].gravity,
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
-        entityInfo[i].position.x += MOVE_SPEED * dv.x * dt;
-        entityInfo[i].position.y += MOVE_SPEED * dv.y * dt;
+        entityInfo[i].position.x += dv.x * dt;
+        entityInfo[i].position.y += dv.y * dt;
     }
 }
 static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
@@ -159,7 +169,7 @@ static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
 
         if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entityInfo[i].rect)) {
             entityMoveId = i;
-            PERPH_SetMouseLeftTrig(trigMove);
+            PERPH_SetMouseLeftTrig((Trig){TRIG_MoveEntity, NULL, true});
         }
         if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
     }
@@ -201,6 +211,7 @@ bool INTEL_DrawIntelNet(IntelArr* intelArr) {
     for (int k = 0; k < intelArr->len; k++) {
         const Intel intel = intelArr->arr[k];
         if (intel.effective == false) continue;
+        if (intel.visible == false) continue;
 
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = INTEL_GetScaledPos(entityInfo[i].position);

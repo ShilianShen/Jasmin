@@ -4,7 +4,6 @@
 #include "intel_arr.h"
 
 
-static TTF_Font *font = NULL;
 enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS};
 static const char* HEAD_SET[NUM_HEADS] = {
     [HEAD_VISIBLE] = "VISIBLE",
@@ -55,8 +54,7 @@ static const TrigFunc HEAD_TRIG[NUM_HEADS] = {
 
 
 // INIT & EXIT =========================================================================================================
-bool INTEL_InitIntelSet() {
-    font = TTF_OpenFont(SET_FONT);
+static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
     REQ_CONDITION(font != NULL, return false);
 
     struct {int num; const char** names; SDL_Texture** tex; float w;} NUMS[] = {
@@ -81,8 +79,8 @@ bool INTEL_InitIntelSet() {
     unitW[HEAD_JUDGE] = NUMS[2].w;
     unitW[HEAD_STATE] = NUMS[3].w;
 
-    visibleTex[0] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
-    visibleTex[1] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
+    visibleTex[true] = TXT_LoadTexture(renderer, font, "TRUE", WHITE);
+    visibleTex[false] = TXT_LoadTexture(renderer, font, "FALSE", WHITE);
     REQ_CONDITION(visibleTex[0] != NULL, return false);
     REQ_CONDITION(visibleTex[1] != NULL, return false);
     unitW[HEAD_VISIBLE] = (float)SDL_max(visibleTex[0]->w, visibleTex[1]->w);
@@ -93,12 +91,18 @@ bool INTEL_InitIntelSet() {
         unitW[i] = SDL_max(unitW[i], headTex[i]->w);
     }
     unitH = (float)TTF_GetFontHeight(font);
+    return true;
+}
+bool INTEL_InitIntelSet() {
+    TTF_Font *font = TTF_OpenFont(SET_FONT);
 
+    const bool rk = INTEL_InitIntelSet_RK(font);
+    TTF_CloseFont(font); font = NULL;
+
+    REQ_CONDITION(rk != false, return false);
     return true;
 }
 void INTEL_ExitIntelSet() {
-    TTF_CloseFont(font); font = NULL;
-
     const struct {int num; SDL_Texture** tex;} NUMS[] = {
         {NUM_ENTITIES, entityTex},
         {NUM_ACTIONS, actionTex},

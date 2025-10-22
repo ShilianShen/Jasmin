@@ -141,27 +141,27 @@ bool INTEL_Init() {
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN,
-        JUDGE_MANU, STATE_TRUE
+        JUDGE_MANU, STATE_TRUE, true
     });
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_CAN, ENTITY_FLY,
-        JUDGE_MANU, STATE_FALSE
+        JUDGE_MANU, STATE_FALSE, true
     });
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_HUMAN, ACTION_WILL, ENTITY_DEATH,
-        JUDGE_MANU, STATE_TRUE
+        JUDGE_MANU, STATE_TRUE, true
     });
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_WILL, ENTITY_DEATH,
-        JUDGE_AUTO, STATE_UNKNOWN
+        JUDGE_AUTO, STATE_UNKNOWN, true
     });
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY,
-        JUDGE_AUTO, STATE_UNKNOWN
+        JUDGE_AUTO, STATE_UNKNOWN, true
     });
 
     return true;
