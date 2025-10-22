@@ -15,18 +15,16 @@ static struct {const int num; const char** names; SDL_Texture** tex; float w;} s
 
 
 typedef enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} SetHead;
-static struct {const char* name; SetType type; SDL_Texture* tex;} HEAD_SET[NUM_HEADS] = {
-    [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE, NULL},
-    [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY, NULL},
-    [HEAD_ACTION] = {"ACTION", TYPE_ACTION, NULL},
-    [HEAD_OBJECT] = {"OBJECT", TYPE_ENTITY, NULL},
-    [HEAD_JUDGE] = {"JUDGE", TYPE_JUDGE, NULL},
-    [HEAD_STATE] = {"STATE", TYPE_STATE, NULL},
+static struct {const char* name; SetType type; SDL_Texture* tex; float w; TrigFunc func;} HEAD_SET[NUM_HEADS] = {
+    [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE},
+    [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY},
+    [HEAD_ACTION] = {"ACTION", TYPE_ACTION},
+    [HEAD_OBJECT] = {"OBJECT", TYPE_ENTITY},
+    [HEAD_JUDGE] = {"JUDGE", TYPE_JUDGE},
+    [HEAD_STATE] = {"STATE", TYPE_STATE},
 };
-// static SDL_Texture *headTex[NUM_HEADS];
-
-
-static float unitW[NUM_HEADS] = {0}, unitH = 0;
+static float unitW[NUM_HEADS] = {0};
+static float unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color BACK_C = {64, 64, 64, 128};
 static SDL_FRect headRect[NUM_HEADS];
@@ -84,17 +82,13 @@ static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
             setInfo[I].w = SDL_max(setInfo[I].w, tex[i]->w);
         }
     }
-    unitW[HEAD_SUBJECT] = setInfo[TYPE_ENTITY].w;
-    unitW[HEAD_ACTION] = setInfo[TYPE_ACTION].w;
-    unitW[HEAD_OBJECT] = setInfo[TYPE_ENTITY].w;
-    unitW[HEAD_JUDGE] = setInfo[TYPE_JUDGE].w;
-    unitW[HEAD_STATE] = setInfo[TYPE_STATE].w;
-    unitW[HEAD_VISIBLE] = setInfo[TYPE_VISIBLE].w;
 
     for (int i = 0; i < NUM_HEADS; i++) {
         HEAD_SET[i].tex = TXT_LoadTexture(renderer, font, HEAD_SET[i].name, WHITE);
         REQ_CONDITION(HEAD_SET[i].tex != NULL, return false);
-        unitW[i] = SDL_max(unitW[i], HEAD_SET[i].tex->w);
+        unitW[i] = SDL_max(setInfo[HEAD_SET[i].type].w, HEAD_SET[i].tex->w);
+        // HEAD_SET[i].w
+        //
     }
     unitH = (float)TTF_GetFontHeight(font);
     return true;
