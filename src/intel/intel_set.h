@@ -8,9 +8,15 @@
 SDL_FRect INTEL_GetIntelSetBckRect();
 
 
-void Intel_TrigChangeVisible(void* para);
-void Intel_TrigChangeJudge(void* para);
-void Intel_TrigChangeState(void* para);
+void INTEL_TrigChangeVisible(void* para);
+void INTEL_TrigChangeJudge(void* para);
+void INTEL_TrigChangeState(void* para);
+void INTEL_TrigSortVisible(void* para);
+void INTEL_TrigSortJudge(void* para);
+void INTEL_TrigSortSubject(void* para);
+void INTEL_TrigSortAction(void* para);
+void INTEL_TrigSortObject(void* para);
+void INTEL_TrigSortState(void* para);
 
 
 bool INTEL_InitIntelSet();

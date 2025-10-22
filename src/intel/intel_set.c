@@ -5,29 +5,24 @@
 
 
 typedef enum {TYPE_VISIBLE, TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES} SetType;
-static struct {const int num; const char** names; SDL_Texture** tex; float w;} setInfo[NUM_TYPES] = {
-    [TYPE_VISIBLE] = {2, (const char*[]){"FALSE", "TRUE"}, (SDL_Texture*[2]){}, 0},
-    [TYPE_ENTITY] = {NUM_ENTITIES, ENTITY_NAMES, (SDL_Texture*[NUM_ENTITIES]){}, 0},
-    [TYPE_ACTION] = {NUM_ACTIONS, ACTION_NAMES, (SDL_Texture*[NUM_ACTIONS]){}, 0},
-    [TYPE_JUDGE] = {NUM_JUDGES, JUDGE_NAMES, (SDL_Texture*[NUM_JUDGES]){}, 0},
-    [TYPE_STATE] = {NUM_STATES, STATE_NAMES, (SDL_Texture*[NUM_STATES]){}, 0},
-};
+typedef struct {int num; const char** names; TrigFunc func; SDL_Texture** tex; float w;} TypeInfo;
+TypeInfo typeInfos[NUM_TYPES];
 
 
 typedef enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} SetHead;
-static struct {const char* name; SetType type; SDL_Texture* tex; float w; TrigFunc func;} HEAD_SET[NUM_HEADS] = {
-    [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE},
-    [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY},
-    [HEAD_ACTION] = {"ACTION", TYPE_ACTION},
-    [HEAD_OBJECT] = {"OBJECT", TYPE_ENTITY},
-    [HEAD_JUDGE] = {"JUDGE", TYPE_JUDGE},
-    [HEAD_STATE] = {"STATE", TYPE_STATE},
+static struct {
+    const char* name; SetType type; TrigFunc func; SDL_Texture* tex; float w; SDL_FRect rect;
+} headInfos[NUM_HEADS] = {
+    [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE, INTEL_TrigSortVisible},
+    [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY, INTEL_TrigSortSubject},
+    [HEAD_ACTION] = {"ACTION", TYPE_ACTION, INTEL_TrigSortAction},
+    [HEAD_OBJECT] = {"OBJECT", TYPE_ENTITY, INTEL_TrigSortObject},
+    [HEAD_JUDGE] = {"JUDGE", TYPE_JUDGE, INTEL_TrigSortJudge},
+    [HEAD_STATE] = {"STATE", TYPE_STATE, INTEL_TrigSortState},
 };
-static float unitW[NUM_HEADS] = {0};
 static float unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color BACK_C = {64, 64, 64, 128};
-static SDL_FRect headRect[NUM_HEADS];
 
 
 static const int LEN_BUFFER = 100;
@@ -38,7 +33,7 @@ static int bufferHead = 0;
 // GET & SET ===========================================================================================================
 SDL_FRect INTEL_GetIntelSetBckRect() {
     SDL_FRect bckRect = {0, 0, 0, (float)(bufferHead + 1) * (unitH + 2 * dy)};
-    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
+    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += headInfos[i].w + 2 * dx;
     bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
     return bckRect;
@@ -46,54 +41,135 @@ SDL_FRect INTEL_GetIntelSetBckRect() {
 
 
 // TRIG ================================================================================================================
-void Intel_TrigChangeVisible(void* para) {
+void INTEL_TrigChangeVisible(void* para) {
     Intel* intel = para;
     intel->visible = !intel->visible;
 }
-void Intel_TrigChangeJudge(void* para) {
+void INTEL_TrigChangeJudge(void* para) {
     Intel* intel = para;
     intel->judge = (intel->judge + 1) % NUM_JUDGES;
     intel->state = STATE_UNKNOWN;
 }
-void Intel_TrigChangeState(void* para) {
+void INTEL_TrigChangeState(void* para) {
     Intel* intel = para;
     if (intel->judge != JUDGE_MANU) return;
     intel->state = (intel->state + 1) % NUM_STATES;
 }
-static const TrigFunc HEAD_TRIG[NUM_HEADS] = {
-    [HEAD_VISIBLE] = Intel_TrigChangeVisible,
-    [HEAD_JUDGE] = Intel_TrigChangeJudge,
-    [HEAD_STATE] = Intel_TrigChangeState,
-};
+
+
+
+void INTEL_TrigSortVisible(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        if (intelArr->arr[i].visible == true) continue;
+
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[j].visible == false) continue;
+
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+            break;
+        }
+    }
+}
+void INTEL_TrigSortJudge(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[i].judge <= intelArr->arr[j].judge) continue;
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+        }
+    }
+}
+void INTEL_TrigSortSubject(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[i].subject <= intelArr->arr[j].subject) continue;
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+        }
+    }
+}
+void INTEL_TrigSortAction(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[i].action <= intelArr->arr[j].action) continue;
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+        }
+    }
+}
+void INTEL_TrigSortObject(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[i].object <= intelArr->arr[j].object) continue;
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+        }
+    }
+}
+void INTEL_TrigSortState(void* para) {
+    const IntelArr* intelArr = para;
+    for (int i = 0; i < intelArr->len; i++) {
+        for (int j = i + 1; j < intelArr->len; j++) {
+            if (intelArr->arr[i].state <= intelArr->arr[j].state) continue;
+            const Intel temp = intelArr->arr[i];
+            intelArr->arr[i] = intelArr->arr[j];
+            intelArr->arr[j] = temp;
+        }
+    }
+}
 
 
 // INIT & EXIT =========================================================================================================
+static bool INTEL_InitIntelSet_Type() {
+    static const char* VISIBLE_NAMES[2] = {"FALSE", "TRUE"};
+    typeInfos[TYPE_VISIBLE] = (TypeInfo){2, VISIBLE_NAMES, INTEL_TrigChangeVisible};
+    typeInfos[TYPE_ENTITY] = (TypeInfo){NUM_ENTITIES, ENTITY_NAMES};
+    typeInfos[TYPE_ACTION] = (TypeInfo){NUM_ACTIONS, ACTION_NAMES};
+    typeInfos[TYPE_JUDGE] = (TypeInfo){NUM_JUDGES, JUDGE_NAMES, INTEL_TrigChangeJudge};
+    typeInfos[TYPE_STATE] = (TypeInfo){NUM_STATES, STATE_NAMES, INTEL_TrigChangeState};
+    for (int i = 0; i < NUM_TYPES; i++) {
+        typeInfos[i].tex = calloc(typeInfos[i].num, sizeof(SDL_Texture*));
+        REQ_CONDITION(typeInfos[i].tex != NULL, return false);
+    }
+    return true;
+}
 static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
     REQ_CONDITION(font != NULL, return false);
 
     for (int I = 0; I < NUM_TYPES; I++) {
-        const int num = setInfo[I].num;
-        const char** names = setInfo[I].names;
-        SDL_Texture** tex = setInfo[I].tex;
+        const int num = typeInfos[I].num;
+        const char** names = typeInfos[I].names;
+        SDL_Texture** tex = typeInfos[I].tex;
 
         for (int i = 0; i < num; i++) {
             tex[i] = TXT_LoadTexture(renderer, font, names[i], WHITE);
             REQ_CONDITION(tex[i] != NULL, return false);
-            setInfo[I].w = SDL_max(setInfo[I].w, tex[i]->w);
+            typeInfos[I].w = SDL_max(typeInfos[I].w, tex[i]->w);
         }
     }
 
     for (int i = 0; i < NUM_HEADS; i++) {
-        HEAD_SET[i].tex = TXT_LoadTexture(renderer, font, HEAD_SET[i].name, WHITE);
-        REQ_CONDITION(HEAD_SET[i].tex != NULL, return false);
-        unitW[i] = SDL_max(setInfo[HEAD_SET[i].type].w, HEAD_SET[i].tex->w);
-        // HEAD_SET[i].w
-        //
+        headInfos[i].tex = TXT_LoadTexture(renderer, font, headInfos[i].name, WHITE);
+        REQ_CONDITION(headInfos[i].tex != NULL, return false);
+        headInfos[i].w = SDL_max(typeInfos[headInfos[i].type].w, headInfos[i].tex->w);
     }
     unitH = (float)TTF_GetFontHeight(font);
     return true;
 }
 bool INTEL_InitIntelSet() {
+    REQ_CONDITION(INTEL_InitIntelSet_Type(), return false);
+
     TTF_Font *font = TTF_OpenFont(SET_FONT);
 
     const bool rk = INTEL_InitIntelSet_RK(font);
@@ -104,18 +180,19 @@ bool INTEL_InitIntelSet() {
 }
 void INTEL_ExitIntelSet() {
     for (int I = 0; I < NUM_TYPES; I++) {
-        const int num = setInfo[I].num;
-        SDL_Texture** tex = setInfo[I].tex;
-
+        const int num = typeInfos[I].num;
+        SDL_Texture** tex = typeInfos[I].tex;
         for (int i = 0; i < num; i++) {
             SDL_DestroyTexture(tex[i]);
             tex[i] = NULL;
         }
+        free(typeInfos[I].tex);
+        typeInfos[I].tex = NULL;
     }
 
     for (int i = 0; i < NUM_HEADS; i++) {
-        SDL_DestroyTexture(HEAD_SET[i].tex);
-        HEAD_SET[i].tex = NULL;
+        SDL_DestroyTexture(headInfos[i].tex);
+        headInfos[i].tex = NULL;
     }
 }
 
@@ -136,8 +213,8 @@ static bool INTEL_RenewIntelSet_Head(const SDL_FRect bckRect) {
     float x = bckRect.x;
     for (int i = 0; i < NUM_HEADS; i++) {
         x += dx;
-        headRect[i] = (SDL_FRect){x, y, (float)HEAD_SET[i].tex->w, (float)HEAD_SET[i].tex->h};
-        x += unitW[i] + dx;
+        headInfos[i].rect = (SDL_FRect){x, y, (float)headInfos[i].tex->w, (float)headInfos[i].tex->h};
+        x += headInfos[i].w + dx;
     }
     return true;
 }
@@ -151,28 +228,35 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
             x += dx;
             const SDL_Texture* tx = NULL;
             switch (j) {
-                case HEAD_VISIBLE: tx = setInfo[TYPE_VISIBLE].tex[intel.visible]; break;
-                case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
-                case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
-                case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
-                case HEAD_JUDGE: tx = setInfo[TYPE_JUDGE].tex[intel.judge]; break;
-                case HEAD_STATE: tx = setInfo[TYPE_STATE].tex[intel.state]; break;
+                case HEAD_VISIBLE: tx = typeInfos[TYPE_VISIBLE].tex[intel.visible]; break;
+                case HEAD_SUBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.subject]; break;
+                case HEAD_ACTION: tx = typeInfos[TYPE_ACTION].tex[intel.action]; break;
+                case HEAD_OBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.object]; break;
+                case HEAD_JUDGE: tx = typeInfos[TYPE_JUDGE].tex[intel.judge]; break;
+                case HEAD_STATE: tx = typeInfos[TYPE_STATE].tex[intel.state]; break;
                 default: continue;
             }
             buffer[i].rect[j] = (SDL_FRect){x, y, (float)tx->w, (float)tx->h};
-            x += unitW[j] + dx;
+            x += headInfos[j].w + dx;
         }
     }
     return true;
 }
-static bool INTEL_RenewIntelSet_Trig() {
+static bool INTEL_RenewIntelSet_Trig(IntelArr* intelArr) {
+    for (int i = 0; i < NUM_HEADS; i++) {
+        const SDL_FRect rect = headInfos[i].rect;
+        if (PERPH_GetMouseInRect(rect) == false) continue;
+        if (PERPH_GetMouseLeftInRect(rect) == false) continue;
+        PERPH_SetMouseLeftTrig((Trig){headInfos[i].func, intelArr, false});
+    }
     for (int i = 0; i < bufferHead; i++) {
         Intel* intel = buffer[i].intel;
         for (int j = 0; j < NUM_HEADS; j++) {
             const SDL_FRect rect = buffer[i].rect[j];
             if (PERPH_GetMouseInRect(rect) == false) continue;
             if (PERPH_GetMouseLeftInRect(rect) == false) continue;
-            PERPH_SetMouseLeftTrig((Trig){HEAD_TRIG[j], intel, false});
+            const SetType type = headInfos[j].type;
+            PERPH_SetMouseLeftTrig((Trig){typeInfos[type].func, intel, false});
         }
     }
     return true;
@@ -184,7 +268,7 @@ bool INTEL_RenewIntelSet(IntelArr* intelArr) {
 
     REQ_CONDITION(INTEL_RenewIntelSet_Head(bckRect), return false);
     REQ_CONDITION(INTEL_RenewIntelSet_Body(bckRect), return false);
-    REQ_CONDITION(INTEL_RenewIntelSet_Trig(), return false);
+    REQ_CONDITION(INTEL_RenewIntelSet_Trig(intelArr), return false);
     return true;
 }
 
@@ -192,8 +276,8 @@ bool INTEL_RenewIntelSet(IntelArr* intelArr) {
 // DRAW ================================================================================================================
 static bool INTEL_DrawIntelSet_Head() {
     for (int i = 0; i < NUM_HEADS; i++) {
-        SDL_FRect rect = headRect[i];
-        SDL_RenderTexture(renderer, HEAD_SET[i].tex, NULL, &rect);
+        SDL_FRect rect = headInfos[i].rect;
+        SDL_RenderTexture(renderer, headInfos[i].tex, NULL, &rect);
     }
     return true;
 }
@@ -204,17 +288,17 @@ static bool INTEL_DrawIntelSet_Body() {
             SDL_Color back = EMPTY, text = WHITE;
             SDL_Texture* tx = NULL;
             switch (j) {
-                case HEAD_VISIBLE: tx = setInfo[TYPE_VISIBLE].tex[intel.visible]; break;
-                case HEAD_SUBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.subject]; break;
-                case HEAD_ACTION: tx = setInfo[TYPE_ACTION].tex[intel.action]; break;
-                case HEAD_OBJECT: tx = setInfo[TYPE_ENTITY].tex[intel.object]; break;
+                case HEAD_VISIBLE: tx = typeInfos[TYPE_VISIBLE].tex[intel.visible]; break;
+                case HEAD_SUBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.subject]; break;
+                case HEAD_ACTION: tx = typeInfos[TYPE_ACTION].tex[intel.action]; break;
+                case HEAD_OBJECT: tx = typeInfos[TYPE_ENTITY].tex[intel.object]; break;
                 case HEAD_JUDGE: {
                     back = BACK_C;
-                    tx = setInfo[TYPE_JUDGE].tex[intel.judge];
+                    tx = typeInfos[TYPE_JUDGE].tex[intel.judge];
                     break;
                 }
                 case HEAD_STATE: {
-                    tx = setInfo[TYPE_STATE].tex[intel.state];
+                    tx = typeInfos[TYPE_STATE].tex[intel.state];
                     back = STATE_COLORS[intel.state];
                     text = JUDGE_COLORS[intel.judge];
                     break;
@@ -237,7 +321,7 @@ static bool INTEL_DrawIntelSet_Body() {
 }
 bool INTEL_DrawIntelSet() {
     SDL_FRect bckRect = {0, 0, 0, (float)(bufferHead + 1) * (unitH + 2 * dy)};
-    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += unitW[i] + 2 * dx;
+    for (int i = 0; i < NUM_HEADS; i++) bckRect.w += headInfos[i].w + 2 * dx;
     bckRect.x = windowRect.x + (windowRect.w - bckRect.w) / 2;
     bckRect.y = windowRect.y + (windowRect.h - bckRect.h) / 2;
 
