@@ -96,26 +96,29 @@ static void INTEL_RenewIntelNet_EntityInfoVisible(IntelArr* intelArr) {
         entityInfo[intelArr->arr[k].object].visible = true;
     }
 }
-static void INTEL_RenewIntelNet_EntityInfoRepulsion() {
-    for (int i = 0; i < NUM_ENTITIES; i++) {
-        if (entityInfo[i].visible == false) continue;
-        for (int j = 0; j < NUM_ENTITIES; j++) {
-            if (entityInfo[j].visible == false || i == j) continue;
-            const SDL_FPoint A = entityInfo[i].position;
-            const SDL_FPoint B = entityInfo[j].position;
 
-            SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-            if (AB.x == 0 && AB.y == 0) AB = (SDL_FPoint){SDL_randf() - 0.5f, SDL_randf() - 0.5f};
 
-            const float normAB = SDL_sqrtf(AB.x * AB.x + AB.y * AB.y);
-            const float force = -1 / (normAB * normAB);
+static SDL_FPoint INTEL_GetRepulsion(const SDL_FPoint A, const SDL_FPoint B) {
+    SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+    if (AB.x == 0 && AB.y == 0) AB = (SDL_FPoint){SDL_randf() - 0.5f, SDL_randf() - 0.5f};
 
-            entityInfo[i].repulsion.x += force * AB.x / normAB;
-            entityInfo[i].repulsion.y += force * AB.y / normAB;
-        }
-    }
+    const float normAB = SDL_sqrtf(AB.x * AB.x + AB.y * AB.y);
+    const float force = -1 / (normAB * normAB);
+
+    return (SDL_FPoint){force * AB.x / normAB, force * AB.y / normAB};
 }
-static void INTEL_RenewIntelNet_EntityInfoGravitation(IntelArr* intelArr) {
+static SDL_FPoint INTEL_GetGravitation(const SDL_FPoint A, const SDL_FPoint B) {
+    const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+    return AB;
+}
+static SDL_FPoint INTEL_GetGravity(const SDL_FPoint A, const SDL_FPoint B) {
+    const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
+    return AB;
+}
+
+
+static void INTEL_RenewIntelNet_EntityInfo_Position(IntelArr* intelArr) {
+    // Gravitation
     for (int k = 0; k < intelArr->len; k++) {
         const Intel intel = intelArr->arr[k];
         if (intel.effective == false || intel.visible == false) continue;
@@ -123,28 +126,32 @@ static void INTEL_RenewIntelNet_EntityInfoGravitation(IntelArr* intelArr) {
         const int i = intel.subject, j = intel.object;
         if (entityInfo[i].visible == false || entityInfo[j].visible == false) continue;
 
-        const SDL_FPoint A = entityInfo[i].position;
-        const SDL_FPoint B = entityInfo[j].position;
-
-        const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-        entityInfo[i].gravitation.x += AB.x;
-        entityInfo[i].gravitation.y += AB.y;
-        entityInfo[j].gravitation.x -= AB.x;
-        entityInfo[j].gravitation.y -= AB.y;
+        const SDL_FPoint F = INTEL_GetGravitation(entityInfo[i].position, entityInfo[j].position);
+        entityInfo[i].gravitation.x += F.x;
+        entityInfo[i].gravitation.y += F.y;
+        entityInfo[j].gravitation.x -= F.x;
+        entityInfo[j].gravitation.y -= F.y;
     }
-}
-static void INTEL_RenewIntelNet_EntityInfoGravity() {
+
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entityInfo[i].visible == false) continue;
-        const SDL_FPoint A = entityInfo[i].position;
-        const SDL_FPoint B = {0, 0};
-        const SDL_FPoint AB = {B.x - A.x, B.y - A.y};
-        entityInfo[i].gravity = AB;
-    }
-}
-static void INTEL_RenewIntelNet_EntityInfoPosition() {
-    const float dt = BASIC_DT;
-    for (int i = 0; i < NUM_ENTITIES; i++) {
+
+        // Repulsion
+        for (int j = 0; j < NUM_ENTITIES; j++) {
+            if (entityInfo[j].visible == false || i == j) continue;
+
+            const SDL_FPoint F = INTEL_GetRepulsion(
+                entityInfo[i].position,
+                entityInfo[j].position
+                );
+            entityInfo[i].repulsion.x += F.x;
+            entityInfo[i].repulsion.y += F.y;
+        }
+
+        // Gravity
+        entityInfo[i].gravity = INTEL_GetGravity(entityInfo[i].position, (SDL_FPoint){0, 0});
+
+        // Position
         if (i == entityMoveId) continue;
         const SDL_FPoint points[] = {
             entityInfo[i].repulsion,
@@ -152,10 +159,12 @@ static void INTEL_RenewIntelNet_EntityInfoPosition() {
             entityInfo[i].gravity,
         };
         const SDL_FPoint dv = SDL_GetSumFPoint(len_of(points), points);
-        entityInfo[i].position.x += dv.x * dt;
-        entityInfo[i].position.y += dv.y * dt;
+        entityInfo[i].position.x += dv.x * BASIC_DT * 10;
+        entityInfo[i].position.y += dv.y * BASIC_DT * 10;
     }
 }
+
+
 static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (entityInfo[i].visible == false) continue;
@@ -175,22 +184,13 @@ static void INTEL_RenewIntelNet_EntityInfoRectTrig() {
 }
 static bool INTEL_RenewIntelNet_EntityInfo(IntelArr* intelArr) {
     INTEL_RenewIntelNet_EntityInfoVisible(intelArr);
-    INTEL_RenewIntelNet_EntityInfoRepulsion();
-    INTEL_RenewIntelNet_EntityInfoGravitation(intelArr);
-    INTEL_RenewIntelNet_EntityInfoGravity();
-    INTEL_RenewIntelNet_EntityInfoPosition();
+    INTEL_RenewIntelNet_EntityInfo_Position(intelArr);
     INTEL_RenewIntelNet_EntityInfoRectTrig();
     return true;
 }
 bool INTEL_RenewIntelNet(IntelArr* intelArr) {
     for (int k = 0; k < intelArr->len; k++) {
         const Intel intel = intelArr->arr[k];
-        if (intel.subject == ENTITY_NULL && intel.action == ACTION_NULL && intel.object == ENTITY_NULL) {
-            // intelArrNow->arr[k].effective == false;
-        }
-        if (intel.judge == JUDGE_AUTO) {
-            intelArr->arr[k].state = INTEL_GetAutoState(intel);
-        }
         const int i = intel.subject, j = intel.object;
         const SDL_FPoint A = INTEL_GetScaledPos(entityInfo[i].position);
         const SDL_FPoint B = INTEL_GetScaledPos(entityInfo[j].position);
