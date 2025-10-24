@@ -28,6 +28,7 @@ bool SDL_GetSurfaceColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
 SDL_FPoint SDL_GetSumFPoint(int N, const SDL_FPoint points[N]);
 bool SDL_SetRenderColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
+SDL_FPoint SDL_ClipPointInRect(SDL_FPoint point, SDL_FRect rect);
 
 
 SDL_Texture* TXT_LoadTexture(

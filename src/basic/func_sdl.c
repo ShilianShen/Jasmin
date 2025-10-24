@@ -291,3 +291,12 @@ bool SDL_RenderDashedLine(SDL_Renderer *renderer, SDL_FPoint A, SDL_FPoint B, fl
 bool SDL_SetTextureColorRGB(SDL_Texture* tex, const SDL_Color color) {
     return SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
 }
+SDL_FPoint SDL_ClipPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
+    if (SDL_GetPointInRect(point, rect)) return point;
+    SDL_FPoint result = point;
+    if (point.x < rect.x) result.x = rect.x;
+    if (point.y < rect.y) result.y = rect.y;
+    if (rect.x + rect.w < point.x) result.x = rect.x + rect.w;
+    if (rect.y + rect.h < point.y) result.y = rect.y + rect.h;
+    return result;
+}
