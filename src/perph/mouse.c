@@ -77,7 +77,7 @@ static void PERPH_RenewMouse_State() {
 
     float x, y;
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&x, &y);
-    mouse.state2.pos = (SDL_FPoint){x * scale_x, y * scale_y};
+    mouse.state2.pos = (SDL_FPoint){x * windowScale.x, y * windowScale.y};
     mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
     mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
 

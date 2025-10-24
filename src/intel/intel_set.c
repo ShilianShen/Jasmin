@@ -4,15 +4,16 @@
 #include "intel_arr.h"
 
 
-typedef enum {TYPE_VISIBLE, TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES} SetType;
-typedef struct {int num; const char** names; TrigFunc func; SDL_Texture** tex; float w;} TypeInfo;
+typedef enum SetType {TYPE_VISIBLE, TYPE_ENTITY, TYPE_ACTION, TYPE_JUDGE, TYPE_STATE, NUM_TYPES} SetType;
+typedef struct TypeInfo {int num; const char** names; TrigFunc func; SDL_Texture** tex; float w;} TypeInfo;
 TypeInfo typeInfos[NUM_TYPES];
 
 
-typedef enum {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} SetHead;
-static struct {
+typedef enum SetHead {HEAD_VISIBLE, HEAD_SUBJECT, HEAD_ACTION, HEAD_OBJECT, HEAD_JUDGE, HEAD_STATE, NUM_HEADS} SetHead;
+typedef struct HeadInfo{
     const char* name; SetType type; TrigFunc func; SDL_Texture* tex; float w; SDL_FRect rect;
-} headInfos[NUM_HEADS] = {
+} HeadInfo;
+HeadInfo headInfos[NUM_HEADS] = {
     [HEAD_VISIBLE] = {"VISIBLE", TYPE_VISIBLE, INTEL_TrigSortVisible},
     [HEAD_SUBJECT] = {"SUBJECT", TYPE_ENTITY, INTEL_TrigSortSubject},
     [HEAD_ACTION] = {"ACTION", TYPE_ACTION, INTEL_TrigSortAction},

@@ -38,11 +38,10 @@ SDL_FPoint SDL_GetSumFPoint(const int N, const SDL_FPoint points[N]) {
 bool SDL_LoadDstRectAligned(SDL_FRect *dst_rect, SDL_Texture *texture, const SDL_FRect *src_rect, const SDL_FRect *gid_rect, const SDL_FRect *bck_rect, int anchor) {
     REQ_CONDITION(dst_rect != NULL, return false);
 
-
     SDL_FRect src = {0, 0, 0, 0};
     if (texture == NULL && src_rect == NULL) {
-        src.w = (float)windowWidth;
-        src.h = (float)windowHeight;
+        src.w = windowRect.w;
+        src.h = windowRect.h;
     }
     else if (src_rect != NULL) {
         src.w = src_rect->w;
@@ -55,7 +54,7 @@ bool SDL_LoadDstRectAligned(SDL_FRect *dst_rect, SDL_Texture *texture, const SDL
     if (gid_rect != NULL) {gid = *gid_rect;}
 
 
-    SDL_FRect bck = {0, 0, (float)windowWidth, (float)windowHeight};
+    SDL_FRect bck = windowRect;
     if (bck_rect != NULL) {bck = *bck_rect;}
 
 

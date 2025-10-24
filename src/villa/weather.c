@@ -36,12 +36,12 @@ bool VILLA_InitRain() {
 bool VILLA_RenewRain() {
     const float cos = SDL_cosf(rainTheme.arg), sin = SDL_sinf(rainTheme.arg);
     const float A = (float)SDL_GetTicks();
-    const float B = SDL_max(windowRectScaled.w, windowRectScaled.h);
+    const float B = SDL_max(windowRect.w, windowRect.h);
     for (int i = 0; i < NUM_RAIN; i++) {
         const float rate = rainTheme.min + (rainTheme.max - rainTheme.min) * BASIC_AtvLinear(rainDrops[i].w);
         const float offset = SDL_fmodf(A * rate, 2 * B) - B;
-        rainPos[i].x = rainDrops[i].x * windowRectScaled.w + offset * sin;
-        rainPos[i].y = rainDrops[i].y * windowRectScaled.h + offset * cos;
+        rainPos[i].x = rainDrops[i].x * windowRect.w + offset * sin;
+        rainPos[i].y = rainDrops[i].y * windowRect.h + offset * cos;
     }
     return true;
 }

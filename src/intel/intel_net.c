@@ -143,7 +143,7 @@ static void INTEL_RenewIntelNet_EntityInfoGravity() {
     }
 }
 static void INTEL_RenewIntelNet_EntityInfoPosition() {
-    const float dt = BASIC_T2 - BASIC_T1;
+    const float dt = BASIC_DT;
     for (int i = 0; i < NUM_ENTITIES; i++) {
         if (i == entityMoveId) continue;
         const SDL_FPoint points[] = {

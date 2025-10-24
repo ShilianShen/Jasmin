@@ -1,6 +1,7 @@
 #ifndef JASMIN__BASIC_H
 #define JASMIN__BASIC_H
 
+
 #define len_of(x) (sizeof(x) / sizeof((x)[0]))
 #define REQ_CONDITION(expr, stmt)                          \
     do {                                                   \
@@ -27,29 +28,20 @@ typedef enum {
 } JSM_DataType;
 
 
-extern SDL_FRect windowRectScaled, windowRect;
-extern ma_engine engine;
-
-
 void MA_PlaySound(const char *sound);
 
 
-extern SDL_Window* window;
-extern SDL_Renderer* renderer;
-
-
 extern const char* WINDOW_TITLE;
-extern const int WINDOW_WIDTH, WINDOW_HEIGHT;
+extern const int WINDOW_WIDTH;
+extern const int WINDOW_HEIGHT;
+extern SDL_Window* window;
+extern SDL_FRect windowRect;
+extern ma_engine engine;
+extern SDL_Renderer* renderer;
 extern bool running;
-extern const SDL_WindowFlags FLAG;
-SDL_Event sdl_event;
-extern SDL_GLContext content;
-extern float BASIC_T1, BASIC_T2;
-
-
-extern int logical_w, logical_h;
-extern int windowWidth, windowHeight;
-extern float scale_x, scale_y;
+extern SDL_Event sdl_event;
+extern float BASIC_DT;
+extern SDL_FPoint windowScale;
 extern SDL_Color EMPTY, BLACK, WHITE;
 
 
