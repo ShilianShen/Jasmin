@@ -38,9 +38,7 @@ bool BASIC_Init() {
 }
 void BASIC_Exit() {
     SDL_DestroyWindow(window); window = NULL;
-
     SDL_Quit();
-
     ma_engine_uninit(&engine);
 }
 bool BASIC_Renew() {
@@ -49,12 +47,15 @@ bool BASIC_Renew() {
     BASIC_T2 = (float)SDL_GetTicks() / 1000;
     BASIC_DT = BASIC_T2 - BASIC_T1;
 
-    int logical_w, logical_h, windowWidth, windowHeight;
+    int logical_w, logical_h;
     SDL_GetWindowSize(window, &logical_w, &logical_h);
-    SDL_GetWindowSizeInPixels(window, &windowWidth, &windowHeight);
-    windowScale.x = (float)windowWidth / (float)logical_w;
-    windowScale.y = (float)windowHeight / (float)logical_h;
-    windowRect = (SDL_FRect){0, 0, (float)windowWidth, (float)windowHeight};
+
+    int physical_w, windowHeight;
+    SDL_GetWindowSizeInPixels(window, &physical_w, &windowHeight);
+
+    windowScale = (SDL_FPoint){(float)physical_w / (float)logical_w, (float)windowHeight / (float)logical_h};
+    windowRect = (SDL_FRect){0, 0, (float)physical_w, (float)windowHeight};
+
     return true;
 }
 bool BASIC_Draw() {
