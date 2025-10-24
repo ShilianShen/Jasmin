@@ -2,20 +2,18 @@
 
 
 SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
 SDL_FRect windowRect = {0, 0, 0, 0};
-SDL_Event sdl_event;
+SDL_FPoint windowScale = {1, 1};
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 1200;
 const int WINDOW_HEIGHT = 800;
+
+
+SDL_Renderer* renderer = NULL;
+SDL_Event sdl_event;
 bool running = true;
-
-
-SDL_FPoint windowScale = {1, 1};
 SDL_Color EMPTY = {0, 0, 0, 0}, BLACK = {0, 0, 0, 255}, WHITE = {255, 255, 255, 255};
 float BASIC_DT = 0;
-
-
 ma_engine engine;
 
 
@@ -26,7 +24,7 @@ bool BASIC_Init() {
     REQ_CONDITION(SDL_Init(SDL_INIT_VIDEO), return false);
     REQ_CONDITION(TTF_Init(), return false);
 
-    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY;
+    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
     window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAGS);
     REQ_CONDITION(window != NULL, return false);
 
