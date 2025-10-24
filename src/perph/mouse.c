@@ -113,7 +113,7 @@ bool PERPH_RenewMouse() {
 bool PERPH_DrawMouse() {
     DEBUG_SendMessageL("%s:\n", __func__);
     DEBUG_SendMessageL("    mousePos: %s\n", SDL_GetStrFPoint(mouse.state2.pos));
-    if (mouse.left_trig.func != NULL) DEBUG_SendMessageL("    mouse.left_trig != NULL\n");
+    if (mouse.left_trig.func != NULL) DEBUG_SendMessageL("    mouse.left_trig: READY.\n");
 
     DEBUG_DrawPoint(mouse.state2.pos);
     if (mouse.state2.leftPressed) {
