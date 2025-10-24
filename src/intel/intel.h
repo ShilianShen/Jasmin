@@ -32,7 +32,6 @@ typedef struct {
 } Intel;
 
 
-IntelState INTEL_GetAutoState(Intel intel);
 const char* INTEL_GetStrIntel(Intel intel);
 
 

@@ -44,23 +44,6 @@ const char* INTEL_GetStrIntel(const Intel intel) {
         );
     return string;
 }
-static IntelState INTEL_GetAutoState_OneWay(const Intel intel1) {
-
-    return STATE_UNKNOWN;
-}
-IntelState INTEL_GetAutoState(const Intel intel1) {
-    if (actionSet[intel1.action].type == ACTION_TYPE_TWO_WAY) {
-        Intel intel2 = intel1;
-        intel2.subject = intel1.object;
-        intel2.object = intel1.subject;
-        const IntelState state1 = INTEL_GetAutoState_OneWay(intel1);
-        const IntelState state2 = INTEL_GetAutoState_OneWay(intel2);
-        // if (state1 == STATE_AUTO_T || state2 == STATE_AUTO_T) return STATE_AUTO_T;
-        // if (state1 == STATE_AUTO_F || state2 == STATE_AUTO_F) return STATE_AUTO_F;
-        // return STATE_AUTO_U;
-    }
-    return INTEL_GetAutoState_OneWay(intel1);
-}
 
 
 // TRIG ================================================================================================================
@@ -71,10 +54,7 @@ static void INTEL_ChangeMode(void* para) {
 
 
 // INIT & EXIT =========================================================================================================
-bool INTEL_Init() {
-    INTEL_InitIntelArr();
-
-    testIntelArr = INTEL_CreateIntelArr();
+static bool INTEL_Init_Test() {
     INTEL_AppendIntelArr(testIntelArr, (Intel){
         true,
         ENTITY_SOCRATES, ACTION_BELONG, ENTITY_HUMAN,
@@ -100,6 +80,13 @@ bool INTEL_Init() {
         ENTITY_HUMAN, ACTION_CAN, ENTITY_FLY,
         JUDGE_AUTO, STATE_UNKNOWN, true
     });
+    return true;
+}
+bool INTEL_Init() {
+    INTEL_InitIntelArr();
+
+    testIntelArr = INTEL_CreateIntelArr();
+    INTEL_Init_Test();
 
     return true;
 }
@@ -119,7 +106,8 @@ bool INTEL_Renew() {
 
 // DRAW ================================================================================================================
 bool INTEL_Draw() {
-    DEBUG_SendMessageL("%s: mode: %s\n", __func__, netMode ? "NET" : "SET");
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("    mode: %s\n", netMode ? "NET" : "SET");
     INTEL_DrawIntelArr(testIntelArr);
     return true;
 }

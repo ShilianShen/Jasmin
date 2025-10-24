@@ -14,6 +14,7 @@ static struct {
 static const SDL_FPoint scale = {500, 300};
 
 
+
 // GET & SET ===========================================================================================================
 void INTEL_ResetIntelNet() {
     for (int i = 0; i < NUM_ENTITIES; i++) {
@@ -207,6 +208,9 @@ bool INTEL_RenewIntelNet(IntelArr* intelArr) {
 
 // DRAW ================================================================================================================
 bool INTEL_DrawIntelNet(IntelArr* intelArr) {
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("    scale: %s\n", SDL_GetStrFPoint(scale));
+
     const float time = (float)SDL_GetTicks();
     for (int k = 0; k < intelArr->len; k++) {
         const Intel intel = intelArr->arr[k];
