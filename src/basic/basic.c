@@ -39,6 +39,8 @@ void BASIC_Exit() {
     SDL_Quit();
     ma_engine_uninit(&engine);
 }
+
+
 bool BASIC_Renew() {
     static float BASIC_T1 = 0, BASIC_T2 = 0;
     BASIC_T1 = BASIC_T2;

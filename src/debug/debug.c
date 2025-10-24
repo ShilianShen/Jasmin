@@ -95,6 +95,24 @@ void DEBUG_Exit() {
 
 
 // RENEW ===============================================================================================================
+static void DEBUG_Renew_Fps() {
+    static float fpsSet[1000];
+    static int head = 0;
+
+    if (BASIC_DT != 0) {
+        const float fps = 1.f / BASIC_DT;
+        fpsSet[head] = fps;
+        head = (head + 1) % len_of(fpsSet);
+    }
+    float min = 100000, max = -1;
+    for (int i = 0; i < len_of(fpsSet); i++) {
+        min = SDL_min(min, fpsSet[i]);
+        max = SDL_max(max, fpsSet[i]);
+    }
+    DEBUG_SendMessageL("%s:\n", __func__);
+    DEBUG_SendMessageL("    min: %4.2f\n", min);
+    DEBUG_SendMessageL("    max: %4.2f\n", max);
+}
 bool DEBUG_Renew() {
     if (!DEBUG_ON) return true;
 
@@ -104,14 +122,8 @@ bool DEBUG_Renew() {
             debug.message[i] = NULL;
         }
     }
+    DEBUG_Renew_Fps();
 
-    static Uint64 t1 = 0, t2 = 0;
-    t2 = SDL_GetTicks();
-    if (t2 / 1000 > 0) {
-        const float fps = 1000.f / (float)(t2 - t1);
-        DEBUG_SendMessageL("%s: FPS: %4.2f\n", __func__, fps);
-    }
-    t1 = SDL_GetTicks();
     return true;
 }
 

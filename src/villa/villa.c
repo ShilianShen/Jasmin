@@ -5,8 +5,8 @@
 #include "character.h"
 
 
-const char CHARACTER_TABLE_JSON_FILE[] = "../config/villa_character.json";
-const char ROOM_TABLE_JSON_FILE[] = "../config/villa_room.json";
+const char* CHARACTER_TABLE_JSON_FILE = "../config/villa_character.json";
+const char* ROOM_TABLE_JSON_FILE = "../config/villa_room.json";
 
 
 Table characterTable;
@@ -19,6 +19,7 @@ int cameraDirect;
 Character* you = NULL;
 
 
+// TRIG ================================================================================================================
 void VILLA_MoveYou(void* direct_void) {
     const int direct = *(int*)direct_void;
     VILLA_SetCharacterMove(you, direct);
@@ -29,6 +30,7 @@ void VILLA_MoveCameraSmall(const void* para_void) {
 }
 
 
+// INIT & EXIT =========================================================================================================
 bool VILLA_Init() {
     cJSON* characterTable_json = getJson(CHARACTER_TABLE_JSON_FILE);
     BASIC_CreateTable(&characterTable, characterTable_json, VILLA_CreateCharacter);
@@ -58,6 +60,13 @@ bool VILLA_Init() {
     }
     return true;
 }
+void VILLA_Exit() {
+    BASIC_DeleteTable(&characterTable, VILLA_DeleteCharacter);
+    BASIC_DeleteTable(&roomTable, VILLA_DestroyRoom_V);
+}
+
+
+// RENEW ===============================================================================================================
 static bool VILLA_Renew_Camera() {
     static Vec3f rotateSmall = {0}, rotateLarge = {0};
     const float t = (float)SDL_GetTicks() / 1000;
@@ -112,7 +121,7 @@ static bool VILLA_Renew_Camera() {
 static bool VILLA_Renew_You() {
     REQ_CONDITION(you != NULL, return false);
     static int directs[VILLA_NUM_DIRECTS];
-    static Trig trig[VILLA_NUM_DIRECTS];
+    Trig trig[VILLA_NUM_DIRECTS];
     for (int i = 0; i < VILLA_NUM_DIRECTS; i++) {
         trig[i] = (Trig){VILLA_MoveYou, &directs[i], true},
         directs[i] = i + cameraDirect;
@@ -131,16 +140,16 @@ bool VILLA_Renew() {
     && VILLA_Renew_Camera()
     ;
 }
+
+
+// DRAW ================================================================================================================
 bool VILLA_Draw() {
     return true
     && BASIC_DrawTable(&roomTable, VILLA_DrawRoom)
-    && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
-    && VILLA_DrawRain()
-    && LOTRI_Draw()
-    && VILLA_Ask(NULL, NULL)
+    // && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
+    // && VILLA_DrawRain()
+    // && LOTRI_Draw()
+    // && VILLA_Ask(NULL, NULL)
     ;
 }
-void VILLA_Exit() {
-    BASIC_DeleteTable(&characterTable, VILLA_DeleteCharacter);
-    BASIC_DeleteTable(&roomTable, VILLA_DestroyRoom_V);
-}
+
