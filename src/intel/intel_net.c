@@ -39,7 +39,7 @@ static SDL_FPoint INTEL_GetDescalePos(const SDL_FPoint pos) {
 
 // TRIG ================================================================================================================
 static EntityId entityMoveId = 0;
-static void TRIG_MoveEntity(void* para) {
+static void TRIG_MoveEntity(TrigPara para) {
     if (entityMoveId == 0) return;
     entityInfo[entityMoveId].position = INTEL_GetDescalePos(PERPH_GetMousePos());
 }
@@ -179,7 +179,7 @@ static void INTEL_RenewIntelNet_EntityInfo_Trig() {
 
         if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entityInfo[i].rect)) {
             entityMoveId = i;
-            PERPH_SetMouseLeftTrig((Trig){TRIG_MoveEntity, NULL, true});
+            PERPH_SetMouseLeftTrig((Trig){TRIG_MoveEntity, (TrigPara)NULL, true});
         }
         if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
     }

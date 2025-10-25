@@ -5,7 +5,7 @@ SDL_Window* window = NULL;
 SDL_FRect windowRect = {0, 0, 0, 0};
 SDL_FPoint windowScale = {1, 1};
 const char* WINDOW_TITLE = "Test";
-const int WINDOW_WIDTH = 1200;
+const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 800;
 
 
@@ -30,6 +30,7 @@ bool BASIC_Init() {
 
     renderer = SDL_CreateRenderer(window, NULL);
     REQ_CONDITION(renderer != NULL, return false);
+    SDL_SetRenderVSync(renderer, true);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     return true;

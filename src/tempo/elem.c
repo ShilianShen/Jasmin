@@ -39,8 +39,8 @@ static const struct {
     [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL, 0},
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, NULL, true}},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, NULL, false}},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, (TrigPara)NULL, true}},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, (TrigPara)NULL, false}},
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {
@@ -85,7 +85,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
         if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
             elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
-            elem->trig.para = elem;
+            elem->trig.para = (TrigPara)elem;
         }
     }
     if (cJSON_ExistKey(elem_json, key = "anchor")) {
@@ -117,7 +117,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
 
         if (elem->trig.func ==  NULL) {
-            elem->trig = (Trig){func, elem->para_string, false};
+            elem->trig = (Trig){func, (TrigPara)elem->para_string, false};
         }
     }
     if (cJSON_ExistKey(elem_json, key = "bck")) {
@@ -240,15 +240,15 @@ bool TEMPO_DrawElem(const void *elem_void) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncBool(void *para) {
-    const Elem* elem = para;
+void TEMPO_TrigFuncBool(TrigPara para) {
+    const Elem* elem = (Elem*)para;
     bool* now = elem->info.bool_.now;
     if (now != NULL) {
         *now = !*now;
     }
 }
-void TEMPO_TrigFuncSlid(void *para) {
-    const Elem* elem = para;
+void TEMPO_TrigFuncSlid(TrigPara para) {
+    const Elem* elem = (Elem*)para;
     const SDL_FRect dst_rect = elem->dst_rect;
     const ElemSlidInfo* slid = &elem->info.slid;
     TrigFunc_Slid(slid, dst_rect);

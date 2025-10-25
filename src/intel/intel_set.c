@@ -42,24 +42,24 @@ SDL_FRect INTEL_GetIntelSetBckRect() {
 
 
 // TRIG ================================================================================================================
-void INTEL_TrigChangeVisible(void* para) {
-    Intel* intel = para;
+void INTEL_TrigChangeVisible(TrigPara para) {
+    Intel* intel = (Intel*)para;
     intel->visible = !intel->visible;
 }
-void INTEL_TrigChangeJudge(void* para) {
-    Intel* intel = para;
+void INTEL_TrigChangeJudge(TrigPara para) {
+    Intel* intel = (Intel*)para;
     intel->judge = (intel->judge + 1) % NUM_JUDGES;
     intel->state = STATE_UNKNOWN;
 }
-void INTEL_TrigChangeState(void* para) {
-    Intel* intel = para;
+void INTEL_TrigChangeState(TrigPara para) {
+    Intel* intel = (Intel*)para;
     if (intel->judge != JUDGE_MANU) return;
     intel->state = (intel->state + 1) % NUM_STATES;
 }
 
 
-void INTEL_TrigSortVisible(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortVisible(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         if (intelArr->arr[i].visible == true) continue;
 
@@ -73,8 +73,8 @@ void INTEL_TrigSortVisible(void* para) {
         }
     }
 }
-void INTEL_TrigSortJudge(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortJudge(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         for (int j = i + 1; j < intelArr->len; j++) {
             if (intelArr->arr[i].judge <= intelArr->arr[j].judge) continue;
@@ -84,8 +84,8 @@ void INTEL_TrigSortJudge(void* para) {
         }
     }
 }
-void INTEL_TrigSortSubject(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortSubject(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         for (int j = i + 1; j < intelArr->len; j++) {
             if (intelArr->arr[i].subject <= intelArr->arr[j].subject) continue;
@@ -95,8 +95,8 @@ void INTEL_TrigSortSubject(void* para) {
         }
     }
 }
-void INTEL_TrigSortAction(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortAction(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         for (int j = i + 1; j < intelArr->len; j++) {
             if (intelArr->arr[i].action <= intelArr->arr[j].action) continue;
@@ -106,8 +106,8 @@ void INTEL_TrigSortAction(void* para) {
         }
     }
 }
-void INTEL_TrigSortObject(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortObject(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         for (int j = i + 1; j < intelArr->len; j++) {
             if (intelArr->arr[i].object <= intelArr->arr[j].object) continue;
@@ -117,8 +117,8 @@ void INTEL_TrigSortObject(void* para) {
         }
     }
 }
-void INTEL_TrigSortState(void* para) {
-    const IntelArr* intelArr = para;
+void INTEL_TrigSortState(TrigPara para) {
+    const IntelArr* intelArr = (IntelArr*)para;
     for (int i = 0; i < intelArr->len; i++) {
         for (int j = i + 1; j < intelArr->len; j++) {
             if (intelArr->arr[i].state <= intelArr->arr[j].state) continue;
@@ -254,7 +254,7 @@ static bool INTEL_RenewIntelSet_Trig(IntelArr* intelArr) {
         const SDL_FRect rect = headInfos[i].rect;
         if (PERPH_GetMouseInRect(rect) == false) continue;
         if (PERPH_GetMouseLeftInRect(rect) == false) continue;
-        PERPH_SetMouseLeftTrig((Trig){headInfos[i].func, intelArr, false});
+        PERPH_SetMouseLeftTrig((Trig){headInfos[i].func, (TrigPara)intelArr, false});
     }
     for (int i = 0; i < bufferHead; i++) {
         Intel* intel = buffer[i].intel;
@@ -263,7 +263,7 @@ static bool INTEL_RenewIntelSet_Trig(IntelArr* intelArr) {
             if (PERPH_GetMouseInRect(rect) == false) continue;
             if (PERPH_GetMouseLeftInRect(rect) == false) continue;
             const SetType type = headInfos[j].type;
-            PERPH_SetMouseLeftTrig((Trig){typeInfos[type].func, intel, false});
+            PERPH_SetMouseLeftTrig((Trig){typeInfos[type].func, (TrigPara)intel, false});
         }
     }
     return true;

@@ -60,9 +60,12 @@ bool PERPH_RenewKeyboard() {
 bool PERPH_DrawKeyboard() {
     DEBUG_SendMessageL("%s: [", __func__);
     for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
-        if (keyboard.state2.pressed[i] == true && keyboard.trigArray[i].func != NULL) {
-            DEBUG_SendMessageL("%s, ", SDL_GetScancodeName(i));
+        if (keyboard.trigArray[i].func == NULL) continue;
+
+        if (keyboard.state2.pressed[i] == true) {
+            DEBUG_SendMessageL("[%s], ", SDL_GetScancodeName(i));
         }
+        else DEBUG_SendMessageL("%s, ", SDL_GetScancodeName(i));
     }
     DEBUG_SendMessageL("]\n", __func__);
     return true;

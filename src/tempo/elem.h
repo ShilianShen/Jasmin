@@ -20,8 +20,8 @@ bool TEMPO_RenewElem(void* elem_void);
 bool TEMPO_DrawElem(const void* elem_void);
 
 
-void TEMPO_TrigFuncBool(void *para);
-void TEMPO_TrigFuncSlid(void *para);
+void TEMPO_TrigFuncBool(TrigPara para);
+void TEMPO_TrigFuncSlid(TrigPara para);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H

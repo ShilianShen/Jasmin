@@ -47,7 +47,7 @@ const char* INTEL_GetStrIntel(const Intel intel) {
 
 
 // TRIG ================================================================================================================
-static void INTEL_ChangeMode(void* para) {
+static void INTEL_ChangeMode(TrigPara para) {
     netMode = !netMode;
     INTEL_ResetIntelNet();
 }
@@ -99,7 +99,7 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewIntelArr(testIntelArr);
-    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, (Trig){INTEL_ChangeMode, NULL, false});
+    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, (Trig){INTEL_ChangeMode, (TrigPara)NULL, false});
     return true;
 }
 

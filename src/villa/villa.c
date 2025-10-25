@@ -20,8 +20,8 @@ Character* you = NULL;
 
 
 // TRIG ================================================================================================================
-void VILLA_MoveYou(void* direct_void) {
-    const int direct = *(int*)direct_void;
+void VILLA_MoveYou(const TrigPara direct_void) {
+    const int direct = (int)direct_void;
     VILLA_SetCharacterMove(you, direct);
 }
 void VILLA_MoveCameraSmall(const void* para_void) {
@@ -118,23 +118,18 @@ static bool VILLA_Renew_Camera() {
 
     return true;
 }
-static bool VILLA_Renew_You() {
-    REQ_CONDITION(you != NULL, return false);
-    static int directs[VILLA_NUM_DIRECTS];
-    Trig trig[VILLA_NUM_DIRECTS];
-    for (int i = 0; i < VILLA_NUM_DIRECTS; i++) {
-        trig[i] = (Trig){VILLA_MoveYou, &directs[i], true},
-        directs[i] = i + cameraDirect;
+static bool VILLA_Renew_Trig() {
+    if (you != NULL) {
+        PERPH_SetKeyTrig(SDL_SCANCODE_W, (Trig){VILLA_MoveYou, VILLA_DIRECT_PX + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_A, (Trig){VILLA_MoveYou, VILLA_DIRECT_PY + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_S, (Trig){VILLA_MoveYou, VILLA_DIRECT_NX + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_D, (Trig){VILLA_MoveYou, VILLA_DIRECT_NY + cameraDirect, true});
     }
-    PERPH_SetKeyTrig(SDL_SCANCODE_W, trig[VILLA_DIRECT_PX]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_A, trig[VILLA_DIRECT_PY]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_S, trig[VILLA_DIRECT_NX]);
-    PERPH_SetKeyTrig(SDL_SCANCODE_D, trig[VILLA_DIRECT_NY]);
     return true;
 }
 bool VILLA_Renew() {
     return true
-    && VILLA_Renew_You()
+    && VILLA_Renew_Trig()
     && BASIC_RenewTable(&roomTable, VILLA_RenewRoom)
     && BASIC_RenewTable(&characterTable, VILLA_RenewCharacter)
     && VILLA_Renew_Camera()
@@ -146,10 +141,9 @@ bool VILLA_Renew() {
 bool VILLA_Draw() {
     return true
     && BASIC_DrawTable(&roomTable, VILLA_DrawRoom)
-    // && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
-    // && VILLA_DrawRain()
-    // && LOTRI_Draw()
-    // && VILLA_Ask(NULL, NULL)
+    && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
+    && LOTRI_Draw()
+    && VILLA_Ask(NULL, NULL)
     ;
 }
 
