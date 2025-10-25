@@ -24,7 +24,7 @@ bool BASIC_Init() {
     REQ_CONDITION(SDL_Init(SDL_INIT_VIDEO), return false);
     REQ_CONDITION(TTF_Init(), return false);
 
-    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE | SDL_WINDOW_METAL;
     window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAGS);
     REQ_CONDITION(window != NULL, return false);
 

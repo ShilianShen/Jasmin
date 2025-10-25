@@ -24,7 +24,6 @@ static const int LEN_ENV_ARRAY = len_of(ENV_ARRAY);
 int main() {
     running = BASIC_InitEnv(LEN_ENV_ARRAY, ENV_ARRAY);
 
-
     while (running) {
         while (SDL_PollEvent(&sdl_event)) {
             switch (sdl_event.type) {
@@ -33,18 +32,12 @@ int main() {
             }
         }
 
-        Uint64 renew1 = SDL_GetTicks();
         running = running && BASIC_RenewEnv(LEN_ENV_ARRAY, ENV_ARRAY);
-        Uint64 renew2 = SDL_GetTicks();
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        Uint64 draw1 = SDL_GetTicks();
         running = running && BASIC_DrawEnv(LEN_ENV_ARRAY, ENV_ARRAY);
-        Uint64 draw2 = SDL_GetTicks();
-
-        // printf("%llu, %llu\n", renew2 - renew1, draw2 - draw1);
 
         SDL_RenderPresent(renderer);
     }

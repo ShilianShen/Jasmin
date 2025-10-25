@@ -19,14 +19,17 @@ int cameraDirect;
 Character* you = NULL;
 
 
+enum {CAMERA_Q, CAMERA_E, CAMERA_W, CAMERA_A, CAMERA_S, CAMERA_D, NUM_CAMERA_MOVES};
+bool cameraMoves[NUM_CAMERA_MOVES];
+
+
 // TRIG ================================================================================================================
-void VILLA_MoveYou(const TrigPara direct_void) {
-    const int direct = (int)direct_void;
+static void VILLA_TrigMoveYou(const TrigPara para) {
+    const int direct = (int)para;
     VILLA_SetCharacterMove(you, direct);
 }
-void VILLA_MoveCameraSmall(const void* para_void) {
-
-
+static void VILLA_TrigMoveCamera(const TrigPara para) {
+    cameraMoves[para] = true;
 }
 
 
@@ -78,10 +81,10 @@ static bool VILLA_Renew_Camera() {
         rotateSmall = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
 
         Vec3f v = {0, 0.5f, 0.3f};
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_DOWN )) v.v.y += angle;
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_UP   )) v.v.y -= angle;
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_LEFT )) v.v.z += angle;
-        if (PERPH_GetKeyPressed(SDL_SCANCODE_RIGHT)) v.v.z -= angle;
+        if (cameraMoves[CAMERA_S]) v.v.y += angle;
+        if (cameraMoves[CAMERA_W]) v.v.y -= angle;
+        if (cameraMoves[CAMERA_A]) v.v.z += angle;
+        if (cameraMoves[CAMERA_D]) v.v.z -= angle;
 
         if (BASIC_GetVecEqual(v, v2) == false) {
             v1 = rotateSmall;
@@ -96,8 +99,8 @@ static bool VILLA_Renew_Camera() {
         static float t1 = 0, t2 = 0;
         rotateLarge = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
         if (t >= t2){
-            if (PERPH_GetKeyPressed(SDL_SCANCODE_Q)) direct++;
-            if (PERPH_GetKeyPressed(SDL_SCANCODE_E)) direct--;
+            if (cameraMoves[CAMERA_Q]) direct++;
+            if (cameraMoves[CAMERA_E]) direct--;
             const Vec3f v = {0, 0, M_PI_2 * direct};
             if (BASIC_GetVecEqual(v, v2) == false) {
                 v1 = rotateLarge;
@@ -116,15 +119,23 @@ static bool VILLA_Renew_Camera() {
     else if (5 * M_PI_4 <= z && z < 7 * M_PI_4) cameraDirect = VILLA_DIRECT_NY;
     DEBUG_SendMessageL("%s: %.2f, %d\n", __func__, z, cameraDirect);
 
+    for (int i = 0; i < NUM_CAMERA_MOVES; i++) cameraMoves[i] = false;
+
     return true;
 }
 static bool VILLA_Renew_Trig() {
     if (you != NULL) {
-        PERPH_SetKeyTrig(SDL_SCANCODE_W, (Trig){VILLA_MoveYou, VILLA_DIRECT_PX + cameraDirect, true});
-        PERPH_SetKeyTrig(SDL_SCANCODE_A, (Trig){VILLA_MoveYou, VILLA_DIRECT_PY + cameraDirect, true});
-        PERPH_SetKeyTrig(SDL_SCANCODE_S, (Trig){VILLA_MoveYou, VILLA_DIRECT_NX + cameraDirect, true});
-        PERPH_SetKeyTrig(SDL_SCANCODE_D, (Trig){VILLA_MoveYou, VILLA_DIRECT_NY + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_W, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_PX + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_A, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_PY + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_S, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_NX + cameraDirect, true});
+        PERPH_SetKeyTrig(SDL_SCANCODE_D, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_NY + cameraDirect, true});
     }
+    PERPH_SetKeyTrig(SDL_SCANCODE_UP, (Trig){VILLA_TrigMoveCamera, CAMERA_W, true});
+    PERPH_SetKeyTrig(SDL_SCANCODE_LEFT, (Trig){VILLA_TrigMoveCamera, CAMERA_A, true});
+    PERPH_SetKeyTrig(SDL_SCANCODE_DOWN, (Trig){VILLA_TrigMoveCamera, CAMERA_S, true});
+    PERPH_SetKeyTrig(SDL_SCANCODE_RIGHT, (Trig){VILLA_TrigMoveCamera, CAMERA_D, true});
+    PERPH_SetKeyTrig(SDL_SCANCODE_Q, (Trig){VILLA_TrigMoveCamera, CAMERA_Q, true});
+    PERPH_SetKeyTrig(SDL_SCANCODE_E, (Trig){VILLA_TrigMoveCamera, CAMERA_E, true});
     return true;
 }
 bool VILLA_Renew() {
