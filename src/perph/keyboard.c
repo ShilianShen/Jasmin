@@ -20,6 +20,12 @@ bool PERPH_SetKeyTrig(const SDL_Scancode key, const Trig trig) {
     keyboard.trigArray[key] = trig;
     return true;
 }
+bool PERPH_ResetKeyTrig() {
+    for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
+        keyboard.trigArray[i].func = NULL;
+    }
+    return true;
+}
 
 
 // RENEW ===============================================================================================================

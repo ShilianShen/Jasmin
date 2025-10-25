@@ -20,7 +20,7 @@ Character* you = NULL;
 
 
 enum {CAMERA_Q, CAMERA_E, CAMERA_W, CAMERA_A, CAMERA_S, CAMERA_D, NUM_CAMERA_MOVES};
-bool cameraMoves[NUM_CAMERA_MOVES];
+static bool cameraMoves[NUM_CAMERA_MOVES];
 
 
 // TRIG ================================================================================================================

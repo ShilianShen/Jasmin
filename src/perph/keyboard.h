@@ -10,6 +10,7 @@ bool PERPH_DrawKeyboard();
 bool PERPH_GetKeyPressed(SDL_Scancode key);
 bool PERPH_GetKeyPress(SDL_Scancode key);
 bool PERPH_SetKeyTrig(SDL_Scancode key, Trig trig);
+bool PERPH_ResetKeyTrig();
 
 
 #endif //PERPH_KEYBOARD_H
