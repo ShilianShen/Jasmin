@@ -12,8 +12,9 @@ Camera camera = {
 
 
 // SET & GET ===========================================================================================================
-bool LOTRI_SetCamera(const Vec3f rotation) {
+bool LOTRI_SetCamera(const Vec3f rotation, const Vec3f position) {
     camera.rotation = rotation;
+    camera.position = position;
     return true;
 }
 

@@ -15,10 +15,15 @@ struct Character {
     Model* model;
     Coord coord1, coord2;
     float t1, t2;
+    SDL_Texture* sprite;
 };
 
 
-// SET & GET ===========================================================================================================
+// GET & SET ===========================================================================================================
+bool VILLA_GetCharacterPosition(const Character* character, Vec3f* position) {
+    if (character == NULL) return false;
+    return LOTRI_GetModelPosition(character->model, position);
+}
 bool VILLA_GetIfSomeoneThere(const Coord coord) {
     for (int i = 0; i < characterTable.len; i++) {
         const Character* character = characterTable.kv[i].val;
@@ -62,6 +67,27 @@ bool VILLA_SetCharacterMove(Character* character, int direct) {
     character->t2 = time + WALK_TIME_PER_CELL;
 
     return true;
+}
+Character* VILLA_GetForwardCharacter(const Character* character) {
+    if (character == NULL) return NULL;
+    if (BASIC_T2 < character->t2) return NULL;
+
+    Coord coord = character->coord2;
+    switch (character->coord2.direct) {
+        case VILLA_DIRECT_PX: coord.x++; break;
+        case VILLA_DIRECT_PY: coord.y++; break;
+        case VILLA_DIRECT_NX: coord.x--; break;
+        case VILLA_DIRECT_NY: coord.y--; break;
+        default: return NULL;
+    }
+    if (VILLA_GetIfSomeoneThere(coord) == false) return NULL;
+    for (int i = 0; i < characterTable.len; i++) {
+        Character* one = characterTable.kv[i].val;
+        if (one->coord2.room == coord.room && one->coord2.x == coord.x && one->coord2.y == coord.y) {
+            return one;
+        }
+    }
+    return NULL;
 }
 
 
@@ -143,33 +169,5 @@ bool VILLA_DrawCharacter(const void *character_void) {
 
     LOTRI_DrawModel(character->model);
 
-    return true;
-}
-
-
-// ?
-bool VILLA_Ask(Character* subject, Character* object) {
-    static const char* text = "Dive?";
-    static float t1 = 0, t2 = 0;
-
-    const float t = (float)SDL_GetTicks() / 1000;
-    const int len = SDL_min(strlen(text), (int)(20 * (t - t1)));
-    char string[len+1];
-    for (int i = 0; i < len; i++) {
-        string[i] = text[i];
-    }
-    string[len] = '\0';
-
-    SDL_Texture* texture = TXT_LoadTexture(renderer, VILLA_Font, string, (SDL_Color){255, 255, 255, 255});
-
-    SDL_FRect dst;
-    const SDL_Color color = {0, 0, 0, 128};
-    const SDL_FRect gid = {0, -160, 1, 1};
-    SDL_LoadDstRectAligned(&dst, texture, NULL, &gid, NULL, 18);
-    SDL_SetRenderColor(renderer, color);
-    SDL_RenderFillRect(renderer, &dst);
-    SDL_RenderTexture(renderer, texture, NULL, &dst);
-
-    SDL_DestroyTexture(texture);
     return true;
 }

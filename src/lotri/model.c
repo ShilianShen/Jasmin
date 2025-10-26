@@ -115,6 +115,15 @@ bool LOTRI_SetModelScale(Model* model, const Vec3f scale) {
     model->scale = scale;
     return true;
 }
+bool LOTRI_GetModelPosition(const Model* model, Vec3f* position) {
+    if (model == NULL) {
+        printf("LOTRI_SetModelPosition: NULL\n");
+        return false;
+    }
+
+    *position = model->position;
+    return true;
+}
 bool LOTRI_SetModelPosition(Model* model, const Vec3f position) {
     if (model == NULL) {
         printf("LOTRI_SetModelPosition: NULL\n");

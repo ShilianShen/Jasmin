@@ -14,7 +14,7 @@ static const Env ENV_ARRAY[] = {
     {"DEBUG", DEBUG_Init, DEBUG_Renew, DEBUG_Draw, DEBUG_Exit},
     {"PERPH", PERPH_Init, PERPH_Renew, PERPH_Draw, PERPH_Exit},
     // {"TEMPO", TEMPO_Init, TEMPO_Renew, TEMPO_Draw, TEMPO_Exit},
-    // {"INTEL", INTEL_Init, INTEL_Renew, INTEL_Draw, INTEL_Exit},
+    {"INTEL", INTEL_Init, INTEL_Renew, NULL, INTEL_Exit},
     {"LOTRI", LOTRI_Init, LOTRI_Renew, NULL, LOTRI_Exit},
     {"VILLA", VILLA_Init, VILLA_Renew, VILLA_Draw, VILLA_Exit},
 };

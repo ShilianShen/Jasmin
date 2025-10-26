@@ -7,12 +7,11 @@
 
 typedef intptr_t TrigPara;
 typedef void (*TrigFunc)(TrigPara);
-struct Trig {
+typedef struct {
     TrigFunc func;
     TrigPara para;
     bool sustain;
-};
-typedef struct Trig Trig;
+} Trig;
 
 
 void BASIC_PullTrig(Trig trig);

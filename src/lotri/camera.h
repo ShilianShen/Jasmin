@@ -15,7 +15,7 @@ struct Camera {
 extern Camera camera;
 
 
-bool LOTRI_SetCamera(Vec3f rotation);
+bool LOTRI_SetCamera(Vec3f rotation, Vec3f position);
 
 bool LOTRI_RenewCamera();
 bool LOTRI_DrawCamera();

@@ -40,7 +40,7 @@ extern ma_engine engine;
 extern SDL_Renderer* renderer;
 extern bool running;
 extern SDL_Event sdl_event;
-extern float BASIC_DT;
+extern float BASIC_T1, BASIC_T2, BASIC_DT;
 extern SDL_FPoint windowScale;
 extern SDL_Color EMPTY, BLACK, WHITE;
 

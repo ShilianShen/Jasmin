@@ -13,7 +13,7 @@ SDL_Renderer* renderer = NULL;
 SDL_Event sdl_event;
 bool running = true;
 SDL_Color EMPTY = {0, 0, 0, 0}, BLACK = {0, 0, 0, 255}, WHITE = {255, 255, 255, 255};
-float BASIC_DT = 0;
+float BASIC_T1 = 0, BASIC_T2 = 0, BASIC_DT = 0;
 ma_engine engine;
 
 
@@ -43,7 +43,6 @@ void BASIC_Exit() {
 
 
 bool BASIC_Renew() {
-    static float BASIC_T1 = 0, BASIC_T2 = 0;
     BASIC_T1 = BASIC_T2;
     BASIC_T2 = (float)SDL_GetTicks() / 1000;
     BASIC_DT = BASIC_T2 - BASIC_T1;

@@ -3,6 +3,7 @@
 #include "room.h"
 #include "weather.h"
 #include "character.h"
+#include "message.h"
 
 
 const char* CHARACTER_TABLE_JSON_FILE = "../config/villa_character.json";
@@ -31,6 +32,12 @@ static void VILLA_TrigMoveYou(const TrigPara para) {
 static void VILLA_TrigMoveCamera(const TrigPara para) {
     cameraMoves[para] = true;
 }
+static void VILLA_TrigSendMessage(const TrigPara para) {
+    VILLA_SendMessage("This is a text for test.");
+}
+static void VILLA_TrigClearMessage(const TrigPara para) {
+    VILLA_ResetMessage();
+}
 
 
 // INIT & EXIT =========================================================================================================
@@ -49,6 +56,7 @@ bool VILLA_Init() {
     you = characterTable.kv[0].val;
 
     VILLA_InitRain();
+    VILLA_InitMessage();
 
     VILLA_Font = TTF_OpenFont("../res/font/Times New Roman.ttf", 60);
     REQ_CONDITION(VILLA_Font != NULL, return false);
@@ -66,11 +74,15 @@ bool VILLA_Init() {
 void VILLA_Exit() {
     BASIC_DeleteTable(&characterTable, VILLA_DeleteCharacter);
     BASIC_DeleteTable(&roomTable, VILLA_DestroyRoom_V);
+    VILLA_ExitMessage();
 }
 
 
 // RENEW ===============================================================================================================
 static bool VILLA_Renew_Camera() {
+    Vec3f position;
+    VILLA_GetCharacterPosition(you, &position);
+
     static Vec3f rotateSmall = {0}, rotateLarge = {0};
     const float t = (float)SDL_GetTicks() / 1000;
     {
@@ -110,9 +122,9 @@ static bool VILLA_Renew_Camera() {
             }
         }
     }
-    const Vec3f cameraRotate = BASIC_GetAdd(rotateSmall, rotateLarge);
-    LOTRI_SetCamera(cameraRotate);
-    const float z = SDL_fmodf(SDL_fmodf(cameraRotate.v.z, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
+    const Vec3f rotation = BASIC_GetAdd(rotateSmall, rotateLarge);
+    LOTRI_SetCamera(rotation, position);
+    const float z = SDL_fmodf(SDL_fmodf(rotation.v.z, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
     if (7 * M_PI_4 <= z || z < 1 * M_PI_4) cameraDirect = VILLA_DIRECT_PX;
     else if (1 * M_PI_4 <= z && z < 3 * M_PI_4) cameraDirect = VILLA_DIRECT_PY;
     else if (3 * M_PI_4 <= z && z < 5 * M_PI_4) cameraDirect = VILLA_DIRECT_NX;
@@ -136,6 +148,9 @@ static bool VILLA_Renew_Trig() {
     PERPH_SetKeyTrig(SDL_SCANCODE_RIGHT, (Trig){VILLA_TrigMoveCamera, CAMERA_D, true});
     PERPH_SetKeyTrig(SDL_SCANCODE_Q, (Trig){VILLA_TrigMoveCamera, CAMERA_Q, true});
     PERPH_SetKeyTrig(SDL_SCANCODE_E, (Trig){VILLA_TrigMoveCamera, CAMERA_E, true});
+
+    PERPH_SetKeyTrig(SDL_SCANCODE_J, (Trig){VILLA_TrigSendMessage, 0, false});
+    PERPH_SetKeyTrig(SDL_SCANCODE_K, (Trig){VILLA_TrigClearMessage, 0, false});
     return true;
 }
 bool VILLA_Renew() {
@@ -144,6 +159,7 @@ bool VILLA_Renew() {
     && BASIC_RenewTable(&roomTable, VILLA_RenewRoom)
     && BASIC_RenewTable(&characterTable, VILLA_RenewCharacter)
     && VILLA_Renew_Camera()
+    && VILLA_RenewMessage()
     ;
 }
 
@@ -154,7 +170,8 @@ bool VILLA_Draw() {
     && BASIC_DrawTable(&roomTable, VILLA_DrawRoom)
     && BASIC_DrawTable(&characterTable, VILLA_DrawCharacter)
     && LOTRI_Draw()
-    && VILLA_Ask(NULL, NULL)
+    // && INTEL_Draw()
+    && VILLA_DrawMessage()
     ;
 }
 
