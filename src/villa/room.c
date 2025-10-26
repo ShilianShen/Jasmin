@@ -51,6 +51,9 @@ bool VILLA_GetRoomCellPosition(const Coord coord, Vec3f* position) {
     *position = coord.room->cells[coord.x][coord.y].worldPosition;
     return true;
 }
+bool VILLA_GetCoordEqualWithoutDirect(const Coord coord1, const Coord coord2) {
+    return coord1.room == coord2.room && coord1.x == coord2.x && coord1.y == coord2.y;
+}
 
 
 // CREATE & DELETE =====================================================================================================

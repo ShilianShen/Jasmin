@@ -31,19 +31,15 @@ typedef enum {
     VILLA_NUM_ACTS,
 } VILLA_Action;
 typedef struct Room Room;
-typedef struct Coord Coord;
-struct Coord {
-    Room *room;
-    int x, y;
-    int direct;
-};
+typedef struct {Room *room; int x, y; int direct;} Coord;
 
 
 bool VILLA_GetRoomCellEmpty(Coord coord);
 bool VILLA_GetRoomCellPosition(Coord coord, Vec3f* position);
+bool VILLA_GetCoordEqualWithoutDirect(Coord coord1, Coord coord2);
+
 
 void *VILLA_CreateRoom(const cJSON *room_json);
-
 void *VILLA_DestroyRoom_V(void *room_void);
 
 void VILLA_DeleteRoom(void *room_void);
