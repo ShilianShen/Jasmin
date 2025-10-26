@@ -25,7 +25,7 @@ typedef struct {
     SDL_FRect dstRect;
     float time;
 } Message;
-static const int NUM_MESSAGES = 5;
+static const int NUM_MESSAGES = 4;
 static Message box[NUM_MESSAGES] = {0};
 
 
@@ -69,6 +69,12 @@ void VILLA_ResetMessage() {
         VILLA_FreeMessage(&box[i]);
     }
 }
+bool VILLA_HaveMessage() {
+    for (int i = 0; i < NUM_MESSAGES; i++) {
+        if (box[i].string != NULL) return true;
+    }
+    return false;
+}
 
 
 // INIT & EXIT =========================================================================================================
@@ -81,9 +87,6 @@ bool VILLA_InitMessage() {
     REQ_CONDITION(sprite != NULL, return false);
     SDL_SetTextureScaleMode(sprite, SDL_SCALEMODE_NEAREST);
 
-    VILLA_SendMessage("Google Fonts makes it easy to bring personality.");
-    // VILLA_SendMessage("Our robust catalog of open-source fonts.");
-    // VILLA_SendMessage("No matter where you are in the world.");
     return true;
 }
 void VILLA_ExitMessage() {

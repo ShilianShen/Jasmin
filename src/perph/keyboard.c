@@ -58,6 +58,7 @@ bool PERPH_RenewKeyboard() {
     return true
     && PERPH_RenewKeyboard_State()
     && PERPH_RenewKeyboard_TrigArray()
+    && PERPH_ResetKeyTrig()
     ;
 }
 

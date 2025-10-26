@@ -136,12 +136,21 @@ static bool VILLA_Renew_Camera() {
     return true;
 }
 static bool VILLA_Renew_Trig() {
-    if (you != NULL) {
+    if (VILLA_GetForwardCharacter(you) != NULL) {
+        if (PERPH_GetKeyPressed(SDL_SCANCODE_RSHIFT)) {
+            PERPH_SetKeyTrig(SDL_SCANCODE_RETURN, (Trig){VILLA_TrigClearMessage, 0, false});
+        }
+        else {
+            PERPH_SetKeyTrig(SDL_SCANCODE_RETURN, (Trig){VILLA_TrigSendMessage, 0, false});
+        }
+    }
+    if (you != NULL && VILLA_HaveMessage() == false) {
         PERPH_SetKeyTrig(SDL_SCANCODE_W, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_PX + cameraDirect, true});
         PERPH_SetKeyTrig(SDL_SCANCODE_A, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_PY + cameraDirect, true});
         PERPH_SetKeyTrig(SDL_SCANCODE_S, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_NX + cameraDirect, true});
         PERPH_SetKeyTrig(SDL_SCANCODE_D, (Trig){VILLA_TrigMoveYou, VILLA_DIRECT_NY + cameraDirect, true});
     }
+
     PERPH_SetKeyTrig(SDL_SCANCODE_UP, (Trig){VILLA_TrigMoveCamera, CAMERA_W, true});
     PERPH_SetKeyTrig(SDL_SCANCODE_LEFT, (Trig){VILLA_TrigMoveCamera, CAMERA_A, true});
     PERPH_SetKeyTrig(SDL_SCANCODE_DOWN, (Trig){VILLA_TrigMoveCamera, CAMERA_S, true});
@@ -149,8 +158,6 @@ static bool VILLA_Renew_Trig() {
     PERPH_SetKeyTrig(SDL_SCANCODE_Q, (Trig){VILLA_TrigMoveCamera, CAMERA_Q, true});
     PERPH_SetKeyTrig(SDL_SCANCODE_E, (Trig){VILLA_TrigMoveCamera, CAMERA_E, true});
 
-    PERPH_SetKeyTrig(SDL_SCANCODE_J, (Trig){VILLA_TrigSendMessage, 0, false});
-    PERPH_SetKeyTrig(SDL_SCANCODE_K, (Trig){VILLA_TrigClearMessage, 0, false});
     return true;
 }
 bool VILLA_Renew() {

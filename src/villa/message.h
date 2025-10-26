@@ -7,6 +7,7 @@
 
 bool VILLA_SendMessage(const char* string);
 void VILLA_ResetMessage();
+bool VILLA_HaveMessage();
 
 
 bool VILLA_InitMessage();

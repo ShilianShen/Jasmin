@@ -83,7 +83,8 @@ Character* VILLA_GetForwardCharacter(const Character* character) {
     if (VILLA_GetIfSomeoneThere(coord) == false) return NULL;
     for (int i = 0; i < characterTable.len; i++) {
         Character* one = characterTable.kv[i].val;
-        if (one->coord2.room == coord.room && one->coord2.x == coord.x && one->coord2.y == coord.y) {
+        if (BASIC_T2 < one->t2) continue;
+        if (VILLA_GetCoordEqualWithoutDirect(coord, one->coord2)) {
             return one;
         }
     }
