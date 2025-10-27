@@ -6,7 +6,8 @@
 
 
 bool VILLA_SendMessage(const char *name, const char* string);
-void VILLA_ResetMessage();
+
+bool VILLA_ClearMessage();
 bool VILLA_HaveMessage();
 
 

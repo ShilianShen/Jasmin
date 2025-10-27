@@ -38,7 +38,7 @@ static void VILLA_TrigSendMessage(const TrigPara para) {
     VILLA_SendMessage("GAY", string);
 }
 static void VILLA_TrigClearMessage(const TrigPara para) {
-    VILLA_ResetMessage();
+    VILLA_ClearMessage();
 }
 
 
