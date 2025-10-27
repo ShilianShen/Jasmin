@@ -6,7 +6,7 @@ static TTF_Font* font = NULL;
 static float fontHeight = 0.f;
 static SDL_FRect back;
 static float backSpaceOut = 100, backSpaceIn = 10;
-static SDL_Texture* sprite = NULL;
+static SDL_Texture* spriteTex = NULL;
 static const float SPRITE_SCALE = 8;
 
 
@@ -17,6 +17,7 @@ static const SDL_Color TEXT_COLOR = {100, 100, 100, 255};
 static const SDL_Color BACK_COLOR = {225, 225, 225, 255};
 static const int CHAR_PER_SEC = 50;
 static const float SPRITE_SPEED = 4;
+static const SDL_FPoint SPRITE_OFFSET = {50, 50};
 
 
 static char* messageName = NULL;
@@ -94,16 +95,16 @@ bool VILLA_InitMessage() {
     REQ_CONDITION(font != NULL, return false);
     fontHeight = (float)TTF_GetFontHeight(font);
 
-    sprite = IMG_LoadTexture(renderer, "../res/image/test_sprite.png");
-    REQ_CONDITION(sprite != NULL, return false);
-    SDL_SetTextureScaleMode(sprite, SDL_SCALEMODE_NEAREST);
+    spriteTex = IMG_LoadTexture(renderer, "../res/image/test_sprite.png");
+    REQ_CONDITION(spriteTex != NULL, return false);
+    SDL_SetTextureScaleMode(spriteTex, SDL_SCALEMODE_NEAREST);
 
     return true;
 }
 void VILLA_ExitMessage() {
     TTF_CloseFont(font); font = NULL;
 
-    SDL_DestroyTexture(sprite); sprite = NULL;
+    SDL_DestroyTexture(spriteTex); spriteTex = NULL;
 }
 
 
@@ -170,12 +171,10 @@ static bool VILLA_DrawMessage_Box() {
     return true;
 }
 static bool VILLA_DrawMessage_Sprite() {
-    if (sprite == NULL) return false;
-    const float dx = 50, dy = 50;
+    if (spriteTex == NULL) return false;
     const float ATV = BASIC_AtvSin2((BASIC_T2 - startTime) * SPRITE_SPEED);
-
-    const SDL_FRect srcRect = {0, 0, (float)sprite->w, (float)sprite->h};
-    SDL_SetTextureAlphaMod(sprite, (int)(ATV * 255));
+    SDL_SetTextureAlphaMod(spriteTex, (int)(ATV * 255));
+    const SDL_FRect srcRect = {0, 0, (float)spriteTex->w, (float)spriteTex->h};
 
     SDL_FRect dstRect = srcRect;
     dstRect.w *= SPRITE_SCALE;
@@ -184,14 +183,14 @@ static bool VILLA_DrawMessage_Sprite() {
     dstRect.y = back.y - dstRect.h;
 
     SDL_FRect shadowRect = dstRect;
-    shadowRect.y += dy * ATV;
-    SDL_SetTextureColorRGB(sprite, BLACK);
-    SDL_RenderTexture(renderer, sprite, &srcRect, &shadowRect);
+    shadowRect.y += SPRITE_OFFSET.y * ATV;
+    SDL_SetTextureColorRGB(spriteTex, BLACK);
+    SDL_RenderTexture(renderer, spriteTex, &srcRect, &shadowRect);
 
     SDL_FRect spriteRect = dstRect;
-    spriteRect.x += dx * ATV;
-    SDL_SetTextureColorRGB(sprite, WHITE);
-    SDL_RenderTexture(renderer, sprite, &srcRect, &spriteRect);
+    spriteRect.x += SPRITE_OFFSET.x * ATV;
+    SDL_SetTextureColorRGB(spriteTex, WHITE);
+    SDL_RenderTexture(renderer, spriteTex, &srcRect, &spriteRect);
 
     return true;
 }
