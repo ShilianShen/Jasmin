@@ -19,6 +19,10 @@ static const int CHAR_PER_SEC = 50;
 static const float SPRITE_SPEED = 4;
 
 
+static char* messageName = NULL;
+static SDL_Texture* nameTex = NULL;
+
+
 typedef struct {
     char* string;
     SDL_Texture* texture;
@@ -41,8 +45,8 @@ void VILLA_FreeMessage(Message* message) {
         message->texture = NULL;
     }
 }
-bool VILLA_SendMessage(const char* string) {
-    REQ_CONDITION(string != NULL, return false);
+bool VILLA_SendMessage(const char* name, const char* string) {
+    REQ_CONDITION(name != NULL && string != NULL, return false);
 
     for (int i = 0; i < NUM_MESSAGES; i++) {
         if (box[i].string != NULL) continue;
@@ -62,6 +66,13 @@ bool VILLA_SendMessage(const char* string) {
     box[NUM_MESSAGES - 1].string = strdup(string);
     REQ_CONDITION(box[NUM_MESSAGES - 1].string != NULL, return false);
     box[NUM_MESSAGES - 1].time = BASIC_T2;
+
+    if (messageName != NULL) {
+        free(messageName);
+        messageName = NULL;
+    }
+    messageName = strdup(name);
+    REQ_CONDITION(messageName != NULL, return false);
     return true;
 }
 void VILLA_ResetMessage() {
@@ -160,33 +171,32 @@ static bool VILLA_DrawMessage_Box() {
 }
 static bool VILLA_DrawMessage_Sprite() {
     if (sprite == NULL) return false;
+    const float dx = 50, dy = 50;
     const float ATV = BASIC_AtvSin2((BASIC_T2 - startTime) * SPRITE_SPEED);
-    const SDL_FRect srcRect = {0, 0, (float)sprite->w, (float)sprite->h * ATV};
-    SDL_FRect spriteRect = srcRect;
-    spriteRect.w *= SPRITE_SCALE;
-    spriteRect.h *= SPRITE_SCALE;
-    spriteRect.x = back.x;
-    spriteRect.y = back.y - spriteRect.h;
-    SDL_FRect shadowRect = spriteRect;
-    shadowRect.x -= 50;
-    shadowRect.y += 50;
+
+    const SDL_FRect srcRect = {0, 0, (float)sprite->w, (float)sprite->h};
+    SDL_SetTextureAlphaMod(sprite, (int)(ATV * 255));
+
+    SDL_FRect dstRect = srcRect;
+    dstRect.w *= SPRITE_SCALE;
+    dstRect.h *= SPRITE_SCALE;
+    dstRect.x = back.x;
+    dstRect.y = back.y - dstRect.h;
+
+    SDL_FRect shadowRect = dstRect;
+    shadowRect.y += dy * ATV;
     SDL_SetTextureColorRGB(sprite, BLACK);
     SDL_RenderTexture(renderer, sprite, &srcRect, &shadowRect);
+
+    SDL_FRect spriteRect = dstRect;
+    spriteRect.x += dx * ATV;
     SDL_SetTextureColorRGB(sprite, WHITE);
     SDL_RenderTexture(renderer, sprite, &srcRect, &spriteRect);
+
     return true;
 }
 bool VILLA_DrawMessage() {
-    bool need = false;
-    for (int i = 0; i < NUM_MESSAGES; i++) {
-        if (box[i].string != NULL) {
-            need = true;
-            break;
-        }
-    }
-    if (need == false) return true;
-    // SDL_SetRenderColor(renderer, (SDL_Color){128, 128, 255, 255});
-    // SDL_RenderClear(renderer);
+    if (VILLA_HaveMessage() == false) return true;
     VILLA_DrawMessage_Sprite();
     VILLA_DrawMessage_Back();
     VILLA_DrawMessage_Box();

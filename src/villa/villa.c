@@ -33,7 +33,9 @@ static void VILLA_TrigMoveCamera(const TrigPara para) {
     cameraMoves[para] = true;
 }
 static void VILLA_TrigSendMessage(const TrigPara para) {
-    VILLA_SendMessage("This is a text for test.");
+    const Character* object = VILLA_GetForwardCharacter(you);
+    const char* string = VILLA_GetMessageBetween(you, object);
+    VILLA_SendMessage("GAY", string);
 }
 static void VILLA_TrigClearMessage(const TrigPara para) {
     VILLA_ResetMessage();

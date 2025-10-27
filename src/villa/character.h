@@ -18,6 +18,7 @@ bool VILLA_GetCharacterPosition(const Character* character, Vec3f* position);
 bool VILLA_GetIfSomeoneThere(Coord coord);
 bool VILLA_SetCharacterCoord(Character* character, Coord coord);
 bool VILLA_SetCharacterMove(Character* character, int direct);
+const char* VILLA_GetMessageBetween(const Character* subject, const Character* object);
 Character* VILLA_GetForwardCharacter(const Character* character);
 
 

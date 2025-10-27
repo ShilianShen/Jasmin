@@ -5,7 +5,7 @@
 #include "villa.h"
 
 
-bool VILLA_SendMessage(const char* string);
+bool VILLA_SendMessage(const char *name, const char* string);
 void VILLA_ResetMessage();
 bool VILLA_HaveMessage();
 

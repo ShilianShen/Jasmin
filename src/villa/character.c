@@ -68,6 +68,9 @@ bool VILLA_SetCharacterMove(Character* character, int direct) {
 
     return true;
 }
+const char* VILLA_GetMessageBetween(const Character* subject, const Character* object) {
+    return "HAHAHA.";
+}
 Character* VILLA_GetForwardCharacter(const Character* character) {
     if (character == NULL) return NULL;
     if (BASIC_T2 < character->t2) return NULL;
