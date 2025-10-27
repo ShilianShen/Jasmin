@@ -4,9 +4,7 @@
 #define MESSAGE_FONT "../res/font/IBMPlexMono-Medium.ttf", 48
 static TTF_Font* font = NULL;
 static float fontHeight = 0.f;
-static float AAA = 100, BBB = 100;
 static SDL_Texture* spriteTex = NULL;
-static const float SPRITE_SCALE = 8;
 
 
 static float startTime = 0.f;
@@ -14,7 +12,6 @@ static const SDL_Color TEXT_COLOR = {100, 100, 100, 255};
 static const int CHAR_PER_SEC = 50;
 
 
-static char* messageName = NULL;
 static SDL_Texture* nameTex = NULL;
 static SDL_FRect nameRect = {0};
 
@@ -31,6 +28,29 @@ static SDL_FRect mailRect = {0};
 
 
 // GET & SET ===========================================================================================================
+bool VILLA_SetName(const char* name) {
+    REQ_CONDITION(name != NULL, return false);
+    if (nameTex != NULL) {
+        SDL_DestroyTexture(nameTex);
+        nameTex = NULL;
+    }
+    nameTex = TXT_LoadTexture(renderer, font, name, WHITE);
+    REQ_CONDITION(nameTex != NULL, return false);
+    return true;
+}
+bool VILLA_SetMessage(const int i, const char* message) {
+    if (mailMessage[i].string != NULL) {
+        free(mailMessage[i].string);
+        mailMessage[i].string = NULL;
+    }
+    mailMessage[i].string = strdup(message);
+    REQ_CONDITION(mailMessage[i].string != NULL, return false);
+    mailMessage[i].time = BASIC_T2;
+    if (i == 0) {
+        startTime = BASIC_T2;
+    }
+    return true;
+}
 void VILLA_FreeMessage(Message* message) {
     if (message == NULL) return;
     if (message->string != NULL) {
@@ -45,21 +65,11 @@ void VILLA_FreeMessage(Message* message) {
 bool VILLA_SendMessage(const char* name, const char* string) {
     REQ_CONDITION(name != NULL && string != NULL, return false);
 
-    if (messageName != NULL) {
-        free(messageName);
-        messageName = NULL;
-    }
-    messageName = strdup(name);
-    REQ_CONDITION(messageName != NULL, return false);
+    VILLA_SetName(name);
 
     for (int i = 0; i < NUM_MESSAGES; i++) {
         if (mailMessage[i].string != NULL) continue;
-        mailMessage[i].string = strdup(string);
-        REQ_CONDITION(mailMessage[i].string != NULL, return false);
-        mailMessage[i].time = BASIC_T2;
-        if (i == 0) {
-            startTime = BASIC_T2;
-        }
+        VILLA_SetMessage(i, string);
         return true;
     }
 
@@ -67,9 +77,8 @@ bool VILLA_SendMessage(const char* name, const char* string) {
     for (int i = 1; i < NUM_MESSAGES; i++) {
         mailMessage[i - 1] = mailMessage[i];
     }
-    mailMessage[NUM_MESSAGES - 1].string = strdup(string);
-    REQ_CONDITION(mailMessage[NUM_MESSAGES - 1].string != NULL, return false);
-    mailMessage[NUM_MESSAGES - 1].time = BASIC_T2;
+    mailMessage[NUM_MESSAGES - 1] = (Message){0};
+    VILLA_SetMessage(NUM_MESSAGES - 1, string);
 
     return true;
 }
@@ -107,9 +116,10 @@ void VILLA_ExitMessage() {
 
 // RENEW ===============================================================================================================
 static bool VILLA_RenewMessage_Mail() {
-    mailRect.x = AAA;
-    mailRect.y = windowRect.h - fontHeight * (float)NUM_MESSAGES - BBB;
-    mailRect.w = windowRect.w - 2 * AAA;
+    static const SDL_FPoint PPP = {100, 100};
+    mailRect.x = PPP.x;
+    mailRect.y = windowRect.h - fontHeight * (float)NUM_MESSAGES - PPP.y;
+    mailRect.w = windowRect.w - 2 * PPP.x;
     mailRect.h = fontHeight * (float)NUM_MESSAGES;
     return true;
 }
@@ -133,21 +143,13 @@ static bool VILLA_RenewMessage_Message() {
     return true;
 }
 static bool VILLA_RenewMessage_Name() {
-    if (messageName == NULL) return true;
-
-    if (nameTex != NULL) {
-        SDL_DestroyTexture(nameTex);
-        nameTex = NULL;
-    }
-    nameTex = TXT_LoadTexture(renderer, font, messageName, WHITE);
-    REQ_CONDITION(nameTex != NULL, return false);
+    if (nameTex == NULL) return true;
     nameRect = (SDL_FRect){
         mailRect.x,
         mailRect.y - fontHeight,
         (float)nameTex->w,
         (float)nameTex->h
     };
-
     return true;
 }
 bool VILLA_RenewMessage() {
@@ -190,7 +192,7 @@ bool DrawBox(const int N, SDL_FRect rects[N]) {
 }
 
 
-static bool VILLA_DrawMessage_Mail() {
+static bool VILLA_DrawMessage_MailName() {
     SDL_FRect rects[] = {nameRect, mailRect};
     DrawBox(len_of(rects), rects);
 
@@ -203,14 +205,12 @@ static bool VILLA_DrawMessage_Mail() {
         SDL_DestroyTexture(mailMessage[i].texture);
         mailMessage[i].texture = NULL;
     }
-    return true;
-}
-static bool VILLA_DrawMessage_Name() {
     SDL_SetTextureColorRGB(nameTex, TEXT_COLOR);
     SDL_RenderTexture(renderer, nameTex, NULL, &nameRect);
     return true;
 }
 static bool VILLA_DrawMessage_Sprite() {
+    static const float SPRITE_SCALE = 8;
     static const float SPRITE_SPEED = 4;
     static const SDL_FPoint SPRITE_OFFSET = {50, 50};
 
@@ -240,7 +240,6 @@ static bool VILLA_DrawMessage_Sprite() {
 bool VILLA_DrawMessage() {
     if (VILLA_HaveMessage() == false) return true;
     VILLA_DrawMessage_Sprite();
-    VILLA_DrawMessage_Mail();
-    VILLA_DrawMessage_Name();
+    VILLA_DrawMessage_MailName();
     return true;
 }
