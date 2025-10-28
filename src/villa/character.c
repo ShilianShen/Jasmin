@@ -35,6 +35,10 @@ bool VILLA_GetIfSomeoneThere(const Coord coord) {
     }
     return false;
 }
+SDL_Texture* VILLA_GetCharacterSprite(const Character* character) {
+    if (character == NULL) return NULL;
+    return character->sprite;
+}
 bool VILLA_SetCharacterCoord(Character* character, const Coord coord) {
     REQ_CONDITION(character != NULL, return false);
     if (VILLA_GetRoomCellEmpty(coord) == false) return false;
@@ -108,6 +112,12 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
 
     character->model = LOTRI_CreateModel(model_json, material_json, MODEL_SIDE_CAMERA);
     REQ_CONDITION(character->model != NULL, return false);
+
+    char* sprite_json = NULL;
+    REQ_CONDITION(cJSON_Load(character_json, "sprite", JSM_STRING, &sprite_json), return false);
+    character->sprite = IMG_LoadTexture(renderer, sprite_json);
+    REQ_CONDITION(character->sprite != NULL, return false);
+    SDL_SetTextureScaleMode(character->sprite, SDL_SCALEMODE_NEAREST);
 
 	return true;
 }

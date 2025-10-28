@@ -6,9 +6,9 @@
 
 
 bool VILLA_SendMessage(const char *name, const char* string);
-
 bool VILLA_ClearMessage();
 bool VILLA_HaveMessage();
+bool VILLA_SetMessageSprite(SDL_Texture* texture);
 
 
 bool VILLA_InitMessage();

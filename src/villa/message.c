@@ -79,16 +79,17 @@ bool VILLA_HaveMessage() {
     }
     return false;
 }
+bool VILLA_SetMessageSprite(SDL_Texture* texture) {
+    REQ_CONDITION(texture != NULL, return false);
+    spriteTex = texture;
+    return true;
+}
 
 
 // INIT & EXIT =========================================================================================================
 bool VILLA_InitMessage() {
     font = TTF_OpenFont(MESSAGE_FONT);
     REQ_CONDITION(font != NULL, return false);
-
-    spriteTex = IMG_LoadTexture(renderer, "../res/image/test_sprite.png");
-    REQ_CONDITION(spriteTex != NULL, return false);
-    SDL_SetTextureScaleMode(spriteTex, SDL_SCALEMODE_NEAREST);
 
     return true;
 }

@@ -16,6 +16,7 @@ typedef struct Character Character;
 
 bool VILLA_GetCharacterPosition(const Character* character, Vec3f* position);
 bool VILLA_GetIfSomeoneThere(Coord coord);
+SDL_Texture* VILLA_GetCharacterSprite(const Character* character);
 bool VILLA_SetCharacterCoord(Character* character, Coord coord);
 bool VILLA_SetCharacterMove(Character* character, int direct);
 const char* VILLA_GetMessageBetween(const Character* subject, const Character* object);

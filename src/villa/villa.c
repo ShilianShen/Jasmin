@@ -36,6 +36,7 @@ static void VILLA_TrigSendMessage(const TrigPara para) {
     const Character* object = VILLA_GetForwardCharacter(you);
     const char* string = VILLA_GetMessageBetween(you, object);
     VILLA_SendMessage("GAY", string);
+    VILLA_SetMessageSprite(VILLA_GetCharacterSprite(you));
 }
 static void VILLA_TrigClearMessage(const TrigPara para) {
     VILLA_ClearMessage();
