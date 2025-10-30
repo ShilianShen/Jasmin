@@ -115,8 +115,10 @@ static bool VILLA_CreateCharacter_RK(Character* character, const cJSON* characte
 
     char* sprite_json = NULL;
     REQ_CONDITION(cJSON_Load(character_json, "sprite", JSM_STRING, &sprite_json), return false);
+
     character->sprite = IMG_LoadTexture(renderer, sprite_json);
     REQ_CONDITION(character->sprite != NULL, return false);
+
     SDL_SetTextureScaleMode(character->sprite, SDL_SCALEMODE_NEAREST);
 
 	return true;
