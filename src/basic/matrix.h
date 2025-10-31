@@ -3,6 +3,7 @@
 
 
 #include "_basic.h"
+#include "atv.h"
 
 
 typedef union {struct {float x, y, z, w;} v; float arr[4];} Vec4f;
@@ -15,11 +16,14 @@ Vec3f BASIC_GetNormal(Vec3f A, Vec3f B, Vec3f C);
 Vec3f BASIC_GetSum(Vec3f A, Vec3f B, Vec3f C);
 float BASIC_GetDot(Vec3f A, Vec3f B);
 Vec3f BASIC_GetAdd(Vec3f A, Vec3f B);
+Vec3f BASIC_AtvVec(Vec3f a, Vec3f b, float t, AtvFunc atv);
 const char* BASIC_GetStrVec3f(Vec3f vec);
 bool BASIC_GetVecEqual(Vec3f A, Vec3f B);
 
 
+
 typedef struct {float m[4][4];} Mat4f;
+bool LOTRI_LoadV3M4(int N, Vec3f vec_in[N], Mat4f mat, Vec4f vec_out[N], bool w);
 
 
 Mat4f BASIC_GetMatXMat(Mat4f A, Mat4f B);

@@ -93,7 +93,7 @@ static bool VILLA_Renew_Camera() {
         static Vec3f v1 = {0}, v2 = {0};
         static float t1 = 0, t2 = 0;
 
-        rotateSmall = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
+        rotateSmall = BASIC_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
 
         Vec3f v = {0, 0.5f, 0.3f};
         if (cameraMoves[CAMERA_S]) v.v.y += angle;
@@ -112,7 +112,7 @@ static bool VILLA_Renew_Camera() {
         static int direct = 0;
         static Vec3f v1 = {0}, v2 = {0};
         static float t1 = 0, t2 = 0;
-        rotateLarge = LOTRI_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
+        rotateLarge = BASIC_AtvVec(v1, v2, (t - t1) / (t2 - t1), BASIC_AtvRank2);
         if (t >= t2){
             if (cameraMoves[CAMERA_Q]) direct++;
             if (cameraMoves[CAMERA_E]) direct--;
@@ -170,6 +170,7 @@ bool VILLA_Renew() {
     && BASIC_RenewTable(&characterTable, VILLA_RenewCharacter)
     && VILLA_Renew_Camera()
     && VILLA_RenewMessage()
+    && LOTRI_Renew()
     ;
 }
 

@@ -144,19 +144,19 @@ void* VILLA_DeleteCharacter(void *character_void) {
 
 
 // RENEW ===============================================================================================================
-static bool VILLA_RenewCharacter_Src(const Character* character) {
+static bool VILLA_RenewCharacter_Src(Character* character) {
     VILLA_Action action = VILLA_ACT_NONE;
     const int direct = (character->coord2.direct - cameraDirect + 4) % 4;
     const float time = (float)SDL_GetTicks() / 1000;
     if (time < character->t2) {
-        switch (SDL_GetTicks() / 100 % 4) {
+        switch ((int)((BASIC_T2 - character->t1) * 10) % 4) {
             case 1: action = VILLA_ACT_WALK_1; break;
             case 3: action = VILLA_ACT_WALK_2; break;
             default: break;
         }
     }
-
-    return LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
+    LOTRI_SetModelSrc(character->model, &TEX_SRC[direct][action]);
+    return true;
 }
 bool VILLA_RenewCharacter(void *character_void) {
     Character* character = character_void;
@@ -170,7 +170,7 @@ bool VILLA_RenewCharacter(void *character_void) {
         REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord1, &position1), return false);
         REQ_CONDITION(VILLA_GetRoomCellPosition(character->coord2, &position2), return false);
         const float rate = (time - character->t1) / (character->t2 - character->t1);
-        const Vec3f position = LOTRI_AtvVec(position1, position2, rate, BASIC_AtvLinear);
+        const Vec3f position = BASIC_AtvVec(position1, position2, rate, BASIC_AtvLinear);
         LOTRI_SetModelPosition(character->model, position);
     }
     LOTRI_RenewModel(character->model);
@@ -185,5 +185,10 @@ bool VILLA_DrawCharacter(const void *character_void) {
 
     LOTRI_DrawModel(character->model);
 
+    {
+        Vec3f vec;
+        LOTRI_GetModelWorldVertex(character->model, 0, &vec);
+        DEBUG_SendMessageR("%s: %s\n", __func__, BASIC_GetStrVec3f(vec));
+    }
     return true;
 }

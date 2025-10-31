@@ -131,7 +131,7 @@ static bool VILLA_RenewMessage_Message() {
     return true;
 }
 static bool VILLA_RenewMessage_Name() {
-    static const SDL_FPoint OFFSET = {-20, 0};
+    static const SDL_FPoint OFFSET = {0, 0};
     if (nameTex == NULL) return true;
     nameRect = (SDL_FRect){
         mailRect.x + OFFSET.x,

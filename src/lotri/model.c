@@ -6,84 +6,35 @@ const Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
 
 
 
-Vec3f LOTRI_AtvVec(const Vec3f a, const Vec3f b, const float t, const AtvFunc atv) {
-    Vec3f result;
-    for (int i = 0; i < 3; i++) {
-        result.arr[i] = a.arr[i] + atv(t) * (b.arr[i] - a.arr[i]);
-    }
-    return result;
-}
-
-
-Vec3f LOTRI_GetDelayVecVec(const DelayVec3f delay) {
-    if (delay.t1 == delay.t2) return delay.v2;
-
-    const float t = (float)SDL_GetTicks() / 1000;
-    const float rate = (t - delay.t1) / (delay.t2 - delay.t1);
-    // DEBUG_SendMessageR("AA%.2f, %.2f, %.2f\n", t, rate, 0);
-    return LOTRI_AtvVec(delay.v1, delay.v2, rate, BASIC_AtvRank1);
-}
-bool LOTRI_SetDelayVec(DelayVec3f* delay, const Vec3f v2, const float time) {
-    if (delay == NULL || BASIC_GetVecEqual(delay->v2, v2) == true) return false;
-
-    const float t = (float)SDL_GetTicks() / 1000;
-    if (delay->block == true && t < delay->t2) return false;
-
-    delay->v1 = LOTRI_GetDelayVecVec(*delay);
-    delay->t1 = t;
-    delay->t2 = t + time;
-    delay->v2 = v2;
-    return true;
-}
-
-
-
-
-
-// MAT =================================================================================================================
-
-
-
 // VERTEX & FACE =======================================================================================================
-bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out[N], const bool w) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < 4; j++) {
-            vec_out[i].arr[j] = 0;
-            for (int k = 0; k < 3; k++) {
-                vec_out[i].arr[j] += vec_in[i].arr[k] * mat.m[k][j];
-            }
-            if (w) {
-                vec_out[i].arr[j] += mat.m[3][j];
-            }
-        }
-    }
-    return true;
-}
+
 
 
 
 typedef struct {int index; float key;} KeyIndex;
 int compare_key_index(const void *a, const void *b) {
     const float diff = ((KeyIndex*)a)->key - ((KeyIndex*)b)->key;
-    return (diff < 0) - (diff > 0);
+    if (diff < 0) return -1;
+    if (diff > 0) return 1;
+    return 0;
 }
-void sort_indices_by_keys(const int N, const float keys[N], int indices[N]) {
+void BASIC_SortIndices(const int N, const float keys[N], int indices[N], const bool ascending) {
     KeyIndex temp[N];
-
-    // 初始化索引和对应的 key 值
     for (int i = 0; i < N; ++i) {
         temp[i].index = i;
         temp[i].key = keys[i];
     }
 
-    // 排序
     qsort(temp, N, sizeof(KeyIndex), compare_key_index);
 
-    // 提取排序后的索引
-    for (int i = 0; i < N; ++i) {
-        indices[i] = temp[i].index;
+    for (int i = 0; i < N; i++) {
+        indices[i] = ascending ? temp[i].index : temp[N-1-i].index;
     }
 }
+
+
+
+
 
 
 struct Model {
@@ -354,7 +305,7 @@ static void LOTRI_RenewModel_WorldFaces(const Model* model) {
         }
         depths[i] = depth;
     }
-    sort_indices_by_keys(model->numFaces, depths, indices);
+    BASIC_SortIndices(model->numFaces, depths, indices, false);
     for (int i = 0; i < model->numFaces; i++) {
         model->worldFaces[i].ijk = model->modelFaces[indices[i]].ijk;
     }
@@ -423,7 +374,7 @@ bool LOTRI_DrawModelBuffer(const int N, const Model* modelArray[N]) {
     }
 
     int indices[N];
-    sort_indices_by_keys(N, depth, indices);
+    BASIC_SortIndices(N, depth, indices, false);
 
     bool result = true;
     for (int i = 0; i < N; i++) {

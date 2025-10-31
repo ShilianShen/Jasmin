@@ -32,6 +32,13 @@ Vec3f BASIC_GetAdd(const Vec3f A, const Vec3f B) {
     };
     return result;
 }
+Vec3f BASIC_AtvVec(const Vec3f a, const Vec3f b, const float t, const AtvFunc atv) {
+    Vec3f result;
+    for (int i = 0; i < 3; i++) {
+        result.arr[i] = a.arr[i] + atv(t) * (b.arr[i] - a.arr[i]);
+    }
+    return result;
+}
 
 
 bool BASIC_GetVecEqual(const Vec3f A, const Vec3f B) {
@@ -59,6 +66,20 @@ Mat4f BASIC_GetMatXMat(const Mat4f A, const Mat4f B) {
         }
     }
     return AB;
+}
+bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out[N], const bool w) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < 4; j++) {
+            vec_out[i].arr[j] = 0;
+            for (int k = 0; k < 3; k++) {
+                vec_out[i].arr[j] += vec_in[i].arr[k] * mat.m[k][j];
+            }
+            if (w) {
+                vec_out[i].arr[j] += mat.m[3][j];
+            }
+        }
+    }
+    return true;
 }
 Mat4f BASIC_GetProd(const int N, const Mat4f matArray[]) {
     Mat4f result = matArray[0];
