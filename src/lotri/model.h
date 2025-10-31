@@ -19,6 +19,7 @@ typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
 typedef struct LOTRI_Model LOTRI_Model;
+typedef struct LOTRI_World LOTRI_World;
 typedef enum ModelSide {
     MODEL_SIDE_NULL,
     MODEL_SIDE_OUT,
