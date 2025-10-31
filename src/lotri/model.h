@@ -36,6 +36,7 @@ void LOTRI_DestroyModel(Model* model);
 Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
+bool LOTRI_SetModelScale(Model* model, Vec3f scale);
 bool LOTRI_GetModelPosition(const Model* model, Vec3f* position);
 bool LOTRI_SetModelPosition(Model* model, Vec3f position);
 bool LOTRI_SetModelRotation(Model* model, Vec3f rotation);
@@ -45,7 +46,7 @@ bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 bool LOTRI_GetModelWorldVertex(const Model* model, int index, Vec3f* vec);
 bool LOTRI_GetModelModelVertex(const Model* model, int index, Vec3f* vec);
-bool LOTRI_GetModelCZ(const Model* model, float* cz);
+
 bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src);
 
 

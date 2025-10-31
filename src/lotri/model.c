@@ -5,14 +5,8 @@ int modelBufferHead = 0;
 const Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
 
 
-
-// VERTEX & FACE =======================================================================================================
-
-
 struct Model {
-    Vec3f scale;
-    Vec3f position;
-    Vec3f rotation;
+    Vec3f scale, position, rotation;
 
     int numVertices;
     LOTRI_Vertex *modelVertices, *worldVertices;
@@ -29,30 +23,41 @@ struct Model {
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_SetModelScale(Model* model, const Vec3f scale) {
-    if (model == NULL) {
-        printf("LOTRI_SetModelPosition: NULL\n");
-        return false;
-    }
-
-    model->scale = scale;
-    return true;
-}
 bool LOTRI_GetModelPosition(const Model* model, Vec3f* position) {
-    if (model == NULL) {
-        printf("LOTRI_SetModelPosition: NULL\n");
-        return false;
-    }
-
+    REQ_CONDITION(model != NULL, return false);
+    REQ_CONDITION(position != NULL, return false);
     *position = model->position;
     return true;
 }
-bool LOTRI_SetModelPosition(Model* model, const Vec3f position) {
-    if (model == NULL) {
-        printf("LOTRI_SetModelPosition: NULL\n");
-        return false;
-    }
+bool LOTRI_GetModelWorldVertex(const Model* model, const int index, Vec3f* vec) {
+    if (model == NULL) return false;
+    if (index >= model->numVertices) return false;
 
+    *vec = model->worldVertices[index].xyz;
+    return true;
+}
+bool LOTRI_GetModelModelVertex(const Model* model, const int index, Vec3f* vec) {
+    if (model == NULL) return false;
+    if (index >= model->numVertices) return false;
+
+    *vec = model->modelVertices[index].xyz;
+    return true;
+}
+
+
+bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src) {
+    if (model == NULL) return false;
+
+    model->src = src;
+    return true;
+}
+bool LOTRI_SetModelScale(Model* model, const Vec3f scale) {
+    REQ_CONDITION(model != NULL, return false);
+    model->scale = scale;
+    return true;
+}
+bool LOTRI_SetModelPosition(Model* model, const Vec3f position) {
+    REQ_CONDITION(model != NULL, return false);
     model->position = position;
     return true;
 }
@@ -89,33 +94,6 @@ bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
     if (model == NULL) return false;
 
     model->mat = mat;
-    return true;
-}
-
-bool LOTRI_GetModelWorldVertex(const Model* model, const int index, Vec3f* vec) {
-    if (model == NULL) return false;
-    if (index >= model->numVertices) return false;
-
-    *vec = model->worldVertices[index].xyz;
-    return true;
-}
-bool LOTRI_GetModelModelVertex(const Model* model, const int index, Vec3f* vec) {
-    if (model == NULL) return false;
-    if (index >= model->numVertices) return false;
-
-    *vec = model->modelVertices[index].xyz;
-    return true;
-}
-bool LOTRI_GetModelCZ(const Model* model, float* cz) {
-    if (model == NULL || cz == NULL) return false;
-
-    *cz = model->rotation.v.z - camera.rotation.v.z;
-    return true;
-}
-bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src) {
-    if (model == NULL) return false;
-
-    model->src = src;
     return true;
 }
 
