@@ -18,7 +18,7 @@ typedef struct {Vec3f xyz; Vec4f rgba; Vec2f uv;} LOTRI_Vertex;
 typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
-typedef struct Model Model;
+typedef struct LOTRI_Model LOTRI_Model;
 typedef enum ModelSide {
     MODEL_SIDE_NULL,
     MODEL_SIDE_OUT,
@@ -29,31 +29,31 @@ typedef enum ModelSide {
 
 #define MAX_MODEL_BUFFER 64
 extern int modelBufferHead;
-extern const Model* modelBuffer[];
+extern const LOTRI_Model* modelBuffer[];
 
 
-void LOTRI_DestroyModel(Model* model);
-Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
+void LOTRI_DestroyModel(LOTRI_Model* model);
+LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
-bool LOTRI_SetModelScale(Model* model, Vec3f scale);
-bool LOTRI_GetModelPosition(const Model* model, Vec3f* position);
-bool LOTRI_SetModelPosition(Model* model, Vec3f position);
-bool LOTRI_SetModelRotation(Model* model, Vec3f rotation);
-bool LOTRI_SetModelNormals(const Model* model, ModelSide side);
+bool LOTRI_SetModelScale(LOTRI_Model* model, Vec3f scale);
+bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position);
+bool LOTRI_SetModelPosition(LOTRI_Model* model, Vec3f position);
+bool LOTRI_SetModelRotation(LOTRI_Model* model, Vec3f rotation);
+bool LOTRI_SetModelNormals(const LOTRI_Model* model, ModelSide side);
 
 
-bool LOTRI_GetModelWorldVertex(const Model* model, int index, Vec3f* vec);
-bool LOTRI_GetModelModelVertex(const Model* model, int index, Vec3f* vec);
+bool LOTRI_GetModelWorldVertex(const LOTRI_Model* model, int index, Vec3f* vec);
+bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, int index, Vec3f* vec);
 
-bool LOTRI_SetModelSrc(Model* model, SDL_FRect* src);
-
-
-bool LOTRI_RenewModel(Model* model);
+bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src);
 
 
-bool LOTRI_DrawModel(const Model* model);
-bool LOTRI_DrawModelBuffer(int N, const Model* modelArray[N]);
+bool LOTRI_RenewModel(LOTRI_Model* model);
+
+
+bool LOTRI_DrawModel(const LOTRI_Model* model);
+bool LOTRI_DrawModelBuffer(int N, const LOTRI_Model* modelArray[N]);
 
 
 #endif //MODEL_H

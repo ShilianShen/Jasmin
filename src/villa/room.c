@@ -19,7 +19,7 @@ const SDL_Color colors[VILLA_NUM_DATA_TYPES] = {
 };
 typedef struct RoomCell RoomCell;
 struct Room {
-    Model* model;
+    LOTRI_Model* model;
     SDL_Surface* maskSur;
     SDL_Texture* maskTex;
     SDL_Rect mask_indices;

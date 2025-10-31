@@ -12,7 +12,7 @@ static SDL_FRect direct2rect2[VILLA_NUM_DIRECTS] = {
     [VILLA_DIRECT_NY] = {0, 0.75f, 0.25f, 0.25f},
 };
 struct Character {
-    Model* model;
+    LOTRI_Model* model;
     Coord coord1, coord2;
     float t1, t2;
     SDL_Texture* sprite;

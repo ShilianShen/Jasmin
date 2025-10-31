@@ -23,8 +23,8 @@ bool LOTRI_SetCamera(const Vec3f rotation, const Vec3f position) {
 static void LOTRI_RenewCamera_Proj() {
     matProj = (Mat4f){
         .m = {
-            {0, 0, 1, 0},
-            {-1, 0, 0, 0},
+            {0, 0, -1, 0},
+            {1, 0, 0, 0},
             {0, -1, 0, 0},
             {windowRect.w / 2, windowRect.h / 2, 0, 1},
         }
