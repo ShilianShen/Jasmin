@@ -18,7 +18,7 @@ struct Model {
     SDL_FRect* src;
     float depth;
     SDL_Texture* texture;
-    Mat4f mat;
+    // Mat4f mat;
 };
 
 
@@ -88,12 +88,6 @@ bool LOTRI_SetModelNormals(const Model* model, const ModelSide side) {
             model->modelFaces[i].xyz = normal;
         }
     }
-    return true;
-}
-bool LOTRI_SetModelMat(Model* model, const Mat4f mat) {
-    if (model == NULL) return false;
-
-    model->mat = mat;
     return true;
 }
 
@@ -199,53 +193,25 @@ static void LOTRI_RenewModel_Mat(Model* model) {
     if (model->side == MODEL_SIDE_CAMERA) {
         rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
     }
+
     const Mat4f matArr[] = {
         BASIC_GetMatS(model->scale),
         BASIC_GetMatR(rotation),
         BASIC_GetMatT(model->position),
         camera.mat,
     };
-    LOTRI_SetModelMat(model, BASIC_GetProd(len_of(matArr), matArr));
-}
-static void LOTRI_RenewModel_WorldVertices(const Model* model) {
-    // xyz
+    const Mat4f mat = BASIC_GetProd(len_of(matArr), matArr);
+
     for (int i = 0; i < model->numVertices; i++) {
-        for (int j = 0; j < 3; j++) {
-            float* ij = &model->worldVertices[i].xyz.arr[j];
-            *ij = 0;
-            for (int k = 0; k < 3; k++) {
-                *ij += model->modelVertices[i].xyz.arr[k] * model->mat.m[k][j];
-            }
-            *ij += model->mat.m[3][j];
-        }
+        model->worldVertices[i].xyz = BASIC_GetV3M4(model->modelVertices[i].xyz, mat, true);
+        model->worldVertices[i].uv = BASIC_GetV2Rect(model->modelVertices[i].uv, model->src);
     }
-    // uv
-    if (model->src == NULL) {
-        for (int i = 0; i < model->numVertices; i++) {
-            model->worldVertices[i].uv = model->modelVertices[i].uv;
-        }
-    }
-    else {
-        for (int i = 0; i < model->numVertices; i++) {
-            model->worldVertices[i].uv = (Vec2f){
-                model->src->x + model->src->w * model->modelVertices[i].uv.v.x,
-                model->src->y + model->src->h * model->modelVertices[i].uv.v.y,
-            };
-        }
+    for (int i = 0; i < model->numFaces; i++) {
+        model->worldFaces[i].xyz = BASIC_GetV3M4(model->modelFaces[i].xyz, mat, false);
     }
 }
-static void LOTRI_RenewModel_WorldFaces(const Model* model) {
-    for (int i = 0; i < model->numFaces; i++) {
-        for (int j = 0; j < 3; j++) {
-            float* ij = &model->worldFaces[i].xyz.arr[j];
-            *ij = 0;
-            for (int k = 0; k < 3; k++) {
-                *ij += model->modelFaces[i].xyz.arr[k] * model->mat.m[k][j];
-            }
-        }
-    }
+static void LOTRI_RenewModel_Depth(Model* model) {
     float depths[model->numFaces];
-    int indices[model->numFaces];
     for (int i = 0; i < model->numFaces; i++) {
         const Vec3i index = model->modelFaces[i].ijk;
         float depth = 0;
@@ -255,12 +221,14 @@ static void LOTRI_RenewModel_WorldFaces(const Model* model) {
         }
         depths[i] = depth;
     }
+    int indices[model->numFaces];
     BASIC_SortIndices(model->numFaces, depths, indices, false);
     for (int i = 0; i < model->numFaces; i++) {
         model->worldFaces[i].ijk = model->modelFaces[indices[i]].ijk;
     }
-}
-static void LOTRI_RenewModel_Depth(Model* model) {
+
+
+
     if (model->side == MODEL_SIDE_CAMERA) {
         model->depth = model->worldVertices[0].xyz.v.z;
         return;
@@ -281,8 +249,8 @@ bool LOTRI_RenewModel(Model* model) {
     if (model == NULL) return false;
 
     LOTRI_RenewModel_Mat(model);
-    LOTRI_RenewModel_WorldVertices(model);
-    LOTRI_RenewModel_WorldFaces(model);
+    // LOTRI_RenewModel_WorldVertices(model);
+    // LOTRI_RenewModel_WorldFaces(model);
     LOTRI_RenewModel_Depth(model);
 
     return true;

@@ -67,7 +67,7 @@ Mat4f BASIC_GetMatXMat(const Mat4f A, const Mat4f B) {
     }
     return AB;
 }
-bool LOTRI_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out[N], const bool w) {
+bool BASIC_LoadV3M4(const int N, Vec3f vec_in[N], const Mat4f mat, Vec4f vec_out[N], const bool w) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < 4; j++) {
             vec_out[i].arr[j] = 0;
@@ -169,5 +169,22 @@ Mat4f BASIC_GetInvT(const Vec3f vec) {
             {-vec.v.x, -vec.v.y, -vec.v.z, 1},
         }
     };
+    return result;
+}
+Vec3f BASIC_GetV3M4(const Vec3f vec, const Mat4f mat, const bool w) {
+    Vec3f result = {0};
+    for (int j = 0; j < 3; j++) {
+        for (int k = 0; k < 3; k++) {
+            result.arr[j] += vec.arr[k] * mat.m[k][j];
+        }
+        if (w) result.arr[j] += mat.m[3][j];
+    }
+    return result;
+}
+Vec2f BASIC_GetV2Rect(const Vec2f vec, const SDL_FRect* rect) {
+    if (rect == NULL) return vec;
+    Vec2f result;
+    result.v.x = rect->x + rect->w * vec.v.x;
+    result.v.y = rect->y + rect->h * vec.v.y;
     return result;
 }

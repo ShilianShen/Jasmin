@@ -41,7 +41,6 @@ bool LOTRI_GetModelPosition(const Model* model, Vec3f* position);
 bool LOTRI_SetModelPosition(Model* model, Vec3f position);
 bool LOTRI_SetModelRotation(Model* model, Vec3f rotation);
 bool LOTRI_SetModelNormals(const Model* model, ModelSide side);
-bool LOTRI_SetModelMat(Model* model, Mat4f mat);
 
 
 bool LOTRI_GetModelWorldVertex(const Model* model, int index, Vec3f* vec);

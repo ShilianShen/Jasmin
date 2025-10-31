@@ -23,7 +23,7 @@ bool BASIC_GetVecEqual(Vec3f A, Vec3f B);
 
 
 typedef struct {float m[4][4];} Mat4f;
-bool LOTRI_LoadV3M4(int N, Vec3f vec_in[N], Mat4f mat, Vec4f vec_out[N], bool w);
+bool BASIC_LoadV3M4(int N, Vec3f vec_in[N], Mat4f mat, Vec4f vec_out[N], bool w);
 
 
 Mat4f BASIC_GetMatXMat(Mat4f A, Mat4f B);
@@ -33,6 +33,10 @@ Mat4f BASIC_GetInvR(Vec3f vec);
 Mat4f BASIC_GetMatS(Vec3f vec);
 Mat4f BASIC_GetMatT(Vec3f vec);
 Mat4f BASIC_GetInvT(Vec3f vec);
+
+
+Vec3f BASIC_GetV3M4(Vec3f vec, Mat4f mat, bool w);
+Vec2f BASIC_GetV2Rect(Vec2f vec, const SDL_FRect* rect);
 
 
 #endif //BASIC_MATRIX_H
