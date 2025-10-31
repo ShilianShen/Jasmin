@@ -18,7 +18,6 @@ struct Model {
     SDL_FRect* src;
     float depth;
     SDL_Texture* texture;
-    // Mat4f mat;
 };
 
 
@@ -189,14 +188,13 @@ Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const Model
 
 // RENEW ===============================================================================================================
 static void LOTRI_RenewModel_Mat(Model* model) {
-    Vec3f rotation = model->rotation;
     if (model->side == MODEL_SIDE_CAMERA) {
-        rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
+        model->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
     }
 
     const Mat4f matArr[] = {
         BASIC_GetMatS(model->scale),
-        BASIC_GetMatR(rotation),
+        BASIC_GetMatR(model->rotation),
         BASIC_GetMatT(model->position),
         camera.mat,
     };
