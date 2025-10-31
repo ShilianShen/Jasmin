@@ -50,7 +50,7 @@ bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, int index, Vec3f* vec);
 bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src);
 
 
-bool LOTRI_RenewModel(LOTRI_Model* model);
+// bool LOTRI_RenewModel(LOTRI_Model* model);
 
 
 bool LOTRI_DrawModel(const LOTRI_Model* model);

@@ -149,7 +149,7 @@ static bool VILLA_RenewCharacter_Src(Character* character) {
     const int direct = (character->coord2.direct - cameraDirect + 4) % 4;
     const float time = (float)SDL_GetTicks() / 1000;
     if (time < character->t2) {
-        switch ((int)((BASIC_T2 - character->t1) * 10) % 4) {
+        switch ((int)(BASIC_T2 * 8) % 4) {
             case 1: action = VILLA_ACT_WALK_1; break;
             case 3: action = VILLA_ACT_WALK_2; break;
             default: break;
@@ -173,7 +173,7 @@ bool VILLA_RenewCharacter(void *character_void) {
         const Vec3f position = BASIC_AtvVec(position1, position2, rate, BASIC_AtvLinear);
         LOTRI_SetModelPosition(character->model, position);
     }
-    LOTRI_RenewModel(character->model);
+    // LOTRI_RenewModel(character->model);
     return true;
 }
 

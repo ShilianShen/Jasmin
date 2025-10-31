@@ -178,7 +178,7 @@ static bool VILLA_RenewRoomCells(Room* room) {
 }
 bool VILLA_RenewRoom(void *room_void) {
     Room* room = room_void;
-    LOTRI_RenewModel(room->model);
+    // LOTRI_RenewModel(room->model);
     VILLA_RenewRoomCells(room);
     return true;
 }

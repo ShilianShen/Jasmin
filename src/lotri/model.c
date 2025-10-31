@@ -195,18 +195,26 @@ LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const
 
 // RENEW ===============================================================================================================
 static void LOTRI_RenewModel_Depth(LOTRI_Model* model) {
-    if (model->side == MODEL_SIDE_CAMERA) {
-        model->depth = model->worldVertices[0].xyz.v.z;
-        return;
-    }
     float depth = 0;
-    for (int i = 0; i < model->numVertices; i++) {
-        const Vec3f vertex = model->worldVertices[i].xyz;
-        if (model->side == MODEL_SIDE_IN) {
-            depth = SDL_max(depth, vertex.v.z);
+    switch (model->side) {
+        case MODEL_SIDE_IN: {
+            for (int i = 0; i < model->numVertices; i++) {
+                depth = SDL_max(depth, model->worldVertices[i].xyz.v.z);
+            }
+            break;
         }
-        else {
-            depth = SDL_min(depth, vertex.v.z);
+        case MODEL_SIDE_OUT: {
+            for (int i = 0; i < model->numVertices; i++) {
+                depth = SDL_min(depth, model->worldVertices[i].xyz.v.z);
+            }
+            break;
+        }
+        default: {
+            for (int i = 0; i < model->numVertices; i++) {
+                depth += model->worldVertices[i].xyz.v.z;
+            }
+            depth /= (float)model->numVertices;
+            break;
         }
     }
     model->depth = depth;
@@ -244,6 +252,7 @@ bool LOTRI_RenewModel(LOTRI_Model* model) {
 // DRAW ================================================================================================================
 bool LOTRI_DrawModel(const LOTRI_Model* model) {
     if (model == NULL) return false;
+    LOTRI_RenewModel(model);
     if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
 
     modelBuffer[modelBufferHead] = model;

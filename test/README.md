@@ -8,8 +8,6 @@ villa的room的读取
 
 villa的room的视角变换
 
-villa的character移动bug修复
-
 villa的character的动作选择
 
 villa的character的脚本
