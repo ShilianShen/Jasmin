@@ -10,6 +10,7 @@
 #include "trig.h"
 #include "env.h"
 #include "matrix.h"
+#include "sort.h"
 
 
 bool BASIC_Init();
