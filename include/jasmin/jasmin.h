@@ -9,7 +9,7 @@
 #include "../../src/intel/intel.h"
 #include "../../src/tempo/tempo.h"
 #include "../../src/lotri/lotri.h"
-#include "../../src/villa/villa.h"
+#include "../../src/chess/chess.h"
 
 
 
