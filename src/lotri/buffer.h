@@ -10,5 +10,4 @@ bool LOTRI_RenewModelBuffer();
 bool LOTRI_DrawModelBuffer();
 
 
-
 #endif //LOTRI_BUFFER_H

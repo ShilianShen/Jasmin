@@ -9,10 +9,10 @@ bool LOTRI_Renew() {
         modelBuffer[i] = NULL;
     }
     modelBufferHead = 0;
-    LOTRI_RenewCamera();
     return true;
 }
 bool LOTRI_Draw() {
+    LOTRI_RenewCamera();
     LOTRI_DrawCamera();
     LOTRI_DrawModelBuffer();
     return true;

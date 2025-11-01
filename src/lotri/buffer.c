@@ -16,12 +16,6 @@ bool LOTRI_BufferModel(LOTRI_Model* model) {
 }
 
 
-// RENEW ===============================================================================================================
-bool LOTRI_RenewModelBuffer() {
-    return true;
-}
-
-
 // DRAW ================================================================================================================
 bool LOTRI_DrawModelBuffer() {
     float depth[modelBufferHead];

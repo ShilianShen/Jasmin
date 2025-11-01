@@ -15,6 +15,8 @@ struct LOTRI_Model {
     float depth;
     SDL_Texture* texture;
 };
+
+
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position) {
     REQ_CONDITION(model != NULL, return false);
