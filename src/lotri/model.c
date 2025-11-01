@@ -1,7 +1,20 @@
 #include "model.h"
 
 
+struct LOTRI_Model {
+    Vec3f scale, position, rotation;
 
+    int numVertices;
+    LOTRI_Vertex *modelVertices, *worldVertices;
+
+    int numFaces;
+    LOTRI_Face *modelFaces, *worldFaces;
+
+    ModelSide side;
+    SDL_FRect* src;
+    float depth;
+    SDL_Texture* texture;
+};
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position) {
     REQ_CONDITION(model != NULL, return false);
@@ -21,6 +34,12 @@ bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, const int index, Vec3f*
     if (index >= model->numVertices) return false;
 
     *vec = model->modelVertices[index].xyz;
+    return true;
+}
+bool LOTRI_GetModelDepth(const LOTRI_Model* model, float* depth) {
+    REQ_CONDITION(model != NULL, return false);
+    REQ_CONDITION(depth != NULL, return false);
+    *depth = model->depth;
     return true;
 }
 bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src) {

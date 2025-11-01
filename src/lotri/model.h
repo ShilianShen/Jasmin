@@ -25,26 +25,13 @@ typedef enum ModelSide {
     MODEL_SIDE_IN,
     MODEL_SIDE_CAMERA
 } ModelSide;
-struct LOTRI_Model {
-    Vec3f scale, position, rotation;
 
-    int numVertices;
-    LOTRI_Vertex *modelVertices, *worldVertices;
-
-    int numFaces;
-    LOTRI_Face *modelFaces, *worldFaces;
-
-    ModelSide side;
-    SDL_FRect* src;
-    float depth;
-    SDL_Texture* texture;
-};
 typedef struct LOTRI_World LOTRI_World;
 
 
 #define MAX_MODEL_BUFFER 64
 extern int modelBufferHead;
-extern const LOTRI_Model* modelBuffer[];
+extern LOTRI_Model* modelBuffer[];
 
 
 void LOTRI_DestroyModel(LOTRI_Model* model);
@@ -53,8 +40,7 @@ LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, Model
 
 bool LOTRI_GetModelWorldVertex(const LOTRI_Model* model, int index, Vec3f* vec);
 bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, int index, Vec3f* vec);
-
-
+bool LOTRI_GetModelDepth(const LOTRI_Model* model, float* depth);
 bool LOTRI_SetModelScale(LOTRI_Model* model, Vec3f scale);
 bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position);
 bool LOTRI_SetModelPosition(LOTRI_Model* model, Vec3f position);

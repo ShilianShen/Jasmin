@@ -2,13 +2,12 @@
 
 
 int modelBufferHead = 0;
-const LOTRI_Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
+LOTRI_Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_BufferModel(const LOTRI_Model* model) {
+bool LOTRI_BufferModel(LOTRI_Model* model) {
     if (model == NULL) return false;
-    LOTRI_RenewModel(model);
     if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
 
     modelBuffer[modelBufferHead] = model;
@@ -27,7 +26,9 @@ bool LOTRI_RenewModelBuffer() {
 bool LOTRI_DrawModelBuffer() {
     float depth[modelBufferHead];
     for (int i = 0; i < modelBufferHead; i++) {
-        depth[i] = modelBuffer[i]->depth;
+        LOTRI_Model* model = modelBuffer[i];
+        LOTRI_RenewModel(model);
+        LOTRI_GetModelDepth(model, &depth[i]);
     }
 
     int indices[modelBufferHead];
@@ -35,7 +36,9 @@ bool LOTRI_DrawModelBuffer() {
 
     bool result = true;
     for (int i = 0; i < modelBufferHead; i++) {
-        result = result && LOTRI_DrawModel(modelBuffer[indices[i]]);
+        const int I = indices[i];
+        const LOTRI_Model* model = modelBuffer[I];
+        result = result && LOTRI_DrawModel(model);
     }
     return result;
 }
