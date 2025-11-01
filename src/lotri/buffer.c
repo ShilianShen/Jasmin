@@ -1,11 +1,19 @@
 #include "buffer.h"
 
 
-int modelBufferHead = 0;
-LOTRI_Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
+#define MAX_MODEL_BUFFER 64
+static int modelBufferHead = 0;
+static LOTRI_Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
 
 
 // GET & SET ===========================================================================================================
+bool LOTRI_ClearBuffer() {
+    for (int i = 0; i < MAX_MODEL_BUFFER; i++) {
+        modelBuffer[i] = NULL;
+    }
+    modelBufferHead = 0;
+    return true;
+}
 bool LOTRI_BufferModel(LOTRI_Model* model) {
     if (model == NULL) return false;
     if (modelBufferHead >= MAX_MODEL_BUFFER) return false;

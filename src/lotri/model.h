@@ -6,32 +6,21 @@
 #include "camera.h"
 
 
-typedef struct {
-    float t1, t2;
-    Vec3f v1, v2;
-    AtvFunc func;
-    bool block;
-} DelayVec3f;
-
-
 typedef struct {Vec3f xyz; Vec4f rgba; Vec2f uv;} LOTRI_Vertex;
 typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
-typedef struct LOTRI_Model LOTRI_Model;
 typedef enum ModelSide {
     MODEL_SIDE_NULL,
     MODEL_SIDE_OUT,
     MODEL_SIDE_IN,
     MODEL_SIDE_CAMERA
 } ModelSide;
-
+typedef struct LOTRI_Model LOTRI_Model;
 typedef struct LOTRI_World LOTRI_World;
 
 
-#define MAX_MODEL_BUFFER 64
-extern int modelBufferHead;
-extern LOTRI_Model* modelBuffer[];
+
 
 
 void LOTRI_DestroyModel(LOTRI_Model* model);
