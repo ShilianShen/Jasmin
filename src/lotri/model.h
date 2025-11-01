@@ -19,13 +19,27 @@ typedef struct {Vec3i ijk; Vec3f xyz;} LOTRI_Face;
 
 
 typedef struct LOTRI_Model LOTRI_Model;
-typedef struct LOTRI_World LOTRI_World;
 typedef enum ModelSide {
     MODEL_SIDE_NULL,
     MODEL_SIDE_OUT,
     MODEL_SIDE_IN,
     MODEL_SIDE_CAMERA
 } ModelSide;
+struct LOTRI_Model {
+    Vec3f scale, position, rotation;
+
+    int numVertices;
+    LOTRI_Vertex *modelVertices, *worldVertices;
+
+    int numFaces;
+    LOTRI_Face *modelFaces, *worldFaces;
+
+    ModelSide side;
+    SDL_FRect* src;
+    float depth;
+    SDL_Texture* texture;
+};
+typedef struct LOTRI_World LOTRI_World;
 
 
 #define MAX_MODEL_BUFFER 64
@@ -50,7 +64,7 @@ bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, int index, Vec3f* vec);
 bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src);
 
 
-// bool LOTRI_RenewModel(LOTRI_Model* model);
+bool LOTRI_RenewModel(LOTRI_Model* model);
 
 
 bool LOTRI_DrawModel(const LOTRI_Model* model);
