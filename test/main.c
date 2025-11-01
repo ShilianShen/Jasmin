@@ -6,7 +6,7 @@
 #include "../src/tempo/tempo.h"
 #include "../src/lotri/lotri.h"
 #include "../src/intel/intel.h"
-#include "../src/villa/villa.h"
+#include "../src/chess/chess.h"
 
 
 static const Env ENV_ARRAY[] = {
@@ -16,7 +16,7 @@ static const Env ENV_ARRAY[] = {
     // {"TEMPO", TEMPO_Init, TEMPO_Renew, TEMPO_Draw, TEMPO_Exit},
     {"INTEL", INTEL_Init, INTEL_Renew, NULL, INTEL_Exit},
     {"LOTRI", LOTRI_Init, LOTRI_Renew, NULL, LOTRI_Exit},
-    {"VILLA", VILLA_Init, VILLA_Renew, VILLA_Draw, VILLA_Exit},
+    {"CHESS", VILLA_Init, VILLA_Renew, VILLA_Draw, VILLA_Exit},
 };
 static const int LEN_ENV_ARRAY = len_of(ENV_ARRAY);
 
