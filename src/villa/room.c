@@ -187,7 +187,7 @@ bool VILLA_RenewRoom(void *room_void) {
 // DRAW ================================================================================================================
 bool VILLA_DrawRoom(const void *room_void) {
     const Room* room = room_void;
-    LOTRI_DrawModel(room->model);
+    LOTRI_BufferModel(room->model);
     Vec3f vec3s[4];
     LOTRI_GetModelWorldVertex(room->model, room->mask_indices.x, &vec3s[0]);
     LOTRI_GetModelWorldVertex(room->model, room->mask_indices.y, &vec3s[1]);

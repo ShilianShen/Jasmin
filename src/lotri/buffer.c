@@ -5,37 +5,37 @@ int modelBufferHead = 0;
 const LOTRI_Model* modelBuffer[MAX_MODEL_BUFFER] = {0};
 
 
-static bool LOTRI_DrawModelBuffer_Model(const LOTRI_Model* model) {
+// GET & SET ===========================================================================================================
+bool LOTRI_BufferModel(const LOTRI_Model* model) {
     if (model == NULL) return false;
+    LOTRI_RenewModel(model);
+    if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
 
-    for (int i = 0; i < model->numFaces; i++) {
-        if (model->worldFaces[i].xyz.v.z > 0) continue;
-        const Vec3i face = model->modelFaces[i].ijk;
-
-        SDL_RenderGeometryRaw(
-            renderer, model->texture,
-            (float*)&model->worldVertices[0].xyz, sizeof(LOTRI_Vertex),
-            (SDL_FColor*)&model->worldVertices[0].rgba, sizeof(LOTRI_Vertex),
-            (float*)&model->worldVertices[0].uv, sizeof(LOTRI_Vertex),
-            model->numVertices, face.arr, 3, sizeof(int)
-            );
-    }
+    modelBuffer[modelBufferHead] = model;
+    modelBufferHead++;
     return true;
 }
-bool LOTRI_DrawModelBuffer(const int N, const LOTRI_Model* modelArray[N]) {
-    if (modelArray == NULL) return false;
 
-    float depth[N];
-    for (int i = 0; i < N; i++) {
-        depth[i] = modelArray[i]->depth;
+
+// RENEW ===============================================================================================================
+bool LOTRI_RenewModelBuffer() {
+    return true;
+}
+
+
+// DRAW ================================================================================================================
+bool LOTRI_DrawModelBuffer() {
+    float depth[modelBufferHead];
+    for (int i = 0; i < modelBufferHead; i++) {
+        depth[i] = modelBuffer[i]->depth;
     }
 
-    int indices[N];
-    BASIC_SortIndices(N, depth, indices, false);
+    int indices[modelBufferHead];
+    BASIC_SortIndices(modelBufferHead, depth, indices, false);
 
     bool result = true;
-    for (int i = 0; i < N; i++) {
-        result = result && LOTRI_DrawModelBuffer_Model(modelArray[indices[i]]);
+    for (int i = 0; i < modelBufferHead; i++) {
+        result = result && LOTRI_DrawModel(modelBuffer[indices[i]]);
     }
     return result;
 }

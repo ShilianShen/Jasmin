@@ -14,7 +14,7 @@ bool LOTRI_Renew() {
 }
 bool LOTRI_Draw() {
     LOTRI_DrawCamera();
-    LOTRI_DrawModelBuffer(modelBufferHead, modelBuffer);
+    LOTRI_DrawModelBuffer();
     return true;
 }
 void LOTRI_Exit() {

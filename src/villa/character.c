@@ -183,7 +183,7 @@ bool VILLA_DrawCharacter(const void *character_void) {
     const Character* character = (Character*)character_void;
     REQ_CONDITION(character != NULL, return false);
 
-    LOTRI_DrawModel(character->model);
+    LOTRI_BufferModel(character->model);
 
     {
         Vec3f vec;

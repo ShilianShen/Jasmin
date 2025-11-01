@@ -2,8 +2,6 @@
 
 
 
-
-
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position) {
     REQ_CONDITION(model != NULL, return false);
@@ -25,15 +23,6 @@ bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, const int index, Vec3f*
     *vec = model->modelVertices[index].xyz;
     return true;
 }
-float LOTRI_SumFaceZ(const LOTRI_Face face, const LOTRI_Vertex* vertices) {
-    float result = 0;
-    for (int i = 0; i < 3; i++) {
-        result += vertices[face.ijk.arr[i]].xyz.v.z;
-    }
-    return result;
-}
-
-
 bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src) {
     if (model == NULL) return false;
 
@@ -235,10 +224,18 @@ bool LOTRI_RenewModel(LOTRI_Model* model) {
 // DRAW ================================================================================================================
 bool LOTRI_DrawModel(const LOTRI_Model* model) {
     if (model == NULL) return false;
-    LOTRI_RenewModel(model);
-    if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
 
-    modelBuffer[modelBufferHead] = model;
-    modelBufferHead++;
+    for (int i = 0; i < model->numFaces; i++) {
+        if (model->worldFaces[i].xyz.v.z > 0) continue;
+        const Vec3i face = model->modelFaces[i].ijk;
+
+        SDL_RenderGeometryRaw(
+            renderer, model->texture,
+            (float*)&model->worldVertices[0].xyz, sizeof(LOTRI_Vertex),
+            (SDL_FColor*)&model->worldVertices[0].rgba, sizeof(LOTRI_Vertex),
+            (float*)&model->worldVertices[0].uv, sizeof(LOTRI_Vertex),
+            model->numVertices, face.arr, 3, sizeof(int)
+            );
+    }
     return true;
 }
