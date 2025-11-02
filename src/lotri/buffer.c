@@ -1,46 +1,51 @@
 #include "buffer.h"
 
 
-#define MAX_MODEL_BUFFER 64
-static int modelBufferHead = 0;
-static LOTRI_MW* modelBuffer[MAX_MODEL_BUFFER] = {0};
+#define LOTRI_MAX_BUFFER 64
+static int worldBufferHead = 0;
+static LOTRI_MW* worldBuffer[LOTRI_MAX_BUFFER] = {0};
 
 
 // GET & SET ===========================================================================================================
 bool LOTRI_ClearBuffer() {
-    for (int i = 0; i < MAX_MODEL_BUFFER; i++) {
-        modelBuffer[i] = NULL;
+    for (int i = 0; i < LOTRI_MAX_BUFFER; i++) {
+        worldBuffer[i] = NULL;
     }
-    modelBufferHead = 0;
+    worldBufferHead = 0;
     return true;
 }
-bool LOTRI_BufferModel(LOTRI_MW* model) {
+bool LOTRI_SendBuffer(LOTRI_MW* model) {
     if (model == NULL) return false;
-    if (modelBufferHead >= MAX_MODEL_BUFFER) return false;
+    if (worldBufferHead >= LOTRI_MAX_BUFFER) return false;
 
-    modelBuffer[modelBufferHead] = model;
-    modelBufferHead++;
+    worldBuffer[worldBufferHead] = model;
+    worldBufferHead++;
+    return true;
+}
+
+
+// RENEW ===============================================================================================================
+bool LOTRI_RenewBuffer() {
     return true;
 }
 
 
 // DRAW ================================================================================================================
-bool LOTRI_DrawModelBuffer() {
-    float depth[modelBufferHead];
-    for (int i = 0; i < modelBufferHead; i++) {
-        LOTRI_MW* model = modelBuffer[i];
-        LOTRI_RenewModel(model);
-        LOTRI_GetWorldDepth(model->world, &depth[i]);
+bool LOTRI_DrawBuffer() {
+    float depth[worldBufferHead];
+    for (int i = 0; i < worldBufferHead; i++) {
+        LOTRI_World* world = worldBuffer[i]->world;
+        REQ_CONDITION(LOTRI_RenewWorld(world), return false);
+        REQ_CONDITION(LOTRI_GetWorldDepth(world, &depth[i]), return false);
     }
 
-    int indices[modelBufferHead];
-    BASIC_SortIndices(modelBufferHead, depth, indices, false);
+    int indices[worldBufferHead];
+    BASIC_SortIndices(worldBufferHead, depth, indices, false);
 
-    bool result = true;
-    for (int i = 0; i < modelBufferHead; i++) {
+    for (int i = 0; i < worldBufferHead; i++) {
         const int I = indices[i];
-        const LOTRI_MW* model = modelBuffer[I];
-        result = result && LOTRI_DrawMW(model);
+        const LOTRI_World* world = worldBuffer[I]->world;
+        REQ_CONDITION(LOTRI_DrawWorld(world), return false);
     }
-    return result;
+    return true;
 }

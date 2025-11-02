@@ -8,9 +8,9 @@
 
 
 bool LOTRI_ClearBuffer();
-bool LOTRI_BufferModel(LOTRI_MW *model);
-bool LOTRI_RenewModelBuffer();
-bool LOTRI_DrawModelBuffer();
+bool LOTRI_SendBuffer(LOTRI_MW *model);
+bool LOTRI_RenewBuffer();
+bool LOTRI_DrawBuffer();
 
 
 #endif //LOTRI_BUFFER_H

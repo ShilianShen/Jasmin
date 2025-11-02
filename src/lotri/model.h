@@ -13,8 +13,6 @@ typedef enum ModelSide {
     MODEL_SIDE_CAMERA,
     NUM_MODEL_SIDES
 } ModelSide;
-
-
 typedef struct LOTRI_Model LOTRI_Model;
 struct LOTRI_Model {
     int numVertices;
@@ -29,8 +27,6 @@ struct LOTRI_Model {
 
 
 bool LOTRI_GetModelVertex(const LOTRI_Model *model, int index, Vec3f* vec);
-
-
 LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char* file_mtl, ModelSide side);
 LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model);
 

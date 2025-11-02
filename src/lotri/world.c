@@ -9,7 +9,8 @@ bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
     return true;
 }
 bool LOTRI_GetWorldVertex(const LOTRI_World *world, const int index, Vec3f* vec) {
-    if (world == NULL) return false;
+    REQ_CONDITION(world != NULL, return false);
+    REQ_CONDITION(vec != NULL, return false);
     if (index >= world->model->numVertices) return false;
     *vec = world->vertices[index].xyz;
     return true;
@@ -36,7 +37,7 @@ bool LOTRI_SetWorldRotation(LOTRI_World *world, const Vec3f rotation) {
     return true;
 }
 bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src) {
-    if (world == NULL) return false;
+    REQ_CONDITION(world != NULL, return false);
     world->src = src;
     return true;
 }
@@ -61,10 +62,7 @@ LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model) {
     REQ_CONDITION(world != NULL, return NULL);
 
     const bool RK = LOTRI_CreateWorld_RK(world, model);
-    REQ_CONDITION(RK, {
-        // world = LOTRI_DeleteWorld(world);
-        return NULL;
-    });
+    REQ_CONDITION(RK, {world = LOTRI_DeleteWorld(world); return NULL;});
 
     return world;
 }
@@ -85,4 +83,75 @@ LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
 
 
 // RENEW ===============================================================================================================
+static void LOTRI_RenewWorld_Depth(LOTRI_World* world) {
+    float depth = 0;
+    switch (world->model->side) {
+        case MODEL_SIDE_IN: {
+            for (int i = 0; i < world->model->numVertices; i++) {
+                depth = SDL_max(depth, world->vertices[i].xyz.v.z);
+            }
+            break;
+        }
+        case MODEL_SIDE_OUT: {
+            for (int i = 0; i < world->model->numVertices; i++) {
+                depth = SDL_min(depth, world->vertices[i].xyz.v.z);
+            }
+            break;
+        }
+        default: {
+            for (int i = 0; i < world->model->numVertices; i++) {
+                depth += world->vertices[i].xyz.v.z;
+            }
+            depth /= (float)world->model->numVertices;
+            break;
+        }
+    }
+    world->depth = depth;
+}
+bool LOTRI_RenewWorld(LOTRI_World* world) {
+    REQ_CONDITION(world != NULL, return false);
+
+    if (world->model->side == MODEL_SIDE_CAMERA) {
+        world->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
+    }
+
+    const Mat4f matArr[] = {
+        BASIC_GetMatS(world->scale),
+        BASIC_GetMatR(world->rotation),
+        BASIC_GetMatT(world->position),
+        camera.mat,
+    };
+    const Mat4f mat = BASIC_GetProd(len_of(matArr), matArr);
+
+    for (int i = 0; i < world->model->numVertices; i++) {
+        world->vertices[i].xyz = BASIC_GetV3M4(world->model->vertices[i].xyz, mat, true);
+        world->vertices[i].uv = BASIC_GetV2Rect(world->model->vertices[i].uv, world->src);
+    }
+
+    for (int i = 0; i < world->model->numFaces; i++) {
+        world->faces[i].ijk = world->model->faces[i].ijk;
+        world->faces[i].xyz = BASIC_GetV3M4(world->model->faces[i].xyz, mat, false);
+    }
+    LOTRI_RenewWorld_Depth(world);
+    return true;
+}
+
+
 // DRAW ================================================================================================================
+bool LOTRI_DrawWorld(const LOTRI_World* world) {
+    REQ_CONDITION(world != NULL, return false);
+
+    for (int i = 0; i < world->model->numFaces; i++) {
+        if (world->faces[i].xyz.v.z > 0) continue;
+        const Vec3i face = world->model->faces[i].ijk;
+
+        SDL_RenderGeometryRaw(
+            renderer, world->model->texture,
+            (float*)&world->vertices[0].xyz, sizeof(LOTRI_Vertex),
+            (SDL_FColor*)&world->vertices[0].rgba, sizeof(LOTRI_Vertex),
+            (float*)&world->vertices[0].uv, sizeof(LOTRI_Vertex),
+            world->model->numVertices, face.arr, 3, sizeof(int)
+            );
+    }
+    return true;
+}

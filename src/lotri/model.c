@@ -1,9 +1,6 @@
 #include "model.h"
 
 
-
-
-
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelVertex(const LOTRI_Model *model, const int index, Vec3f* vec) {
     if (model == NULL) return false;

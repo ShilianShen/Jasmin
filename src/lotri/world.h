@@ -28,6 +28,8 @@ bool LOTRI_SetWorldRotation(LOTRI_World *world, Vec3f rotation);
 
 LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model);
 LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world);
+bool LOTRI_RenewWorld(LOTRI_World* world);
+bool LOTRI_DrawWorld(const LOTRI_World* world);
 
 
 #endif //LOTRI_WORLD_H
