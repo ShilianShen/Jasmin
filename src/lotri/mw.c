@@ -1,7 +1,6 @@
 #include "mw.h"
 
 
-// GET & SET ===========================================================================================================
 // CREATE & DELETE =====================================================================================================
 static bool LOTRI_CreateMW_RK(LOTRI_MW* mw, const char* file_obj, const char* file_mtl, const ModelSide side) {
     mw->model = LOTRI_CreateModel(file_obj, file_mtl, side);
@@ -30,12 +29,4 @@ LOTRI_MW* LOTRI_DeleteMW(LOTRI_MW *mw) {
     free(mw); mw = NULL;
 
     return NULL;
-}
-
-
-// DRAW ================================================================================================================
-bool LOTRI_DrawMW(const LOTRI_MW* mw) {
-    if (mw == NULL) return false;
-    LOTRI_DrawWorld(mw->world);
-    return true;
 }
