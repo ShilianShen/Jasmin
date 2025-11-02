@@ -34,6 +34,11 @@ bool LOTRI_SetWorldRotation(LOTRI_World *world, const Vec3f rotation) {
     world->rotation = rotation;
     return true;
 }
+bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src) {
+    if (world == NULL) return false;
+    world->src = src;
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================

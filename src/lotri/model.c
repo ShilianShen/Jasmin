@@ -2,18 +2,10 @@
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
-    if (mw == NULL) return false;
-    if (index >= mw->model->numVertices) return false;
-
-    *vec = mw->model->vertices[index].xyz;
-    return true;
-}
-
-bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src) {
-    if (mw == NULL) return false;
-
-    mw->world->src = src;
+bool LOTRI_GetModelVertex(const LOTRI_Model *model, const int index, Vec3f* vec) {
+    if (model == NULL) return false;
+    if (index >= model->numVertices) return false;
+    *vec = model->vertices[index].xyz;
     return true;
 }
 bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
@@ -39,6 +31,7 @@ bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
 
 
 // CREATE & DELETE =====================================================================================================
+
 static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
     model->numVertices = (int)mesh->position_count;
     model->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
@@ -70,6 +63,20 @@ static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, co
 
     return true;
 }
+LOTRI_Model* LOTRI_CreateModel(const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
+    LOTRI_Model* model = calloc(1, sizeof(LOTRI_Model));
+    REQ_CONDITION(model != NULL, return NULL);
+
+    const bool RK = LOTRI_CreateModel_RK(model, mesh, file_mtl, side);
+    REQ_CONDITION(RK, {
+        model = LOTRI_DeleteModel(model);
+        return NULL;
+    });
+
+    return model;
+}
+
+
 static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
     world->numVertices = model->numVertices;
     world->numFaces = model->numFaces;
@@ -84,29 +91,21 @@ static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
     world->scale = (Vec3f){1, 1, 1};
     return true;
 }
-static bool LOTRI_CreateMW_RK(LOTRI_MW* mw, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
-    mw->model = calloc(1, sizeof(LOTRI_Model));
-    mw->world = calloc(1, sizeof(LOTRI_World));
-    REQ_CONDITION(LOTRI_CreateModel_RK(mw->model, mesh, file_mtl, side), return false);
-    REQ_CONDITION(LOTRI_CreateWorld_RK(mw->world, mw->model), return false);
-    return true;
-}
+LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model) {
+    LOTRI_World* world = calloc(1, sizeof(LOTRI_World));
+    REQ_CONDITION(world != NULL, return NULL);
 
-LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, const ModelSide side) {
-
-    LOTRI_MW* mw = calloc(1, sizeof(LOTRI_MW));
-    REQ_CONDITION(mw != NULL, return NULL);
-
-    fastObjMesh* mesh = fast_obj_read(file_obj);
-    REQ_CONDITION(mesh != NULL, return NULL);
-    REQ_CONDITION(LOTRI_CreateMW_RK(mw, mesh, file_mtl, side), {
-        LOTRI_DeleteMW(mw);
-        mw = NULL;
+    const bool RK = LOTRI_CreateWorld_RK(world, model);
+    REQ_CONDITION(RK, {
+        // world = LOTRI_DeleteWorld(world);
+        return NULL;
     });
 
-    fast_obj_destroy(mesh);
-    return mw;
+    return world;
 }
+
+
+
 
 
 LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model) {

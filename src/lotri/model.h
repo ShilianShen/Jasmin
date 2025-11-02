@@ -42,16 +42,16 @@ struct LOTRI_World {
 
 
 LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model);
-LOTRI_MW *LOTRI_DeleteMW(LOTRI_MW *mw);
-LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
 
-bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
+
+bool LOTRI_GetModelVertex(const LOTRI_Model *model, int index, Vec3f* vec);
 
 
+LOTRI_Model* LOTRI_CreateModel(const fastObjMesh* mesh, const char* file_mtl, ModelSide side);
+LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model);
 
-bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src);
 
 
 bool LOTRI_RenewModel(LOTRI_MW* mw);
