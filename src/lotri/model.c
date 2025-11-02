@@ -1,7 +1,6 @@
 #include "model.h"
 
-typedef struct LOTRI_Model LOTRI_Model;
-typedef struct LOTRI_World LOTRI_World;
+
 
 struct LOTRI_Model {
     int numVertices;
@@ -19,17 +18,14 @@ struct LOTRI_World {
     SDL_FRect* src;
     float depth;
 };
-struct LOTRI_MW {
-    LOTRI_Model* model;
-    LOTRI_World* world;
-};
+
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_GetModelPosition(const LOTRI_MW* mw, Vec3f* position) {
-    REQ_CONDITION(mw != NULL, return false);
+bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
+    REQ_CONDITION(world != NULL, return false);
     REQ_CONDITION(position != NULL, return false);
-    *position = mw->world->position;
+    *position = world->position;
     return true;
 }
 bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
@@ -146,7 +142,7 @@ LOTRI_MW* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const Mo
     
     if (LOTRI_CreateModel_RK(mw, mesh, file_mtl) == false) {
         printf("%s: Failed to create LOTRI modelVertices\n", __func__);
-        LOTRI_DestroyModel(mw);
+        LOTRI_DeleteMW(mw);
         mw = NULL;
     }
     else {
@@ -159,30 +155,50 @@ LOTRI_MW* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const Mo
 
     return mw;
 }
-void LOTRI_DestroyModel(LOTRI_MW* mw) {
-    if (mw != NULL) {
-        if (mw->model->vertices != NULL) {
-            free(mw->model->vertices);
-            mw->model->vertices = NULL;
-        }
-        if (mw->world->vertices != NULL) {
-            free(mw->world->vertices);
-            mw->world->vertices = NULL;
-        }
-        if (mw->model->texture != NULL) {
-            SDL_DestroyTexture(mw->model->texture);
-            mw->model->texture = NULL;
-        }
-        if (mw->model->faces != NULL) {
-            free(mw->model->faces);
-            mw->model->faces = NULL;
-        }
-        if (mw->world->faces != NULL) {
-            free(mw->world->faces);
-            mw->world->faces = NULL;
-        }
-        free(mw);
+
+
+LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model) {
+    if (model == NULL) {
+        return model;
     }
+    if (model->vertices != NULL) {
+        free(model->vertices);
+        model->vertices = NULL;
+    }
+    if (model->texture != NULL) {
+        SDL_DestroyTexture(model->texture);
+        model->texture = NULL;
+    }
+    if (model->faces != NULL) {
+        free(model->faces);
+        model->faces = NULL;
+    }
+    free(model);
+    model = NULL;
+    return model;
+}
+LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
+    if (world == NULL) {
+        return world;
+    }
+    if (world->vertices != NULL) {
+        free(world->vertices);
+        world->vertices = NULL;
+    }
+    if (world->faces != NULL) {
+        free(world->faces);
+        world->faces = NULL;
+    }
+    return world;
+}
+LOTRI_MW* LOTRI_DeleteMW(LOTRI_MW *mw) {
+    if (mw == NULL) return mw;
+
+    mw->model = LOTRI_DeleteModel(mw->model);
+    mw->world = LOTRI_DeleteWorld(mw->world);
+    free(mw); mw = NULL;
+
+    return NULL;
 }
 
 
