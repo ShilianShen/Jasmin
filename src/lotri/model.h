@@ -36,7 +36,7 @@ bool LOTRI_SetModelScale(LOTRI_MW* mw, Vec3f scale);
 bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
 bool LOTRI_SetModelPosition(LOTRI_MW* mw, Vec3f position);
 bool LOTRI_SetModelRotation(LOTRI_MW* mw, Vec3f rotation);
-bool LOTRI_SetModelNormals(const LOTRI_MW* mw, ModelSide side);
+bool LOTRI_SetMWNormals(const LOTRI_MW* mw, ModelSide side);
 bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src);
 
 
