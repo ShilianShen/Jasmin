@@ -46,9 +46,9 @@ LOTRI_MW *LOTRI_DeleteMW(LOTRI_MW *mw);
 LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
-bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
+
 bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
-bool LOTRI_GetModelDepth(const LOTRI_MW* mw, float* depth);
+
 
 
 bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src);

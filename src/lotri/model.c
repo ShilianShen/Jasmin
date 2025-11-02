@@ -2,13 +2,6 @@
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
-    if (mw == NULL) return false;
-    if (index >= mw->model->numVertices) return false;
-
-    *vec = mw->world->vertices[index].xyz;
-    return true;
-}
 bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
     if (mw == NULL) return false;
     if (index >= mw->model->numVertices) return false;
@@ -16,12 +9,7 @@ bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) 
     *vec = mw->model->vertices[index].xyz;
     return true;
 }
-bool LOTRI_GetModelDepth(const LOTRI_MW* mw, float* depth) {
-    REQ_CONDITION(mw != NULL, return false);
-    REQ_CONDITION(depth != NULL, return false);
-    *depth = mw->world->depth;
-    return true;
-}
+
 bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src) {
     if (mw == NULL) return false;
 
@@ -83,6 +71,8 @@ static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, co
     return true;
 }
 static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
+    world->numVertices = model->numVertices;
+    world->numFaces = model->numFaces;
     world->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
     REQ_CONDITION(world->vertices != NULL, return false);
     for (int i = 0; i < model->numVertices; i++) {

@@ -6,6 +6,8 @@
 #include "model.h"
 
 
+bool LOTRI_GetWorldVertex(const LOTRI_World *world, int index, Vec3f* vec);
+bool LOTRI_GetWorldDepth(const LOTRI_World *world, float* depth);
 bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
 bool LOTRI_SetWorldScale(LOTRI_World *world, Vec3f scale);
 bool LOTRI_SetWorldPosition(LOTRI_World *world, Vec3f position);

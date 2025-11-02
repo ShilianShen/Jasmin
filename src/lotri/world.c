@@ -7,6 +7,18 @@ bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
     *position = world->position;
     return true;
 }
+bool LOTRI_GetWorldVertex(const LOTRI_World *world, const int index, Vec3f* vec) {
+    if (world == NULL) return false;
+    if (index >= world->numVertices) return false;
+    *vec = world->vertices[index].xyz;
+    return true;
+}
+bool LOTRI_GetWorldDepth(const LOTRI_World *world, float* depth) {
+    REQ_CONDITION(world != NULL, return false);
+    REQ_CONDITION(depth != NULL, return false);
+    *depth = world->depth;
+    return true;
+}
 bool LOTRI_SetWorldScale(LOTRI_World *world, const Vec3f scale) {
     REQ_CONDITION(world != NULL, return false);
     world->scale = scale;

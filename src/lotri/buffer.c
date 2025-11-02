@@ -30,7 +30,7 @@ bool LOTRI_DrawModelBuffer() {
     for (int i = 0; i < modelBufferHead; i++) {
         LOTRI_MW* model = modelBuffer[i];
         LOTRI_RenewModel(model);
-        LOTRI_GetModelDepth(model, &depth[i]);
+        LOTRI_GetWorldDepth(model->world, &depth[i]);
     }
 
     int indices[modelBufferHead];
