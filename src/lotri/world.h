@@ -1,0 +1,18 @@
+#ifndef LOTRI_WORLD_H
+#define LOTRI_WORLD_H
+
+
+#include "_lotri.h"
+#include "model.h"
+
+
+bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
+bool LOTRI_SetWorldScale(LOTRI_World *world, Vec3f scale);
+bool LOTRI_SetWorldPosition(LOTRI_World *world, Vec3f position);
+bool LOTRI_SetWorldRotation(LOTRI_World *world, Vec3f rotation);
+
+
+LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world);
+
+
+#endif //LOTRI_WORLD_H

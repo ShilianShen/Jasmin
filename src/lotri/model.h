@@ -23,8 +23,25 @@ struct LOTRI_MW {
     LOTRI_Model* model;
     LOTRI_World* world;
 };
+struct LOTRI_Model {
+    int numVertices;
+    LOTRI_Vertex *vertices;
+    int numFaces;
+    LOTRI_Face *faces;
+    ModelSide side;
+    SDL_Texture* texture;
+};
+struct LOTRI_World {
+    Vec3f scale, position, rotation;
+    int numVertices, numFaces;
+    LOTRI_Vertex *vertices;
+    LOTRI_Face *faces;
+    SDL_FRect* src;
+    float depth;
+};
 
 
+LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model);
 LOTRI_MW *LOTRI_DeleteMW(LOTRI_MW *mw);
 LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, ModelSide side);
 
@@ -32,11 +49,8 @@ LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, ModelSide s
 bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
 bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
 bool LOTRI_GetModelDepth(const LOTRI_MW* mw, float* depth);
-bool LOTRI_SetModelScale(LOTRI_MW* mw, Vec3f scale);
-bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
-bool LOTRI_SetModelPosition(LOTRI_MW* mw, Vec3f position);
-bool LOTRI_SetModelRotation(LOTRI_MW* mw, Vec3f rotation);
-bool LOTRI_SetMWNormals(const LOTRI_MW* mw, ModelSide side);
+
+
 bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src);
 
 

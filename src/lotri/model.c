@@ -1,33 +1,7 @@
 #include "model.h"
 
 
-
-struct LOTRI_Model {
-    int numVertices;
-    LOTRI_Vertex *vertices;
-    int numFaces;
-    LOTRI_Face *faces;
-    ModelSide side;
-    SDL_Texture* texture;
-};
-struct LOTRI_World {
-    Vec3f scale, position, rotation;
-    int numVertices, numFaces;
-    LOTRI_Vertex *vertices;
-    LOTRI_Face *faces;
-    SDL_FRect* src;
-    float depth;
-};
-
-
-
 // GET & SET ===========================================================================================================
-bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
-    REQ_CONDITION(world != NULL, return false);
-    REQ_CONDITION(position != NULL, return false);
-    *position = world->position;
-    return true;
-}
 bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
     if (mw == NULL) return false;
     if (index >= mw->model->numVertices) return false;
@@ -54,41 +28,6 @@ bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src) {
     mw->world->src = src;
     return true;
 }
-bool LOTRI_SetModelScale(LOTRI_MW* mw, const Vec3f scale) {
-    REQ_CONDITION(mw != NULL, return false);
-    mw->world->scale = scale;
-    return true;
-}
-bool LOTRI_SetModelPosition(LOTRI_MW* mw, const Vec3f position) {
-    REQ_CONDITION(mw != NULL, return false);
-    mw->world->position = position;
-    return true;
-}
-bool LOTRI_SetModelRotation(LOTRI_MW* mw, const Vec3f rotation) {
-    REQ_CONDITION(mw != NULL, return false);
-    mw->world->rotation = rotation;
-    return true;
-}
-bool LOTRI_SetMWNormals(const LOTRI_MW* mw, const ModelSide side) {
-    if (mw == NULL) return false;
-    if (side == MODEL_SIDE_NULL) return true;
-
-    for (int i = 0; i < mw->model->numFaces; i++) {
-        const Vec3i index = mw->model->faces[i].ijk;
-        const Vec3f a = mw->model->vertices[index.v.i].xyz;
-        const Vec3f b = mw->model->vertices[index.v.j].xyz;
-        const Vec3f c = mw->model->vertices[index.v.k].xyz;
-        const Vec3f normal = BASIC_GetNormal(a, b, c);
-        const Vec3f sum = BASIC_GetSum(a, b, c);
-        if (side == MODEL_SIDE_IN ^ BASIC_GetDot(normal, sum) < 0) {
-            mw->model->faces[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
-        }
-        else {
-            mw->model->faces[i].xyz = normal;
-        }
-    }
-    return true;
-}
 bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
     if (model == NULL) return false;
     if (side == MODEL_SIDE_NULL) return true;
@@ -112,9 +51,6 @@ bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
 
 
 // CREATE & DELETE =====================================================================================================
-
-
-
 static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
     model->numVertices = (int)mesh->position_count;
     model->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
@@ -159,6 +95,8 @@ static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
     return true;
 }
 static bool LOTRI_CreateMW_RK(LOTRI_MW* mw, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
+    mw->model = calloc(1, sizeof(LOTRI_Model));
+    mw->world = calloc(1, sizeof(LOTRI_World));
     REQ_CONDITION(LOTRI_CreateModel_RK(mw->model, mesh, file_mtl, side), return false);
     REQ_CONDITION(LOTRI_CreateWorld_RK(mw->world, mw->model), return false);
     return true;
@@ -169,9 +107,6 @@ LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, const Model
     LOTRI_MW* mw = calloc(1, sizeof(LOTRI_MW));
     REQ_CONDITION(mw != NULL, return NULL);
 
-    mw->model = calloc(1, sizeof(LOTRI_Model));
-    mw->world = calloc(1, sizeof(LOTRI_World));
-
     fastObjMesh* mesh = fast_obj_read(file_obj);
     REQ_CONDITION(mesh != NULL, return NULL);
     REQ_CONDITION(LOTRI_CreateMW_RK(mw, mesh, file_mtl, side), {
@@ -180,8 +115,6 @@ LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, const Model
     });
 
     fast_obj_destroy(mesh);
-
-
     return mw;
 }
 
@@ -206,29 +139,7 @@ LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model) {
     model = NULL;
     return model;
 }
-LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
-    if (world == NULL) {
-        return world;
-    }
-    if (world->vertices != NULL) {
-        free(world->vertices);
-        world->vertices = NULL;
-    }
-    if (world->faces != NULL) {
-        free(world->faces);
-        world->faces = NULL;
-    }
-    return world;
-}
-LOTRI_MW* LOTRI_DeleteMW(LOTRI_MW *mw) {
-    if (mw == NULL) return mw;
 
-    mw->model = LOTRI_DeleteModel(mw->model);
-    mw->world = LOTRI_DeleteWorld(mw->world);
-    free(mw); mw = NULL;
-
-    return NULL;
-}
 
 
 // RENEW ===============================================================================================================

@@ -3,6 +3,8 @@
 
 
 #include "model.h"
+#include "world.h"
+#include "mw.h"
 
 
 bool LOTRI_ClearBuffer();
