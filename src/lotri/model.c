@@ -1,6 +1,9 @@
 #include "model.h"
 
 
+
+
+
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelVertex(const LOTRI_Model *model, const int index, Vec3f* vec) {
     if (model == NULL) return false;
@@ -9,7 +12,7 @@ bool LOTRI_GetModelVertex(const LOTRI_Model *model, const int index, Vec3f* vec)
     return true;
 }
 bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
-    if (model == NULL) return false;
+    REQ_CONDITION(model != NULL, return false;);
     if (side == MODEL_SIDE_NULL) return true;
 
     for (int i = 0; i < model->numFaces; i++) {
@@ -32,19 +35,20 @@ bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
 
 // CREATE & DELETE =====================================================================================================
 static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
+
     model->numVertices = (int)mesh->position_count;
     model->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
-
     REQ_CONDITION(model->vertices != NULL, return false);
+
+    model->numFaces = (int)mesh->face_count;
+    model->faces = calloc(model->numFaces, sizeof(LOTRI_Face));
+    REQ_CONDITION(model->faces != NULL, return false);
 
     for (int i = 0; i < model->numVertices; i++) {
         model->vertices[i].xyz = (Vec3f){mesh->positions[3*i], mesh->positions[3*i+1], mesh->positions[3*i+2]};
         model->vertices[i].rgba = (Vec4f){1, 1, 1, 1};
         model->vertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
     }
-    model->numFaces = (int)mesh->face_count;
-    model->faces = calloc(model->numFaces, sizeof(LOTRI_Face));
-    REQ_CONDITION(model->faces != NULL, return false);
 
     for (int i = 0; i < model->numFaces; i++) {
         model->faces[i].ijk = (Vec3i){(int)mesh->indices[3*i].p, (int)mesh->indices[3*i+1].p, (int)mesh->indices[3*i+2].p,};
@@ -55,22 +59,24 @@ static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, co
     const int num_materials = parse_mtl_file(file_mtl, materials, 1);
     model->texture = IMG_LoadTexture(renderer, materials[0].map_Kd);
     REQ_CONDITION(model->texture != NULL, return false);
-
     SDL_SetTextureScaleMode(model->texture, SDL_SCALEMODE_NEAREST);
+
     model->side = side;
     LOTRI_SetModelNormals(model, side);
 
     return true;
 }
-LOTRI_Model* LOTRI_CreateModel(const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
+LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char* file_mtl, const ModelSide side) {
+
     LOTRI_Model* model = calloc(1, sizeof(LOTRI_Model));
     REQ_CONDITION(model != NULL, return NULL);
 
+    fastObjMesh* mesh = fast_obj_read(file_obj);
+    REQ_CONDITION(mesh != NULL, {model = LOTRI_DeleteModel(model); return NULL;});
+
     const bool RK = LOTRI_CreateModel_RK(model, mesh, file_mtl, side);
-    REQ_CONDITION(RK, {
-        model = LOTRI_DeleteModel(model);
-        return NULL;
-    });
+    fast_obj_destroy(mesh); mesh = NULL;
+    REQ_CONDITION(RK, {model = LOTRI_DeleteModel(model); return NULL;});
 
     return model;
 }
@@ -95,9 +101,3 @@ LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model) {
     return model;
 }
 
-
-// RENEW ===============================================================================================================
-
-
-
-// DRAW ================================================================================================================

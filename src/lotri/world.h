@@ -8,8 +8,8 @@
 
 typedef struct LOTRI_World LOTRI_World;
 struct LOTRI_World {
+    const LOTRI_Model* model;
     Vec3f scale, position, rotation;
-    int numVertices, numFaces;
     LOTRI_Vertex *vertices;
     LOTRI_Face *faces;
     SDL_FRect* src;

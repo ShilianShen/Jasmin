@@ -1,5 +1,6 @@
 #include "world.h"
 
+
 // GET & SET ===========================================================================================================
 bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
     REQ_CONDITION(world != NULL, return false);
@@ -9,7 +10,7 @@ bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position) {
 }
 bool LOTRI_GetWorldVertex(const LOTRI_World *world, const int index, Vec3f* vec) {
     if (world == NULL) return false;
-    if (index >= world->numVertices) return false;
+    if (index >= world->model->numVertices) return false;
     *vec = world->vertices[index].xyz;
     return true;
 }
@@ -43,8 +44,7 @@ bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src) {
 
 // CREATE & DELETE =====================================================================================================
 static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
-    world->numVertices = model->numVertices;
-    world->numFaces = model->numFaces;
+    world->model = model;
     world->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
     REQ_CONDITION(world->vertices != NULL, return false);
     for (int i = 0; i < model->numVertices; i++) {

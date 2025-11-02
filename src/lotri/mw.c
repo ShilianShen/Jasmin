@@ -3,8 +3,8 @@
 
 // GET & SET ===========================================================================================================
 // CREATE & DELETE =====================================================================================================
-static bool LOTRI_CreateMW_RK(LOTRI_MW* mw, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
-    mw->model = LOTRI_CreateModel(mesh, file_mtl, side);
+static bool LOTRI_CreateMW_RK(LOTRI_MW* mw, const char* file_obj, const char* file_mtl, const ModelSide side) {
+    mw->model = LOTRI_CreateModel(file_obj, file_mtl, side);
     mw->world = LOTRI_CreateWorld(mw->model);
     REQ_CONDITION(mw->model != NULL, return false);
     REQ_CONDITION(mw->world != NULL, return false);
@@ -17,7 +17,7 @@ LOTRI_MW* LOTRI_CreateMW(const char* file_obj, const char *file_mtl, const Model
 
     fastObjMesh* mesh = fast_obj_read(file_obj);
     REQ_CONDITION(mesh != NULL, return NULL);
-    REQ_CONDITION(LOTRI_CreateMW_RK(mw, mesh, file_mtl, side), {
+    REQ_CONDITION(LOTRI_CreateMW_RK(mw, file_obj, file_mtl, side), {
         LOTRI_DeleteMW(mw);
         mw = NULL;
     });
