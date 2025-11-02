@@ -1,7 +1,24 @@
 #include "model.h"
 
+typedef struct LOTRI_Model LOTRI_Model;
+typedef struct LOTRI_World LOTRI_World;
 
 struct LOTRI_Model {
+    int numVertices; LOTRI_Vertex *vertices;
+    int numFaces; LOTRI_Face *faces;
+    ModelSide side;
+    SDL_Texture* texture;
+};
+struct LOTRI_World {
+    Vec3f scale, position, rotation;
+
+    int numVertices; LOTRI_Vertex *vertices;
+    int numFaces; LOTRI_Face *faces;
+
+    SDL_FRect* src;
+    float depth;
+};
+struct LOTRI_MW {
     Vec3f scale, position, rotation;
 
     int numVertices;
@@ -11,80 +28,76 @@ struct LOTRI_Model {
     LOTRI_Face *modelFaces, *worldFaces;
 
     ModelSide side;
+    SDL_Texture* texture;
     SDL_FRect* src;
     float depth;
-    SDL_Texture* texture;
 };
 
 
 // GET & SET ===========================================================================================================
-bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position) {
-    REQ_CONDITION(model != NULL, return false);
+bool LOTRI_GetModelPosition(const LOTRI_MW* mw, Vec3f* position) {
+    REQ_CONDITION(mw != NULL, return false);
     REQ_CONDITION(position != NULL, return false);
-    *position = model->position;
+    *position = mw->position;
     return true;
 }
-bool LOTRI_GetModelWorldVertex(const LOTRI_Model* model, const int index, Vec3f* vec) {
-    if (model == NULL) return false;
-    if (index >= model->numVertices) return false;
+bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
+    if (mw == NULL) return false;
+    if (index >= mw->numVertices) return false;
 
-    *vec = model->worldVertices[index].xyz;
+    *vec = mw->worldVertices[index].xyz;
     return true;
 }
-bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, const int index, Vec3f* vec) {
-    if (model == NULL) return false;
-    if (index >= model->numVertices) return false;
+bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, const int index, Vec3f* vec) {
+    if (mw == NULL) return false;
+    if (index >= mw->numVertices) return false;
 
-    *vec = model->modelVertices[index].xyz;
+    *vec = mw->modelVertices[index].xyz;
     return true;
 }
-bool LOTRI_GetModelDepth(const LOTRI_Model* model, float* depth) {
-    REQ_CONDITION(model != NULL, return false);
+bool LOTRI_GetModelDepth(const LOTRI_MW* mw, float* depth) {
+    REQ_CONDITION(mw != NULL, return false);
     REQ_CONDITION(depth != NULL, return false);
-    *depth = model->depth;
+    *depth = mw->depth;
     return true;
 }
-bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src) {
-    if (model == NULL) return false;
+bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src) {
+    if (mw == NULL) return false;
 
-    model->src = src;
+    mw->src = src;
     return true;
 }
-bool LOTRI_SetModelScale(LOTRI_Model* model, const Vec3f scale) {
-    REQ_CONDITION(model != NULL, return false);
-    model->scale = scale;
+bool LOTRI_SetModelScale(LOTRI_MW* mw, const Vec3f scale) {
+    REQ_CONDITION(mw != NULL, return false);
+    mw->scale = scale;
     return true;
 }
-bool LOTRI_SetModelPosition(LOTRI_Model* model, const Vec3f position) {
-    REQ_CONDITION(model != NULL, return false);
-    model->position = position;
+bool LOTRI_SetModelPosition(LOTRI_MW* mw, const Vec3f position) {
+    REQ_CONDITION(mw != NULL, return false);
+    mw->position = position;
     return true;
 }
-bool LOTRI_SetModelRotation(LOTRI_Model* model, const Vec3f rotation) {
-    if (model == NULL) {
-        printf("LOTRI_SetModelRotation: NULL\n");
-        return false;
-    }
-
-    model->rotation = rotation;
+bool LOTRI_SetModelRotation(LOTRI_MW* mw, const Vec3f rotation) {
+    REQ_CONDITION(mw != NULL, return false);
+    mw->rotation = rotation;
     return true;
 }
-bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
-    if (model == NULL) return false;
+bool LOTRI_SetModelNormals(const LOTRI_MW* mw, const ModelSide side) {
+    if (mw == NULL) return false;
     if (side == MODEL_SIDE_NULL) return true;
 
-    for (int i = 0; i < model->numFaces; i++) {
-        const Vec3i index = model->modelFaces[i].ijk;
-        const Vec3f a = model->modelVertices[index.v.i].xyz;
-        const Vec3f b = model->modelVertices[index.v.j].xyz;
-        const Vec3f c = model->modelVertices[index.v.k].xyz;
+    for (int i = 0; i < mw->numFaces; i++) {
+        const Vec3i index = mw->modelFaces[i].ijk;
+        const Vec3f a = mw->modelVertices[index.v.i].xyz;
+        const Vec3f b = mw->modelVertices[index.v.j].xyz;
+        const Vec3f c = mw->modelVertices[index.v.k].xyz;
         const Vec3f normal = BASIC_GetNormal(a, b, c);
         const Vec3f sum = BASIC_GetSum(a, b, c);
         if (side == MODEL_SIDE_IN ^ BASIC_GetDot(normal, sum) < 0) {
-            model->modelFaces[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
+            mw->modelFaces[i].xyz = (Vec3f){-normal.v.x, -normal.v.y, -normal.v.z};
         }
         else {
-            model->modelFaces[i].xyz = normal;
+            mw->modelFaces[i].xyz = normal;
         }
     }
     return true;
@@ -92,73 +105,73 @@ bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
 
 
 // CREATE & DELETE =====================================================================================================
-void LOTRI_DestroyModel(LOTRI_Model* model) {
-    if (model != NULL) {
-        if (model->modelVertices != NULL) {
-            free(model->modelVertices);
-            model->modelVertices = NULL;
+void LOTRI_DestroyModel(LOTRI_MW* mw) {
+    if (mw != NULL) {
+        if (mw->modelVertices != NULL) {
+            free(mw->modelVertices);
+            mw->modelVertices = NULL;
         }
-        if (model->worldVertices != NULL) {
-            free(model->worldVertices);
-            model->worldVertices = NULL;
+        if (mw->worldVertices != NULL) {
+            free(mw->worldVertices);
+            mw->worldVertices = NULL;
         }
-        if (model->texture != NULL) {
-            SDL_DestroyTexture(model->texture);
-            model->texture = NULL;
+        if (mw->texture != NULL) {
+            SDL_DestroyTexture(mw->texture);
+            mw->texture = NULL;
         }
-        if (model->modelFaces != NULL) {
-            free(model->modelFaces);
-            model->modelFaces = NULL;
+        if (mw->modelFaces != NULL) {
+            free(mw->modelFaces);
+            mw->modelFaces = NULL;
         }
-        if (model->worldFaces != NULL) {
-            free(model->worldFaces);
-            model->worldFaces = NULL;
+        if (mw->worldFaces != NULL) {
+            free(mw->worldFaces);
+            mw->worldFaces = NULL;
         }
-        free(model);
+        free(mw);
     }
 }
-static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, const char* file_mtl) {
-    memset(model, 0, sizeof(LOTRI_Model));
-    model->numVertices = (int)mesh->position_count;
-    model->modelVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
-    model->worldVertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
-    if (model->modelVertices == NULL || model->worldVertices == NULL) {
+static bool LOTRI_CreateModel_RK(LOTRI_MW* mw, const fastObjMesh* mesh, const char* file_mtl) {
+    memset(mw, 0, sizeof(LOTRI_MW));
+    mw->numVertices = (int)mesh->position_count;
+    mw->modelVertices = calloc(mw->numVertices, sizeof(LOTRI_Vertex));
+    mw->worldVertices = calloc(mw->numVertices, sizeof(LOTRI_Vertex));
+    if (mw->modelVertices == NULL || mw->worldVertices == NULL) {
         printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
         return false;
         }
-    for (int i = 0; i < model->numVertices; i++) {
-        model->modelVertices[i].xyz = (Vec3f){mesh->positions[3*i], mesh->positions[3*i+1], mesh->positions[3*i+2]};
-        model->worldVertices[i].rgba = model->modelVertices[i].rgba = (Vec4f){1, 1, 1, 1};
-        model->worldVertices[i].uv = model->modelVertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
+    for (int i = 0; i < mw->numVertices; i++) {
+        mw->modelVertices[i].xyz = (Vec3f){mesh->positions[3*i], mesh->positions[3*i+1], mesh->positions[3*i+2]};
+        mw->worldVertices[i].rgba = mw->modelVertices[i].rgba = (Vec4f){1, 1, 1, 1};
+        mw->worldVertices[i].uv = mw->modelVertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
     }
 
-    model->numFaces = (int)mesh->face_count;
-    model->modelFaces = calloc(model->numFaces, sizeof(LOTRI_Face));
-    model->worldFaces = calloc(model->numFaces, sizeof(LOTRI_Face));
-    if (model->worldFaces == NULL || model->modelFaces == NULL) {
+    mw->numFaces = (int)mesh->face_count;
+    mw->modelFaces = calloc(mw->numFaces, sizeof(LOTRI_Face));
+    mw->worldFaces = calloc(mw->numFaces, sizeof(LOTRI_Face));
+    if (mw->worldFaces == NULL || mw->modelFaces == NULL) {
         printf("%s: Failed to allocate memory for LOTRI_CreateModel_RK\n", __func__);
         return false;
         }
-    for (int i = 0; i < model->numFaces; i++) {
-        model->modelFaces[i].ijk = (Vec3i){(int)mesh->indices[3*i].p, (int)mesh->indices[3*i+1].p, (int)mesh->indices[3*i+2].p,};
-        model->modelFaces[i].xyz = (Vec3f){mesh->normals[3*i+3], mesh->normals[3*i+4], mesh->normals[3*i+5],};
+    for (int i = 0; i < mw->numFaces; i++) {
+        mw->modelFaces[i].ijk = (Vec3i){(int)mesh->indices[3*i].p, (int)mesh->indices[3*i+1].p, (int)mesh->indices[3*i+2].p,};
+        mw->modelFaces[i].xyz = (Vec3f){mesh->normals[3*i+3], mesh->normals[3*i+4], mesh->normals[3*i+5],};
     }
 
     MTLMaterial materials[1];
     const int num_materials = parse_mtl_file(file_mtl, materials, 1);
-    model->texture = IMG_LoadTexture(renderer, materials[0].map_Kd);
-    if (model->texture == NULL) {
+    mw->texture = IMG_LoadTexture(renderer, materials[0].map_Kd);
+    if (mw->texture == NULL) {
         printf("%s: Failed to load texture\n", __func__);
         return false;
     }
-    SDL_SetTextureScaleMode(model->texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(mw->texture, SDL_SCALEMODE_NEAREST);
 
     return true;
 }
-LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const ModelSide side) {
+LOTRI_MW* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const ModelSide side) {
 
-    LOTRI_Model* model = malloc(sizeof(LOTRI_Model));
-    if (model == NULL) {
+    LOTRI_MW* mw = malloc(sizeof(LOTRI_MW));
+    if (mw == NULL) {
         printf("%s: Failed to \n", __func__);
         return false;
     }
@@ -169,93 +182,93 @@ LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, const
         return false;
     }
 
-    if (LOTRI_CreateModel_RK(model, mesh, file_mtl) == false) {
+    if (LOTRI_CreateModel_RK(mw, mesh, file_mtl) == false) {
         printf("%s: Failed to create LOTRI modelVertices\n", __func__);
-        LOTRI_DestroyModel(model);
-        model = NULL;
+        LOTRI_DestroyModel(mw);
+        mw = NULL;
     }
     else {
-        model->scale = (Vec3f){1, 1, 1};
-        model->side = side;
-        LOTRI_SetModelNormals(model, model->side);
+        mw->scale = (Vec3f){1, 1, 1};
+        mw->side = side;
+        LOTRI_SetModelNormals(mw, mw->side);
     }
     fast_obj_destroy(mesh);
 
 
-    return model;
+    return mw;
 }
 
 
 // RENEW ===============================================================================================================
-static void LOTRI_RenewModel_Depth(LOTRI_Model* model) {
+static void LOTRI_RenewModel_Depth(LOTRI_MW* mw) {
     float depth = 0;
-    switch (model->side) {
+    switch (mw->side) {
         case MODEL_SIDE_IN: {
-            for (int i = 0; i < model->numVertices; i++) {
-                depth = SDL_max(depth, model->worldVertices[i].xyz.v.z);
+            for (int i = 0; i < mw->numVertices; i++) {
+                depth = SDL_max(depth, mw->worldVertices[i].xyz.v.z);
             }
             break;
         }
         case MODEL_SIDE_OUT: {
-            for (int i = 0; i < model->numVertices; i++) {
-                depth = SDL_min(depth, model->worldVertices[i].xyz.v.z);
+            for (int i = 0; i < mw->numVertices; i++) {
+                depth = SDL_min(depth, mw->worldVertices[i].xyz.v.z);
             }
             break;
         }
         default: {
-            for (int i = 0; i < model->numVertices; i++) {
-                depth += model->worldVertices[i].xyz.v.z;
+            for (int i = 0; i < mw->numVertices; i++) {
+                depth += mw->worldVertices[i].xyz.v.z;
             }
-            depth /= (float)model->numVertices;
+            depth /= (float)mw->numVertices;
             break;
         }
     }
-    model->depth = depth;
+    mw->depth = depth;
 }
-bool LOTRI_RenewModel(LOTRI_Model* model) {
-    if (model == NULL) return false;
+bool LOTRI_RenewModel(LOTRI_MW* mw) {
+    if (mw == NULL) return false;
 
-    if (model->side == MODEL_SIDE_CAMERA) {
-        model->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
+    if (mw->side == MODEL_SIDE_CAMERA) {
+        mw->rotation = (Vec3f){0, -camera.rotation.v.y, camera.rotation.v.z + (float)M_PI};
     }
 
     const Mat4f matArr[] = {
-        BASIC_GetMatS(model->scale),
-        BASIC_GetMatR(model->rotation),
-        BASIC_GetMatT(model->position),
+        BASIC_GetMatS(mw->scale),
+        BASIC_GetMatR(mw->rotation),
+        BASIC_GetMatT(mw->position),
         camera.mat,
     };
     const Mat4f mat = BASIC_GetProd(len_of(matArr), matArr);
 
-    for (int i = 0; i < model->numVertices; i++) {
-        model->worldVertices[i].xyz = BASIC_GetV3M4(model->modelVertices[i].xyz, mat, true);
-        model->worldVertices[i].uv = BASIC_GetV2Rect(model->modelVertices[i].uv, model->src);
+    for (int i = 0; i < mw->numVertices; i++) {
+        mw->worldVertices[i].xyz = BASIC_GetV3M4(mw->modelVertices[i].xyz, mat, true);
+        mw->worldVertices[i].uv = BASIC_GetV2Rect(mw->modelVertices[i].uv, mw->src);
     }
 
-    for (int i = 0; i < model->numFaces; i++) {
-        model->worldFaces[i].ijk = model->modelFaces[i].ijk;
-        model->worldFaces[i].xyz = BASIC_GetV3M4(model->modelFaces[i].xyz, mat, false);
+    for (int i = 0; i < mw->numFaces; i++) {
+        mw->worldFaces[i].ijk = mw->modelFaces[i].ijk;
+        mw->worldFaces[i].xyz = BASIC_GetV3M4(mw->modelFaces[i].xyz, mat, false);
     }
-    LOTRI_RenewModel_Depth(model);
+    LOTRI_RenewModel_Depth(mw);
 
     return true;
 }
 
 
 // DRAW ================================================================================================================
-bool LOTRI_DrawModel(const LOTRI_Model* model) {
-    if (model == NULL) return false;
+bool LOTRI_DrawModel(const LOTRI_MW* mw) {
+    if (mw == NULL) return false;
 
-    for (int i = 0; i < model->numFaces; i++) {
-        if (model->worldFaces[i].xyz.v.z > 0) continue;
-        const Vec3i face = model->modelFaces[i].ijk;
+    for (int i = 0; i < mw->numFaces; i++) {
+        if (mw->worldFaces[i].xyz.v.z > 0) continue;
+        const Vec3i face = mw->modelFaces[i].ijk;
 
         SDL_RenderGeometryRaw(
-            renderer, model->texture,
-            (float*)&model->worldVertices[0].xyz, sizeof(LOTRI_Vertex),
-            (SDL_FColor*)&model->worldVertices[0].rgba, sizeof(LOTRI_Vertex),
-            (float*)&model->worldVertices[0].uv, sizeof(LOTRI_Vertex),
-            model->numVertices, face.arr, 3, sizeof(int)
+            renderer, mw->texture,
+            (float*)&mw->worldVertices[0].xyz, sizeof(LOTRI_Vertex),
+            (SDL_FColor*)&mw->worldVertices[0].rgba, sizeof(LOTRI_Vertex),
+            (float*)&mw->worldVertices[0].uv, sizeof(LOTRI_Vertex),
+            mw->numVertices, face.arr, 3, sizeof(int)
             );
     }
     return true;

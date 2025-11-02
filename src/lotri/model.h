@@ -16,32 +16,31 @@ typedef enum ModelSide {
     MODEL_SIDE_IN,
     MODEL_SIDE_CAMERA
 } ModelSide;
-typedef struct LOTRI_Model LOTRI_Model;
-typedef struct LOTRI_World LOTRI_World;
+typedef struct LOTRI_MW LOTRI_MW;
 
 
 
 
 
-void LOTRI_DestroyModel(LOTRI_Model* model);
-LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
+void LOTRI_DestroyModel(LOTRI_MW* mw);
+LOTRI_MW* LOTRI_CreateModel(const char* file_obj, const char *file_mtl, ModelSide side);
 
 
-bool LOTRI_GetModelWorldVertex(const LOTRI_Model* model, int index, Vec3f* vec);
-bool LOTRI_GetModelModelVertex(const LOTRI_Model* model, int index, Vec3f* vec);
-bool LOTRI_GetModelDepth(const LOTRI_Model* model, float* depth);
-bool LOTRI_SetModelScale(LOTRI_Model* model, Vec3f scale);
-bool LOTRI_GetModelPosition(const LOTRI_Model* model, Vec3f* position);
-bool LOTRI_SetModelPosition(LOTRI_Model* model, Vec3f position);
-bool LOTRI_SetModelRotation(LOTRI_Model* model, Vec3f rotation);
-bool LOTRI_SetModelNormals(const LOTRI_Model* model, ModelSide side);
-bool LOTRI_SetModelSrc(LOTRI_Model* model, SDL_FRect* src);
+bool LOTRI_GetModelWorldVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
+bool LOTRI_GetModelModelVertex(const LOTRI_MW* mw, int index, Vec3f* vec);
+bool LOTRI_GetModelDepth(const LOTRI_MW* mw, float* depth);
+bool LOTRI_SetModelScale(LOTRI_MW* mw, Vec3f scale);
+bool LOTRI_GetModelPosition(const LOTRI_MW* mw, Vec3f* position);
+bool LOTRI_SetModelPosition(LOTRI_MW* mw, Vec3f position);
+bool LOTRI_SetModelRotation(LOTRI_MW* mw, Vec3f rotation);
+bool LOTRI_SetModelNormals(const LOTRI_MW* mw, ModelSide side);
+bool LOTRI_SetModelSrc(LOTRI_MW* mw, SDL_FRect* src);
 
 
-bool LOTRI_RenewModel(LOTRI_Model* model);
+bool LOTRI_RenewModel(LOTRI_MW* mw);
 
 
-bool LOTRI_DrawModel(const LOTRI_Model* model);
+bool LOTRI_DrawModel(const LOTRI_MW* mw);
 
 
 
