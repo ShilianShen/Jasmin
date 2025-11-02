@@ -40,7 +40,7 @@ bool LOTRI_DrawModelBuffer() {
     for (int i = 0; i < modelBufferHead; i++) {
         const int I = indices[i];
         const LOTRI_MW* model = modelBuffer[I];
-        result = result && LOTRI_DrawModel(model);
+        result = result && LOTRI_DrawMW(model);
     }
     return result;
 }

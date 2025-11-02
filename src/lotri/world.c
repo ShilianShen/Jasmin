@@ -42,6 +42,32 @@ bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src) {
 
 
 // CREATE & DELETE =====================================================================================================
+static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
+    world->numVertices = model->numVertices;
+    world->numFaces = model->numFaces;
+    world->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
+    REQ_CONDITION(world->vertices != NULL, return false);
+    for (int i = 0; i < model->numVertices; i++) {
+        world->vertices[i].rgba = model->vertices[i].rgba;
+        world->vertices[i].uv = model->vertices[i].uv;
+    }
+    world->faces = calloc(model->numFaces, sizeof(LOTRI_Face));
+    REQ_CONDITION(world->faces != NULL, return false);
+    world->scale = (Vec3f){1, 1, 1};
+    return true;
+}
+LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model) {
+    LOTRI_World* world = calloc(1, sizeof(LOTRI_World));
+    REQ_CONDITION(world != NULL, return NULL);
+
+    const bool RK = LOTRI_CreateWorld_RK(world, model);
+    REQ_CONDITION(RK, {
+        // world = LOTRI_DeleteWorld(world);
+        return NULL;
+    });
+
+    return world;
+}
 LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
     if (world == NULL) {
         return world;

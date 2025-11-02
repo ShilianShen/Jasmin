@@ -6,6 +6,17 @@
 #include "model.h"
 
 
+typedef struct LOTRI_World LOTRI_World;
+struct LOTRI_World {
+    Vec3f scale, position, rotation;
+    int numVertices, numFaces;
+    LOTRI_Vertex *vertices;
+    LOTRI_Face *faces;
+    SDL_FRect* src;
+    float depth;
+};
+
+
 bool LOTRI_GetWorldVertex(const LOTRI_World *world, int index, Vec3f* vec);
 bool LOTRI_GetWorldDepth(const LOTRI_World *world, float* depth);
 bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
@@ -15,6 +26,7 @@ bool LOTRI_SetWorldPosition(LOTRI_World *world, Vec3f position);
 bool LOTRI_SetWorldRotation(LOTRI_World *world, Vec3f rotation);
 
 
+LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model);
 LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world);
 
 
