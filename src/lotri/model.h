@@ -13,6 +13,7 @@ typedef enum ModelSide {
     MODEL_SIDE_CAMERA,
     NUM_MODEL_SIDES
 } ModelSide;
+
 typedef struct LOTRI_Model LOTRI_Model;
 struct LOTRI_Model {
     int numVertices;

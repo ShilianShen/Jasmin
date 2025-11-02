@@ -67,9 +67,8 @@ LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model) {
     return world;
 }
 LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
-    if (world == NULL) {
-        return world;
-    }
+    if (world == NULL) return world;
+
     if (world->vertices != NULL) {
         free(world->vertices);
         world->vertices = NULL;
@@ -78,6 +77,9 @@ LOTRI_World* LOTRI_DeleteWorld(LOTRI_World* world) {
         free(world->faces);
         world->faces = NULL;
     }
+
+    free(world);
+    world = NULL;
     return world;
 }
 

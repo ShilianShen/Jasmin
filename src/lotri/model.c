@@ -3,8 +3,8 @@
 
 // GET & SET ===========================================================================================================
 bool LOTRI_GetModelVertex(const LOTRI_Model *model, const int index, Vec3f* vec) {
-    if (model == NULL) return false;
-    if (index >= model->numVertices) return false;
+    REQ_CONDITION(model != NULL, return false);
+    REQ_CONDITION(0 <= index && index < model->numVertices, return false);
     *vec = model->vertices[index].xyz;
     return true;
 }
@@ -32,24 +32,38 @@ bool LOTRI_SetModelNormals(const LOTRI_Model* model, const ModelSide side) {
 
 // CREATE & DELETE =====================================================================================================
 static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, const char* file_mtl, const ModelSide side) {
-
     model->numVertices = (int)mesh->position_count;
     model->vertices = calloc(model->numVertices, sizeof(LOTRI_Vertex));
     REQ_CONDITION(model->vertices != NULL, return false);
+
+    for (int i = 0; i < model->numVertices; i++) {
+        model->vertices[i].xyz = (Vec3f){
+            mesh->positions[3*i],
+            mesh->positions[3*i+1],
+            mesh->positions[3*i+2]
+        };
+        model->vertices[i].rgba = (Vec4f){1, 1, 1, 1};
+        model->vertices[i].uv = (Vec2f){
+            mesh->texcoords[2*i],
+            1-mesh->texcoords[2*i+1]
+        };
+    }
 
     model->numFaces = (int)mesh->face_count;
     model->faces = calloc(model->numFaces, sizeof(LOTRI_Face));
     REQ_CONDITION(model->faces != NULL, return false);
 
-    for (int i = 0; i < model->numVertices; i++) {
-        model->vertices[i].xyz = (Vec3f){mesh->positions[3*i], mesh->positions[3*i+1], mesh->positions[3*i+2]};
-        model->vertices[i].rgba = (Vec4f){1, 1, 1, 1};
-        model->vertices[i].uv = (Vec2f){mesh->texcoords[2*i], 1-mesh->texcoords[2*i+1]};
-    }
-
     for (int i = 0; i < model->numFaces; i++) {
-        model->faces[i].ijk = (Vec3i){(int)mesh->indices[3*i].p, (int)mesh->indices[3*i+1].p, (int)mesh->indices[3*i+2].p,};
-        model->faces[i].xyz = (Vec3f){mesh->normals[3*i+3], mesh->normals[3*i+4], mesh->normals[3*i+5],};
+        model->faces[i].ijk = (Vec3i){
+            (int)mesh->indices[3*i].p,
+            (int)mesh->indices[3*i+1].p,
+            (int)mesh->indices[3*i+2].p,
+        };
+        model->faces[i].xyz = (Vec3f){
+            mesh->normals[3*i+3],
+            mesh->normals[3*i+4],
+            mesh->normals[3*i+5],
+        };
     }
 
     MTLMaterial materials[1];
@@ -69,18 +83,23 @@ LOTRI_Model* LOTRI_CreateModel(const char* file_obj, const char* file_mtl, const
     REQ_CONDITION(model != NULL, return NULL);
 
     fastObjMesh* mesh = fast_obj_read(file_obj);
-    REQ_CONDITION(mesh != NULL, {model = LOTRI_DeleteModel(model); return NULL;});
+    REQ_CONDITION(mesh != NULL, {
+        model = LOTRI_DeleteModel(model);
+        return NULL;
+    });
 
     const bool RK = LOTRI_CreateModel_RK(model, mesh, file_mtl, side);
-    fast_obj_destroy(mesh); mesh = NULL;
-    REQ_CONDITION(RK, {model = LOTRI_DeleteModel(model); return NULL;});
+    fast_obj_destroy(mesh);
+    mesh = NULL;
+    REQ_CONDITION(RK, {
+        model = LOTRI_DeleteModel(model);
+        return NULL;
+    });
 
     return model;
 }
 LOTRI_Model* LOTRI_DeleteModel(LOTRI_Model* model) {
-    if (model == NULL) {
-        return model;
-    }
+    if (model == NULL) return model;
     if (model->vertices != NULL) {
         free(model->vertices);
         model->vertices = NULL;
