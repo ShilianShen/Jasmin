@@ -8,7 +8,7 @@
 
 
 bool LOTRI_ClearBuffer();
-bool LOTRI_SendBuffer(LOTRI_MW *model);
+bool LOTRI_SendBuffer(LOTRI_World* world);
 bool LOTRI_RenewBuffer();
 bool LOTRI_DrawBuffer();
 
