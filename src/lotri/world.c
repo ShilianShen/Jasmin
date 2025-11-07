@@ -41,6 +41,11 @@ bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src) {
     world->src = src;
     return true;
 }
+bool LOTRI_SetWorldTexture(LOTRI_World *world, SDL_Texture* texture) {
+    REQ_CONDITION(world != NULL, return false);
+    world->texture = texture != NULL ? texture : world->model->texture;
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================
@@ -55,6 +60,7 @@ static bool LOTRI_CreateWorld_RK(LOTRI_World* world, const LOTRI_Model* model) {
     world->faces = calloc(model->numFaces, sizeof(LOTRI_Face));
     REQ_CONDITION(world->faces != NULL, return false);
     world->scale = (Vec3f){1, 1, 1};
+    world->texture = model->texture;
     return true;
 }
 LOTRI_World* LOTRI_CreateWorld(const LOTRI_Model* model) {
@@ -148,7 +154,7 @@ bool LOTRI_DrawWorld(const LOTRI_World* world) {
         const Vec3i face = world->model->faces[i].ijk;
 
         SDL_RenderGeometryRaw(
-            renderer, world->model->texture,
+            renderer, world->texture,
             (float*)&world->vertices[0].xyz, sizeof(LOTRI_Vertex),
             (SDL_FColor*)&world->vertices[0].rgba, sizeof(LOTRI_Vertex),
             (float*)&world->vertices[0].uv, sizeof(LOTRI_Vertex),

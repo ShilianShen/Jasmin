@@ -14,6 +14,7 @@ struct LOTRI_World {
     LOTRI_Face *faces;
     SDL_FRect* src;
     float depth;
+    SDL_Texture* texture;
 };
 
 
@@ -22,6 +23,7 @@ bool LOTRI_GetWorldDepth(const LOTRI_World *world, float* depth);
 bool LOTRI_GetWorldPosition(const LOTRI_World *world, Vec3f* position);
 bool LOTRI_SetWorldScale(LOTRI_World *world, Vec3f scale);
 bool LOTRI_SetWorldSrc(LOTRI_World *world, SDL_FRect* src);
+bool LOTRI_SetWorldTexture(LOTRI_World *world, SDL_Texture* texture);
 bool LOTRI_SetWorldPosition(LOTRI_World *world, Vec3f position);
 bool LOTRI_SetWorldRotation(LOTRI_World *world, Vec3f rotation);
 
