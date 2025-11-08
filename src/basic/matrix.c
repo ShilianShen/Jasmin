@@ -32,6 +32,29 @@ Vec3f BASIC_GetAdd(const Vec3f A, const Vec3f B) {
     };
     return result;
 }
+Vec3f BASIC_GetMinus(const Vec3f A, const Vec3f B) {
+    const Vec3f result = {
+        A.v.x - B.v.x,
+        A.v.y - B.v.y,
+        A.v.z - B.v.z,
+    };
+    return result;
+}
+Vec3f BASIC_GetWeightedAdd(const float wa, const float wb, const Vec3f A, const Vec3f B) {
+    const Vec3f result = {
+        wa * A.v.x + wb * B.v.x,
+        wa * A.v.y + wb * B.v.y,
+        wa * A.v.z + wb * B.v.z,
+    };
+    return result;
+}
+Vec3f BASIC_GetScaledVec(const float scale, const Vec3f vec) {
+    Vec3f result = vec;
+    for (int i = 0; i < 3; i++) {
+        result.arr[i] *= scale;
+    }
+    return result;
+}
 Vec3f BASIC_AtvVec(const Vec3f a, const Vec3f b, const float t, const AtvFunc atv) {
     Vec3f result;
     for (int i = 0; i < 3; i++) {
