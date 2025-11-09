@@ -252,18 +252,16 @@ static bool INTEL_RenewIntelSet_Body(const SDL_FRect bckRect) {
 static bool INTEL_RenewIntelSet_Trig(IntelArr* intelArr) {
     for (int i = 0; i < NUM_HEADS; i++) {
         const SDL_FRect rect = headInfos[i].rect;
-        if (PERPH_GetMouseInRect(rect) == false) continue;
-        if (PERPH_GetMouseLeftInRect(rect) == false) continue;
-        PERPH_SetMouseLeftTrig((Trig){headInfos[i].func, (TrigPara)intelArr, false});
+        if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, rect) == false) continue;
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){headInfos[i].func, (TrigPara)intelArr, false});
     }
     for (int i = 0; i < bufferHead; i++) {
         Intel* intel = buffer[i].intel;
         for (int j = 0; j < NUM_HEADS; j++) {
             const SDL_FRect rect = buffer[i].rect[j];
-            if (PERPH_GetMouseInRect(rect) == false) continue;
-            if (PERPH_GetMouseLeftInRect(rect) == false) continue;
+            if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, rect) == false) continue;
             const SetType type = headInfos[j].type;
-            PERPH_SetMouseLeftTrig((Trig){typeInfos[type].func, (TrigPara)intel, false});
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){typeInfos[type].func, (TrigPara)intel, false});
         }
     }
     return true;
@@ -313,7 +311,7 @@ static bool INTEL_DrawIntelSet_Body() {
                 default: continue;
             }
             const SDL_FRect rect = buffer[i].rect[j];
-            if (PERPH_GetMouseInRect(rect) && PERPH_GetMouseLeftInRect(rect)) {
+            if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, rect)) {
                 const SDL_Color temp = text;
                 text = back;
                 back = temp;

@@ -1,53 +1,50 @@
 #include "mouse.h"
 
 
+
+static const char* MOUSE_KEY_NAMES[PERPH_NUM_MOUSE_KEYS] = {
+    [PERPH_MOUSE_KEY_LEFT] = "Left",
+    [PERPH_MOUSE_KEY_RIGHT] = "Right",
+};
 static struct {
     struct {
-        SDL_FPoint pos, leftPos, rightPos;
-        bool leftPressed, rightPressed;
+        SDL_FPoint posNow;
+        SDL_FPoint pos[PERPH_NUM_MOUSE_KEYS];
+        bool pressed[PERPH_NUM_MOUSE_KEYS];
     } state1, state2;
-    Trig left_trig;
-    Trig right_trig;
+    Trig trig[PERPH_NUM_MOUSE_KEYS];
     SDL_Texture* tex;
     SDL_FRect texDstRect;
     cJSON* json;
 } mouse;
 
 
-// SET & GET ===========================================================================================================
+// GET & SET ===========================================================================================================
 SDL_FPoint PERPH_GetMousePos() {
-    return mouse.state2.pos;
+    return mouse.state2.posNow;
 }
-void PERPH_SetMouseLeftTrig(const Trig trig) {
-    mouse.left_trig = trig;
-}
-void PERPH_SetMouseRightTrig(const Trig trig) {
-    mouse.right_trig = trig;
+bool PERPH_SetMouseKeyTrig(const PERPH_MouseKey key, const Trig trig) {
+    mouse.trig[key] = trig;
+    return true;
 }
 bool PERPH_GetMouseInRect(const SDL_FRect rect) {
-    return SDL_GetPointInRect(mouse.state2.pos, rect);
+    return SDL_GetPointInRect(mouse.state2.posNow, rect);
 }
-bool PERPH_GetMouseLeftInRect(const SDL_FRect rect) {
-    return mouse.state2.leftPressed && SDL_GetPointInRect(mouse.state2.leftPos, rect);
+bool PERPH_GetMouseKeyInRect(const PERPH_MouseKey key, const SDL_FRect rect) {
+    return mouse.state2.pressed[key] && SDL_GetPointInRect(mouse.state2.pos[key], rect);
 }
-bool PERPH_GetMouseLeftPressed() {
-    return mouse.state2.leftPressed;
+bool PERPH_GetMouseAndKeyInRect(const PERPH_MouseKey key, const SDL_FRect rect) {
+    return PERPH_GetMouseInRect(rect) && PERPH_GetMouseKeyInRect(key, rect);
 }
-bool PERPH_GetMouseLeftPress() {
-    return mouse.state1.leftPressed == false && mouse.state2.leftPressed == true;
+bool PERPH_GetMouseKeyPressed(const PERPH_MouseKey key) {
+    return mouse.state2.pressed[key];
 }
-bool PERPH_GetMouseRightInRect(const SDL_FRect rect) {
-    return mouse.state2.rightPressed && SDL_GetPointInRect(mouse.state2.rightPos, rect);
-}
-bool PERPH_GetMouseRightPressed() {
-    return mouse.state2.rightPressed;
-}
-bool PERPH_GetMouseRightPress() {
-    return mouse.state1.rightPressed == false && mouse.state2.rightPressed == true;
+bool PERPH_GetMouseKeyPress(const PERPH_MouseKey key) {
+    return mouse.state1.pressed[key] == false && mouse.state2.pressed[key] == true;
 }
 
 
-// INIT & EXIR =========================================================================================================
+// INIT & EXIT =========================================================================================================
 bool PERPH_InitMouse() {
     memset(&mouse, 0, sizeof(mouse));
     mouse.json = getJson(PERPH_MOUSE_JSON);
@@ -89,54 +86,33 @@ static void PERPH_RenewMouse_State() {
 
     float x, y;
     const SDL_MouseButtonFlags buttons = SDL_GetMouseState(&x, &y);
-    mouse.state2.pos = (SDL_FPoint){x * windowScale.x, y * windowScale.y};
-    mouse.state2.leftPressed = buttons & SDL_BUTTON_LMASK;
-    mouse.state2.rightPressed = buttons & SDL_BUTTON_RMASK;
+    mouse.state2.posNow = (SDL_FPoint){x * windowScale.x, y * windowScale.y};
+    mouse.state2.pressed[PERPH_MOUSE_KEY_LEFT] = buttons & SDL_BUTTON_LMASK;
+    mouse.state2.pressed[PERPH_MOUSE_KEY_RIGHT] = buttons & SDL_BUTTON_RMASK;
 
-    if (!mouse.state1.leftPressed && mouse.state2.leftPressed) mouse.state2.leftPos = mouse.state2.pos;
-    if (!mouse.state1.rightPressed && mouse.state2.rightPressed) mouse.state2.rightPos = mouse.state2.pos;
-}
-static void PERPH_RenewMouse_TrigLeft() {
-    if (mouse.left_trig.func == NULL) return;
-
-    if (mouse.left_trig.sustain == false
-        && mouse.state1.leftPressed == true
-        && mouse.state2.leftPressed == false
-        ) {
-        ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        BASIC_PullTrig(mouse.left_trig);
-        }
-
-    if (mouse.left_trig.sustain == true
-        && mouse.state1.leftPressed == true
-        ) {
-        if (mouse.state2.leftPressed == false) ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        BASIC_PullTrig(mouse.left_trig);
-        }
-    mouse.left_trig = (Trig){0};
-}
-static void PERPH_RenewMouse_TrigRight() {
-    if (mouse.right_trig.func == NULL) return;
-
-    if (mouse.right_trig.sustain == false
-        && mouse.state1.rightPressed == true
-        && mouse.state2.rightPressed == false
-        ) {
-        ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        BASIC_PullTrig(mouse.right_trig);
-        }
-
-    if (mouse.right_trig.sustain == true
-        && mouse.state1.rightPressed == true
-        ) {
-        if (mouse.state2.rightPressed == false) ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
-        BASIC_PullTrig(mouse.right_trig);
-        }
-    mouse.right_trig = (Trig){0};
+    if (!mouse.state1.pressed[PERPH_MOUSE_KEY_LEFT] && mouse.state2.pressed[PERPH_MOUSE_KEY_LEFT]) mouse.state2.pos[PERPH_MOUSE_KEY_LEFT] = mouse.state2.posNow;
+    if (!mouse.state1.pressed[PERPH_MOUSE_KEY_RIGHT] && mouse.state2.pressed[PERPH_MOUSE_KEY_RIGHT]) mouse.state2.pos[PERPH_MOUSE_KEY_RIGHT] = mouse.state2.posNow;
 }
 static void PERPH_RenewMouse_Trig() {
-    PERPH_RenewMouse_TrigLeft();
-    PERPH_RenewMouse_TrigRight();
+    for (int key = 0; key < PERPH_NUM_MOUSE_KEYS; key++) {
+        if (mouse.trig[key].func == NULL) continue;
+
+        if (mouse.trig[key].sustain == false
+            && mouse.state1.pressed[key] == true
+            && mouse.state2.pressed[key] == false
+            ) {
+            ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+            BASIC_PullTrig(mouse.trig[key]);
+            }
+
+        if (mouse.trig[key].sustain == true
+            && mouse.state1.pressed[key] == true
+            ) {
+            if (mouse.state2.pressed[key] == false) ma_engine_play_sound(&engine, "../res/sound/switch.wav", NULL);
+            BASIC_PullTrig(mouse.trig[key]);
+            }
+        mouse.trig[key] = (Trig){0};
+    }
 }
 bool PERPH_RenewMouse() {
     PERPH_RenewMouse_State();
@@ -148,26 +124,22 @@ bool PERPH_RenewMouse() {
 // DRAW ================================================================================================================
 bool PERPH_DrawMouse() {
     DEBUG_SendMessageL("%s:\n", __func__);
-    DEBUG_SendMessageL("    mousePos: %s\n", SDL_GetStrFPoint(mouse.state2.pos));
-    if (mouse.left_trig.func != NULL) DEBUG_SendMessageL("    mouse.left_trig: READY.\n");
+    DEBUG_SendMessageL("    posNow: %s\n", SDL_GetStrFPoint(mouse.state2.posNow));
 
-    DEBUG_DrawPoint(mouse.state2.pos);
-    if (mouse.state2.leftPressed) {
-        DEBUG_SendMessageL("    mouseLeftPos: %s\n", SDL_GetStrFPoint(mouse.state2.leftPos));
-        DEBUG_DrawPoint(mouse.state2.leftPos);
-        DEBUG_DrawLine(mouse.state2.leftPos, mouse.state2.pos);
+    for (int key = 0; key < PERPH_NUM_MOUSE_KEYS; key++) {
+        if (mouse.trig[key].func != NULL) {
+            DEBUG_SendMessageL("    trig[%s]: READY.\n", MOUSE_KEY_NAMES[key]);
+        }
+        DEBUG_DrawPoint(mouse.state2.posNow);
+        if (mouse.state2.pressed[key]) {
+            DEBUG_SendMessageL("    pos[%s]: %s\n", MOUSE_KEY_NAMES[key], SDL_GetStrFPoint(mouse.state2.pos[key]));
+            DEBUG_DrawPoint(mouse.state2.pos[key]);
+            DEBUG_DrawLine(mouse.state2.pos[key], mouse.state2.posNow);
+        }
     }
 
-    if (mouse.right_trig.func != NULL) DEBUG_SendMessageL("    mouse.right_trig: READY.\n");
-
-    DEBUG_DrawPoint(mouse.state2.pos);
-    if (mouse.state2.rightPressed) {
-        DEBUG_SendMessageL("    mouseRightPos: %s\n", SDL_GetStrFPoint(mouse.state2.rightPos));
-        DEBUG_DrawPoint(mouse.state2.rightPos);
-        DEBUG_DrawLine(mouse.state2.rightPos, mouse.state2.pos);
-    }
-    mouse.texDstRect.x = mouse.state2.pos.x;
-    mouse.texDstRect.y = mouse.state2.pos.y;
+    mouse.texDstRect.x = mouse.state2.posNow.x;
+    mouse.texDstRect.y = mouse.state2.posNow.y;
     SDL_RenderTexture(renderer, mouse.tex, NULL, &mouse.texDstRect);
     return true;
 }

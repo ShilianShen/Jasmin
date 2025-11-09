@@ -77,7 +77,7 @@ bool TEMPO_RenewPage(Page *page) {
     REQ_CONDITION(TEMPO_RenewPage_DstRect(page), return false);
 
     TEMPO_SetElemPublicBck(&page->dst_rect);
-    PERPH_SetMouseLeftTrig((Trig){0});
+    PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){0});
     BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
     TEMPO_SetElemPublicBck(NULL);
     return true;

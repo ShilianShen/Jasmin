@@ -177,11 +177,11 @@ static void INTEL_RenewIntelNet_EntityInfo_Trig() {
         entityInfo[i].rect.x = position.x - entityInfo[i].rect.w / 2;
         entityInfo[i].rect.y = position.y - entityInfo[i].rect.h / 2;
 
-        if (PERPH_GetMouseLeftPressed() && PERPH_GetMouseInRect(entityInfo[i].rect)) {
+        if (PERPH_GetMouseKeyPressed(PERPH_MOUSE_KEY_LEFT) && PERPH_GetMouseInRect(entityInfo[i].rect)) {
             entityMoveId = i;
-            PERPH_SetMouseLeftTrig((Trig){TRIG_MoveEntity, (TrigPara)NULL, true});
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TRIG_MoveEntity, (TrigPara)NULL, true});
         }
-        if (PERPH_GetMouseLeftPressed() == false) entityMoveId = 0;
+        if (PERPH_GetMouseKeyPressed(PERPH_MOUSE_KEY_LEFT) == false) entityMoveId = 0;
     }
 }
 static bool INTEL_RenewIntelNet_EntityInfo(IntelArr* intelArr) {
@@ -228,12 +228,12 @@ bool INTEL_DrawIntelNet(IntelArr* intelArr) {
         }
         else SDL_RenderLine(renderer, A.x, A.y, B.x, B.y);
 
-        if (PERPH_GetMouseLeftInRect(rect)) {
+        if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, rect)) {
             DEBUG_SendMessageR("%s: %s.\n", __func__, INTEL_GetStrIntel(intel));
         }
 
         SDL_Color text = JUDGE_COLORS[intel.judge], back = STATE_COLORS[intel.state];
-        if (PERPH_GetMouseLeftInRect(rect)) {
+        if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, rect)) {
             const SDL_Color temp = text;
             text = back;
             back = temp;

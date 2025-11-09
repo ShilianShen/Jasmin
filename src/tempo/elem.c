@@ -193,7 +193,7 @@ bool TEMPO_RenewElem(void *elem_void) {
     REQ_CONDITION(TEMPO_RenewElem_DstRect(elem), return false);
 
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
-    const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
+    const bool mouseLeftIn = PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect);
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
@@ -206,10 +206,10 @@ bool TEMPO_RenewElem(void *elem_void) {
 
     if (elem->trig.func != NULL) {
         if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseLeftTrig(elem->trig);
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig);
         }
         if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseLeftTrig(elem->trig);
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig);
         }
     }
 
@@ -223,7 +223,7 @@ bool TEMPO_DrawElem(const void *elem_void) {
     REQ_CONDITION(elem != NULL, return false);
 
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
-    const bool mouseLeftIn = PERPH_GetMouseLeftInRect(elem->dst_rect);
+    const bool mouseLeftIn = PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect);
     if (mouseLeftIn) DEBUG_FillRect(elem->dst_rect);
 
     const SDL_FRect dst = {
