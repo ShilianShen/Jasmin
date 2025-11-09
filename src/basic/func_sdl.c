@@ -23,7 +23,13 @@ char*SDL_GetStrFPoint(const SDL_FPoint point) {
 }
 bool SDL_GetSurfaceColor(SDL_Surface* surface, const int x, const int y, SDL_Color* color) {
     REQ_CONDITION(surface != NULL, return false);
+    REQ_CONDITION(color != NULL, return false);
     SDL_ReadSurfacePixel(surface, x, y, &color->r, &color->g, &color->b, &color->a);
+    return true;
+}
+bool SDL_SetSurfaceColor(SDL_Surface* surface, const int x, const int y, const SDL_Color color) {
+    REQ_CONDITION(surface != NULL, return false);
+    SDL_WriteSurfacePixel(surface, x, y, color.r, color.g, color.b, color.a);
     return true;
 }
 SDL_FPoint SDL_GetSumFPoint(const int N, const SDL_FPoint points[N]) {

@@ -25,6 +25,7 @@ bool SDL_RenderParallelLine(SDL_Renderer *renderer, SDL_FPoint A, SDL_FPoint B, 
 bool SDL_RenderDashedLine(SDL_Renderer *renderer, SDL_FPoint A, SDL_FPoint B, float dash_len, float gap_len, float offset);
 bool SDL_SetTextureColorRGB(SDL_Texture* tex, SDL_Color color);
 bool SDL_GetSurfaceColor(SDL_Surface* surface, int x, int y, SDL_Color* color);
+bool SDL_SetSurfaceColor(SDL_Surface* surface, int x, int y, SDL_Color color);
 SDL_FPoint SDL_GetSumFPoint(int N, const SDL_FPoint points[N]);
 bool SDL_SetRenderColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
