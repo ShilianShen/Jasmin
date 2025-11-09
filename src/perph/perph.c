@@ -11,12 +11,12 @@ void PERPH_Exit() {
 }
 bool PERPH_Renew() {
     REQ_CONDITION(PERPH_RenewMouse(), return false);
-    REQ_CONDITION(PERPH_RenewKeyboard(), return false);
+    REQ_CONDITION(PERPH_RenewBoard(), return false);
     return true;
 }
 bool PERPH_Draw() {
     REQ_CONDITION(PERPH_DrawMouse(), return false);
-    REQ_CONDITION(PERPH_DrawKeyboard(), return false);
+    REQ_CONDITION(PERPH_DrawBoard(), return false);
     return true;
 }
 

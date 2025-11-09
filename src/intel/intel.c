@@ -99,7 +99,7 @@ void INTEL_Exit() {
 // RENEW ===============================================================================================================
 bool INTEL_Renew() {
     INTEL_RenewIntelArr(testIntelArr);
-    PERPH_SetKeyTrig(SDL_SCANCODE_TAB, (Trig){INTEL_ChangeMode, (TrigPara)NULL, false});
+    PERPH_SetBoardKeyTrig(SDL_SCANCODE_TAB, (Trig){INTEL_ChangeMode, (TrigPara)NULL, false});
     return true;
 }
 
