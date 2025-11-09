@@ -16,6 +16,10 @@ bool PERPH_GetMouseLeftPressed();
 bool PERPH_GetMouseLeftPress();
 bool PERPH_GetMouseLeftInRect(SDL_FRect rect);
 void PERPH_SetMouseLeftTrig(Trig trig);
+bool PERPH_GetMouseRightPressed();
+bool PERPH_GetMouseRightPress();
+bool PERPH_GetMouseRightInRect(SDL_FRect rect);
+void PERPH_SetMouseRightTrig(Trig trig);
 SDL_FPoint PERPH_GetMousePos();
 
 
