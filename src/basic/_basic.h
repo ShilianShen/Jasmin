@@ -10,6 +10,12 @@
             stmt;                                          \
         }                                                  \
     } while (0)
+#define OPT_CONDITION(expr, stmt)                          \
+    do {                                                   \
+        if (!(expr)) {                                     \
+            stmt;                                          \
+        }                                                  \
+    } while (0)
 
 
 #include "../third_party/third_party.h"
