@@ -29,14 +29,14 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
         TEMPO_SetElemPublicTable(NULL);
     }
     if (cJSON_ExistKey(page_json, key = "anchor")) {
-        REQ_CONDITION(cJSON_Load(page_json, key, JSM_INT, &page->anchor), return false);
+        REQ_CONDITION(cJSON_LoadByKey(page_json, key, JSM_INT, &page->anchor), return false);
     }
     if (cJSON_ExistKey(page_json, key = "src")) {
-        REQ_CONDITION(cJSON_Load(page_json, key, JSM_FRECT, &page->src_rect), return false);
+        REQ_CONDITION(cJSON_LoadByKey(page_json, key, JSM_FRECT, &page->src_rect), return false);
         page->src = &page->src_rect;
     }
     if (cJSON_ExistKey(page_json, key = "color")) {
-        REQ_CONDITION(cJSON_Load(page_json, key, JSM_COLOR, &page->color), return false);
+        REQ_CONDITION(cJSON_LoadByKey(page_json, key, JSM_COLOR, &page->color), return false);
     }
     return true;
 }

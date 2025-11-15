@@ -73,10 +73,109 @@ bool cJSON_ExistKey(const cJSON* object, const char* key) {
     if (val == NULL) return false; // Req Condition
     return true;
 }
-bool cJSON_Load(const cJSON* object, const char* key, const JSM_DataType type, void* target) {
+bool cJSON_LoadByKey(const cJSON* object, const char* key, const JSM_DataType type, void* target) {
     // 这个函数的任务是: object[key]暴露给target, 不涉及alloc
     if (object == NULL || key == NULL || target == NULL) return false; // Req Condition
     const cJSON* val = cJSON_GetObjectItem(object, key);
+    if (val == NULL) return false; // Req Condition
+    switch (type) {
+        case JSM_INT: {
+            if (cJSON_IsNumber(val)) {
+                *(int*)target = val->valueint;
+                return true;
+            }
+            return false;
+        }
+        case JSM_FLOAT: {
+            if (cJSON_IsNumber(val)) {
+                *(float*)target = (float)val->valuedouble;
+                return true;
+            }
+            return false;
+        }
+        case JSM_BOOL: {
+            if (cJSON_IsBool(val)) {
+                *(bool*)target = (bool)val->valueint;
+                return true;
+            }
+            return false;
+        }
+        case JSM_FRECT: {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* rect_json[4];
+            for (int i = 0; i < 4; i++) {
+                rect_json[i] = cJSON_GetArrayItem(val, i);
+                if (rect_json[i] == NULL || cJSON_IsNumber(rect_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_FRect rect = {
+                (float)rect_json[0]->valuedouble,
+                (float)rect_json[1]->valuedouble,
+                (float)rect_json[2]->valuedouble,
+                (float)rect_json[3]->valuedouble,
+            };
+            *(SDL_FRect*)target = rect;
+            return true;
+        }
+        case JSM_RECT: {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* rect_json[4];
+            for (int i = 0; i < 4; i++) {
+                rect_json[i] = cJSON_GetArrayItem(val, i);
+                if (rect_json[i] == NULL || cJSON_IsNumber(rect_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_Rect rect = {
+                rect_json[0]->valueint,
+                rect_json[1]->valueint,
+                rect_json[2]->valueint,
+                rect_json[3]->valueint,
+            };
+            *(SDL_Rect*)target = rect;
+            return true;
+        }
+        case JSM_STRING: {
+            if (cJSON_IsString(val) == false) {
+                return false;
+            }
+            *(char**)target = val->valuestring;
+            return true;
+        }
+        case JSM_COLOR:  {
+            if (cJSON_IsArray(val) == false || cJSON_GetArraySize(val) != 4) {
+                return false;
+            }
+            const cJSON* color_json[4];
+            for (int i = 0; i < 4; i++) {
+                color_json[i] = cJSON_GetArrayItem(val, i);
+                if (color_json[i] == NULL || cJSON_IsNumber(color_json[i]) == false) {
+                    return false;
+                }
+            }
+            const SDL_Color color = {
+                (int)color_json[0]->valuedouble,
+                (int)color_json[1]->valuedouble,
+                (int)color_json[2]->valuedouble,
+                (int)color_json[3]->valuedouble,
+            };
+            *(SDL_Color*)target = color;
+            return true;
+        }
+        default: return false;
+    }
+}
+bool cJSON_LoadByIdx(const cJSON* object, const int idx, const JSM_DataType type, void* target) {
+    // 这个函数的任务是: object[key]暴露给target, 不涉及alloc
+    REQ_CONDITION(object != NULL, return false);
+    REQ_CONDITION(target != NULL, return false);
+    REQ_CONDITION(0 <= idx && idx < cJSON_GetArraySize(object), return false);
+    const cJSON* val = cJSON_GetArrayItem(object, idx);
     if (val == NULL) return false; // Req Condition
     switch (type) {
         case JSM_INT: {

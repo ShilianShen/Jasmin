@@ -10,15 +10,15 @@ bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
     char* string_json = NULL;
     char* font_json = NULL;
     bool key_json = false;
-    if (cJSON_Load(info_json, key = "string", JSM_STRING, &string_json) == false) {
+    if (cJSON_LoadByKey(info_json, key = "string", JSM_STRING, &string_json) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_Load(info_json, key = "font", JSM_STRING, &font_json) == false) {
+    if (cJSON_LoadByKey(info_json, key = "font", JSM_STRING, &font_json) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    cJSON_Load(info_json, key = "key", JSM_BOOL, &key_json);
+    cJSON_LoadByKey(info_json, key = "key", JSM_BOOL, &key_json);
 
     text->font = BASIC_GetTableValByKey(theme.fontTable, font_json);
     text->string = strdup(string_json);

@@ -14,16 +14,16 @@ static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
 
     const char* path = NULL;
     if (cJSON_ExistKey(font_json, key = "path")) {
-        if (cJSON_Load(font_json, key, JSM_STRING, &path) == false) {
-            printf("%s: cJSON_Load failed.\n", __func__);
+        if (cJSON_LoadByKey(font_json, key, JSM_STRING, &path) == false) {
+            printf("%s: cJSON_LoadByKey failed.\n", __func__);
             return false;
         } // Req Condition
     }
 
     float size = 0;
     if (cJSON_ExistKey(font_json, key = "size")) {
-        if (cJSON_Load(font_json, key, JSM_FLOAT, &size) == false) {
-            printf("%s: cJSON_Load failed.\n", __func__);
+        if (cJSON_LoadByKey(font_json, key, JSM_FLOAT, &size) == false) {
+            printf("%s: cJSON_LoadByKey failed.\n", __func__);
             return false;
         } // Req Condition
     }
