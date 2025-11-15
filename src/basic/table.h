@@ -17,6 +17,11 @@ typedef void*(*DeleteFunc)(void*);
 
 void* BASIC_GetTableValByKey(Table table, const char* key);
 const char* BASIC_GetTableKeyByVal(Table table, const void* val);
+void* BASIC_GetTableValByIdx(Table table, int idx);
+const char* BASIC_GetTableKeyByIdx(Table table, int idx);
+bool BASIC_SortTableByKey(Table table, const char* keys[]);
+bool BASIC_GetTableIdxByKey(Table table, const char* key, int* idx);
+bool BASIC_GetTableIdxByVal(Table table, const void* val, int* idx);
 
 
 bool BASIC_CreateTable(Table* table, const cJSON* table_json, CreateFunc func);
