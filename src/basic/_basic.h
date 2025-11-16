@@ -49,7 +49,12 @@ extern bool running;
 extern SDL_Event sdl_event;
 extern float BASIC_T1, BASIC_T2, BASIC_DT;
 extern SDL_FPoint windowScale;
-extern SDL_Color EMPTY, BLACK, WHITE, RED, GREEN, BLUE;
-
+// extern SDL_Color EMPTY, BLACK, WHITE, RED, GREEN, BLUE;
+#define WHITE (SDL_Color){255, 255, 255, 255}
+#define BLACK (SDL_Color){0, 0, 0, 255}
+#define RED (SDL_Color){255, 0, 0, 255}
+#define GREEN (SDL_Color){0, 255, 0, 255}
+#define BLUE (SDL_Color){0, 0, 255, 255}
+#define EMPTY (SDL_Color){0, 0, 0, 0}
 
 #endif //JASMIN__BASIC_H

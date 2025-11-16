@@ -12,12 +12,6 @@ const int WINDOW_HEIGHT = 800;
 SDL_Renderer* renderer = NULL;
 SDL_Event sdl_event;
 bool running = true;
-SDL_Color EMPTY = {0, 0, 0, 0};
-SDL_Color BLACK = {0, 0, 0, 255};
-SDL_Color WHITE = {255, 255, 255, 255};
-SDL_Color RED = {255, 0, 0, 255};
-SDL_Color GREEN = {0, 255, 0, 255};
-SDL_Color BLUE = {0, 0, 255, 255};
 float BASIC_T1 = 0, BASIC_T2 = 0, BASIC_DT = 0;
 ma_engine engine;
 
