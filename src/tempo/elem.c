@@ -39,8 +39,8 @@ static const struct {
     [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL, 0},
     [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
     [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, (TrigPara)NULL, true}},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, (TrigPara)NULL, false}},
+    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, 0, true}},
+    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, 0, false}},
 };
 static ElemType TEMPO_GetElemTypeFromString(const char* string) {
     for (int i = 0; i < ELEM_NUM_TYPES; i++) {

@@ -23,7 +23,12 @@ static struct {
 SDL_FPoint PERPH_GetMousePos() {
     return mouse.state2.posNow;
 }
+SDL_FPoint PERPH_GetMouseKeyPos(const PERPH_MouseKey key) {
+    return mouse.state2.pos[key];
+}
 bool PERPH_SetMouseKeyTrig(const PERPH_MouseKey key, const Trig trig) {
+    REQ_CONDITION(0 <= key && key < PERPH_NUM_MOUSE_KEYS, return false);
+    if (mouse.trig[key].func != NULL) return false;
     mouse.trig[key] = trig;
     return true;
 }
@@ -31,7 +36,10 @@ bool PERPH_GetMouseInRect(const SDL_FRect rect) {
     return SDL_GetPointInRect(mouse.state2.posNow, rect);
 }
 bool PERPH_GetMouseKeyInRect(const PERPH_MouseKey key, const SDL_FRect rect) {
-    return mouse.state2.pressed[key] && SDL_GetPointInRect(mouse.state2.pos[key], rect);
+    return true
+    && mouse.state2.pressed[key]
+    && SDL_GetPointInRect(mouse.state2.pos[key], rect)
+    ;
 }
 bool PERPH_GetMouseAndKeyInRect(const PERPH_MouseKey key, const SDL_FRect rect) {
     return PERPH_GetMouseInRect(rect) && PERPH_GetMouseKeyInRect(key, rect);

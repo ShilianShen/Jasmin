@@ -25,6 +25,7 @@ bool PERPH_GetMouseKeyPressed(PERPH_MouseKey key);
 bool PERPH_GetMouseKeyPress(PERPH_MouseKey key);
 bool PERPH_SetMouseKeyTrig(PERPH_MouseKey key, Trig trig);
 SDL_FPoint PERPH_GetMousePos();
+SDL_FPoint PERPH_GetMouseKeyPos(PERPH_MouseKey key);
 
 
 #endif //PERPH_MOUSE_H
