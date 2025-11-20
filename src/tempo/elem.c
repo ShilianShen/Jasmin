@@ -120,6 +120,9 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             elem->trig = (Trig){func, (TrigPara)elem->para_string, false};
         }
     }
+    if (elem->trig.func == NULL) {
+        elem->trig.func = BASIC_TrigPass;
+    }
     if (cJSON_ExistKey(elem_json, key = "bck")) {
         const char* bck_json = NULL;
         REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &bck_json), return false);
@@ -257,18 +260,12 @@ void TEMPO_TrigFuncSlid(TrigPara para) {
 
 // SET & GET ===========================================================================================================
 bool TEMPO_SetElemDstRect(Elem *elem, const SDL_FRect dst_rect) {
-    if (elem == NULL) {
-        printf("%s: elem is null.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(elem != NULL, return false);
     elem->dst_rect = dst_rect;
     return true;
 }
 bool TEMPO_GetElemDstRect(const Elem *elem, SDL_FRect *dst) {
-    if (elem == NULL) {
-        printf("%s: elem is null.\n", __func__);
-        return false;
-    }
+    REQ_CONDITION(elem != NULL, return false);
     *dst = elem->dst_rect;
     return true;
 }
