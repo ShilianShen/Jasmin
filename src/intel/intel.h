@@ -14,11 +14,6 @@ extern const SDL_Color JUDGE_COLORS[];
 extern const SDL_Color STATE_COLORS[];
 
 
-#define ACTION_FONT "../res/font/IBMPlexMono-Medium.ttf", 24
-#define ENTITY_FONT "../res/font/Courier New.ttf", 48
-#define SET_FONT "../res/font/Courier New.ttf", 48
-
-
 typedef enum {STATE_UNKNOWN, STATE_TRUE, STATE_FALSE, STATE_PARADOX, NUM_STATES} IntelState;
 typedef enum {JUDGE_MANU, JUDGE_AUTO, NUM_JUDGES} IntelJudge;
 typedef struct {

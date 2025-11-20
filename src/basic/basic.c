@@ -32,12 +32,15 @@ bool BASIC_Init() {
     SDL_SetRenderVSync(renderer, true);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+    REQ_CONDITION(BASIC_InitFont(), return false);
+
     return true;
 }
 void BASIC_Exit() {
     SDL_DestroyWindow(window); window = NULL;
     SDL_Quit();
     ma_engine_uninit(&engine);
+    BASIC_ExitFont();
 }
 
 

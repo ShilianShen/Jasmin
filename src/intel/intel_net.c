@@ -60,16 +60,8 @@ static bool INTEL_InitIntelNet_RK(TTF_Font* entityFont, TTF_Font* actionFont) {
     return true;
 }
 bool INTEL_InitIntelNet() {
-    TTF_Font* entityFont = TTF_OpenFont(ENTITY_FONT);
-    TTF_Font* actionFont = TTF_OpenFont(ACTION_FONT);
-
-    const bool rk = INTEL_InitIntelNet_RK(entityFont, actionFont);
-
-    TTF_CloseFont(entityFont); entityFont = NULL;
-    TTF_CloseFont(actionFont); actionFont = NULL;
-
+    const bool rk = INTEL_InitIntelNet_RK(BASIC_GetFont("intel_entity"), BASIC_GetFont("intel_action"));
     REQ_CONDITION(rk, return false);
-
     return true;
 }
 void INTEL_ExitIntelNet() {

@@ -32,10 +32,7 @@ static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
         return NULL;
     }
     TTF_Font* font = TTF_OpenFont(path, size); // alloc
-    if (font == NULL) {
-        printf("%s: TTF_OpenFont failed.\n", __func__);
-        return NULL;
-    }
+    REQ_CONDITION(font != NULL, return NULL);
 
     return font;
 }

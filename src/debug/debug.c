@@ -55,7 +55,7 @@ bool DEBUG_Init() {
     REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_path", JSM_STRING, &font_path), return false);
     REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_size", JSM_FLOAT, &font_size), return false);
 
-    debug.font = TTF_OpenFont(font_path, font_size);
+    debug.font = BASIC_GetFont("debug");
     REQ_CONDITION(debug.font != NULL, return false);
 
     SDL_Color colors[DEBUG_NUM_COLORS];
@@ -83,10 +83,6 @@ bool DEBUG_Init() {
     return true;
 }
 void DEBUG_Exit() {
-    if (debug.font != NULL) {
-        TTF_CloseFont(debug.font);
-        debug.font = NULL;
-    }
     if (debug.json != NULL) {
         cJSON_Delete(debug.json);
         debug.json = NULL;

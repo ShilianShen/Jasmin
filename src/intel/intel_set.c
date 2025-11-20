@@ -170,10 +170,7 @@ static bool INTEL_InitIntelSet_RK(TTF_Font* font) {
 bool INTEL_InitIntelSet() {
     REQ_CONDITION(INTEL_InitIntelSet_Type(), return false);
 
-    TTF_Font *font = TTF_OpenFont(SET_FONT);
-
-    const bool rk = INTEL_InitIntelSet_RK(font);
-    TTF_CloseFont(font); font = NULL;
+    const bool rk = INTEL_InitIntelSet_RK(BASIC_GetFont("intel_set"));
 
     REQ_CONDITION(rk != false, return false);
     return true;

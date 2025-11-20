@@ -11,6 +11,7 @@
 #include "env.h"
 #include "matrix.h"
 #include "sort.h"
+#include "font.h"
 
 
 bool BASIC_Init();
