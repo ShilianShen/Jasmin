@@ -59,9 +59,9 @@ bool PERPH_InitMouse() {
     REQ_CONDITION(mouse.json != NULL, return false);
 
     char* tex_json = NULL;
-    if (cJSON_LoadByKey(mouse.json, "tex", JSM_STRING, &tex_json)) {
+    if (cJSON_LoadByKey(mouse.json, "tex", JSM_STRING, &tex_json, NULL)) {
         float scale = 0;
-        REQ_CONDITION(cJSON_LoadByKey(mouse.json, "scale", JSM_FLOAT, &scale), return false);
+        REQ_CONDITION(cJSON_LoadByKey(mouse.json, "scale", JSM_FLOAT, &scale, NULL), return false);
 
         mouse.tex = IMG_LoadTexture(renderer, tex_json);
         REQ_CONDITION(mouse.tex != NULL, return false);

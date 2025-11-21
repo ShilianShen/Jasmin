@@ -54,17 +54,15 @@ static ElemType TEMPO_GetElemTypeFromString(const char* string) {
 
 // ELEM ================================================================================================================
 struct Elem {
-    ElemType type;
-    ElemInfo info;
+    ElemType type; ElemInfo info;
 
     int anchor;
     SDL_Texture* tex;
-    SDL_FRect gid_rect, *gid;
-    SDL_FRect src_rect, *src;
-    SDL_FRect dst_rect, *bck;
+    SDL_FRect gid_rect, src_rect;
+    SDL_FRect dst_rect;
+    SDL_FRect *gid, *src, *bck;
 
-    Trig trig;
-    char* para_string;
+    Trig trig; char* para_string;
 };
 
 
@@ -74,7 +72,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     const char* key;
     if (cJSON_ExistKey(elem_json, key = "type")) {
         char* type_json = NULL;
-        if (cJSON_LoadByKey(elem_json, key, JSM_STRING, &type_json) == true) {
+        if (cJSON_LoadByKey(elem_json, key, JSM_STRING, &type_json, NULL) == true) {
             elem->type = TEMPO_GetElemTypeFromString(type_json);
         }
         REQ_CONDITION(elem->type != ELEM_TYPE_NULL, return false);
@@ -89,26 +87,26 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         }
     }
     if (cJSON_ExistKey(elem_json, key = "anchor")) {
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_INT, &elem->anchor), return false);
+        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_INT, &elem->anchor, NULL), return false);
     }
     if (cJSON_ExistKey(elem_json, key = "gid")) {
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->gid_rect), return false);
+        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->gid_rect, NULL), return false);
         elem->gid = &elem->gid_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "src")) {
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->src_rect), return false);
+        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->src_rect, NULL), return false);
         elem->src = &elem->src_rect;
     }
     if (cJSON_ExistKey(elem_json, key = "func") && elem->trig.func == NULL) {
         const char* func_json = NULL;
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &func_json), return false);
+        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &func_json, NULL), return false);
 
         const TrigFunc func = BASIC_GetTableValByKey(TEMPO_StaticTrigTable, func_json);
         REQ_CONDITION(func != NULL, return false);
 
         const char* para_json = NULL;
         if (cJSON_ExistKey(elem_json, "para")) {
-            REQ_CONDITION(cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json), return false);
+            REQ_CONDITION(cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json, NULL), return false);
         }
 
         if (para_json != NULL) {
@@ -125,7 +123,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     if (cJSON_ExistKey(elem_json, key = "bck")) {
         const char* bck_json = NULL;
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &bck_json), return false);
+        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &bck_json, NULL), return false);
         if (publicElemTable != NULL) {
             for (int i = 0; i < publicElemTable->len; i++) {
                 const char* subkey = publicElemTable->kv[i].key;

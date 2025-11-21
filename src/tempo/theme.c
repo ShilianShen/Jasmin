@@ -14,7 +14,7 @@ static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
 
     const char* path = NULL;
     if (cJSON_ExistKey(font_json, key = "path")) {
-        if (cJSON_LoadByKey(font_json, key, JSM_STRING, &path) == false) {
+        if (cJSON_LoadByKey(font_json, key, JSM_STRING, &path, NULL) == false) {
             printf("%s: cJSON_LoadByKey failed.\n", __func__);
             return false;
         } // Req Condition
@@ -22,7 +22,7 @@ static TTF_Font* TEMPO_LoadTheme_Font(const cJSON* font_json) {
 
     float size = 0;
     if (cJSON_ExistKey(font_json, key = "size")) {
-        if (cJSON_LoadByKey(font_json, key, JSM_FLOAT, &size) == false) {
+        if (cJSON_LoadByKey(font_json, key, JSM_FLOAT, &size, NULL) == false) {
             printf("%s: cJSON_LoadByKey failed.\n", __func__);
             return false;
         } // Req Condition

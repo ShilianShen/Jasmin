@@ -12,8 +12,8 @@ TTF_Font* BASIC_GetFont(const char* key) {
 }
 static void* BASIC_CreateFont(const cJSON* font_json) {
     REQ_CONDITION(font_json != NULL, return NULL);
-    char* path; REQ_CONDITION(cJSON_LoadByKey(font_json, "path", JSM_STRING, &path), return false);
-    float size; REQ_CONDITION(cJSON_LoadByKey(font_json, "size", JSM_FLOAT, &size), return false);
+    char* path; REQ_CONDITION(cJSON_LoadByKey(font_json, "path", JSM_STRING, &path, NULL), return false);
+    float size; REQ_CONDITION(cJSON_LoadByKey(font_json, "size", JSM_FLOAT, &size, NULL), return false);
     TTF_Font* font = TTF_OpenFont(path, size);
     REQ_CONDITION(font != NULL, return NULL);
     return font;

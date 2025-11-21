@@ -73,9 +73,11 @@ bool cJSON_ExistKey(const cJSON* object, const char* key) {
     if (val == NULL) return false; // Req Condition
     return true;
 }
-bool cJSON_LoadByKey(const cJSON* object, const char* key, const JSM_DataType type, void* target) {
+bool cJSON_LoadByKey(const cJSON* object, const char* key, const JSM_DataType type, void* target, void *default_) {
     // 这个函数的任务是: object[key]暴露给target, 不涉及alloc
-    if (object == NULL || key == NULL || target == NULL) return false; // Req Condition
+    REQ_CONDITION(object != NULL, return false);
+    REQ_CONDITION(key != NULL, return false);
+    REQ_CONDITION(target != NULL, return false);
     const cJSON* val = cJSON_GetObjectItem(object, key);
     if (val == NULL) return false; // Req Condition
     switch (type) {

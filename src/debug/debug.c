@@ -52,23 +52,23 @@ bool DEBUG_Init() {
 
     char* font_path = NULL;
     float font_size = 0;
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_path", JSM_STRING, &font_path), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_size", JSM_FLOAT, &font_size), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_path", JSM_STRING, &font_path, NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_size", JSM_FLOAT, &font_size, NULL), return false);
 
     debug.font = BASIC_GetFont("debug");
     REQ_CONDITION(debug.font != NULL, return false);
 
     SDL_Color colors[DEBUG_NUM_COLORS];
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_rect" , JSM_COLOR, &colors[DEBUG_COLOR_RECT ]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_face" , JSM_COLOR, &colors[DEBUG_COLOR_FACE ]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_text" , JSM_COLOR, &colors[DEBUG_COLOR_TEXT ]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_dark" , JSM_COLOR, &colors[DEBUG_COLOR_DARK ]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT]), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_point", JSM_COLOR, &colors[DEBUG_COLOR_POINT], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_rect" , JSM_COLOR, &colors[DEBUG_COLOR_RECT ], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_face" , JSM_COLOR, &colors[DEBUG_COLOR_FACE ], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_text" , JSM_COLOR, &colors[DEBUG_COLOR_TEXT ], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_dark" , JSM_COLOR, &colors[DEBUG_COLOR_DARK ], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "color_light", JSM_COLOR, &colors[DEBUG_COLOR_LIGHT], NULL), return false);
 
     int alphas[DEBUG_NUM_ALPHAS];
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "alpha_dark" , JSM_INT, &alphas[DEBUG_ALPHA_DARK ]), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT]), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "alpha_dark" , JSM_INT, &alphas[DEBUG_ALPHA_DARK ], NULL), return false);
+    REQ_CONDITION(cJSON_LoadByKey(debug.json, "alpha_light", JSM_INT, &alphas[DEBUG_ALPHA_LIGHT], NULL), return false);
 
     for (int i = 0; i < DEBUG_NUM_COLORS; i++) {
         for (int j = 0; j < DEBUG_NUM_ALPHAS; j++) {
