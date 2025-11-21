@@ -14,23 +14,23 @@ bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
     const char* key = NULL;
     const char* now_json = NULL;
 
-    if (cJSON_LoadByKey(info_json, key = "discrete", JSM_BOOL, &slid->discrete, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "discrete", JSM_BOOL, &slid->discrete) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadByKey(info_json, key = "readonly", JSM_BOOL, &slid->readonly, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "readonly", JSM_BOOL, &slid->readonly) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadByKey(info_json, key = "min", JSM_FLOAT, &slid->min, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "min", JSM_FLOAT, &slid->min) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadByKey(info_json, key = "max", JSM_FLOAT, &slid->max, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "max", JSM_FLOAT, &slid->max) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }
-    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json) == false) {
         printf("%s: failed in %s.\n", __func__, key);
         return false;
     }

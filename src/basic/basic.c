@@ -7,6 +7,17 @@ SDL_FPoint windowScale = {1, 1};
 const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 800;
+const size_t JSM_DataTypeSize[JSM_NUM_TYPES] = {
+    [JSM_VOID] = sizeof(void),
+    [JSM_PTR] = sizeof(void*),
+    [JSM_INT] = sizeof(int),
+    [JSM_FLOAT] = sizeof(float),
+    [JSM_STRING] = sizeof(char*),
+    [JSM_BOOL] = sizeof(bool),
+    [JSM_FRECT] = sizeof(SDL_FRect),
+    [JSM_RECT] = sizeof(SDL_Rect),
+    [JSM_COLOR] = sizeof(SDL_Color),
+};
 
 
 SDL_Renderer* renderer = NULL;

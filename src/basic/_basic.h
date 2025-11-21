@@ -34,6 +34,7 @@ typedef enum {
     JSM_COLOR,
     JSM_NUM_TYPES
 } JSM_DataType;
+extern const size_t JSM_DataTypeSize[JSM_NUM_TYPES];
 
 
 void MA_PlaySound(const char *sound);

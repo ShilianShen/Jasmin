@@ -12,11 +12,11 @@ bool TEMPO_CreateElemBool(void* info, const cJSON* info_json) {
 
     const char* key = NULL;
     const char* now_json = NULL;
-    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json, NULL) == false) {
+    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json) == false) {
         printf("%s: failed in %s\n", __func__, key);
         return false;
     }
-    cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly, NULL);
+    cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
 
     bool_->now = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_BOOL], now_json);
     return true;

@@ -56,7 +56,7 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
         REQ_CONDITION(path_json != NULL, return false);
         if (cJSON_ExistKey(path_json, subkey = "pageNow")) {
             const char* pageNow_json = NULL;
-            if (cJSON_LoadByKey(path_json, subkey, JSM_STRING, &pageNow_json, NULL)) {
+            if (cJSON_LoadByKey(path_json, subkey, JSM_STRING, &pageNow_json)) {
                 menu.path[0] = BASIC_GetTableValByKey(menu.pageTable, pageNow_json);
             }
         }
