@@ -58,9 +58,9 @@ struct Elem {
 
     int anchor;
     SDL_Texture* tex;
-    SDL_FRect gid_rect, src_rect;
-    SDL_FRect dst_rect;
-    SDL_FRect *gid, *src, *bck;
+    SDL_FRect gid_rect, *gid;
+    SDL_FRect src_rect, *src;
+    SDL_FRect dst_rect, *bck;
 
     Trig trig; char* para_string;
 };
@@ -68,22 +68,18 @@ struct Elem {
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
-    memset(elem, 0, sizeof(Elem));
     const char* key = NULL;
-
     char* type_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(elem_json, "type", JSM_STRING, &type_json), return false);
     elem->type = TEMPO_GetElemTypeFromString(type_json);
     REQ_CONDITION(elem->type != ELEM_TYPE_NULL, return false);
 
-    if (cJSON_ExistKey(elem_json, key = "info")) {
-        const cJSON* info_json = cJSON_GetObjectItem(elem_json, key);
-        REQ_CONDITION(info_json != NULL, return false);
-        REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
-        if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
-            elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
-            elem->trig.para = (TrigPara)elem;
-        }
+    const cJSON* info_json = cJSON_GetObjectItem(elem_json, "info");
+    REQ_CONDITION(info_json != NULL, return false);
+    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
+    if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
+        elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
+        elem->trig.para = (TrigPara)elem;
     }
 
     cJSON_LoadByKey(elem_json, "anchor", JSM_INT, &elem->anchor);
@@ -115,12 +111,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             elem->trig = (Trig){func, (TrigPara)elem->para_string, false};
         }
     }
-
-
-    if (elem->trig.func == NULL) {
-        elem->trig.func = BASIC_TrigPass;
-    }
-
 
     return true;
 }
@@ -192,12 +182,12 @@ bool TEMPO_RenewElem(void *elem_void) {
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStrFRect(elem->dst_rect));
     }
 
-    if (elem->trig.func != NULL) {
+    {
         if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig);
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
         }
         if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig);
+            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
         }
     }
 

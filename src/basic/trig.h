@@ -14,7 +14,7 @@ typedef struct {
 } Trig;
 
 
-void BASIC_TrigPass(TrigPara para);
+extern Trig BASIC_TrigPass;
 void BASIC_PullTrig(Trig trig);
 
 
