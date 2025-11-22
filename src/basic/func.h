@@ -48,7 +48,7 @@ SDL_Texture* TXT_LoadTextureWithLines(
     );
 bool SDL_LoadDstRectAligned(
     SDL_FRect *dst_rect,
-    SDL_Texture *texture,
+    const SDL_Texture *texture,
     const SDL_FRect *src_rect,
     const SDL_FRect *gid_rect,
     const SDL_FRect *bck_rect,

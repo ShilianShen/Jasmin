@@ -66,7 +66,7 @@ static bool TEMPO_RenewPage_DstRect(Page* page) {
     return SDL_LoadDstRectAligned(
         &page->dst_rect,
         NULL,
-        page->src,
+        page->src != NULL ? page->src : &windowRect,
         NULL,
         NULL,
         page->anchor

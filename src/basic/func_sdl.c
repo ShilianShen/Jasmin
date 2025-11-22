@@ -41,36 +41,25 @@ SDL_FPoint SDL_GetSumFPoint(const int N, const SDL_FPoint points[N]) {
     return sum;
 }
 
-bool SDL_LoadDstRectAligned(SDL_FRect *dst_rect, SDL_Texture *texture, const SDL_FRect *src_rect, const SDL_FRect *gid_rect, const SDL_FRect *bck_rect, int anchor) {
+bool SDL_LoadDstRectAligned(
+    SDL_FRect *dst_rect,
+    const SDL_Texture *texture,
+    const SDL_FRect *src_rect,
+    const SDL_FRect *gid_rect,
+    const SDL_FRect *bck_rect,
+    const int anchor) {
+
     REQ_CONDITION(dst_rect != NULL, return false);
+    REQ_CONDITION(src_rect != NULL || texture != NULL, return false);
 
-    SDL_FRect src = {0, 0, 0, 0};
-    if (texture == NULL && src_rect == NULL) {
-        src.w = windowRect.w;
-        src.h = windowRect.h;
-    }
-    else if (src_rect != NULL) {
-        src.w = src_rect->w;
-        src.h = src_rect->h;
-    }
-    else {SDL_GetTextureSize(texture, &src.w, &src.h);}
-
-
-    SDL_FRect gid = {0, 0, 1, 1};
-    if (gid_rect != NULL) {gid = *gid_rect;}
-
-
-    SDL_FRect bck = windowRect;
-    if (bck_rect != NULL) {bck = *bck_rect;}
-
+    const SDL_FRect src = src_rect != NULL ? *src_rect : (SDL_FRect){0, 0, (float)texture->w, (float)texture->h};
+    const SDL_FRect gid = gid_rect != NULL ? *gid_rect : (SDL_FRect){0, 0, 1, 1};
+    const SDL_FRect bck = bck_rect != NULL ? *bck_rect : windowRect;
 
     dst_rect->w = src.w * gid.w;
     dst_rect->h = src.h * gid.h;
 
-    // load dst_rect -> x, y
-    anchor += 40;
-    const int x = anchor % 9;
-    const int y = anchor / 9;
+    const int x = (anchor + 40) % 9, y = (anchor + 40) / 9;
     float cx = 0, cy = 0, dx = 0, dy = 0;
     switch (x / 3) {
         case 0: cx = bck.x            ; break;
@@ -110,7 +99,7 @@ bool SDL_RenderTextureAligned(
     ) {
     // Req Condition
     if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return false;}
-    if (texture == NULL) {printf("%s: texture  not exists.\n", __func__); return false;}
+    if (texture == NULL) {printf("%s: texture not exists.\n", __func__); return false;}
 
     //
     SDL_FRect dst_rect;
