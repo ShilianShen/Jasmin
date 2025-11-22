@@ -109,7 +109,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 }
 void *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
-
     Elem* elem = calloc(1, sizeof(Elem));
     REQ_CONDITION(elem != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
@@ -209,14 +208,14 @@ bool TEMPO_DrawElem(const void *elem_void) {
 
 
 // TRIG ================================================================================================================
-void TEMPO_TrigFuncBool(TrigPara para) {
+void TEMPO_TrigFuncBool(const TrigPara para) {
     const Elem* elem = (Elem*)para;
     bool* now = elem->info.bool_.now;
     if (now != NULL) {
         *now = !*now;
     }
 }
-void TEMPO_TrigFuncSlid(TrigPara para) {
+void TEMPO_TrigFuncSlid(const TrigPara para) {
     const Elem* elem = (Elem*)para;
     const SDL_FRect dst_rect = elem->dst_rect;
     const ElemSlidInfo* slid = &elem->info.slid;
