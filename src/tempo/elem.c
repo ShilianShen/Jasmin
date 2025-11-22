@@ -88,15 +88,16 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 
     cJSON_LoadByKey(elem_json, "anchor", JSM_INT, &elem->anchor);
 
+    const char* bck_json = NULL;
+    if (cJSON_LoadByKey(elem_json, "gid", JSM_FRECT, &elem->gid_rect)) elem->gid = &elem->gid_rect;
+    if (cJSON_LoadByKey(elem_json, "src", JSM_FRECT, &elem->src_rect)) elem->src = &elem->src_rect;
+    if (cJSON_LoadByKey(elem_json, "bck", JSM_STRING, &bck_json)) {
+        REQ_CONDITION(publicElemTable != NULL, return false);
+        Elem* another = BASIC_GetTableValByKey(*publicElemTable, bck_json);
+        REQ_CONDITION(another != NULL, return false);
+        elem->bck = &another->dst_rect;
+    }
 
-    if (cJSON_ExistKey(elem_json, key = "gid")) {
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->gid_rect), return false);
-        elem->gid = &elem->gid_rect;
-    }
-    if (cJSON_ExistKey(elem_json, key = "src")) {
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_FRECT, &elem->src_rect), return false);
-        elem->src = &elem->src_rect;
-    }
     if (cJSON_ExistKey(elem_json, key = "func") && elem->trig.func == NULL) {
         const char* func_json = NULL;
         REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &func_json), return false);
@@ -105,11 +106,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         REQ_CONDITION(func != NULL, return false);
 
         const char* para_json = NULL;
-        if (cJSON_ExistKey(elem_json, "para")) {
-            REQ_CONDITION(cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json), return false);
-        }
-
-        if (para_json != NULL) {
+        if (cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json)) {
             elem->para_string = strdup(para_json);
             REQ_CONDITION(elem->para_string != NULL, return false);
         }
@@ -118,23 +115,13 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             elem->trig = (Trig){func, (TrigPara)elem->para_string, false};
         }
     }
+
+
     if (elem->trig.func == NULL) {
         elem->trig.func = BASIC_TrigPass;
     }
-    if (cJSON_ExistKey(elem_json, key = "bck")) {
-        const char* bck_json = NULL;
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &bck_json), return false);
-        if (publicElemTable != NULL) {
-            for (int i = 0; i < publicElemTable->len; i++) {
-                const char* subkey = publicElemTable->kv[i].key;
-                if (subkey != NULL && strcmp(bck_json, subkey) == 0) {
-                    Elem* other = publicElemTable->kv[i].val;
-                    elem->bck = &other->dst_rect;
-                    break;
-                }
-            }
-        }
-    }
+
+
     return true;
 }
 void *TEMPO_CreateElem(const cJSON *elem_json) {
