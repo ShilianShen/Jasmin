@@ -13,11 +13,10 @@ bool TEMPO_Init() {
     for (int i = 0; i < TEMPO_OUTER_TRIG_TABLE.len; i++) {
         TEMPO_TrigFuncTable.kv[i+TEMPO_INNER_TRIG_TABLE.len] = TEMPO_INNER_TRIG_TABLE.kv[i];
     }
-    return TEMPO_LoadTheme() && TEMPO_LoadMenu();
+    return TEMPO_LoadMenu();
 }
 void TEMPO_Exit() {
     TEMPO_UnloadMenu();
-    TEMPO_UnloadTheme();
     free(TEMPO_TrigFuncTable.kv);
 }
 bool TEMPO_Renew() {

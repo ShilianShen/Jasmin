@@ -20,7 +20,7 @@ bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
     }
     cJSON_LoadByKey(info_json, key = "key", JSM_BOOL, &key_json);
 
-    text->font = BASIC_GetTableValByKey(theme.fontTable, font_json);
+    text->font = BASIC_GetFont(font_json);
     text->string = strdup(string_json);
     text->key = key_json;
     if (text->font == NULL || text->string == NULL) {
