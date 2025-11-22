@@ -42,51 +42,40 @@ SDL_FPoint SDL_GetSumFPoint(const int N, const SDL_FPoint points[N]) {
 }
 
 bool SDL_LoadDstRectAligned(
-    SDL_FRect *dst_rect,
+    SDL_FRect *dst,
     const SDL_Texture *texture,
-    const SDL_FRect *src_rect,
-    const SDL_FRect *gid_rect,
-    const SDL_FRect *bck_rect,
+    const SDL_FRect *src,
+    const SDL_FRect *gid,
+    const SDL_FRect *bck,
     const int anchor) {
 
-    REQ_CONDITION(dst_rect != NULL, return false);
-    REQ_CONDITION(src_rect != NULL || texture != NULL, return false);
+    REQ_CONDITION(dst != NULL, return false);
+    REQ_CONDITION(src != NULL || texture != NULL, return false);
 
-    const SDL_FRect src = src_rect != NULL ? *src_rect : (SDL_FRect){0, 0, (float)texture->w, (float)texture->h};
-    const SDL_FRect gid = gid_rect != NULL ? *gid_rect : (SDL_FRect){0, 0, 1, 1};
-    const SDL_FRect bck = bck_rect != NULL ? *bck_rect : windowRect;
+    const SDL_FRect src_rect = src != NULL ? *src : (SDL_FRect){0, 0, (float)texture->w, (float)texture->h};
+    const SDL_FRect gid_rect = gid != NULL ? *gid : (SDL_FRect){0, 0, 1, 1};
+    const SDL_FRect bck_rect = bck != NULL ? *bck : windowRect;
 
-    dst_rect->w = src.w * gid.w;
-    dst_rect->h = src.h * gid.h;
+    dst->w = src_rect.w * gid_rect.w;
+    dst->h = src_rect.h * gid_rect.h;
 
-    const int x = (anchor + 40) % 9, y = (anchor + 40) / 9;
-    float cx = 0, cy = 0, dx = 0, dy = 0;
-    switch (x / 3) {
-        case 0: cx = bck.x            ; break;
-        case 1: cx = bck.x + bck.w / 2; break;
-        case 2: cx = bck.x + bck.w    ; break;
-        default: break;
-    }
-    switch (y / 3) {
-        case 0: cy = bck.y            ; break;
-        case 1: cy = bck.y + bck.h / 2; break;
-        case 2: cy = bck.y + bck.h    ; break;
-        default: break;
-    }
-    switch (x % 3) {
-        case 0: dx = -dst_rect->w    ; break;
-        case 1: dx = -dst_rect->w / 2; break;
-        case 2: dx = 0               ; break;
-        default: break;
-    }
-    switch (y % 3) {
-        case 0: dy = -dst_rect->h    ; break;
-        case 1: dy = -dst_rect->h / 2; break;
-        case 2: dy = 0               ; break;
-        default: break;
-    }
-    dst_rect->x = cx + dx + gid.x;
-    dst_rect->y = cy + dy + gid.y;
+    const int x1 = (anchor + 40) % 9 / 3;
+    const int y1 = (anchor + 40) / 9 / 3;
+    const int x2 = (anchor + 40) % 9 % 3;
+    const int y2 = (anchor + 40) / 9 % 3;
+
+    const SDL_FPoint center = {
+        bck_rect.x + bck_rect.w / 2 * (float)x1,
+        bck_rect.y + bck_rect.h / 2 * (float)y1,
+    };
+    const SDL_FPoint adjust = {
+        -dst->w * (1 - (float)x2 / 2),
+        -dst->h * (1 - (float)y2 / 2),
+    };
+
+    dst->x = center.x + adjust.x + gid_rect.x;
+    dst->y = center.y + adjust.y + gid_rect.y;
+
     return true;
 }
 bool SDL_RenderTextureAligned(
@@ -97,11 +86,9 @@ bool SDL_RenderTextureAligned(
     const SDL_FRect* bck_rect,
     const int anchor
     ) {
-    // Req Condition
-    if (renderer == NULL) {printf("%s: renderer not exists.\n", __func__); return false;}
-    if (texture == NULL) {printf("%s: texture not exists.\n", __func__); return false;}
+    REQ_CONDITION(renderer != NULL, return false);
+    REQ_CONDITION(texture != NULL, return false);
 
-    //
     SDL_FRect dst_rect;
     SDL_LoadDstRectAligned(&dst_rect, texture, src_rect, gid_rect, bck_rect, anchor);
     return SDL_RenderTexture(renderer, texture, src_rect, &dst_rect);
