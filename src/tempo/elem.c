@@ -68,7 +68,6 @@ struct Elem {
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
-    const char* key = NULL;
     char* type_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(elem_json, "type", JSM_STRING, &type_json), return false);
     elem->type = TEMPO_GetElemTypeFromString(type_json);
@@ -77,10 +76,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     const cJSON* info_json = cJSON_GetObjectItem(elem_json, "info");
     REQ_CONDITION(info_json != NULL, return false);
     REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
-    if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
-        elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
-        elem->trig.para = (TrigPara)elem;
-    }
 
     cJSON_LoadByKey(elem_json, "anchor", JSM_INT, &elem->anchor);
 
@@ -94,22 +89,20 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->bck = &another->dst_rect;
     }
 
-    if (cJSON_ExistKey(elem_json, key = "func") && elem->trig.func == NULL) {
-        const char* func_json = NULL;
-        REQ_CONDITION(cJSON_LoadByKey(elem_json, key, JSM_STRING, &func_json), return false);
-
+    const char* func_json = NULL; if (cJSON_LoadByKey(elem_json, "func", JSM_STRING, &func_json)) {
         const TrigFunc func = BASIC_GetTableValByKey(TEMPO_StaticTrigTable, func_json);
         REQ_CONDITION(func != NULL, return false);
+        elem->trig.func = func;
+    }
+    const char* para_json = NULL; if (cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json)) {
+        elem->para_string = strdup(para_json);
+        REQ_CONDITION(elem->para_string != NULL, return false);
+        elem->trig.para = (TrigPara)elem->para_string;
+    }
 
-        const char* para_json = NULL;
-        if (cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json)) {
-            elem->para_string = strdup(para_json);
-            REQ_CONDITION(elem->para_string != NULL, return false);
-        }
-
-        if (elem->trig.func ==  NULL) {
-            elem->trig = (Trig){func, (TrigPara)elem->para_string, false};
-        }
+    if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
+        elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
+        elem->trig.para = (TrigPara)elem;
     }
 
     return true;
@@ -182,13 +175,11 @@ bool TEMPO_RenewElem(void *elem_void) {
         DEBUG_SendMessageL("    dst: %s\n", SDL_GetStrFRect(elem->dst_rect));
     }
 
-    {
-        if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
-        }
-        if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
-            PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
-        }
+    if (elem->trig.sustain && mouseLeftIn && TEMPO_OFEN_RELOAD == false) {
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
+    }
+    if (elem->trig.sustain == false && mouseLeftIn && mouseIn && TEMPO_OFEN_RELOAD == false) {
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
     }
 
     return true;
