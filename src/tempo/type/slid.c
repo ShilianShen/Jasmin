@@ -5,35 +5,16 @@
 static const float A = 4, B = 4, C = 6, D = 36;
 
 
-bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
-    ElemSlidInfo* slid = info;
-    if (cJSON_IsObject(info_json) == false) {
-        return false;
-    }
+bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json) {
+    TypeSlidInfo* slid = info;
+    REQ_CONDITION(cJSON_IsObject(info_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "discrete", JSM_BOOL, &slid->discrete), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &slid->readonly), return false);
 
-    const char* key = NULL;
     const char* now_json = NULL;
-
-    if (cJSON_LoadByKey(info_json, key = "discrete", JSM_BOOL, &slid->discrete) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadByKey(info_json, key = "readonly", JSM_BOOL, &slid->readonly) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadByKey(info_json, key = "min", JSM_FLOAT, &slid->min) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadByKey(info_json, key = "max", JSM_FLOAT, &slid->max) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "min", JSM_FLOAT, &slid->min), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "max", JSM_FLOAT, &slid->max), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "now", JSM_STRING, &now_json), return false);
 
     if (slid->discrete) {
         slid->min = roundf(slid->min);
@@ -42,15 +23,12 @@ bool TEMPO_CreateElemSlid(void* info, const cJSON* info_json) {
 
     const JSM_DataType type = slid->discrete ? JSM_INT : JSM_FLOAT;
     slid->now = BASIC_GetTableValByKey(TEMPO_ExternTable[type], now_json);
-    if (slid->now == NULL) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
+    REQ_CONDITION(slid->now != NULL, return false);
 
     return true;
 }
-bool TEMPO_RenewElemSlid(const void* info, SDL_Texture** tex) {
-    const ElemSlidInfo* slid = info;
+bool TEMPO_RenewTypeSlid(const void* info, SDL_Texture** tex) {
+    const TypeSlidInfo* slid = info;
     const float M = slid->max - slid->min;
     const float W = 2 * A + (M + 1) * B + M * C;
     const float H = 2 * A + 2 * B + D;
@@ -108,7 +86,7 @@ bool TEMPO_RenewElemSlid(const void* info, SDL_Texture** tex) {
 
 
 
-void TrigFunc_Slid(const ElemSlidInfo* slid, const SDL_FRect dst_rect) {
+void TrigFunc_Slid(const TypeSlidInfo* slid, const SDL_FRect dst_rect) {
     if (slid->readonly) {
         return;
     }

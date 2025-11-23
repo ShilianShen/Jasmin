@@ -4,25 +4,23 @@
 static const float A = 4, B = 4, C = 6, D = 36;
 
 
-bool TEMPO_CreateElemBool(void* info, const cJSON* info_json) {
-    ElemBoolInfo* bool_ = info;
+bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
+    TypeBoolInfo* bool_ = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
 
     const char* key = NULL;
     const char* now_json = NULL;
-    if (cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json) == false) {
-        printf("%s: failed in %s\n", __func__, key);
-        return false;
-    }
+    REQ_CONDITION(cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json), return false);
+
     cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
 
     bool_->now = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_BOOL], now_json);
     return true;
 }
-bool TEMPO_RenewElemBool(const void* info, SDL_Texture** tex) {
-    const ElemBoolInfo* bool_ = info;
+bool TEMPO_RenewTypeBool(const void* info, SDL_Texture** tex) {
+    const TypeBoolInfo* bool_ = info;
     const float M = 1;
     const float N = *bool_->now;
     const float W = 2 * A + (M + 1) * B + M * D;

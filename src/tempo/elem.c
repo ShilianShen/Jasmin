@@ -1,7 +1,6 @@
-#include "elem_type/text.h"
-#include "elem_type/file.h"
-#include "elem_type/slid.h"
-#include "elem_type/bool.h"
+
+#include "tempo.h"
+#include "elem.h"
 
 
 // ELEM PARA ===========================================================================================================
@@ -9,50 +8,9 @@ static const SDL_FRect* publicBck = NULL;
 static const Table* publicElemTable = NULL;
 
 
-// ELEM TYPE ===========================================================================================================
-typedef enum ElemType {
-    ELEM_TYPE_NULL,
-    ELEM_TYPE_FILE,
-    ELEM_TYPE_TEXT,
-    ELEM_TYPE_SLID,
-    ELEM_TYPE_BOOL,
-    ELEM_NUM_TYPES,
-} ElemType;
-
-
-// ELEM INFO ===========================================================================================================
-typedef union ElemInfo {
-    ElemFileInfo file;
-    ElemTextInfo text;
-    ElemSlidInfo slid;
-    ElemBoolInfo bool_;
-} ElemInfo;
-static const struct {
-    const char* name;
-    bool (*create)(void*, const cJSON*);
-    bool (*renew)(const void*, SDL_Texture**);
-    void (*delete)(void*);
-    Trig trig;
-} ELEM_INFO_DETAIL[ELEM_NUM_TYPES] = {
-    [ELEM_TYPE_NULL] = {"NULL", NULL, NULL, NULL, 0},
-    [ELEM_TYPE_FILE] = {"FILE", TEMPO_CreateElemFile, TEMPO_RenewElemFile, TEMPO_DeleteElemFile, 0},
-    [ELEM_TYPE_TEXT] = {"TEXT", TEMPO_CreateElemText, TEMPO_RenewElemText, TEMPO_DeleteElemText, 0},
-    [ELEM_TYPE_SLID] = {"SLID", TEMPO_CreateElemSlid, TEMPO_RenewElemSlid, NULL, {TEMPO_TrigFuncSlid, 0, true}},
-    [ELEM_TYPE_BOOL] = {"BOOL", TEMPO_CreateElemBool, TEMPO_RenewElemBool, NULL, {TEMPO_TrigFuncBool, 0, false}},
-};
-static ElemType TEMPO_GetElemTypeFromString(const char* string) {
-    for (int i = 0; i < ELEM_NUM_TYPES; i++) {
-        if (strcmp(string, ELEM_INFO_DETAIL[i].name) == 0) {
-            return i;
-        }
-    }
-    return ELEM_TYPE_NULL;
-}
-
-
 // ELEM ================================================================================================================
 struct Elem {
-    ElemType type; ElemInfo info;
+    TypeId typeId; TypeInfo info;
 
     int anchor;
     SDL_Texture* tex;
@@ -68,12 +26,12 @@ struct Elem {
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     char* type_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(elem_json, "type", JSM_STRING, &type_json), return false);
-    elem->type = TEMPO_GetElemTypeFromString(type_json);
-    REQ_CONDITION(elem->type != ELEM_TYPE_NULL, return false);
+    elem->typeId = TEMPO_GetTypeFromString(type_json);
+    REQ_CONDITION(elem->typeId != TEMPO_TYPE_NULL, return false);
 
     const cJSON* info_json = cJSON_GetObjectItem(elem_json, "info");
     REQ_CONDITION(info_json != NULL, return false);
-    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].create(&elem->info, info_json), return false);
+    REQ_CONDITION(TYPE_INFO_DETAIL[elem->typeId].create(&elem->info, info_json), return false);
 
     cJSON_LoadByKey(elem_json, "anchor", JSM_INT, &elem->anchor);
 
@@ -98,8 +56,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->trig.para = (TrigPara)elem->para_string;
     }
 
-    if (ELEM_INFO_DETAIL[elem->type].trig.func != NULL) {
-        elem->trig = ELEM_INFO_DETAIL[elem->type].trig;
+    if (TYPE_INFO_DETAIL[elem->typeId].trig.func != NULL) {
+        elem->trig = TYPE_INFO_DETAIL[elem->typeId].trig;
         elem->trig.para = (TrigPara)elem;
     }
 
@@ -116,8 +74,8 @@ void *TEMPO_DeleteElem(void *elem_void) {
     Elem* elem = elem_void;
     if (elem == NULL) return elem;
 
-    if (ELEM_INFO_DETAIL[elem->type].delete != NULL) {
-        ELEM_INFO_DETAIL[elem->type].delete(&elem->info);
+    if (TYPE_INFO_DETAIL[elem->typeId].delete != NULL) {
+        TYPE_INFO_DETAIL[elem->typeId].delete(&elem->info);
     }
     if (elem->tex != NULL) {
         SDL_DestroyTexture(elem->tex);
@@ -139,8 +97,8 @@ static bool TEMPO_RenewElem_Tex(Elem* elem) {
         SDL_DestroyTexture(elem->tex);
         elem->tex = NULL;
     }
-    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].renew != NULL, return false);
-    REQ_CONDITION(ELEM_INFO_DETAIL[elem->type].renew(&elem->info, &elem->tex), return false);
+    REQ_CONDITION(TYPE_INFO_DETAIL[elem->typeId].renew != NULL, return false);
+    REQ_CONDITION(TYPE_INFO_DETAIL[elem->typeId].renew(&elem->info, &elem->tex), return false);
     return true;
 }
 static bool TEMPO_RenewElem_DstRect(Elem *elem) {
@@ -165,7 +123,7 @@ bool TEMPO_RenewElem(void *elem_void) {
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    type: %s\n", ELEM_INFO_DETAIL[elem->type].name);
+        DEBUG_SendMessageL("    typeId: %s\n", TYPE_INFO_DETAIL[elem->typeId].name);
         if (elem->trig.func != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_TrigFuncTable, elem->trig.func), elem->trig.para);
         }
@@ -216,7 +174,7 @@ void TEMPO_TrigFuncBool(const TrigPara para) {
 void TEMPO_TrigFuncSlid(const TrigPara para) {
     const Elem* elem = (Elem*)para;
     const SDL_FRect dst_rect = elem->dst_rect;
-    const ElemSlidInfo* slid = &elem->info.slid;
+    const TypeSlidInfo* slid = &elem->info.slid;
     TrigFunc_Slid(slid, dst_rect);
 }
 

@@ -1,8 +1,8 @@
 #include "text.h"
 
 
-bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
-    ElemTextInfo* text = info;
+bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
+    TypeTextInfo* text = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -10,14 +10,8 @@ bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
     char* string_json = NULL;
     char* font_json = NULL;
     bool key_json = false;
-    if (cJSON_LoadByKey(info_json, key = "string", JSM_STRING, &string_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
-    if (cJSON_LoadByKey(info_json, key = "font", JSM_STRING, &font_json) == false) {
-        printf("%s: failed in %s.\n", __func__, key);
-        return false;
-    }
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "string", JSM_STRING, &string_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "font", JSM_STRING, &font_json), return false);
     cJSON_LoadByKey(info_json, key = "key", JSM_BOOL, &key_json);
 
     text->font = BASIC_GetFont(font_json);
@@ -28,15 +22,12 @@ bool TEMPO_CreateElemText(void* info, const cJSON* info_json)   {
     }
     return true;
 }
-bool TEMPO_RenewElemText(const void* info, SDL_Texture** tex) {
-    const ElemTextInfo* text = info;
+bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
+    const TypeTextInfo* text = info;
     const char* string = text->string;
     if (text->key == true) {
         string = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_STRING], text->string);
-        if (string == NULL) {
-            printf("%s: failed in key.\n", __func__);
-            return false;
-        }
+        REQ_CONDITION(string != NULL, return false);
     }
     *tex = TXT_LoadTextureWithLines(
                 renderer,
@@ -46,15 +37,12 @@ bool TEMPO_RenewElemText(const void* info, SDL_Texture** tex) {
                 EMPTY,
                 'C'
                 );
-    if (*tex == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, text->string);
-        return false;
-    } // Req Condition
+    REQ_CONDITION(*tex != NULL, return false);
     SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
     return true;
 }
-void TEMPO_DeleteElemText(void* info) {
-    ElemTextInfo* text = info;
+void TEMPO_DeleteTypeText(void* info) {
+    TypeTextInfo* text = info;
     if (text->string != NULL) {
         free(text->string);
         text->string = NULL;
