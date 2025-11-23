@@ -17,6 +17,15 @@ TypeId TEMPO_GetTypeFromString(const char* string) {
     }
     return TEMPO_TYPE_NULL;
 }
+// GET & SET ===========================================================================================================
+Trig TEMPO_GetTypeTrig(const Type* type) {
+    REQ_CONDITION(type != NULL, return (Trig){0});
+    return TYPE_INFO_DETAIL[type->id].trig;
+}
+SDL_Texture* TEMPO_GetTypeTexture(const Type* type) {
+    REQ_CONDITION(type != NULL, return NULL);
+    return type->texture;
+}
 
 
 // CREATE & DELETE =====================================================================================================
@@ -30,7 +39,9 @@ Type* TEMPO_CreateType(const cJSON* type_json) {
     return type;
 }
 Type* TEMPO_DeleteType(Type* type) {
-    TYPE_INFO_DETAIL[type->id].delete(&type->info);
+    if (TYPE_INFO_DETAIL[type->id].delete != NULL) {
+        TYPE_INFO_DETAIL[type->id].delete(&type->info);
+    }
     SDL_DestroyTexture(type->texture);
     free(type);
     return NULL;
@@ -40,6 +51,10 @@ Type* TEMPO_DeleteType(Type* type) {
 // RENEW ===============================================================================================================
 bool TEMPO_RenewType(Type* type) {
     REQ_CONDITION(type != NULL, return false);
+    if (type->texture != NULL) {
+        SDL_DestroyTexture(type->texture);
+        type->texture = NULL;
+    }
     TYPE_INFO_DETAIL[type->id].renew(&type->info, &type->texture);
     return true;
 }

@@ -25,8 +25,8 @@ typedef union {
 } TypeInfo;
 typedef struct Type Type;
 struct Type {
-    TypeId id;
     TypeInfo info;
+    TypeId id;
     SDL_Texture* texture;
 };
 typedef struct {
@@ -38,6 +38,8 @@ typedef struct {
 } TypeFunc;
 extern const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES];
 TypeId TEMPO_GetTypeFromString(const char* string);
+Trig TEMPO_GetTypeTrig(const Type* type);
+SDL_Texture* TEMPO_GetTypeTexture(const Type* type);
 Type* TEMPO_CreateType(const cJSON* type_json);
 Type* TEMPO_DeleteType(Type* type);
 bool TEMPO_RenewType(Type* type);

@@ -51,8 +51,9 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->trig.para = (TrigPara)elem->para_string;
     }
 
-    if (TYPE_INFO_DETAIL[elem->type->id].trig.func != NULL) {
-        elem->trig = TYPE_INFO_DETAIL[elem->type->id].trig;
+    const Trig trig = TEMPO_GetTypeTrig(elem->type);
+    if (trig.func != NULL) {
+        elem->trig = trig;
         elem->trig.para = (TrigPara)elem;
     }
 
@@ -81,18 +82,10 @@ void *TEMPO_DeleteElem(void *elem_void) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElem_Tex(Elem* elem) {
-    if (elem->type->texture != NULL) {
-        SDL_DestroyTexture(elem->type->texture);
-        elem->type->texture = NULL;
-    }
-    REQ_CONDITION(TEMPO_RenewType(elem->type), return false);
-    return true;
-}
 static bool TEMPO_RenewElem_DstRect(Elem *elem) {
     const bool result = SDL_LoadDstRectAligned(
         &elem->dst_rect,
-        elem->type->texture,
+        TEMPO_GetTypeTexture(elem->type),
         elem->src,
         elem->gid,
         elem->bck != NULL ? elem->bck : publicBck,
@@ -103,7 +96,7 @@ static bool TEMPO_RenewElem_DstRect(Elem *elem) {
 bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
-    REQ_CONDITION(TEMPO_RenewElem_Tex(elem), return false);
+    REQ_CONDITION(TEMPO_RenewType(elem->type), return false);
     REQ_CONDITION(TEMPO_RenewElem_DstRect(elem), return false);
 
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
@@ -111,7 +104,6 @@ bool TEMPO_RenewElem(void *elem_void) {
 
     if (mouseLeftIn) {
         DEBUG_SendMessageL("Elem:\n");
-        DEBUG_SendMessageL("    typeId: %s\n", TYPE_INFO_DETAIL[elem->type->id].name);
         if (elem->trig.func != NULL) {
             DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_TrigFuncTable, elem->trig.func), elem->trig.para);
         }
@@ -144,7 +136,7 @@ bool TEMPO_DrawElem(const void *elem_void) {
         roundf(elem->dst_rect.w),
         roundf(elem->dst_rect.h),
     };
-    const bool result = SDL_RenderTexture(renderer, elem->type->texture, elem->src, &dst);
+    const bool result = SDL_RenderTexture(renderer, TEMPO_GetTypeTexture(elem->type), elem->src, &dst);
     if (mouseIn || mouseLeftIn) DEBUG_DrawRect(elem->dst_rect);
 
     return result;
@@ -159,9 +151,7 @@ void TEMPO_TrigFuncBool(const TrigPara para) {
 }
 void TEMPO_TrigFuncSlid(const TrigPara para) {
     const Elem* elem = (Elem*)para;
-    const SDL_FRect dst_rect = elem->dst_rect;
-    const TypeSlidInfo* slid = &elem->type->info.slid;
-    TrigFunc_Slid(slid, dst_rect);
+    TrigFunc_Slid(elem->type, elem->dst_rect);
 }
 
 
