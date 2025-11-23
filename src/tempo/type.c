@@ -17,3 +17,20 @@ TypeId TEMPO_GetTypeFromString(const char* string) {
     }
     return TEMPO_TYPE_NULL;
 }
+
+
+// CREATE & DELETE =====================================================================================================
+Type* TEMPO_CreateType() {
+    return NULL;
+}
+Type* TEMPO_DeleteType() {
+    return NULL;
+}
+
+
+// RENEW ===============================================================================================================
+bool TEMPO_RenewType(Type* type) {
+    REQ_CONDITION(type != NULL, return false);
+    TYPE_INFO_DETAIL[type->id].renew(&type->info, &type->texture);
+    return true;
+}

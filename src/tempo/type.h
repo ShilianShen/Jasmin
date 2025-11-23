@@ -23,7 +23,12 @@ typedef union {
     TypeSlidInfo slid;
     TypeBoolInfo bool_;
 } TypeInfo;
-
+typedef struct Type Type;
+struct Type {
+    TypeId id;
+    TypeInfo info;
+    SDL_Texture* texture;
+};
 typedef struct {
     const char* name;
     bool (*create)(void*, const cJSON*);
@@ -33,6 +38,7 @@ typedef struct {
 } TypeFunc;
 extern const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES];
 TypeId TEMPO_GetTypeFromString(const char* string);
+bool TEMPO_RenewType(Type* type);
 
 
 #endif //TEMPO_TYPE_H
