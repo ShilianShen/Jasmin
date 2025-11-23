@@ -20,10 +20,19 @@ TypeId TEMPO_GetTypeFromString(const char* string) {
 
 
 // CREATE & DELETE =====================================================================================================
-Type* TEMPO_CreateType(cJSON* type_json, cJSON* info_json) {
-    return NULL;
+Type* TEMPO_CreateType(const cJSON* type_json) {
+    REQ_CONDITION(type_json != NULL, return NULL);
+    Type* type = calloc(1, sizeof(Type));
+    REQ_CONDITION(type != NULL, return NULL);
+    type->id = TEMPO_GetTypeFromString(type_json->string);
+    REQ_CONDITION(type->id != TEMPO_TYPE_NULL, return NULL);
+    REQ_CONDITION(TYPE_INFO_DETAIL[type->id].create(&type->info, type_json), return NULL);
+    return type;
 }
-Type* TEMPO_DeleteType() {
+Type* TEMPO_DeleteType(Type* type) {
+    TYPE_INFO_DETAIL[type->id].delete(&type->info);
+    SDL_DestroyTexture(type->texture);
+    free(type);
     return NULL;
 }
 

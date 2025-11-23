@@ -38,6 +38,8 @@ typedef struct {
 } TypeFunc;
 extern const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES];
 TypeId TEMPO_GetTypeFromString(const char* string);
+Type* TEMPO_CreateType(const cJSON* type_json);
+Type* TEMPO_DeleteType(Type* type);
 bool TEMPO_RenewType(Type* type);
 
 
