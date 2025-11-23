@@ -10,8 +10,6 @@ typedef struct Page Page;
 
 void *TEMPO_CreatePage(const cJSON *page_json);
 void *TEMPO_DeletePage(void *page_void);
-
-
 bool TEMPO_RenewPage(Page *page);
 bool TEMPO_DrawPage(const Page *page);
 

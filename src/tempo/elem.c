@@ -3,7 +3,6 @@
 #include "elem.h"
 
 
-// ELEM PARA ===========================================================================================================
 static const SDL_FRect* publicBck = NULL;
 static const Table* publicElemTable = NULL;
 
@@ -167,9 +166,7 @@ bool TEMPO_DrawElem(const void *elem_void) {
 void TEMPO_TrigFuncBool(const TrigPara para) {
     const Elem* elem = (Elem*)para;
     bool* now = elem->info.bool_.now;
-    if (now != NULL) {
-        *now = !*now;
-    }
+    if (now != NULL) *now = !*now;
 }
 void TEMPO_TrigFuncSlid(const TrigPara para) {
     const Elem* elem = (Elem*)para;
