@@ -20,7 +20,7 @@ TypeId TEMPO_GetTypeFromString(const char* string) {
 
 
 // CREATE & DELETE =====================================================================================================
-Type* TEMPO_CreateType() {
+Type* TEMPO_CreateType(cJSON* type_json, cJSON* info_json) {
     return NULL;
 }
 Type* TEMPO_DeleteType() {
