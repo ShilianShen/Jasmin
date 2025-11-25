@@ -5,7 +5,7 @@
 #include "page.h"
 
 
-extern const Table TEMPO_INNER_TRIG_TABLE;
+extern const Table TEMPO_INNER_TRIG_FUNC_TABLE;
 bool TEMPO_LoadMenu();
 void TEMPO_UnloadMenu();
 

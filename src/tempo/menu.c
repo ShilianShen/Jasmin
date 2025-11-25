@@ -216,7 +216,7 @@ static KeyVal TEMPO_INNER_TRIG_SET[] = {
     {"swap", TEMPO_TrigFuncSwap},
     {"slid", TEMPO_TrigFuncSlid},
 };
-const Table TEMPO_INNER_TRIG_TABLE = {
+const Table TEMPO_INNER_TRIG_FUNC_TABLE = {
     .len = len_of(TEMPO_INNER_TRIG_SET),
     .kv = TEMPO_INNER_TRIG_SET
 };
