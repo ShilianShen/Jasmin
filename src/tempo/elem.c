@@ -151,7 +151,7 @@ void TEMPO_TrigFuncBool(const TrigPara para) {
 }
 void TEMPO_TrigFuncSlid(const TrigPara para) {
     const Elem* elem = (Elem*)para;
-    TrigFunc_Slid(elem->type, elem->dst_rect);
+    TrigFunc_Slid((TypeSlidInfo*)elem->type, elem->dst_rect);
 }
 
 

@@ -7,7 +7,7 @@
 #define TEMPO_DEFAULT_THEME_JSON "../config/tempo_theme.json"
 
 
-extern const Table TEMPO_OUTER_TRIG_TABLE;
+extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
 extern const Table TEMPO_ExternTable[];
 extern Table TEMPO_ExternPageTable;
 

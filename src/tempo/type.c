@@ -8,6 +8,7 @@ const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES] = {
     [TEMPO_TYPE_TEXT] = {"TEXT", TEMPO_CreateTypeText, TEMPO_RenewTypeText, TEMPO_DeleteTypeText, 0},
     [TEMPO_TYPE_SLID] = {"SLID", TEMPO_CreateTypeSlid, TEMPO_RenewTypeSlid, NULL, {TEMPO_TrigFuncSlid, 0, true}},
     [TEMPO_TYPE_BOOL] = {"BOOL", TEMPO_CreateTypeBool, TEMPO_RenewTypeBool, NULL, {TEMPO_TrigFuncBool, 0, false}},
+    [TEMPO_TYPE_AUTO] = {"AUTO", NULL, NULL, NULL, 0},
 };
 TypeId TEMPO_GetTypeFromString(const char* string) {
     for (int i = 0; i < TEMPO_NUM_TYPES; i++) {

@@ -15,6 +15,7 @@ typedef enum {
     TEMPO_TYPE_TEXT,
     TEMPO_TYPE_SLID,
     TEMPO_TYPE_BOOL,
+    TEMPO_TYPE_AUTO,
     TEMPO_NUM_TYPES,
 } TypeId;
 typedef union {
