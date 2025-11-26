@@ -6,14 +6,14 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
-    const char* key = NULL;
     char* string_json = NULL;
     char* font_json = NULL;
     bool key_json = false;
     REQ_CONDITION(cJSON_LoadByKey(info_json, "string", JSM_STRING, &string_json), return false);
     REQ_CONDITION(cJSON_LoadByKey(info_json, "font", JSM_STRING, &font_json), return false);
-    cJSON_LoadByKey(info_json, key = "key", JSM_BOOL, &key_json);
+    cJSON_LoadByKey(info_json, "key", JSM_BOOL, &key_json);
 
+    cJSON_LoadByKey(info_json, "back_color", JSM_COLOR, &text->backColor);
     text->font = BASIC_GetFont(font_json);
     text->string = strdup(string_json);
     text->key = key_json;
@@ -34,7 +34,7 @@ bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
                 text->font,
                 string,
                 (SDL_Color){255, 255, 255, 255},
-                EMPTY,
+                text->backColor,
                 'C'
                 );
     REQ_CONDITION(*tex != NULL, return false);

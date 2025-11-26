@@ -5,7 +5,7 @@
 #include "../tempo.h"
 
 
-typedef struct {TTF_Font* font; bool key; char* string;} TypeTextInfo;
+typedef struct {TTF_Font* font; bool key; char* string; SDL_Color backColor;} TypeTextInfo;
 
 
 bool TEMPO_CreateTypeText(void* info, const cJSON* info_json);
