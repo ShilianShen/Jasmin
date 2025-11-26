@@ -26,7 +26,7 @@ bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
     const TypeTextInfo* text = info;
     const char* string = text->string;
     if (text->key == true) {
-        string = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_STRING], text->string);
+        string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
         REQ_CONDITION(string != NULL, return false);
     }
     *tex = TXT_LoadTextureWithLines(

@@ -16,7 +16,7 @@ bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
 
     cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
 
-    bool_->now = BASIC_GetTableValByKey(TEMPO_ExternTable[JSM_BOOL], now_json);
+    bool_->now = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, now_json);
     return true;
 }
 bool TEMPO_RenewTypeBool(const void* info, SDL_Texture** tex) {

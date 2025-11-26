@@ -194,9 +194,7 @@ static void TEMPO_TrigFuncClear(const char* para) {
 }
 static void TEMPO_TrigFuncSwap(const char* para) {
     Page* page = BASIC_GetTableValByKey(menu.pageTable, para);
-    if (page == NULL) {
-        page = BASIC_GetTableValByKey(TEMPO_ExternPageTable, para);
-    }
+
     if (page == NULL) {
         return;
     }

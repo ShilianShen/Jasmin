@@ -7,8 +7,7 @@
 
 
 extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
-extern const Table TEMPO_ExternTable[];
-extern Table TEMPO_ExternPageTable;
+extern const Table TEMPO_PTR_TABLE;
 
 
 bool TEMPO_Init();

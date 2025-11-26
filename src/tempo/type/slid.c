@@ -22,7 +22,7 @@ bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json) {
     }
 
     const JSM_DataType type = slid->discrete ? JSM_INT : JSM_FLOAT;
-    slid->now = BASIC_GetTableValByKey(TEMPO_ExternTable[type], now_json);
+    slid->now = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, now_json);
     REQ_CONDITION(slid->now != NULL, return false);
 
     return true;

@@ -67,7 +67,7 @@ bool PERPH_InitMouse() {
         REQ_CONDITION(mouse.tex != NULL, return false);
         tex_json = NULL;
         SDL_SetTextureScaleMode(mouse.tex, SDL_SCALEMODE_NEAREST);
-        SDL_HideCursor();
+        // SDL_HideCursor();
 
         mouse.texDstRect.w = scale * (float)mouse.tex->w;
         mouse.texDstRect.h = scale * (float)mouse.tex->h;
