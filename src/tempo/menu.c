@@ -66,7 +66,7 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
 }
 bool TEMPO_LoadMenu() {
     memset(&menu, 0, sizeof(Menu));
-    cJSON* menu_json = getJson(TEMPO_DEFAULT_MENU_JSON);
+    cJSON* menu_json = getJson(TEMPO_JSON);
     REQ_CONDITION(menu_json != NULL, return false);
 
     const bool rk = TEMPO_LoadMenu_RK(menu_json);

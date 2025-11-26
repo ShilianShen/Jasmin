@@ -3,6 +3,7 @@
 
 Table TEMPO_TrigFuncTable;
 
+
 // INIT & EXIT =========================================================================================================
 bool TEMPO_Init() {
     const int M = TEMPO_INNER_TRIG_FUNC_TABLE.len;
