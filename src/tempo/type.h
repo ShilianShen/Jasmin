@@ -7,6 +7,7 @@
 #include "type/file.h"
 #include "type/slid.h"
 #include "type/bool.h"
+#include "type/manu.h"
 
 
 typedef enum {
@@ -15,7 +16,7 @@ typedef enum {
     TEMPO_TYPE_TEXT,
     TEMPO_TYPE_SLID,
     TEMPO_TYPE_BOOL,
-    TEMPO_TYPE_AUTO,
+    TEMPO_TYPE_MANU,
     TEMPO_NUM_TYPES,
 } TypeId;
 typedef union {
@@ -23,6 +24,7 @@ typedef union {
     TypeTextInfo text;
     TypeSlidInfo slid;
     TypeBoolInfo bool_;
+    TypeManuInfo manu;
 } TypeInfo;
 typedef struct Type Type;
 struct Type {
