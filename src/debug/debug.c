@@ -50,11 +50,6 @@ bool DEBUG_Init() {
     REQ_CONDITION(debug.json != NULL, return false);
     REQ_CONDITION(cJSON_IsObject(debug.json), return false);
 
-    char* font_path = NULL;
-    float font_size = 0;
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_path", JSM_STRING, &font_path), return false);
-    REQ_CONDITION(cJSON_LoadByKey(debug.json, "font_size", JSM_FLOAT, &font_size), return false);
-
     debug.font = BASIC_GetFont("debug");
     REQ_CONDITION(debug.font != NULL, return false);
 

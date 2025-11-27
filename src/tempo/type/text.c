@@ -17,9 +17,8 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
     text->font = BASIC_GetFont(font_json);
     text->string = strdup(string_json);
     text->key = key_json;
-    if (text->font == NULL || text->string == NULL) {
-        return false;
-    }
+    if (text->font == NULL || text->string == NULL) return false;
+
     return true;
 }
 bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
@@ -29,14 +28,16 @@ bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
         string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
         REQ_CONDITION(string != NULL, return false);
     }
-    *tex = TXT_LoadTextureWithLines(
+    if (*tex == NULL) {
+        *tex = TXT_LoadTextureWithLines(
                 renderer,
                 text->font,
                 string,
-                (SDL_Color){255, 255, 255, 255},
+                WHITE,
                 text->backColor,
                 'C'
                 );
+    }
     REQ_CONDITION(*tex != NULL, return false);
     SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
     return true;

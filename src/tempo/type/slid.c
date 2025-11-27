@@ -34,15 +34,15 @@ bool TEMPO_RenewTypeSlid(const void* info, SDL_Texture** tex) {
     const float H = 2 * A + 2 * B + D;
     // elem->src_rect = (SDL_FRect){0, 0, W, H};
     // elem->gid_rect.w = elem->gid_rect.h = 1;
-    *tex = SDL_CreateTexture(
+    if (*tex == NULL) {
+        *tex = SDL_CreateTexture(
         renderer,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
         (int)W, (int)H
         );
-    if (*tex == NULL) {
-        return false;
     }
+    REQ_CONDITION(*tex != NULL, return false);
     SDL_SetRenderTarget(renderer, *tex);
     SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
     const SDL_FRect frame[4] = {

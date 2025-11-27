@@ -52,10 +52,6 @@ Type* TEMPO_DeleteType(Type* type) {
 // RENEW ===============================================================================================================
 bool TEMPO_RenewType(Type* type) {
     REQ_CONDITION(type != NULL, return false);
-    if (type->texture != NULL) {
-        SDL_DestroyTexture(type->texture);
-        type->texture = NULL;
-    }
     TYPE_INFO_DETAIL[type->id].renew(&type->info, &type->texture);
     return true;
 }

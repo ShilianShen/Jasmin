@@ -9,20 +9,17 @@ bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json) {
     }
     if (string_json != NULL) {
         file->string = strdup(string_json);
-        if (file->string == NULL) {
-            // printf("%s: failed in %s.\n", __func__, key);
-            return false;
-        }
-    } // Req Condition
+        REQ_CONDITION(file->string != NULL, return false);
+    }
     return true;
 }
 bool TEMPO_RenewTypeFile(const void* info, SDL_Texture** tex) {
     const TypeFileInfo* file = info;
-    *tex = IMG_LoadTexture(renderer, file->string);
     if (*tex == NULL) {
-        printf("%s: failed from \"%s\".\n", __func__, file->string);
-        return false;
-    } // Req Condition
+        *tex = IMG_LoadTexture(renderer, file->string);
+    }
+    REQ_CONDITION(*tex != NULL, return false);
+
     SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
     return true;
 }

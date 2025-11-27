@@ -10,9 +10,8 @@ bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
         return false;
     }
 
-    const char* key = NULL;
     const char* now_json = NULL;
-    REQ_CONDITION(cJSON_LoadByKey(info_json, key = "now", JSM_STRING, &now_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "now", JSM_STRING, &now_json), return false);
 
     cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
 
@@ -26,15 +25,11 @@ bool TEMPO_RenewTypeBool(const void* info, SDL_Texture** tex) {
     const float W = 2 * A + (M + 1) * B + M * D;
     const float H = 2 * A + 2 * B + D;
 
-    *tex = SDL_CreateTexture(
-       renderer,
-       SDL_PIXELFORMAT_RGBA8888,
-       SDL_TEXTUREACCESS_TARGET,
-       (int)W, (int)H
-       );
     if (*tex == NULL) {
-        return false;
+        *tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, (int)W, (int)H);
     }
+    REQ_CONDITION(*tex != NULL, return false);
+
     SDL_SetRenderTarget(renderer, *tex);
     SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
     const SDL_FRect frame[5] = {
