@@ -18,16 +18,11 @@ struct Page {
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
-    const char* key;
-    if (cJSON_ExistKey(page_json, key = "elemTable")) {
-        TEMPO_SetElemTableNow(&page->elemTable);
 
-        const cJSON* table_json = cJSON_GetObjectItem(page_json, key);
-        REQ_CONDITION(table_json != NULL, return false);
-        REQ_CONDITION(BASIC_CreateTable(&page->elemTable, table_json, TEMPO_CreateElem), return false);
-
-        TEMPO_SetElemTableNow(NULL);
-    }
+    const cJSON* table_json = cJSON_GetObjectItem(page_json, "elemTable");
+    REQ_CONDITION(table_json != NULL, return false);
+    TEMPO_SetElemTableNow(&page->elemTable);
+    REQ_CONDITION(BASIC_CreateTable(&page->elemTable, table_json, TEMPO_CreateElem), return false);
 
     cJSON_LoadByKey(page_json, "anchor", JSM_INT, &page->anchor);
     cJSON_LoadByKey(page_json, "color", JSM_COLOR, &page->color);
@@ -37,7 +32,6 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
 }
 void *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
-
     Page* page = calloc(1, sizeof(Page));
     REQ_CONDITION(page != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), page = TEMPO_DeletePage(page));
@@ -82,11 +76,8 @@ bool TEMPO_RenewPage(Page *page) {
 // DRAW ================================================================================================================
 bool TEMPO_DrawPage(const Page* page) {
     REQ_CONDITION(page != NULL, return false);
-
     SDL_SetRenderColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);
-
     REQ_CONDITION(BASIC_DrawTable(&page->elemTable, TEMPO_DrawElem), return false);
-
     return true;
 }

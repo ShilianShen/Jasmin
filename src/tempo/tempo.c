@@ -13,10 +13,10 @@ bool TEMPO_Init() {
     for (int i = 0; i < M; i++) TEMPO_TrigFuncTable.kv[i  ] = TEMPO_INNER_TRIG_FUNC_TABLE.kv[i];
     for (int i = 0; i < N; i++) TEMPO_TrigFuncTable.kv[i+M] = TEMPO_OUTER_TRIG_FUNC_TABLE.kv[i];
     TEMPO_TrigFuncTable.len = M + N;
-    return TEMPO_LoadMenu();
+    return TEMPO_InitMenu();
 }
 void TEMPO_Exit() {
-    TEMPO_UnloadMenu();
+    TEMPO_ExitMenu();
     free(TEMPO_TrigFuncTable.kv);
 }
 
@@ -30,6 +30,6 @@ bool TEMPO_Renew() {
 
 // DRAW ================================================================================================================
 bool TEMPO_Draw() {
-    TEMPO_DrawMenu(); //REQ_CONDITION(TEMPO_DrawMenu(), return false);
+    REQ_CONDITION(TEMPO_DrawMenu(), return false);
     return true;
 }

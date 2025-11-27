@@ -1,20 +1,20 @@
 #include "menu.h"
 
 
+// MENU ================================================================================================================
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
 #define MENU_PATH_VOLUME 6
 struct Menu {
-    // malloc in INIT
     Table pageTable;
     Page* pageRoot;
     Page* pageEdge;
 
-    // path
     Page* path[MENU_PATH_VOLUME];
     Page* pageNow;
 };
 typedef struct Menu Menu;
+static Menu menu;
 
 
 // MENU TRIG TYPE ======================================================================================================
@@ -33,16 +33,11 @@ const char* MENU_TRIG_STRINGS[MENU_NUM_TRIGS] = {
 };
 
 
-// MENU ================================================================================================================
-Menu menu;
-
-
-// GET & SET ===========================================================================================================
 
 
 
-// LOAD & UNLOAD =======================================================================================================
-static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
+// INIT & EXIT =========================================================================================================
+static bool TEMPO_InitMenu_RK(const cJSON* menu_json) {
     const char *key = NULL, *subkey = NULL;
     if (cJSON_ExistKey(menu_json, key = "pageTable")) {
         const cJSON* pageTable_json = cJSON_GetObjectItem(menu_json, key);
@@ -64,26 +59,20 @@ static bool TEMPO_LoadMenu_RK(const cJSON* menu_json) {
 
     return true;
 }
-bool TEMPO_LoadMenu() {
+bool TEMPO_InitMenu() {
     memset(&menu, 0, sizeof(Menu));
     cJSON* menu_json = getJson(TEMPO_JSON);
     REQ_CONDITION(menu_json != NULL, return false);
-
-    const bool rk = TEMPO_LoadMenu_RK(menu_json);
+    const bool rk = TEMPO_InitMenu_RK(menu_json);
     cJSON_Delete(menu_json);
-
     if (rk == false) {
-        TEMPO_UnloadMenu();
+        TEMPO_ExitMenu();
         return false;
     }
     return true;
 }
-void TEMPO_UnloadMenu() {
-    for (int i = 0; i < menu.pageTable.len; i++) {
-        free(menu.pageTable.kv[i].key);
-        menu.pageTable.kv[i].key = NULL;
-        menu.pageTable.kv[i].val = TEMPO_DeletePage(menu.pageTable.kv[i].val);
-    }
+void TEMPO_ExitMenu() {
+    BASIC_DeleteTable(&menu.pageTable, TEMPO_DeletePage);
 }
 
 
@@ -121,7 +110,6 @@ static void TEMPO_RenewMenuPageNow() {
     // else pageEdge
     menu.pageNow = menu.pageEdge;
 }
-
 bool TEMPO_RenewMenu() {
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
@@ -142,7 +130,7 @@ bool TEMPO_RenewMenu() {
 
 
 // DRAW ================================================================================================================
-void TEMPO_DrawMenu() {
+bool TEMPO_DrawMenu() {
     if (menu.path[0] == NULL) {
         TEMPO_DrawPage(menu.pageRoot);
     }
@@ -154,6 +142,7 @@ void TEMPO_DrawMenu() {
             TEMPO_DrawPage(menu.path[i]);
         }
     }
+    return true;
 }
 
 

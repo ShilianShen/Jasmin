@@ -6,12 +6,13 @@
 
 
 extern const Table TEMPO_INNER_TRIG_FUNC_TABLE;
-bool TEMPO_LoadMenu();
-void TEMPO_UnloadMenu();
+bool TEMPO_InitMenu();
+void TEMPO_ExitMenu();
 
 
 bool TEMPO_RenewMenu();
-void TEMPO_DrawMenu();
+
+bool TEMPO_DrawMenu();
 
 
 #endif //JASMIN_MENU_MENU_H
