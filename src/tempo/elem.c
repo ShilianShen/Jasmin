@@ -9,7 +9,7 @@ static const Table* elemTableNow = NULL;
 
 // ELEM ================================================================================================================
 struct Elem {
-    Type* type;
+    TEMPO_Type* type;
     int anchor;
     SDL_FRect gid_rect, *gid;
     SDL_FRect src_rect, *src;

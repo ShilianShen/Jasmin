@@ -11,7 +11,6 @@
 
 
 typedef enum {
-    TEMPO_TYPE_NULL,
     TEMPO_TYPE_FILE,
     TEMPO_TYPE_TEXT,
     TEMPO_TYPE_SLID,
@@ -26,8 +25,8 @@ typedef union {
     TypeBoolInfo bool_;
     TypeManuInfo manu;
 } TypeInfo;
-typedef struct Type Type;
-struct Type {
+typedef struct TEMPO_Type TEMPO_Type;
+struct TEMPO_Type {
     TypeInfo info;
     TypeId id;
     SDL_Texture* texture;
@@ -41,11 +40,11 @@ typedef struct {
 } TypeFunc;
 extern const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES];
 TypeId TEMPO_GetTypeFromString(const char* string);
-Trig TEMPO_GetTypeTrig(const Type* type);
-SDL_Texture* TEMPO_GetTypeTexture(const Type* type);
-Type* TEMPO_CreateType(const cJSON* type_json);
-Type* TEMPO_DeleteType(Type* type);
-bool TEMPO_RenewType(Type* type);
+Trig TEMPO_GetTypeTrig(const TEMPO_Type* type);
+SDL_Texture* TEMPO_GetTypeTexture(const TEMPO_Type* type);
+TEMPO_Type* TEMPO_CreateType(const cJSON* type_json);
+TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type);
+bool TEMPO_RenewType(TEMPO_Type* type);
 
 
 #endif //TEMPO_TYPE_H
