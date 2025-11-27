@@ -6,13 +6,14 @@ bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json) {
     REQ_CONDITION(cJSON_IsObject(info_json), return false);
     char* key = NULL;
     REQ_CONDITION(cJSON_LoadByKey(info_json, "key", JSM_STRING, &key), return false);
-    SDL_Texture** texture = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, key);
-    manu->texture = texture;
+    manu->elem = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, key);
+    REQ_CONDITION(manu->elem != NULL, return false);
     return true;
 }
 bool TEMPO_RenewTypeManu(const void* info, SDL_Texture** tex) {
     const TypeManuInfo* manu = info;
-    *tex = *manu->texture;
+    *tex = manu->elem->texture;
+    return true;
 }
 void TEMPO_DeleteTypeManu(void* info) {
 

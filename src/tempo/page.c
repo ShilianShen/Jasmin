@@ -2,7 +2,7 @@
 
 
 // PAGE PARA ===========================================================================================================
-const SDL_FRect* publicBck = NULL;
+const SDL_FRect* elemBckNow = NULL;
 
 
 // PAGE ================================================================================================================
@@ -20,13 +20,13 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     memset(page, 0, sizeof(Page));
     const char* key;
     if (cJSON_ExistKey(page_json, key = "elemTable")) {
-        TEMPO_SetElemPublicTable(&page->elemTable);
+        TEMPO_SetElemTableNow(&page->elemTable);
 
         const cJSON* table_json = cJSON_GetObjectItem(page_json, key);
         REQ_CONDITION(table_json != NULL, return false);
         REQ_CONDITION(BASIC_CreateTable(&page->elemTable, table_json, TEMPO_CreateElem), return false);
 
-        TEMPO_SetElemPublicTable(NULL);
+        TEMPO_SetElemTableNow(NULL);
     }
 
     cJSON_LoadByKey(page_json, "anchor", JSM_INT, &page->anchor);
@@ -71,10 +71,10 @@ bool TEMPO_RenewPage(Page *page) {
     REQ_CONDITION(page != NULL, return false);
     REQ_CONDITION(TEMPO_RenewPage_DstRect(page), return false);
 
-    TEMPO_SetElemPublicBck(&page->dst_rect);
+    TEMPO_SetElemBckNow(&page->dst_rect);
     PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){0});
     BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
-    TEMPO_SetElemPublicBck(NULL);
+    TEMPO_SetElemBckNow(NULL);
     return true;
 }
 

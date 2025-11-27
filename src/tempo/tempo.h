@@ -10,6 +10,14 @@ extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
 extern const Table TEMPO_PTR_TABLE;
 
 
+typedef struct {
+    SDL_Texture* texture;
+    int n;
+    SDL_FRect* rects;
+    Trig* trigs;
+} TEMPO_ManuElem;
+
+
 bool TEMPO_Init();
 void TEMPO_Exit();
 bool TEMPO_Renew();

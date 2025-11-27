@@ -8,8 +8,8 @@
 
 typedef struct Elem Elem;
 extern Table TEMPO_TrigFuncTable;
-bool TEMPO_SetElemPublicBck(const SDL_FRect* bck);
-bool TEMPO_SetElemPublicTable(const Table *table);
+bool TEMPO_SetElemBckNow(const SDL_FRect* bck);
+bool TEMPO_SetElemTableNow(const Table *table);
 
 
 void *TEMPO_CreateElem(const cJSON *elem_json);

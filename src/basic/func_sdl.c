@@ -2,6 +2,15 @@
 
 
 
+SDL_FRect SDL_RoundFRect(const SDL_FRect rect) {
+    const SDL_FRect result = {
+        roundf(rect.x),
+        roundf(rect.y),
+        roundf(rect.w),
+        roundf(rect.h),
+    };
+    return result;
+}
 char*SDL_GetStrColor(const SDL_Color color) {
     static char string[] = "[255, 255, 255, 255]";
     static size_t len = 0;

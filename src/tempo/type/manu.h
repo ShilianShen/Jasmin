@@ -5,7 +5,7 @@
 #include "../tempo.h"
 
 
-typedef struct {SDL_Texture** texture;} TypeManuInfo;
+typedef struct {TEMPO_ManuElem* elem;} TypeManuInfo;
 
 
 bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json);

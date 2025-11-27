@@ -3,8 +3,8 @@
 #include "elem.h"
 
 
-static const SDL_FRect* publicBck = NULL;
-static const Table* publicElemTable = NULL;
+static const SDL_FRect* elemBckNow = NULL;
+static const Table* elemTableNow = NULL;
 
 
 // ELEM ================================================================================================================
@@ -14,14 +14,24 @@ struct Elem {
     SDL_FRect gid_rect, *gid;
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
-
-    Trig trig; char* para_string;
+    Trig trig;
+    char* para_string;
 };
+
+
+// GET & SET ===========================================================================================================
+bool TEMPO_SetElemBckNow(const SDL_FRect* bck) {
+    elemBckNow = bck;
+    return true;
+}
+bool TEMPO_SetElemTableNow(const Table* table) {
+    elemTableNow = table;
+    return true;
+}
 
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
-
     const cJSON* type_json = cJSON_GetArrayItem(elem_json, 0);
     REQ_CONDITION(type_json != NULL, return false);
 
@@ -34,8 +44,8 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     if (cJSON_LoadByKey(elem_json, "gid", JSM_FRECT, &elem->gid_rect)) elem->gid = &elem->gid_rect;
     if (cJSON_LoadByKey(elem_json, "src", JSM_FRECT, &elem->src_rect)) elem->src = &elem->src_rect;
     if (cJSON_LoadByKey(elem_json, "bck", JSM_STRING, &bck_json)) {
-        REQ_CONDITION(publicElemTable != NULL, return false);
-        Elem* another = BASIC_GetTableValByKey(*publicElemTable, bck_json);
+        REQ_CONDITION(elemTableNow != NULL, return false);
+        Elem* another = BASIC_GetTableValByKey(*elemTableNow, bck_json);
         REQ_CONDITION(another != NULL, return false);
         elem->bck = &another->dst_rect;
     }
@@ -70,11 +80,16 @@ void *TEMPO_DeleteElem(void *elem_void) {
     Elem* elem = elem_void;
     if (elem == NULL) return elem;
 
-    TEMPO_DeleteType(elem->type);
+    if (elem->type != NULL) {
+        TEMPO_DeleteType(elem->type);
+        elem->type = NULL;
+    }
+
     if (elem->para_string != NULL) {
         free(elem->para_string);
         elem->para_string = NULL;
     }
+
     free(elem);
     elem = NULL;
     return elem;
@@ -82,23 +97,18 @@ void *TEMPO_DeleteElem(void *elem_void) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewElem_DstRect(Elem *elem) {
-    const bool result = SDL_LoadDstRectAligned(
-        &elem->dst_rect,
-        TEMPO_GetTypeTexture(elem->type),
-        elem->src,
-        elem->gid,
-        elem->bck != NULL ? elem->bck : publicBck,
-        elem->anchor
-        );
-    return result;
-}
 bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
     REQ_CONDITION(TEMPO_RenewType(elem->type), return false);
-    REQ_CONDITION(TEMPO_RenewElem_DstRect(elem), return false);
-
+    SDL_LoadDstRectAligned(
+        &elem->dst_rect,
+        TEMPO_GetTypeTexture(elem->type),
+        elem->src,
+        elem->gid,
+        elem->bck != NULL ? elem->bck : elemBckNow,
+        elem->anchor
+        );
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
     const bool mouseLeftIn = PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect);
 
@@ -129,13 +139,7 @@ bool TEMPO_DrawElem(const void *elem_void) {
     const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
     const bool mouseLeftIn = PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect);
     if (mouseLeftIn) DEBUG_FillRect(elem->dst_rect);
-
-    const SDL_FRect dst = {
-        roundf(elem->dst_rect.x),
-        roundf(elem->dst_rect.y),
-        roundf(elem->dst_rect.w),
-        roundf(elem->dst_rect.h),
-    };
+    const SDL_FRect dst = SDL_RoundFRect(elem->dst_rect);
     const bool result = SDL_RenderTexture(renderer, TEMPO_GetTypeTexture(elem->type), elem->src, &dst);
     if (mouseIn || mouseLeftIn) DEBUG_DrawRect(elem->dst_rect);
 
@@ -154,16 +158,3 @@ void TEMPO_TrigFuncSlid(const TrigPara para) {
     TrigFunc_Slid((TypeSlidInfo*)elem->type, elem->dst_rect);
 }
 
-
-// SET & GET ===========================================================================================================
-bool TEMPO_SetElemPublicBck(const SDL_FRect* bck) {
-    if (bck == NULL) {
-        return false;
-    }
-    publicBck = bck;
-    return true;
-}
-bool TEMPO_SetElemPublicTable(const Table* table) {
-    publicElemTable = table;
-    return true;
-}
