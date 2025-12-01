@@ -2,14 +2,12 @@
 #define FILE_H
 
 
-#include "../tempo.h"
+#include "../type.h"
 
 
-typedef struct {char* string;} TypeFileInfo;
-
-
+typedef struct {SDL_Texture* texture; TrigFunc func; char* para_string;} TypeFile;
 bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeFile(const void* info, SDL_Texture** tex);
+bool TEMPO_RenewTypeFile(void *info, SDL_Texture** tex, const SDL_FPoint *point);
 void TEMPO_DeleteTypeFile(void* info);
 
 

@@ -2,7 +2,7 @@
 
 
 bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
-    TypeTextInfo* text = info;
+    TypeText* text = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -21,8 +21,8 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
 
     return true;
 }
-bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
-    const TypeTextInfo* text = info;
+bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *point) {
+    const TypeText* text = info;
     const char* string = text->string;
     if (text->key == true) {
         string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
@@ -43,7 +43,7 @@ bool TEMPO_RenewTypeText(const void* info, SDL_Texture** tex) {
     return true;
 }
 void TEMPO_DeleteTypeText(void* info) {
-    TypeTextInfo* text = info;
+    TypeText* text = info;
     if (text->string != NULL) {
         free(text->string);
         text->string = NULL;

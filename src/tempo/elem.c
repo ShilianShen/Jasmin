@@ -14,8 +14,6 @@ struct Elem {
     SDL_FRect gid_rect, *gid;
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
-    Trig trig;
-    char* para_string;
 };
 
 
@@ -50,23 +48,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
         elem->bck = &another->dst_rect;
     }
 
-    const char* func_json = NULL; if (cJSON_LoadByKey(elem_json, "func", JSM_STRING, &func_json)) {
-        const TrigFunc func = BASIC_GetTableValByKey(TEMPO_TrigFuncTable, func_json);
-        REQ_CONDITION(func != NULL, return false);
-        elem->trig.func = func;
-    }
-    const char* para_json = NULL; if (cJSON_LoadByKey(elem_json, "para", JSM_STRING, &para_json)) {
-        elem->para_string = strdup(para_json);
-        REQ_CONDITION(elem->para_string != NULL, return false);
-        elem->trig.para = (TrigPara)elem->para_string;
-    }
-
-    const Trig trig = TEMPO_GetTypeTrig(elem->type);
-    if (trig.func != NULL) {
-        elem->trig = trig;
-        elem->trig.para = (TrigPara)elem;
-    }
-
     return true;
 }
 void *TEMPO_CreateElem(const cJSON *elem_json) {
@@ -85,11 +66,6 @@ void *TEMPO_DeleteElem(void *elem_void) {
         elem->type = NULL;
     }
 
-    if (elem->para_string != NULL) {
-        free(elem->para_string);
-        elem->para_string = NULL;
-    }
-
     free(elem);
     elem = NULL;
     return elem;
@@ -100,7 +76,6 @@ void *TEMPO_DeleteElem(void *elem_void) {
 bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
-    REQ_CONDITION(TEMPO_RenewType(elem->type), return false);
     SDL_LoadDstRectAligned(
         &elem->dst_rect,
         TEMPO_GetTypeTexture(elem->type),
@@ -109,23 +84,15 @@ bool TEMPO_RenewElem(void *elem_void) {
         elem->bck != NULL ? elem->bck : elemBckNow,
         elem->anchor
         );
-    const bool mouseIn = PERPH_GetMouseInRect(elem->dst_rect);
-    const bool mouseLeftIn = PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect);
-
-    if (mouseLeftIn) {
-        DEBUG_SendMessageL("Elem:\n");
-        if (elem->trig.func != NULL) {
-            DEBUG_SendMessageL("    trig: %s(%s)\n", BASIC_GetTableKeyByVal(TEMPO_TrigFuncTable, elem->trig.func), elem->trig.para);
-        }
-        DEBUG_SendMessageL("    dst: %s\n", SDL_GetStrFRect(elem->dst_rect));
+    if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect)) {
+        const SDL_FPoint mouse = PERPH_GetMousePos();
+        const SDL_FPoint point = {
+            (mouse.x - elem->dst_rect.x) / (elem->gid != NULL ? elem->gid->w : 1),
+            (mouse.y - elem->dst_rect.y) / (elem->gid != NULL ? elem->gid->h : 1)
+        };
+        REQ_CONDITION(TEMPO_RenewType(elem->type, &point), return false);
     }
-
-    if (elem->trig.sustain && mouseLeftIn) {
-        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
-    }
-    if (elem->trig.sustain == false && mouseLeftIn && mouseIn) {
-        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, elem->trig.func != NULL ? elem->trig : BASIC_TrigPass);
-    }
+    else REQ_CONDITION(TEMPO_RenewType(elem->type, NULL), return false);
 
     return true;
 }
@@ -144,17 +111,5 @@ bool TEMPO_DrawElem(const void *elem_void) {
     if (mouseIn || mouseLeftIn) DEBUG_DrawRect(elem->dst_rect);
 
     return result;
-}
-
-
-// TRIG ================================================================================================================
-void TEMPO_TrigFuncBool(const TrigPara para) {
-    const Elem* elem = (Elem*)para;
-    bool* now = elem->type->info.bool_.now;
-    if (now != NULL) *now = !*now;
-}
-void TEMPO_TrigFuncSlid(const TrigPara para) {
-    const Elem* elem = (Elem*)para;
-    TrigFunc_Slid((TypeSlidInfo*)elem->type, elem->dst_rect);
 }
 

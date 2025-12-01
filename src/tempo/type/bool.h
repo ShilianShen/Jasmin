@@ -5,12 +5,10 @@
 #include "../tempo.h"
 
 
-typedef struct {bool readonly; bool* now;} TypeBoolInfo;
-
-
+typedef struct {bool readonly; bool* now; SDL_Texture* texture;} TypeBool;
 bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeBool(const void* info, SDL_Texture** tex);
-void TEMPO_TrigFuncBool(TrigPara para);
+bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, const SDL_FPoint* point);
+void TEMPO_DeleteTypeBool(void *info);
 
 
 #endif //SWITCH_H

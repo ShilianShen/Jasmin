@@ -1,15 +1,19 @@
 #ifndef SLID_H
 #define SLID_H
 
-#include "../tempo.h"
+
+#include "../type.h"
 
 
-typedef struct {bool readonly; bool discrete; float min, max, *now;} TypeSlidInfo;
-
-
+typedef struct {
+    bool readonly, discrete;
+    float min, max, *now;
+    SDL_Texture* texture;
+    SDL_FPoint point;
+} TypeSlid;
 bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeSlid(const void* info, SDL_Texture** tex);
-void TrigFunc_Slid(const TypeSlidInfo* slid, SDL_FRect dst_rect);
-void TEMPO_TrigFuncSlid(TrigPara para);
+bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, const SDL_FPoint* point);
+void TEMPO_DeleteTypeSlid(void* info);
+
 
 #endif //SLID_H

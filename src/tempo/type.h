@@ -3,13 +3,9 @@
 
 
 #include "tempo.h"
-#include "type/text.h"
-#include "type/file.h"
-#include "type/slid.h"
-#include "type/bool.h"
-#include "type/manu.h"
 
 
+extern Table TEMPO_TrigFuncTable;
 typedef enum {
     TEMPO_TYPE_FILE,
     TEMPO_TYPE_TEXT,
@@ -18,33 +14,11 @@ typedef enum {
     TEMPO_TYPE_MANU,
     TEMPO_NUM_TYPES,
 } TypeId;
-typedef union {
-    TypeFileInfo file;
-    TypeTextInfo text;
-    TypeSlidInfo slid;
-    TypeBoolInfo bool_;
-    TypeManuInfo manu;
-} TypeInfo;
 typedef struct TEMPO_Type TEMPO_Type;
-struct TEMPO_Type {
-    TypeInfo info;
-    TypeId id;
-    SDL_Texture* texture;
-};
-typedef struct {
-    const char* name;
-    bool (*create)(void*, const cJSON*);
-    bool (*renew)(const void*, SDL_Texture**);
-    void (*delete)(void*);
-    Trig trig;
-} TypeFunc;
-extern const TypeFunc TYPE_INFO_DETAIL[TEMPO_NUM_TYPES];
-TypeId TEMPO_GetTypeFromString(const char* string);
-Trig TEMPO_GetTypeTrig(const TEMPO_Type* type);
 SDL_Texture* TEMPO_GetTypeTexture(const TEMPO_Type* type);
 TEMPO_Type* TEMPO_CreateType(const cJSON* type_json);
 TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type);
-bool TEMPO_RenewType(TEMPO_Type* type);
+bool TEMPO_RenewType(TEMPO_Type* type, const SDL_FPoint *point);
 
 
 #endif //TEMPO_TYPE_H
