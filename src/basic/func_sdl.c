@@ -58,8 +58,8 @@ bool SDL_LoadDstRectAligned(
     const SDL_FRect *bck,
     const int anchor) {
 
-    REQ_CONDITION(dst != NULL, return false);
-    REQ_CONDITION(src != NULL || texture != NULL, return false);
+    OPT_CONDITION(dst != NULL, return false);
+    OPT_CONDITION(src != NULL || texture != NULL, return false);
 
     const SDL_FRect src_rect = src != NULL ? *src : (SDL_FRect){0, 0, (float)texture->w, (float)texture->h};
     const SDL_FRect gid_rect = gid != NULL ? *gid : (SDL_FRect){0, 0, 1, 1};

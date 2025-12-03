@@ -10,9 +10,11 @@ bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json) {
     REQ_CONDITION(manu->elem != NULL, return false);
     return true;
 }
-bool TEMPO_RenewTypeManu(void *info, SDL_Texture** tex, const SDL_FPoint* point) {
+bool TEMPO_RenewTypeManu(void *info, SDL_Texture** texture, const SDL_FPoint* point) {
     const TypeManu* manu = info;
-    *tex = manu->elem->texture;
+    if (manu->elem->renew != NULL) {
+        manu->elem->renew(manu->elem, texture, point);
+    }
     return true;
 }
 void TEMPO_DeleteTypeManu(void* info) {

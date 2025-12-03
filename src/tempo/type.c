@@ -87,7 +87,7 @@ TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
 
 
 // RENEW ===============================================================================================================
-bool TEMPO_RenewType(TEMPO_Type* type, const SDL_FPoint *point) {
+bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint *point) {
     REQ_CONDITION(type != NULL, return false);
     const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return false);

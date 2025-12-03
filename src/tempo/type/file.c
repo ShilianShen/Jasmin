@@ -25,6 +25,9 @@ bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json) {
 bool TEMPO_RenewTypeFile(void *info, SDL_Texture** tex, const SDL_FPoint *point) {
     const TypeFile* file = info;
     *tex = file->texture;
+    if (point != NULL) {
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){file->func, (TrigPara)file->para_string, false});
+    }
     return true;
 }
 void TEMPO_DeleteTypeFile(void* info) {
