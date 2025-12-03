@@ -26,7 +26,7 @@ bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
 
     return true;
 }
-bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, const SDL_FPoint* point) {
+bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR) {
     const TypeBool* bool_ = info;
     const float M = 1;
     const float N = *bool_->now;
@@ -48,7 +48,7 @@ bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, const SDL_FPoint* point)
     SDL_SetRenderTarget(renderer, NULL);
     *tex = bool_->texture;
 
-    if (point != NULL && SDL_GetPointInRect(*point, (SDL_FRect){0, 0, W, H})) {
+    if (mouseL != NULL && SDL_GetPointInRect(*mouseL, (SDL_FRect){0, 0, W, H})) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TEMPO_TrigFuncBool, (TrigPara)bool_, false});
     }
     return true;

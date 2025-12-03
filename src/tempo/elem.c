@@ -76,15 +76,19 @@ void *TEMPO_DeleteElem(void *elem_void) {
 bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
-    if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect)) {
-        const SDL_FPoint mouse = PERPH_GetMousePos();
-        const SDL_FPoint point = {
-            (mouse.x - elem->dst_rect.x) / (elem->gid != NULL ? elem->gid->w : 1),
-            (mouse.y - elem->dst_rect.y) / (elem->gid != NULL ? elem->gid->h : 1)
-        };
-        REQ_CONDITION(TEMPO_RenewTypeTrig(elem->type, &point), return false);
-    }
-    else REQ_CONDITION(TEMPO_RenewTypeTrig(elem->type, NULL), return false);
+
+    const SDL_FPoint mouse = PERPH_GetMousePos();
+    const SDL_FPoint point = (SDL_FPoint){
+        (mouse.x - elem->dst_rect.x) / (elem->gid != NULL ? elem->gid->w : 1),
+        (mouse.y - elem->dst_rect.y) / (elem->gid != NULL ? elem->gid->h : 1)
+    };
+
+    REQ_CONDITION(TEMPO_RenewTypeTrig(
+        elem->type,
+        PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect) ? &point : NULL,
+        PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_RIGHT, elem->dst_rect) ? &point : NULL
+        ), return false);
+
     const SDL_Texture* texture = TEMPO_GetTypeTexture(elem->type);
     SDL_LoadDstRectAligned(
         &elem->dst_rect,

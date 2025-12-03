@@ -53,7 +53,7 @@ bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json) {
 
     return true;
 }
-bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, const SDL_FPoint* point) {
+bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR) {
     TypeSlid* slid = info;
     const float M = slid->max - slid->min;
     const float W = (float)slid->texture->w;
@@ -88,8 +88,8 @@ bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, const SDL_FPoint* point)
         SDL_RenderFillRect(renderer, &rect);
     }
     SDL_SetRenderTarget(renderer, NULL);
-    if (point != NULL) {
-        slid->point = *point;
+    if (mouseL != NULL) {
+        slid->point = *mouseL;
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TrigFunc_Slid, (TrigPara)slid, true});
     }
     return true;

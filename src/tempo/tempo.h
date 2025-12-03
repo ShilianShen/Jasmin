@@ -12,7 +12,7 @@ extern const Table TEMPO_PTR_TABLE;
 
 typedef struct {
     void* info;
-    bool (*renew)(void*, SDL_Texture**, const SDL_FPoint*);
+    bool (*renew)(void*, SDL_Texture**, const SDL_FPoint*, const SDL_FPoint*);
 } TEMPO_TypeManu;
 
 

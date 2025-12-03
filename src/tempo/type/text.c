@@ -19,9 +19,18 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
     text->key = key_json;
     if (text->font == NULL || text->string == NULL) return false;
 
+    const char* func_json = NULL; if (cJSON_LoadByKey(info_json, "func", JSM_STRING, &func_json)) {
+        text->func = BASIC_GetTableValByKey(TEMPO_TrigFuncTable, func_json);
+        REQ_CONDITION(text->func != NULL, return false);
+    }
+    const char* para_json = NULL; if (cJSON_LoadByKey(info_json, "para", JSM_STRING, &para_json)) {
+        text->para_string = strdup(para_json);
+        REQ_CONDITION(text->para_string != NULL, return false);
+    }
+
     return true;
 }
-bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *point) {
+bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR) {
     const TypeText* text = info;
     const char* string = text->string;
     if (text->key == true) {
@@ -40,6 +49,9 @@ bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *point)
     }
     REQ_CONDITION(*tex != NULL, return false);
     SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
+    if (mouseL != NULL) {
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){text->func, (TrigPara)text->para_string, false});
+    }
     return true;
 }
 void TEMPO_DeleteTypeText(void* info) {

@@ -12,6 +12,8 @@ struct Page {
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
     SDL_Color color;
+    Trig trigArray[SDL_SCANCODE_COUNT];
+    char* para_string[SDL_SCANCODE_COUNT];
 };
 
 
@@ -28,6 +30,27 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     cJSON_LoadByKey(page_json, "color", JSM_COLOR, &page->color);
     if (cJSON_LoadByKey(page_json, "src", JSM_FRECT, &page->src_rect)) page->src = &page->src_rect;
 
+    const cJSON* trigArray_json = cJSON_GetObjectItem(page_json, "trigArray");
+    if (trigArray_json != NULL) {
+        for (int i = 0; i < cJSON_GetArraySize(trigArray_json); i++) {
+            const cJSON* trig_json = cJSON_GetArrayItem(trigArray_json, i);
+            const int key = SDL_GetScancodeFromName(trig_json->string);
+            REQ_CONDITION(key != SDL_SCANCODE_UNKNOWN, return false);
+
+            const char* func_json = NULL;
+            if (cJSON_LoadByKey(trig_json, "func", JSM_STRING, &func_json)) {
+                page->trigArray[key].func = BASIC_GetTableValByKey(TEMPO_TrigFuncTable, func_json);
+                REQ_CONDITION(page->trigArray[key].func != NULL, return false);
+            }
+
+            const char* para_json = NULL;
+            if (cJSON_LoadByKey(trig_json, "para", JSM_STRING, &para_json)) {
+                page->para_string[key] = strdup(para_json);
+                REQ_CONDITION(page->para_string[key] != NULL, return false);
+                page->trigArray[key].para = (TrigPara)page->para_string[key];
+            }
+        }
+    }
     return true;
 }
 void *TEMPO_CreatePage(const cJSON *page_json) {
@@ -69,6 +92,10 @@ bool TEMPO_RenewPage(Page *page) {
     PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){0});
     BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
     TEMPO_SetElemBckNow(NULL);
+
+    for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
+        PERPH_SetBoardKeyTrig(i, page->trigArray[i]);
+    }
     return true;
 }
 
