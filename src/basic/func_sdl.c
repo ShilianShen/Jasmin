@@ -103,9 +103,9 @@ bool SDL_RenderTextureAligned(
     return SDL_RenderTexture(renderer, texture, src_rect, &dst_rect);
 }
 bool SDL_RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, const SDL_FPoint point, const SDL_Color color) {
-    REQ_CONDITION(renderer != NULL && text != NULL && font != NULL, return false);
+    OPT_CONDITION(renderer != NULL && text != NULL && font != NULL, return false);
     SDL_Texture* texture = TXT_LoadTexture(renderer, font, text, color);
-    REQ_CONDITION(texture != NULL, return false);
+    OPT_CONDITION(texture != NULL, return false);
     SDL_RenderTexture(renderer, texture, NULL, &(SDL_FRect){point.x, point.y, (float)texture->w, (float)texture->h});
     SDL_DestroyTexture(texture);
     return true;
