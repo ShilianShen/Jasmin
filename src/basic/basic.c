@@ -2,9 +2,9 @@
 
 
 SDL_Window* window = NULL;
+cJSON* basic_json = NULL;
 SDL_FRect windowRect = {0, 0, 0, 0};
 SDL_FPoint windowScale = {1, 1};
-const char* WINDOW_TITLE = "Test";
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 800;
 const size_t JSM_DataTypeSize[JSM_NUM_TYPES] = {
@@ -25,6 +25,7 @@ SDL_Event sdl_event;
 bool running = true;
 float BASIC_T1 = 0, BASIC_T2 = 0, BASIC_DT = 0;
 ma_engine engine;
+SDL_Surface* iconSurface = NULL;
 
 
 bool BASIC_Init() {
@@ -34,8 +35,14 @@ bool BASIC_Init() {
     REQ_CONDITION(SDL_Init(SDL_INIT_VIDEO), return false);
     REQ_CONDITION(TTF_Init(), return false);
 
+    basic_json = getJson(BASIC_JSON);
+    REQ_CONDITION(basic_json != NULL, return false);
+
+    char* title_json = NULL;
+    REQ_CONDITION(cJSON_LoadByKey(basic_json, "title", JSM_STRING, &title_json), return false);
+
     const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE | SDL_WINDOW_METAL;
-    window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FLAGS);
+    window = SDL_CreateWindow(title_json, WINDOW_WIDTH, WINDOW_HEIGHT, FLAGS);
     REQ_CONDITION(window != NULL, return false);
 
     renderer = SDL_CreateRenderer(window, NULL);
@@ -44,6 +51,13 @@ bool BASIC_Init() {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     REQ_CONDITION(BASIC_InitFont(), return false);
+
+    char* icon_json = NULL;
+    REQ_CONDITION(cJSON_LoadByKey(basic_json, "icon", JSM_STRING, &icon_json), return false);
+
+    iconSurface = IMG_Load(icon_json);
+    REQ_CONDITION(iconSurface != NULL, return false);
+    SDL_SetWindowIcon(window, iconSurface);
 
     return true;
 }

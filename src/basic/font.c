@@ -27,9 +27,9 @@ static void* BASIC_DeleteFont(void* font_void) {
 
 
 bool BASIC_InitFont() {
-    cJSON* BASIC_Font_json = getJson(BASIC_FONT_JSON);
-    BASIC_CreateTable(&BASIC_FontSet, BASIC_Font_json, BASIC_CreateFont);
-    cJSON_free(BASIC_Font_json);
+    const cJSON* fontSet_json = cJSON_GetObjectItem(basic_json, "fontSet");
+    REQ_CONDITION(fontSet_json != NULL, return false);
+    BASIC_CreateTable(&BASIC_FontSet, fontSet_json, BASIC_CreateFont);
     return true;
 }
 void BASIC_ExitFont() {

@@ -19,7 +19,7 @@
 
 
 #include "../third_party/third_party.h"
-#define BASIC_FONT_JSON "../config/basic_font.json"
+#define BASIC_JSON "../config/basic.json"
 
 
 typedef enum {
@@ -51,6 +51,7 @@ extern bool running;
 extern SDL_Event sdl_event;
 extern float BASIC_T1, BASIC_T2, BASIC_DT;
 extern SDL_FPoint windowScale;
+extern cJSON* basic_json;
 
 
 #define WHITE (SDL_Color){255, 255, 255, 255}
