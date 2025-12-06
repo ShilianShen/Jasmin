@@ -4,17 +4,13 @@
 #include "../src/debug/debug.h"
 #include "../src/perph/perph.h"
 #include "../src/tempo/tempo.h"
-#include "../src/lotri/lotri.h"
-#include "../src/intel/intel.h"
 
 
 static const Env ENV_ARRAY[] = {
     {"BASIC", BASIC_Init, BASIC_Renew, BASIC_Draw, BASIC_Exit},
     {"DEBUG", DEBUG_Init, DEBUG_Renew, DEBUG_Draw, DEBUG_Exit},
     {"PERPH", PERPH_Init, PERPH_Renew, PERPH_Draw, PERPH_Exit},
-    // {"TEMPO", TEMPO_Init, TEMPO_Renew, TEMPO_Draw, TEMPO_Exit},
-    {"INTEL", INTEL_Init, INTEL_Renew, NULL, INTEL_Exit},
-    {"LOTRI", LOTRI_Init, LOTRI_Renew, NULL, LOTRI_Exit},
+    {"TEMPO", TEMPO_Init, TEMPO_Renew, TEMPO_Draw, TEMPO_Exit},
 };
 static const int LEN_ENV_ARRAY = len_of(ENV_ARRAY);
 

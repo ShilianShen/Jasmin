@@ -1,0 +1,57 @@
+{
+    "path": {
+        "pageNow": "Game"
+    },
+    "pageTable": {
+        "Root": {
+            "elemTable": {
+                "0000": {"TEXT": {"font": "title", "string": "TITLE", "func": "forward", "para": "Title"}}
+            }
+        },
+        "Edge": {
+            "elemTable": {
+                "0000": {"TEXT": {"font": "body", "string": "R2R", "func": "clear"}}
+            }
+        },
+        "Title": {
+            "elemTable": {
+                "A": {"TEXT": {"font": "title", "string": "STACK CHESS"}},
+                "B": {"TEXT": {"font": "body", "string": "CONTINUE", "func": "forward", "para": "Game"}, "bck": "A", "anchor": 36},
+                "C": {"TEXT": {"font": "body", "string": "NEW GAME"}, "bck": "B", "anchor": 36},
+                "D": {"TEXT": {"font": "body", "string": "SETTING"}, "bck": "C", "anchor": 36},
+                "E": {"TEXT": {"font": "body", "string": "EXIT"}, "bck": "D", "anchor": 36},
+                "F": {"TEXT": {"font": "body", "string": "COLLECTION"}, "bck": "E", "anchor": 36},
+                "G": {"SLID": {"discrete": false, "readonly": false, "min": 0, "now": "test_float", "max": 10}, "bck": "F", "anchor": 36},
+                "H": {"BOOL": {"readonly": false, "now": "test_bool"}, "bck": "G", "anchor": 36}
+            }
+        },
+        "Game": {
+            "elemTable": {
+                "Exit": {
+                    "TEXT": {"font": "body", "string": "Exit", "func": "backward"}, "anchor": -20
+                },
+                "PAs": {
+                    "TEXT": {"font": "player_action", "string": "PlaActions", "back_color": [0, 50, 0, 255]},
+                    "anchor": 20,
+                    "gid": [0, -300, 1, 1]
+                }
+            },
+            "trigArray": {
+                "TAB": {"func": "forward", "para": "Deck"},
+                "ESCAPE": {"func": "backward"}
+            }
+        },
+        "Deck": {
+            "elemTable": {
+                "Back": {
+                    "TEXT": {"font": "body", "string": "<<<", "func": "backward"},
+                    "anchor": -20
+                }
+            },
+            "trigArray": {
+                "TAB": {"func": "backward"},
+                "ESCAPE": {"func": "backward"}
+            }
+        }
+    }
+}

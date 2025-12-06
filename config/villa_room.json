@@ -1,8 +1,0 @@
-{
-  "root_room": {
-    "model": "../res/model/root_room/model.obj",
-    "material": "../res/model/root_room/material.mtl",
-    "mask": "../res/image/root_room_mask.png",
-    "rect": [4, 5, 9, 8]
-  }
-}

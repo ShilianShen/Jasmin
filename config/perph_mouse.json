@@ -1,5 +1,5 @@
 {
-  "hide": true,
-  "tex": "../res/image/mouse.png",
-  "scale": 5
+    "hide": true,
+    "texture": "../res/image/mouse.png",
+    "scale": 5
 }
