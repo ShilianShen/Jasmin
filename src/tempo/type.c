@@ -12,7 +12,7 @@ struct TEMPO_Type {
         TypeText text;
         TypeSlid slid;
         TypeBool bool_;
-        TypeManu manu;
+        TEMPO_TypeManu* manu;
     } info;
     TypeId id;
 };

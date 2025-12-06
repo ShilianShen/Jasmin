@@ -5,7 +5,6 @@
 #include "../tempo.h"
 
 
-typedef struct {TEMPO_TypeManu* info;} TypeManu;
 bool createManu(void* info, const cJSON* info_json);
 SDL_Texture* textureManu(void* info);
 bool trigManu(void* info, SDL_FPoint mouse);
