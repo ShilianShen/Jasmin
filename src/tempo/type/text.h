@@ -5,10 +5,19 @@
 #include "../type.h"
 
 
-typedef struct {TTF_Font* font; bool key; char* string; SDL_Color backColor; TrigFunc func; char* para_string;} TypeText;
-bool TEMPO_CreateTypeText(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, SDL_FPoint mouse);
-void TEMPO_DeleteTypeText(void* info);
+typedef struct {
+    SDL_Texture* texture;
+    TTF_Font* font;
+    bool key;
+    char* string;
+    SDL_Color backColor;
+    TrigFunc func;
+    char* para_string;
+} TypeText;
+bool createText(void* info, const cJSON* info_json);
+SDL_Texture* textureText(void *info);
+bool trigText(void *info, SDL_FPoint mouse);
+void deleteText(void* info);
 
 
 #endif //ELEM_TEXT_H

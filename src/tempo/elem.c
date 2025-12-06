@@ -79,11 +79,8 @@ bool TEMPO_RenewElem(void *elem_void) {
 
     const SDL_Texture* texture = TEMPO_GetTypeTexture(elem->type);
 
-    const SDL_FPoint mouse = PERPH_GetMousePos();
-    const SDL_FPoint point = texture != NULL ? (SDL_FPoint){
-        (mouse.x - elem->dst_rect.x) / elem->dst_rect.w * (float)texture->w,
-        (mouse.y - elem->dst_rect.y) / elem->dst_rect.h * (float)texture->h
-    } : (SDL_FPoint){0, 0};
+
+    const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), texture);
 
     REQ_CONDITION(TEMPO_RenewTypeTrig(elem->type, point), return false);
 

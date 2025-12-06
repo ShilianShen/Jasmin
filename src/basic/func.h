@@ -32,6 +32,7 @@ bool SDL_SetRenderColor(SDL_Renderer* renderer, SDL_Color color);
 SDL_FColor SDL_GetFColorFromColor(SDL_Color color);
 SDL_FPoint SDL_ClipPointInRect(SDL_FPoint point, SDL_FRect rect);
 bool SDL_GetPointInTexture(SDL_FPoint point, const SDL_Texture* texture);
+SDL_FPoint SDL_StdPointByRect(SDL_FPoint point, SDL_FRect rect);
 SDL_FPoint SDL_ScaleByTexture(SDL_FPoint point, const SDL_Texture* texture);
 
 

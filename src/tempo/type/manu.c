@@ -1,7 +1,7 @@
 #include "manu.h"
 
 
-bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json) {
+bool createManu(void* info, const cJSON* info_json) {
     TypeManu* manu = info;
     REQ_CONDITION(cJSON_IsObject(info_json), return false);
     char* key = NULL;
@@ -10,13 +10,13 @@ bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json) {
     REQ_CONDITION(manu->info != NULL, return false);
     return true;
 }
-bool TEMPO_RenewTypeManu(void *info, SDL_Texture** texture, SDL_FPoint mouse) {
-    const TypeManu* manu = info;
-    if (manu->info->renew != NULL) {
-        manu->info->renew(manu->info->info, texture, mouse);
-    }
-    return true;
-}
-void TEMPO_DeleteTypeManu(void* info) {
+void deleteManu(void* info) {
 
+}
+SDL_Texture* textureManu(void* info) {
+    const TypeManu* manu = info;
+    return NULL;
+}
+bool trigManu(void* info, const SDL_FPoint mouse) {
+    return true;
 }

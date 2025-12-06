@@ -1,7 +1,7 @@
 #include "text.h"
 
 
-bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
+bool createText(void* info, const cJSON* info_json)   {
     TypeText* text = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
@@ -30,34 +30,39 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
 
     return true;
 }
-bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
-    const TypeText* text = info;
-    const char* string = text->string;
-    if (text->key == true) {
-        string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
-        REQ_CONDITION(string != NULL, return false);
-    }
-    if (*tex == NULL) {
-        *tex = TXT_LoadTextureWithLines(
-                renderer,
-                text->font,
-                string,
-                WHITE,
-                text->backColor,
-                'C'
-                );
-    }
-    REQ_CONDITION(*tex != NULL, return false);
-    SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
-    if (&mouse != NULL && SDL_GetPointInTexture(mouse, *tex)) {
-        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){text->func, (TrigPara)text->para_string, false});
-    }
-    return true;
-}
-void TEMPO_DeleteTypeText(void* info) {
+void deleteText(void* info) {
     TypeText* text = info;
     if (text->string != NULL) {
         free(text->string);
         text->string = NULL;
     }
+}
+SDL_Texture* textureText(void *info) {
+    TypeText* text = info;
+    const char* string = text->string;
+    if (text->key == true) {
+        string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
+        REQ_CONDITION(string != NULL, return false);
+    }
+    if (text->font == NULL) {
+        text->texture = TXT_LoadTextureWithLines(
+            renderer,
+            text->font,
+            string,
+            WHITE,
+            text->backColor,
+            'C'
+            );
+    }
+
+    REQ_CONDITION(text->texture != NULL, return false);
+    SDL_SetTextureScaleMode(text->texture, SDL_SCALEMODE_NEAREST);
+    return text->texture;
+}
+bool trigText(void *info, const SDL_FPoint mouse) {
+    TypeText* text = info;
+    if (SDL_GetPointInTexture(mouse, text->texture)) {
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){text->func, (TrigPara)text->para_string, false});
+    }
+    return true;
 }

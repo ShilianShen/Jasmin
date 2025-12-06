@@ -8,7 +8,7 @@ static void TEMPO_TrigFuncBool(const TrigPara para) {
     bool* now = bool_->now;
     if (now != NULL) *now = !*now;
 }
-bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
+bool createBool(void* info, const cJSON* info_json) {
     TypeBool* bool_ = info;
     REQ_CONDITION(cJSON_IsObject(info_json), return false);
 
@@ -26,7 +26,11 @@ bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json) {
 
     return true;
 }
-bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
+void deleteBool(void *info) {
+    TypeBool* bool_ = info;
+    SDL_DestroyTexture(bool_->texture);
+}
+SDL_Texture* textureBool(void* info) {
     const TypeBool* bool_ = info;
     const float M = 1;
     const float N = *bool_->now;
@@ -46,14 +50,12 @@ bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
     };
     SDL_RenderFillRects(renderer, frame, 5);
     SDL_SetRenderTarget(renderer, NULL);
-    *tex = bool_->texture;
-
-    if (SDL_GetPointInRect(mouse, (SDL_FRect){0, 0, W, H})) {
+    return bool_->texture;
+}
+bool trigBool(void* info, const SDL_FPoint mouse) {
+    const TypeBool* bool_ = info;
+    if (SDL_GetPointInTexture(mouse, bool_->texture)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TEMPO_TrigFuncBool, (TrigPara)bool_, false});
     }
     return true;
-}
-void TEMPO_DeleteTypeBool(void *info) {
-    TypeBool* bool_ = info;
-    SDL_DestroyTexture(bool_->texture);
 }

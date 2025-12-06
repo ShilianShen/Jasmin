@@ -6,9 +6,10 @@
 
 
 typedef struct {bool readonly; bool* now; SDL_Texture* texture;} TypeBool;
-bool TEMPO_CreateTypeBool(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeBool(void *info, SDL_Texture** tex, SDL_FPoint mouse);
-void TEMPO_DeleteTypeBool(void *info);
+bool createBool(void* info, const cJSON* info_json);
+SDL_Texture* textureBool(void* info);
+bool trigBool(void* info, SDL_FPoint mouse);
+void deleteBool(void *info);
 
 
 #endif //SWITCH_H

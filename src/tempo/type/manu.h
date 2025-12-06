@@ -6,9 +6,10 @@
 
 
 typedef struct {TEMPO_TypeManu* info;} TypeManu;
-bool TEMPO_CreateTypeManu(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeManu(void *info, SDL_Texture** texture, SDL_FPoint mouse);
-void TEMPO_DeleteTypeManu(void* info);
+bool createManu(void* info, const cJSON* info_json);
+SDL_Texture* textureManu(void* info);
+bool trigManu(void* info, SDL_FPoint mouse);
+void deleteManu(void* info);
 
 
 #endif //MANU_H

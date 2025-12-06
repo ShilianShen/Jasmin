@@ -11,9 +11,10 @@ typedef struct {
     SDL_Texture* texture;
     SDL_FPoint point;
 } TypeSlid;
-bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, SDL_FPoint mouse);
-void TEMPO_DeleteTypeSlid(void* info);
+bool createSlid(void* info, const cJSON* info_json);
+SDL_Texture* textureSlid(void* info);
+bool trigSlid(void* info, SDL_FPoint mouse);
+void deleteSlid(void* info);
 
 
 #endif //SLID_H

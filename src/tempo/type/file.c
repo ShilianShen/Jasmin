@@ -1,7 +1,8 @@
 #include "file.h"
 
 
-bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json) {
+
+bool createFile(void* info, const cJSON* info_json) {
     TypeFile* file = info;
 
     char* path_json = NULL;
@@ -22,15 +23,18 @@ bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json) {
 
     return true;
 }
-bool TEMPO_RenewTypeFile(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
+SDL_Texture* textureFile(void *info) {
     const TypeFile* file = info;
-    *tex = file->texture;
+    return file->texture;
+}
+bool trigFile(void *info, SDL_FPoint mouse) {
+    const TypeFile* file = info;
     if (SDL_GetPointInTexture(mouse, file->texture)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){file->func, (TrigPara)file->para_string, false});
     }
     return true;
 }
-void TEMPO_DeleteTypeFile(void* info) {
+void deleteFile(void* info) {
     TypeFile* file = info;
     SDL_DestroyTexture(file->texture);
 }

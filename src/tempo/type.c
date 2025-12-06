@@ -1,4 +1,4 @@
-#include "type.h"
+// #include "type.h"
 #include "type/text.h"
 #include "type/file.h"
 #include "type/slid.h"
@@ -17,27 +17,25 @@ struct TEMPO_Type {
     TypeId id;
     SDL_Texture* texture;
 };
+
+
 typedef struct {
     bool (*create)(void*, const cJSON*);
-    bool (*renew)(void*, SDL_Texture**, SDL_FPoint);
+    SDL_Texture* (*renew)(void*);
+    bool (*trig)(void*, SDL_FPoint);
     void (*delete)(void*);
 } TypeFunc;
 KeyVal typeKeyVal[TEMPO_NUM_TYPES] = {
-    {"FILE", &(TypeFunc){TEMPO_CreateTypeFile, TEMPO_RenewTypeFile, TEMPO_DeleteTypeFile}},
-    {"TEXT", &(TypeFunc){TEMPO_CreateTypeText, TEMPO_RenewTypeText, TEMPO_DeleteTypeText}},
-    {"SLID", &(TypeFunc){TEMPO_CreateTypeSlid, TEMPO_RenewTypeSlid, TEMPO_DeleteTypeSlid}},
-    {"BOOL", &(TypeFunc){TEMPO_CreateTypeBool, TEMPO_RenewTypeBool, TEMPO_DeleteTypeBool}},
-    {"MANU", &(TypeFunc){TEMPO_CreateTypeManu, TEMPO_RenewTypeManu, TEMPO_DeleteTypeManu}}
+    [TEMPO_TYPE_FILE] = {"FILE", &(TypeFunc){createFile, textureFile, trigFile, deleteFile}},
+    [TEMPO_TYPE_TEXT] = {"TEXT", &(TypeFunc){createText, textureText, trigText, deleteText}},
+    [TEMPO_TYPE_SLID] = {"SLID", &(TypeFunc){createSlid, textureSlid, trigSlid, deleteSlid}},
+    [TEMPO_TYPE_BOOL] = {"BOOL", &(TypeFunc){createBool, textureBool, trigBool, deleteBool}},
+    [TEMPO_TYPE_MANU] = {"MANU", &(TypeFunc){createManu, textureManu, trigManu, deleteManu}}
 };
 Table typeFuncTable = {.kv = typeKeyVal, .len = len_of(typeKeyVal)};
 
 
 // GET & SET ===========================================================================================================
-Trig TEMPO_GetTypeTrig(const TEMPO_Type* type) {
-    REQ_CONDITION(type != NULL, return (Trig){0});
-    // return typeFuncTable.kv[type->id].trig;
-    return (Trig){0};
-}
 SDL_Texture* TEMPO_GetTypeTexture(const TEMPO_Type* type) {
     REQ_CONDITION(type != NULL, return NULL);
     return type->texture;
@@ -73,6 +71,7 @@ bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint mouse) {
     const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return false);
     REQ_CONDITION(typeFunc->renew != NULL, return false);
-    REQ_CONDITION(typeFunc->renew(&type->info, &type->texture, mouse), return false);
+    type->texture = typeFunc->renew(&type->info);
+    //
     return true;
 }

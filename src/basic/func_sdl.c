@@ -296,7 +296,13 @@ bool SDL_GetPointInTexture(const SDL_FPoint point, const SDL_Texture* texture) {
     const SDL_FRect rect = {0, 0, (float)texture->w, (float)texture->h};
     return SDL_GetPointInRect(point, rect);
 }
+SDL_FPoint SDL_StdPointByRect(SDL_FPoint point, const SDL_FRect rect) {
+    point.x = (point.x - rect.x) / rect.w;
+    point.y = (point.y - rect.y) / rect.h;
+    return point;
+}
 SDL_FPoint SDL_ScaleByTexture(SDL_FPoint point, const SDL_Texture* texture) {
+    if (texture == NULL) return (SDL_FPoint){0, 0};
     point.x *= (float)texture->w;
     point.y *= (float)texture->h;
     return point;
