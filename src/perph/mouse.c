@@ -13,8 +13,9 @@ static struct {
         bool pressed[PERPH_NUM_MOUSE_KEYS];
     } state1, state2;
     Trig trig[PERPH_NUM_MOUSE_KEYS];
-    SDL_Texture* tex;
-    SDL_FRect texDstRect;
+    SDL_Texture* texture;
+    SDL_FRect dstRect;
+
     cJSON* json;
 } mouse;
 
@@ -59,18 +60,18 @@ bool PERPH_InitMouse() {
     REQ_CONDITION(mouse.json != NULL, return false);
 
     char* tex_json = NULL;
-    if (cJSON_LoadByKey(mouse.json, "tex", JSM_STRING, &tex_json)) {
+    if (cJSON_LoadByKey(mouse.json, "texture", JSM_STRING, &tex_json)) {
         float scale = 0;
         REQ_CONDITION(cJSON_LoadByKey(mouse.json, "scale", JSM_FLOAT, &scale), return false);
 
-        mouse.tex = IMG_LoadTexture(renderer, tex_json);
-        REQ_CONDITION(mouse.tex != NULL, return false);
+        mouse.texture = IMG_LoadTexture(renderer, tex_json);
+        REQ_CONDITION(mouse.texture != NULL, return false);
         tex_json = NULL;
-        SDL_SetTextureScaleMode(mouse.tex, SDL_SCALEMODE_NEAREST);
+        SDL_SetTextureScaleMode(mouse.texture, SDL_SCALEMODE_NEAREST);
         SDL_HideCursor();
 
-        mouse.texDstRect.w = scale * (float)mouse.tex->w;
-        mouse.texDstRect.h = scale * (float)mouse.tex->h;
+        mouse.dstRect.w = scale * (float)mouse.texture->w;
+        mouse.dstRect.h = scale * (float)mouse.texture->h;
     }
     cJSON_Delete(mouse.json);
     mouse.json = NULL;
@@ -81,9 +82,9 @@ void PERPH_ExitMouse() {
         cJSON_Delete(mouse.json);
         mouse.json = NULL;
     }
-    if (mouse.tex != NULL) {
-        SDL_DestroyTexture(mouse.tex);
-        mouse.tex = NULL;
+    if (mouse.texture != NULL) {
+        SDL_DestroyTexture(mouse.texture);
+        mouse.texture = NULL;
     }
 }
 
@@ -135,10 +136,9 @@ bool PERPH_DrawMouse() {
     DEBUG_SendMessageL("    posNow: %s\n", SDL_GetStrFPoint(mouse.state2.posNow));
 
     for (int key = 0; key < PERPH_NUM_MOUSE_KEYS; key++) {
-        if (mouse.trig[key].func != NULL) {
+        if (mouse.trig[key].func != NULL)
             DEBUG_SendMessageL("    trig[%s]: READY.\n", MOUSE_KEY_NAMES[key]);
-        }
-        DEBUG_DrawPoint(mouse.state2.posNow);
+
         if (mouse.state2.pressed[key]) {
             DEBUG_SendMessageL("    pos[%s]: %s\n", MOUSE_KEY_NAMES[key], SDL_GetStrFPoint(mouse.state2.pos[key]));
             DEBUG_DrawPoint(mouse.state2.pos[key]);
@@ -146,8 +146,10 @@ bool PERPH_DrawMouse() {
         }
     }
 
-    mouse.texDstRect.x = mouse.state2.posNow.x;
-    mouse.texDstRect.y = mouse.state2.posNow.y;
-    SDL_RenderTexture(renderer, mouse.tex, NULL, &mouse.texDstRect);
+    DEBUG_DrawPoint(mouse.state2.posNow);
+
+    mouse.dstRect.x = mouse.state2.posNow.x;
+    mouse.dstRect.y = mouse.state2.posNow.y;
+    SDL_RenderTexture(renderer, mouse.texture, NULL, &mouse.dstRect);
     return true;
 }

@@ -22,10 +22,10 @@ bool TEMPO_CreateTypeFile(void* info, const cJSON* info_json) {
 
     return true;
 }
-bool TEMPO_RenewTypeFile(void *info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR) {
+bool TEMPO_RenewTypeFile(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
     const TypeFile* file = info;
     *tex = file->texture;
-    if (mouseL != NULL) {
+    if (SDL_GetPointInTexture(mouse, file->texture)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){file->func, (TrigPara)file->para_string, false});
     }
     return true;

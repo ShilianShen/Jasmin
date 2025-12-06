@@ -12,7 +12,7 @@ typedef struct {
     SDL_FPoint point;
 } TypeSlid;
 bool TEMPO_CreateTypeSlid(void* info, const cJSON* info_json);
-bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR);
+bool TEMPO_RenewTypeSlid(void* info, SDL_Texture** tex, SDL_FPoint mouse);
 void TEMPO_DeleteTypeSlid(void* info);
 
 

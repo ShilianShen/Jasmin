@@ -291,3 +291,13 @@ SDL_FPoint SDL_ClipPointInRect(const SDL_FPoint point, const SDL_FRect rect) {
     if (rect.y + rect.h < point.y) result.y = rect.y + rect.h;
     return result;
 }
+bool SDL_GetPointInTexture(const SDL_FPoint point, const SDL_Texture* texture) {
+    if (texture == NULL) return false;
+    const SDL_FRect rect = {0, 0, (float)texture->w, (float)texture->h};
+    return SDL_GetPointInRect(point, rect);
+}
+SDL_FPoint SDL_ScaleByTexture(SDL_FPoint point, const SDL_Texture* texture) {
+    point.x *= (float)texture->w;
+    point.y *= (float)texture->h;
+    return point;
+}

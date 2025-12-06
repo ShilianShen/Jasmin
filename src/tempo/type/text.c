@@ -30,7 +30,7 @@ bool TEMPO_CreateTypeText(void* info, const cJSON* info_json)   {
 
     return true;
 }
-bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *mouseL, const SDL_FPoint *mouseR) {
+bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, SDL_FPoint mouse) {
     const TypeText* text = info;
     const char* string = text->string;
     if (text->key == true) {
@@ -49,7 +49,7 @@ bool TEMPO_RenewTypeText(void *info, SDL_Texture** tex, const SDL_FPoint *mouseL
     }
     REQ_CONDITION(*tex != NULL, return false);
     SDL_SetTextureScaleMode(*tex, SDL_SCALEMODE_NEAREST);
-    if (mouseL != NULL) {
+    if (&mouse != NULL && SDL_GetPointInTexture(mouse, *tex)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){text->func, (TrigPara)text->para_string, false});
     }
     return true;

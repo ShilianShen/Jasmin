@@ -145,6 +145,8 @@ void DEBUG_DrawLine(const SDL_FPoint point1, const SDL_FPoint point2) {
 
     SDL_SetRenderColor(renderer, debug.colors[DEBUG_COLOR_POINT][DEBUG_ALPHA_LIGHT]);
     SDL_RenderLine(renderer, point1.x, point1.y, point2.x, point2.y);
+    DEBUG_DrawPoint(point1);
+    DEBUG_DrawPoint(point2);
 }
 void DEBUG_DrawRect(const SDL_FRect rect) {
     if (!DEBUG_ON) return;
