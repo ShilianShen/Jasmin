@@ -14,6 +14,7 @@ struct Elem {
     SDL_FRect gid_rect, *gid;
     SDL_FRect src_rect, *src;
     SDL_FRect dst_rect, *bck;
+    SDL_Texture* texture;
 };
 
 
@@ -77,19 +78,19 @@ bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
 
-    const SDL_Texture* texture = TEMPO_RenewTypeTexture(elem->type);
-    OPT_CONDITION(texture != NULL, return true);
+    elem->texture = TEMPO_RenewTypeTexture(elem->type);
+    OPT_CONDITION(elem->texture != NULL, return true);
 
     SDL_LoadDstRectAligned(
         &elem->dst_rect,
-        texture,
+        elem->texture,
         elem->src,
         elem->gid,
         elem->bck != NULL ? elem->bck : elemBckNow,
         elem->anchor
         );
 
-    const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), texture);
+    const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), elem->texture);
     TEMPO_RenewTypeTrig(elem->type, point);
 
     return true;
@@ -104,7 +105,7 @@ bool TEMPO_DrawElem(const void *elem_void) {
     if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect)) DEBUG_FillRect(elem->dst_rect);
 
     const SDL_FRect dst = SDL_RoundFRect(elem->dst_rect);
-    SDL_RenderTexture(renderer, TEMPO_GetTypeTexture(elem->type), elem->src, &dst);
+    SDL_RenderTexture(renderer, elem->texture, elem->src, &dst);
 
     if (PERPH_GetMouseInRect(elem->dst_rect)) {
         DEBUG_DrawRect(elem->dst_rect);

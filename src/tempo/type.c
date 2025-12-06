@@ -15,7 +15,6 @@ struct TEMPO_Type {
         TypeManu manu;
     } info;
     TypeId id;
-    SDL_Texture* texture;
 };
 
 
@@ -35,13 +34,6 @@ KeyVal typeKeyVal[TEMPO_NUM_TYPES] = {
 Table typeFuncTable = {.kv = typeKeyVal, .len = len_of(typeKeyVal)};
 
 
-// GET & SET ===========================================================================================================
-SDL_Texture* TEMPO_GetTypeTexture(const TEMPO_Type* type) {
-    REQ_CONDITION(type != NULL, return NULL);
-    return type->texture;
-}
-
-
 // CREATE & DELETE =====================================================================================================
 TEMPO_Type* TEMPO_CreateType(const cJSON* type_json) {
     REQ_CONDITION(type_json != NULL, return NULL);
@@ -59,7 +51,6 @@ TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
     REQ_CONDITION(typeFunc != NULL, return NULL);
     if (typeFunc->delete != NULL) typeFunc->delete(&type->info);
 
-    SDL_DestroyTexture(type->texture);
     free(type);
     return NULL;
 }
@@ -73,7 +64,7 @@ SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type) {
     REQ_CONDITION(typeFunc != NULL, return false);
 
     REQ_CONDITION(typeFunc->texture != NULL, return false);
-    return type->texture = typeFunc->texture(&type->info);
+    return typeFunc->texture(&type->info);
 }
 bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint mouse) {
     REQ_CONDITION(type != NULL, return false);
