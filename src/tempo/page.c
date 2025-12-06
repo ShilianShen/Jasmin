@@ -93,8 +93,10 @@ bool TEMPO_RenewPage(Page *page) {
     BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
     TEMPO_SetElemBckNow(NULL);
 
-    for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
-        PERPH_SetBoardKeyTrig(i, page->trigArray[i]);
+    if (trigAuthorize) {
+        for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
+            PERPH_SetBoardKeyTrig(i, page->trigArray[i]);
+        }
     }
     return true;
 }

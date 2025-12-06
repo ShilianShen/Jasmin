@@ -6,6 +6,7 @@
 #include "type.h"
 
 
+extern bool trigAuthorize;
 typedef struct Elem Elem;
 bool TEMPO_SetElemBckNow(const SDL_FRect* bck);
 bool TEMPO_SetElemTableNow(const Table *table);

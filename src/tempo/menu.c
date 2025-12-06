@@ -4,6 +4,7 @@
 // MENU ================================================================================================================
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
+bool trigAuthorize = false;
 #define MENU_PATH_VOLUME 6
 struct Menu {
     Table pageTable;
@@ -114,34 +115,23 @@ bool TEMPO_RenewMenu() {
     TEMPO_RenewMenuPath();
     TEMPO_RenewMenuPageNow();
 
-    if (menu.path[0] == NULL) {
-        TEMPO_RenewPage(menu.pageRoot);
+    trigAuthorize = false;
+    for (int i = 0; menu.path[i+1] != NULL; i++) {
+        TEMPO_RenewPage(menu.path[i]);
     }
-    else if (menu.path[MENU_PATH_VOLUME-1] != NULL) {
-        TEMPO_RenewPage(menu.pageEdge);
-    }
-    else {
-        for (int i = 0; menu.path[i] != NULL; i++) {
-            TEMPO_RenewPage(menu.path[i]);
-        }
-    }
+    trigAuthorize = true;
+    TEMPO_RenewPage(menu.pageNow);
+
     return true;
 }
 
 
 // DRAW ================================================================================================================
 bool TEMPO_DrawMenu() {
-    if (menu.path[0] == NULL) {
-        TEMPO_DrawPage(menu.pageRoot);
+    for (int i = 0; menu.path[i+1] != NULL; i++) {
+        TEMPO_DrawPage(menu.path[i]);
     }
-    else if (menu.path[MENU_PATH_VOLUME-1] != NULL) {
-        TEMPO_DrawPage(menu.pageEdge);
-    }
-    else {
-        for (int i = 0; menu.path[i] != NULL; i++) {
-            TEMPO_DrawPage(menu.path[i]);
-        }
-    }
+    TEMPO_DrawPage(menu.pageNow);
     return true;
 }
 
