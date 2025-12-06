@@ -20,7 +20,8 @@ typedef struct TEMPO_Type TEMPO_Type;
 SDL_Texture* TEMPO_GetTypeTexture(const TEMPO_Type* type);
 TEMPO_Type* TEMPO_CreateType(const cJSON* type_json);
 TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type);
-bool TEMPO_RenewTypeTrig(TEMPO_Type* type, SDL_FPoint mouse);
+SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type);
+bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint mouse);
 
 
 #endif //TEMPO_TYPE_H

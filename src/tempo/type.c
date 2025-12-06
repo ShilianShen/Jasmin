@@ -21,7 +21,7 @@ struct TEMPO_Type {
 
 typedef struct {
     bool (*create)(void*, const cJSON*);
-    SDL_Texture* (*renew)(void*);
+    SDL_Texture* (*texture)(void*);
     bool (*trig)(void*, SDL_FPoint);
     void (*delete)(void*);
 } TypeFunc;
@@ -66,12 +66,21 @@ TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
 
 
 // RENEW ===============================================================================================================
-bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint mouse) {
+SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type) {
     REQ_CONDITION(type != NULL, return false);
+
     const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return false);
-    REQ_CONDITION(typeFunc->renew != NULL, return false);
-    type->texture = typeFunc->renew(&type->info);
-    //
-    return true;
+
+    REQ_CONDITION(typeFunc->texture != NULL, return false);
+    return type->texture = typeFunc->texture(&type->info);
+}
+bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FPoint mouse) {
+    REQ_CONDITION(type != NULL, return false);
+
+    const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    REQ_CONDITION(typeFunc != NULL, return false);
+
+    REQ_CONDITION(typeFunc->trig != NULL, return false);
+    return typeFunc->trig(&type->info, mouse);
 }

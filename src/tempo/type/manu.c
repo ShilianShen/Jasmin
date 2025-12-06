@@ -15,8 +15,9 @@ void deleteManu(void* info) {
 }
 SDL_Texture* textureManu(void* info) {
     const TypeManu* manu = info;
-    return NULL;
+    return manu->info->texture(manu->info->info);
 }
 bool trigManu(void* info, const SDL_FPoint mouse) {
-    return true;
+    const TypeManu* manu = info;
+    return manu->info->trig(manu->info->info, mouse);
 }

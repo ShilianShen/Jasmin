@@ -77,12 +77,8 @@ bool TEMPO_RenewElem(void *elem_void) {
     Elem* elem = elem_void;
     REQ_CONDITION(elem != NULL, return false);
 
-    const SDL_Texture* texture = TEMPO_GetTypeTexture(elem->type);
-
-
-    const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), texture);
-
-    REQ_CONDITION(TEMPO_RenewTypeTrig(elem->type, point), return false);
+    const SDL_Texture* texture = TEMPO_RenewTypeTexture(elem->type);
+    OPT_CONDITION(texture != NULL, return true);
 
     SDL_LoadDstRectAligned(
         &elem->dst_rect,
@@ -92,6 +88,10 @@ bool TEMPO_RenewElem(void *elem_void) {
         elem->bck != NULL ? elem->bck : elemBckNow,
         elem->anchor
         );
+
+    const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), texture);
+    TEMPO_RenewTypeTrig(elem->type, point);
+
     return true;
 }
 

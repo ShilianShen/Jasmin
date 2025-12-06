@@ -28,6 +28,8 @@ bool createText(void* info, const cJSON* info_json)   {
         REQ_CONDITION(text->para_string != NULL, return false);
     }
 
+
+
     return true;
 }
 void deleteText(void* info) {
@@ -44,7 +46,7 @@ SDL_Texture* textureText(void *info) {
         string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
         REQ_CONDITION(string != NULL, return false);
     }
-    if (text->font == NULL) {
+    if (text->texture == NULL) {
         text->texture = TXT_LoadTextureWithLines(
             renderer,
             text->font,
