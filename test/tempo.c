@@ -5,6 +5,7 @@ int test_int = 10;
 float test_float = 10.5f;
 bool test_bool = true;
 char test_string[] = "test_string!!!";
+// 阿富汗上岛咖啡好的
 
 
 static KeyVal aaa[] = {
