@@ -15,7 +15,8 @@
         },
         "Title": {
             "elemTable": {
-                "A": {"TEXT": {"font": "title", "string": "STACK CHESS"}},
+                "A": {
+                    "TEXT": {"font": "title", "string": "STACK CHESS"}},
                 "B": {"TEXT": {"font": "body", "string": "CONTINUE", "func": "forward", "para": "Game"}, "bck": "A", "anchor": 36},
                 "C": {"TEXT": {"font": "body", "string": "NEW GAME"}, "bck": "B", "anchor": 36},
                 "D": {"TEXT": {"font": "body", "string": "SETTING"}, "bck": "C", "anchor": 36},
