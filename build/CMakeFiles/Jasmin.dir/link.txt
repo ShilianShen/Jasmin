@@ -1,0 +1,3 @@
+C:\Application\CMakeInstall\bin\cmake.exe -E rm -f CMakeFiles\Jasmin.dir/objects.a
+C:\Application\C++\mingw64\bin\ar.exe qc CMakeFiles\Jasmin.dir/objects.a @CMakeFiles\Jasmin.dir\objects1.rsp
+C:\Application\C++\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\Jasmin.dir/objects.a -Wl,--no-whole-archive -o G:\GameDesign\game\Arshen\Jasmin-main\Jasmin\bin\Jasmin.exe -Wl,--out-implib,G:\GameDesign\game\Arshen\Jasmin-main\Jasmin\bin\libJasmin.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Jasmin.dir\linkLibs.rsp

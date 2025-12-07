@@ -25,9 +25,9 @@ static float unitH = 0;
 static const float dx = 10, dy = 5;
 static const SDL_Color BACK_C = {64, 64, 64, 128};
 
-
-static const int LEN_BUFFER = 100;
+#define LEN_BUFFER 100
 static struct {Intel* intel; SDL_FRect rect[NUM_HEADS];} buffer[LEN_BUFFER];
+
 static int bufferHead = 0;
 
 

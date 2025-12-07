@@ -1,0 +1,3 @@
+G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build/CMakeFiles/Jasmin.dir
+G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build/CMakeFiles/edit_cache.dir
+G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build/CMakeFiles/rebuild_cache.dir

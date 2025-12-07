@@ -1,6 +1,8 @@
 #ifndef JASMIN__BASIC_H
 #define JASMIN__BASIC_H
 
+#include "../third_party/third_party.h"
+#define BASIC_JSON "../config/basic.json"
 
 #define len_of(x) (sizeof(x) / sizeof((x)[0]))
 #define REQ_CONDITION(expr, stmt)                          \
@@ -16,10 +18,6 @@
             stmt;                                          \
         }                                                  \
     } while (0)
-
-
-#include "../third_party/third_party.h"
-#define BASIC_JSON "../config/basic.json"
 
 
 typedef enum {

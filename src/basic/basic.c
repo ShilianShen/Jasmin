@@ -41,7 +41,7 @@ bool BASIC_Init() {
     char* title_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(basic_json, "title", JSM_STRING, &title_json), return false);
 
-    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE | SDL_WINDOW_METAL;
+    const SDL_WindowFlags FLAGS = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
     window = SDL_CreateWindow(title_json, WINDOW_WIDTH, WINDOW_HEIGHT, FLAGS);
     REQ_CONDITION(window != NULL, return false);
 

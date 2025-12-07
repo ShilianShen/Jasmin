@@ -1,0 +1,248 @@
+[
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\test\\main.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\test\\main.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/test/main.c",
+  "output": "CMakeFiles/Jasmin.dir/test/main.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\test\\tempo.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\test\\tempo.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/test/tempo.c",
+  "output": "CMakeFiles/Jasmin.dir/test/tempo.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\atv.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\atv.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/atv.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/atv.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\basic.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\basic.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/basic.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/basic.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\delay.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\delay.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/delay.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/delay.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\env.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\env.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/env.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/env.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\font.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\font.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/font.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/font.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\func.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\func.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/func.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/func.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\func_sdl.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\func_sdl.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/func_sdl.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/func_sdl.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\matrix.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\matrix.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/matrix.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/matrix.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\sort.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\sort.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/sort.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/sort.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\table.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\table.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/table.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/table.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\basic\\trig.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\basic\\trig.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/basic/trig.c",
+  "output": "CMakeFiles/Jasmin.dir/src/basic/trig.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\debug\\debug.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\debug\\debug.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/debug/debug.c",
+  "output": "CMakeFiles/Jasmin.dir/src/debug/debug.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\action.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\action.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/action.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/action.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\entity.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\entity.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/entity.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/entity.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\intel.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\intel.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/intel.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/intel.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\intel_arr.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\intel_arr.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/intel_arr.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/intel_arr.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\intel_net.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\intel_net.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/intel_net.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/intel_net.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\intel\\intel_set.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\intel\\intel_set.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/intel/intel_set.c",
+  "output": "CMakeFiles/Jasmin.dir/src/intel/intel_set.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\lotri\\buffer.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\lotri\\buffer.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/lotri/buffer.c",
+  "output": "CMakeFiles/Jasmin.dir/src/lotri/buffer.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\lotri\\camera.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\lotri\\camera.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/lotri/camera.c",
+  "output": "CMakeFiles/Jasmin.dir/src/lotri/camera.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\lotri\\lotri.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\lotri\\lotri.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/lotri/lotri.c",
+  "output": "CMakeFiles/Jasmin.dir/src/lotri/lotri.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\lotri\\model.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\lotri\\model.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/lotri/model.c",
+  "output": "CMakeFiles/Jasmin.dir/src/lotri/model.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\lotri\\world.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\lotri\\world.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/lotri/world.c",
+  "output": "CMakeFiles/Jasmin.dir/src/lotri/world.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\perph\\board.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\perph\\board.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/perph/board.c",
+  "output": "CMakeFiles/Jasmin.dir/src/perph/board.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\perph\\mouse.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\perph\\mouse.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/perph/mouse.c",
+  "output": "CMakeFiles/Jasmin.dir/src/perph/mouse.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\perph\\perph.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\perph\\perph.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/perph/perph.c",
+  "output": "CMakeFiles/Jasmin.dir/src/perph/perph.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\elem.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\elem.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/elem.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/elem.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\menu.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\menu.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/menu.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/menu.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\page.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\page.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/page.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/page.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\tempo.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\tempo.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/tempo.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/tempo.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type\\bool.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type\\bool.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type/bool.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type/bool.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type\\file.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type\\file.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type/file.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type/file.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type\\manu.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type\\manu.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type/manu.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type/manu.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type\\slid.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type\\slid.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type/slid.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type/slid.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\tempo\\type\\text.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\tempo\\type\\text.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/tempo/type/text.c",
+  "output": "CMakeFiles/Jasmin.dir/src/tempo/type/text.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\third_party\\cJSON-1.7.18\\cJSON.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\third_party\\cJSON-1.7.18\\cJSON.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/third_party/cJSON-1.7.18/cJSON.c",
+  "output": "CMakeFiles/Jasmin.dir/src/third_party/cJSON-1.7.18/cJSON.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\third_party\\fast_obj-1.3\\fast_obj.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\third_party\\fast_obj-1.3\\fast_obj.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/third_party/fast_obj-1.3/fast_obj.c",
+  "output": "CMakeFiles/Jasmin.dir/src/third_party/fast_obj-1.3/fast_obj.c.obj"
+},
+{
+  "directory": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/build",
+  "command": "C:\\Application\\C++\\mingw64\\bin\\gcc.exe  @CMakeFiles/Jasmin.dir/includes_C.rsp -g -std=gnu99 -o CMakeFiles\\Jasmin.dir\\src\\third_party\\miniaudio-0.11.23\\miniaudio.c.obj -c G:\\GameDesign\\game\\Arshen\\Jasmin-main\\Jasmin\\src\\third_party\\miniaudio-0.11.23\\miniaudio.c",
+  "file": "G:/GameDesign/game/Arshen/Jasmin-main/Jasmin/src/third_party/miniaudio-0.11.23/miniaudio.c",
+  "output": "CMakeFiles/Jasmin.dir/src/third_party/miniaudio-0.11.23/miniaudio.c.obj"
+}
+]

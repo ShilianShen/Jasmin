@@ -19,6 +19,11 @@
 #include <SDL3/SDL_opengl.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stddef.h>
+#include <time.h>
+#include <stdint.h>
 
 #endif //THIRD_PARTY_H

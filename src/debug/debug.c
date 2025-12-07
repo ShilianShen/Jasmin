@@ -257,7 +257,8 @@ void DEBUG_SendMessageL(const char* format, ...) {
     if (!DEBUG_ON) return;
 
     // getNewMessage
-    char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
+    char newMessage[MESSAGE_SIZE_MAX] ; // not malloc
+    newMessage[0] = '\0';
     va_list args;
     va_start(args, format);
     vsnprintf(newMessage, MESSAGE_SIZE_MAX, format, args);
@@ -270,7 +271,8 @@ void DEBUG_SendMessageR(const char* format, ...) {
     if (!DEBUG_ON) return;
 
     // getNewMessage
-    char newMessage[MESSAGE_SIZE_MAX] = ""; // not malloc
+    char newMessage[MESSAGE_SIZE_MAX]; // not malloc
+    newMessage[0] = '\0';
     va_list args;
     va_start(args, format);
     vsnprintf(newMessage, MESSAGE_SIZE_MAX, format, args);
