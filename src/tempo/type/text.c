@@ -64,7 +64,9 @@ SDL_Texture* textureText(void *info) {
 bool trigText(void *info, const SDL_FPoint mouse, SDL_FRect dst_rect) {
     TypeText* text = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
-        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){text->func, (TrigPara)text->para_string, false});
+        const Trig trig = text->func != NULL ? (Trig){text->func, (TrigPara)text->para_string, false} : BASIC_TrigPass;
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, trig);
+
     }
     return true;
 }

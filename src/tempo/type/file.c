@@ -30,7 +30,8 @@ SDL_Texture* textureFile(void *info) {
 bool trigFile(void *info, SDL_FPoint mouse, SDL_FRect dst_rect) {
     const TypeFile* file = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
-        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){file->func, (TrigPara)file->para_string, false});
+        const Trig trig = file->func != NULL ? (Trig){file->func, (TrigPara)file->para_string, false} : BASIC_TrigPass;
+        PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, trig);
     }
     return true;
 }
