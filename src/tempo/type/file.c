@@ -27,9 +27,9 @@ SDL_Texture* textureFile(void *info) {
     const TypeFile* file = info;
     return file->texture;
 }
-bool trigFile(void *info, SDL_FPoint mouse) {
+bool trigFile(void *info, SDL_FPoint mouse, SDL_FRect dst_rect) {
     const TypeFile* file = info;
-    if (SDL_GetPointInTexture(mouse, file->texture)) {
+    if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){file->func, (TrigPara)file->para_string, false});
     }
     return true;

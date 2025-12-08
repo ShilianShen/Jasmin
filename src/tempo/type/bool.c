@@ -52,9 +52,9 @@ SDL_Texture* textureBool(void* info) {
     SDL_SetRenderTarget(renderer, NULL);
     return bool_->texture;
 }
-bool trigBool(void* info, const SDL_FPoint mouse) {
+bool trigBool(void* info, const SDL_FPoint mouse, SDL_FRect dst_rect) {
     const TypeBool* bool_ = info;
-    if (SDL_GetPointInTexture(mouse, bool_->texture)) {
+    if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TEMPO_TrigFuncBool, (TrigPara)bool_, false});
     }
     return true;

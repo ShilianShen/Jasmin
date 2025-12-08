@@ -7,7 +7,7 @@
 
 bool createManu(void* info, const cJSON* info_json);
 SDL_Texture* textureManu(void* info);
-bool trigManu(void* info, SDL_FPoint mouse);
+bool trigManu(void* info, SDL_FPoint mouse, SDL_FRect dst_rect);
 void deleteManu(void* info);
 
 

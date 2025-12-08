@@ -93,9 +93,9 @@ SDL_Texture* textureSlid(void* info) {
     SDL_SetRenderTarget(renderer, NULL);
     return slid->texture;
 }
-bool trigSlid(void* info, const SDL_FPoint mouse) {
+bool trigSlid(void* info, const SDL_FPoint mouse, SDL_FRect dst_rect) {
     TypeSlid* slid = info;
-    if (SDL_GetPointInTexture(mouse, slid->texture)) {
+    if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         slid->point = mouse;
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TrigFunc_Slid, (TrigPara)slid, true});
     }

@@ -13,7 +13,7 @@ typedef struct {
 } TypeSlid;
 bool createSlid(void* info, const cJSON* info_json);
 SDL_Texture* textureSlid(void* info);
-bool trigSlid(void* info, SDL_FPoint mouse);
+bool trigSlid(void* info, SDL_FPoint mouse, SDL_FRect dst_rect);
 void deleteSlid(void* info);
 
 

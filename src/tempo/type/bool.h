@@ -8,7 +8,7 @@
 typedef struct {bool readonly; bool* now; SDL_Texture* texture;} TypeBool;
 bool createBool(void* info, const cJSON* info_json);
 SDL_Texture* textureBool(void* info);
-bool trigBool(void* info, SDL_FPoint mouse);
+bool trigBool(void* info, SDL_FPoint mouse, SDL_FRect dst_rect);
 void deleteBool(void *info);
 
 
