@@ -1,3 +1,1 @@
-# TEMPO
-
-## Intro
+# TEMPO's README_CN

@@ -3,3 +3,6 @@
 /config/
 .DS_Store
 .idea/
+/html/
+/latex/
+/doxy/
