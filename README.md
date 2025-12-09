@@ -8,6 +8,16 @@ Jasmin is a 2D&3D rendering library based on C and SDL3, currently for internal 
 
 > ATTENTION: This doc is still under construction!
 
+## GET DOC
+
+[DocByDoxygen](doxy/html/index.html)
+
+### macOS
+
+```bash
+doxygen Doxyfile
+```
+
 ## INSTALL & UPGRADE
 
 ### Windows
@@ -18,10 +28,10 @@ cd vcpkg
 bootstrap-vcpkg.bat
 
 ```
+
 ```powershell
 vcpkg install sdl3:x64-windows
 ```
-
 
 ### macOS
 
