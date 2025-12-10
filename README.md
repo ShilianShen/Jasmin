@@ -12,16 +12,11 @@ Jasmin is a 2D&3D rendering library based on C and SDL3, currently for internal 
 
 [DocByDoxygen](doxy/html/index.html)
 
-
-
 ```bash
 doxygen Doxyfile
 ```
 
 
-
-```bash
-https://github.com/libsdl-org/SDL.git
-https://github.com/libsdl-org/SDL_ttf.git
-https://github.com/libsdl-org/SDL_image.git
-```
+* [Windows环境配置](doc/Windows.md)
+* [macOS环境配置](doc/macOS.md)
+* [Linux环境配置](doc/Linux.md)
