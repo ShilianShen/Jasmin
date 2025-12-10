@@ -3,7 +3,7 @@
 
 
 #include "../perph/perph.h"
-#define TEMPO_JSON "../../config/tempo.json"
+#define TEMPO_JSON "../config/tempo.json"
 
 
 extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;

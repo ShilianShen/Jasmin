@@ -18,7 +18,7 @@ enum DEBUG_ALPHA {
 };
 
 
-const char* DEBUG_JSON = "../../config/debug.json";
+const char* DEBUG_JSON = "../config/debug.json";
 const int MESSAGE_SIZE_MAX = 128;
 const int DETAIL_SIZE_MAX = 64;
 const bool DEBUG_ON = true;
