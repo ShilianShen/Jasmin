@@ -12,7 +12,7 @@ typedef enum PERPH_MouseKey {
 } PERPH_MouseKey;
 
 
-bool PERPH_InitMouse();
+bool PERPH_InitMouse(const cJSON* mouse_json);
 bool PERPH_DrawMouse();
 bool PERPH_RenewMouse();
 void PERPH_ExitMouse();

@@ -2,9 +2,14 @@
 
 
 bool PERPH_Init() {
-    return true
-    && PERPH_InitMouse()
-    ;
+    cJSON* perph_json = getJson(PERPH_JSON);
+    REQ_CONDITION(perph_json != NULL, return false);
+
+    const cJSON* mouse_json = cJSON_GetObjectItem(perph_json, "mouse");
+    REQ_CONDITION(PERPH_InitMouse(mouse_json), return false);
+
+    cJSON_free(perph_json);
+    return true;
 }
 void PERPH_Exit() {
     PERPH_ExitMouse();

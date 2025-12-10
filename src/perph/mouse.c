@@ -15,8 +15,6 @@ static struct {
     Trig trig[PERPH_NUM_MOUSE_KEYS];
     SDL_Texture* texture;
     SDL_FRect dstRect;
-
-    cJSON* json;
 } mouse;
 
 
@@ -54,15 +52,15 @@ bool PERPH_GetMouseKeyPress(const PERPH_MouseKey key) {
 
 
 // INIT & EXIT =========================================================================================================
-bool PERPH_InitMouse() {
+bool PERPH_InitMouse(const cJSON* mouse_json) {
     memset(&mouse, 0, sizeof(mouse));
-    mouse.json = getJson(PERPH_MOUSE_JSON);
-    REQ_CONDITION(mouse.json != NULL, return false);
+
+    REQ_CONDITION(mouse_json != NULL, return false);
 
     char* tex_json = NULL;
-    if (cJSON_LoadByKey(mouse.json, "texture", JSM_STRING, &tex_json)) {
+    if (cJSON_LoadByKey(mouse_json, "texture", JSM_STRING, &tex_json)) {
         float scale = 0;
-        REQ_CONDITION(cJSON_LoadByKey(mouse.json, "scale", JSM_FLOAT, &scale), return false);
+        REQ_CONDITION(cJSON_LoadByKey(mouse_json, "scale", JSM_FLOAT, &scale), return false);
 
         mouse.texture = IMG_LoadTexture(renderer, tex_json);
         REQ_CONDITION(mouse.texture != NULL, return false);
@@ -73,15 +71,9 @@ bool PERPH_InitMouse() {
         mouse.dstRect.w = scale * (float)mouse.texture->w;
         mouse.dstRect.h = scale * (float)mouse.texture->h;
     }
-    cJSON_Delete(mouse.json);
-    mouse.json = NULL;
     return true;
 }
 void PERPH_ExitMouse() {
-    if (mouse.json != NULL) {
-        cJSON_Delete(mouse.json);
-        mouse.json = NULL;
-    }
     if (mouse.texture != NULL) {
         SDL_DestroyTexture(mouse.texture);
         mouse.texture = NULL;

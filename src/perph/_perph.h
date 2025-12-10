@@ -5,6 +5,7 @@
 #include "../debug/debug.h"
 
 
+#define PERPH_JSON "../config/perph.json"
 #define PERPH_MOUSE_JSON "../config/perph_mouse.json"
 
 
