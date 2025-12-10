@@ -2,5 +2,5 @@
 
 要加入的功能:
 
-* 旋转Page
+* 旋转Page, Elem
 * Elem支持APNG
