@@ -61,7 +61,7 @@ SDL_Texture* textureText(void *info) {
     SDL_SetTextureScaleMode(text->texture, SDL_SCALEMODE_NEAREST);
     return text->texture;
 }
-bool trigText(void *info, const SDL_FPoint mouse, SDL_FRect dst_rect) {
+bool trigText(void *info, const SDL_FPoint mouse, const SDL_FRect dst_rect) {
     TypeText* text = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         const Trig trig = text->func != NULL ? (Trig){text->func, (TrigPara)text->para_string, false} : BASIC_TrigPass;
