@@ -91,8 +91,7 @@ bool TEMPO_RenewElem(void *elem_void) {
         );
 
     if (trigAuthorize) {
-        const SDL_FPoint point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), elem->dst_rect), elem->texture);
-        TEMPO_RenewTypeTrig(elem->type, point, elem->dst_rect);
+        TEMPO_RenewTypeTrig(elem->type, elem->dst_rect);
     }
 
     return true;

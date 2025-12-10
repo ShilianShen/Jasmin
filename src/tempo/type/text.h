@@ -16,7 +16,7 @@ typedef struct {
 } TypeText;
 bool createText(void* info, const cJSON* info_json);
 SDL_Texture* textureText(void *info);
-bool trigText(void *info, SDL_FPoint mouse, SDL_FRect dst_rect);
+bool trigText(void *info, SDL_FRect dst_rect);
 void deleteText(void* info);
 
 

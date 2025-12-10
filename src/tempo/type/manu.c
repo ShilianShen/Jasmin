@@ -20,7 +20,7 @@ SDL_Texture* textureManu(void* info) {
     const TEMPO_TypeManu* manu = *(TEMPO_TypeManu**)info;
     return manu->texture != NULL ? manu->texture(manu->info) : NULL;
 }
-bool trigManu(void* info, const SDL_FPoint mouse, const SDL_FRect dst_rect) {
+bool trigManu(void* info, const SDL_FRect dst_rect) {
     const TEMPO_TypeManu* manu = *(TEMPO_TypeManu**)info;
     return manu->trig != NULL ? manu->trig(manu->info, dst_rect) : false;
 }
