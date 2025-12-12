@@ -8,7 +8,7 @@
 
 ## OUTPUT
 
-在window上显示
+* 在window上显示
 
 ## OTHER
 
