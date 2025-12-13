@@ -42,10 +42,16 @@ bool LOTRI_DrawBuffer() {
     int indices[worldBufferHead];
     BASIC_SortIndices(worldBufferHead, depth, indices, false);
 
+    SDL_SetRenderTarget(renderer, LOTRI_texture);
+    SDL_SetRenderColor(renderer, EMPTY);
+    SDL_RenderClear(renderer);
+
     for (int i = 0; i < worldBufferHead; i++) {
         const int I = indices[i];
         const LOTRI_World* world = worldBuffer[I];
         REQ_CONDITION(LOTRI_DrawWorld(world), return false);
     }
+
+    SDL_SetRenderTarget(renderer, NULL);
     return true;
 }

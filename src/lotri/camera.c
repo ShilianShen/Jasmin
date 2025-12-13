@@ -26,7 +26,7 @@ static void LOTRI_RenewCamera_Proj() {
             {0, 0, 1, 0},
             {-1, 0, 0, 0},
             {0, -1, 0, 0},
-            {windowRect.w / 2, windowRect.h / 2, 0, 1},
+            {(float)LOTRI_texture->w / 2, (float)LOTRI_texture->h / 2, 0, 1},
         }
     };
 }

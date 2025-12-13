@@ -16,7 +16,14 @@ Jasmin is a 2D&3D rendering library based on C and SDL3, currently for internal 
 doxygen Doxyfile
 ```
 
-
 * [Windows环境配置](doc/Windows.md)
 * [macOS环境配置](doc/macOS.md)
 * [Linux环境配置](doc/Linux.md)
+
+## TODO
+
+* Tempo: 旋转Page, Elem
+* Tempo: Elem支持APNG
+* Lotri: 优化CreateModel
+* Lotri: World绑定Trig
+* Lotri: Json接口
