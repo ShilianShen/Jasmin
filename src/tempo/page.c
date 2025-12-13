@@ -1,6 +1,9 @@
 #include "page.h"
 
 
+#include "../perph/perph.h"
+
+
 // PAGE PARA ===========================================================================================================
 const SDL_FRect* elemBckNow = NULL;
 

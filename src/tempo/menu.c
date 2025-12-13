@@ -1,6 +1,9 @@
 #include "menu.h"
 
 
+#include "../perph/perph.h"
+
+
 // MENU ================================================================================================================
 const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
