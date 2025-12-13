@@ -2,11 +2,11 @@
 
 
 static const float A = 4, B = 4, C = 6, D = 36;
-static const SDL_Color color = {255, 255, 200, 255};
+static const SDL_Color color = WHITE;
 static void TEMPO_TrigFuncBool(const TrigPara para) {
     const TypeBool* bool_ = (TypeBool*)para;
     bool* now = bool_->now;
-    if (now != NULL) *now = !*now;
+    if (now != NULL && bool_->readonly == false) *now = !*now;
 }
 bool createBool(void* info, const cJSON* info_json) {
     TypeBool* bool_ = info;
@@ -18,6 +18,8 @@ bool createBool(void* info, const cJSON* info_json) {
     REQ_CONDITION(cJSON_LoadByKey(info_json, "now", JSM_STRING, &now_json), return false);
     bool_->now = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, now_json);
     REQ_CONDITION(bool_->now != NULL, return false);
+
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly), return false);
 
     const float W = 2 * A + 2 * B + D;
     const float H = 2 * A + 2 * B + D;

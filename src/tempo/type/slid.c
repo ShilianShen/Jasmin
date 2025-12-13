@@ -2,7 +2,7 @@
 
 
 static const float A = 4, B = 4, C = 6, D = 36;
-static const SDL_Color color = {255, 255, 200, 255};
+static const SDL_Color color = WHITE;
 static void TrigFunc_Slid(const TrigPara para) {
     const TypeSlid* slid = (TypeSlid*)para;
     if (slid->readonly) return;
@@ -75,6 +75,12 @@ SDL_Texture* textureSlid(void* info) {
     SDL_RenderFillRects(renderer, frame, len_of(frame));
     REQ_CONDITION(slid->now != NULL, return false);
     if (slid->discrete) {
+        if ((int)slid->min > *(int*)slid->now || *(int*)slid->now > (int)slid->max) {
+            SDL_RenderLine(renderer, 0, 0, W, H);
+            SDL_RenderLine(renderer, 0, H, W, 0);
+            SDL_SetRenderTarget(renderer, NULL);
+            return slid->texture;
+        }
         const int N = *(int*)slid->now - (int)slid->min;
         SDL_FRect rects[N];
         for (int i = 0; i < N; i++) {
@@ -86,6 +92,12 @@ SDL_Texture* textureSlid(void* info) {
         SDL_RenderFillRects(renderer, rects, N);
     }
     else {
+        if (slid->min > *slid->now || *slid->now > slid->max) {
+            SDL_RenderLine(renderer, 0, 0, W, H);
+            SDL_RenderLine(renderer, 0, H, W, 0);
+            SDL_SetRenderTarget(renderer, NULL);
+            return slid->texture;
+        }
         const float N = *slid->now - slid->min;
         const SDL_FRect rect = {A + B, A + B, (W - 2 * A - 2 * B) * N / M, H - 2 * A - 2 * B};
         SDL_RenderFillRect(renderer, &rect);

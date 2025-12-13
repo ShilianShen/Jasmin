@@ -6,34 +6,34 @@
 #include "../perph/perph.h"
 
 
-/*
+/**
  * A Json interface.
  */
 #define TEMPO_JSON "../config/tempo.json"
 
 
-/*
+/**
  * A To-Implement interface.
  * Will be used in 'tempo.json' to map 'func' to a TrigFunc.
  */
 extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
 
 
-/*
+/**
  * A To-Implement interface.
  * Will be used in 'tempo.json' to map 'para'/'key' to a void*.
  */
 extern const Table TEMPO_PTR_TABLE;
 
 
-/*
+/**
  * To-Implement interface type.
  * Add it to TEMPO_PTR_TABLE, so it can be found by 'tempo.json'.
  */
 typedef struct {
-    void* info; /* It should point at the manually implemented structure. */
-    SDL_Texture* (*texture)(void*); /* A function to renew & return the texture, which will be drawn. */
-    bool (*trig)(void*, SDL_FRect); /* A function to set Trig, be called when needed, the dst_rect will be given. */
+    void* info; /** It should point at the manually implemented structure. */
+    SDL_Texture* (*texture)(void*); /** A function to renew & return the texture, which will be drawn. */
+    bool (*trig)(void*, SDL_FRect); /** A function to set Trig, be called when needed, the dst_rect will be given. */
 } TEMPO_TypeManu;
 
 
