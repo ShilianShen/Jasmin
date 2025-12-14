@@ -36,7 +36,7 @@ bool createSlid(void* info, const cJSON* info_json) {
     const char* now_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(info_json, "min", JSM_FLOAT, &slid->min), return false);
     REQ_CONDITION(cJSON_LoadByKey(info_json, "max", JSM_FLOAT, &slid->max), return false);
-    REQ_CONDITION(cJSON_LoadByKey(info_json, "now", JSM_STRING, &now_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "key", JSM_STRING, &now_json), return false);
 
     if (slid->discrete) {
         slid->min = roundf(slid->min);

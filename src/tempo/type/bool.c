@@ -15,7 +15,7 @@ bool createBool(void* info, const cJSON* info_json) {
     cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
 
     const char* now_json = NULL;
-    REQ_CONDITION(cJSON_LoadByKey(info_json, "now", JSM_STRING, &now_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "key", JSM_STRING, &now_json), return false);
     bool_->now = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, now_json);
     REQ_CONDITION(bool_->now != NULL, return false);
 

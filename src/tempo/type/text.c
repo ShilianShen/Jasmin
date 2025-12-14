@@ -9,7 +9,7 @@ bool createText(void* info, const cJSON* info_json)   {
     char* string_json = NULL;
     char* font_json = NULL;
     bool key_json = false;
-    REQ_CONDITION(cJSON_LoadByKey(info_json, "string", JSM_STRING, &string_json), return false);
+    REQ_CONDITION(cJSON_LoadByKey(info_json, "text", JSM_STRING, &string_json), return false);
     REQ_CONDITION(cJSON_LoadByKey(info_json, "font", JSM_STRING, &font_json), return false);
     cJSON_LoadByKey(info_json, "key", JSM_BOOL, &key_json);
 
