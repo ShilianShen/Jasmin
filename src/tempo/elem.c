@@ -110,7 +110,6 @@ bool TEMPO_DrawElem(const void *elem_void) {
 
     if (PERPH_GetMouseInRect(elem->dst_rect)) {
         DEBUG_DrawRect(elem->dst_rect);
-        DEBUG_DrawLine((SDL_FPoint){elem->dst_rect.x, elem->dst_rect.y}, PERPH_GetMousePos());
     }
 
     return true;
