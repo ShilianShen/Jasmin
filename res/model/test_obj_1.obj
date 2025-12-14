@@ -1,5 +1,3 @@
-mtllib test_mtl_1.mtl
-usemtl material
 v -0.5 -0.5 -0.5
 v 0.5 -0.5 -0.5
 v 0.5 0.5 -0.5

@@ -66,9 +66,7 @@ static bool LOTRI_CreateModel_RK(LOTRI_Model* model, const fastObjMesh* mesh, co
         };
     }
 
-    MTLMaterial materials[1];
-    const int num_materials = parse_mtl_file(file_mtl, materials, 1);
-    model->texture = IMG_LoadTexture(renderer, materials[0].map_Kd);
+    model->texture = IMG_LoadTexture(renderer, file_mtl);
     REQ_CONDITION(model->texture != NULL, return false);
     SDL_SetTextureScaleMode(model->texture, SDL_SCALEMODE_NEAREST);
 

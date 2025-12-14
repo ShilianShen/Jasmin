@@ -24,6 +24,4 @@ doxygen Doxyfile
 
 * Tempo: 旋转Page, Elem
 * Tempo: Elem支持APNG
-* Lotri: 优化CreateModel
 * Lotri: World绑定Trig
-* Lotri: Json接口
