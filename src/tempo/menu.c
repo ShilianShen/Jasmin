@@ -13,7 +13,6 @@ struct Menu {
     Table pageTable;
     Page* pageRoot;
     Page* pageEdge;
-
     Page* path[MENU_PATH_VOLUME];
     Page* pageNow;
 };
