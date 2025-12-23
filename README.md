@@ -1,6 +1,6 @@
 # Jasmin by OolongImPress
 
-![Logo](doc/icon/icon_64.png)
+![Logo](doc/icon_64.png)
 
 ## INTRO
 
