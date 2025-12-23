@@ -27,7 +27,7 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     const cJSON* table_json = cJSON_GetObjectItem(page_json, "elemTable");
     REQ_CONDITION(table_json != NULL, return false);
     TEMPO_SetElemTableNow(&page->elemTable);
-    REQ_CONDITION(BASIC_CreateTable(&page->elemTable, table_json, TEMPO_CreateElem), return false);
+    REQ_CONDITION(BASIC_CreateTable(&page->elemTable, TEMPO_CreateElem, table_json), return false);
 
     cJSON_LoadByKey(page_json, "anchor", JSM_INT, &page->anchor);
     cJSON_LoadByKey(page_json, "color", JSM_COLOR, &page->color);
@@ -56,15 +56,14 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     }
     return true;
 }
-void *TEMPO_CreatePage(const cJSON *page_json) {
+Page *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
     Page* page = calloc(1, sizeof(Page));
     REQ_CONDITION(page != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), page = TEMPO_DeletePage(page));
     return page;
 }
-void *TEMPO_DeletePage(void *page_void) {
-    Page* page = page_void;
+Page *TEMPO_DeletePage(Page *page) {
     if (page != NULL) {
         if (page->elemTable.kv != NULL) {
             BASIC_DeleteTable(&page->elemTable, TEMPO_DeleteElem);

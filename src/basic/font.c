@@ -10,7 +10,7 @@ TTF_Font* BASIC_GetFont(const char* key) {
     REQ_CONDITION(key != NULL, return false);
     return BASIC_GetTableValByKey(BASIC_FontSet, key);
 }
-static void* BASIC_CreateFont(const cJSON* font_json) {
+static TTF_Font* BASIC_CreateFont(const cJSON* font_json) {
     REQ_CONDITION(font_json != NULL, return NULL);
     char* path; REQ_CONDITION(cJSON_LoadByKey(font_json, "path", JSM_STRING, &path), return false);
     float size; REQ_CONDITION(cJSON_LoadByKey(font_json, "size", JSM_FLOAT, &size), return false);
@@ -18,9 +18,8 @@ static void* BASIC_CreateFont(const cJSON* font_json) {
     REQ_CONDITION(font != NULL, return NULL);
     return font;
 }
-static void* BASIC_DeleteFont(void* font_void) {
-    OPT_CONDITION(font_void != NULL, return font_void);
-    TTF_Font* font = font_void;
+static TTF_Font* BASIC_DeleteFont(TTF_Font* font) {
+    OPT_CONDITION(font != NULL, return font);
     TTF_CloseFont(font);
     return NULL;
 }
@@ -29,7 +28,7 @@ static void* BASIC_DeleteFont(void* font_void) {
 bool BASIC_InitFont() {
     const cJSON* fontSet_json = cJSON_GetObjectItem(basic_json, "fontSet");
     REQ_CONDITION(fontSet_json != NULL, return false);
-    BASIC_CreateTable(&BASIC_FontSet, fontSet_json, BASIC_CreateFont);
+    BASIC_CreateTable(&BASIC_FontSet, BASIC_CreateFont, fontSet_json);
     return true;
 }
 void BASIC_ExitFont() {

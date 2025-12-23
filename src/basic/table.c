@@ -70,7 +70,7 @@ bool BASIC_GetTableIdxByVal(const Table table, const void* val, int* idx) {
 
 
 // CREATE & DELETE =====================================================================================================
-bool BASIC_CreateTable(Table* table, const cJSON* table_json, const CreateFunc func) {
+bool BASIC_CreateTable(Table* table, void* func, const cJSON* table_json) {
     REQ_CONDITION(table_json != NULL, return false);
 
     table->len = cJSON_GetArraySize(table_json);
@@ -86,42 +86,14 @@ bool BASIC_CreateTable(Table* table, const cJSON* table_json, const CreateFunc f
         table->kv[i].key = strdup(kv_json->string);
         REQ_CONDITION(table->kv[i].key != NULL, return false);
 
-        table->kv[i].val = func(kv_json);
+        void*(*CreateFunc)(const cJSON*) = func;
+        table->kv[i].val = CreateFunc(kv_json);
         REQ_CONDITION(table->kv[i].val != NULL, return false);
     }
     return true;
 }
-bool BASIC_RenewTable(const Table* table, const RenewFunc func) {
-    if (table == NULL || func == NULL) {
-        printf("%s: table == NULL || func == NULL.\n", __func__);
-        return false;
-    }
-
-    for (int i = 0; i < table->len; i++) {
-        if (func(table->kv[i].val) == false) {
-            printf("%s: func(table->kv[i].val) == false.\n", __func__);
-            return false;
-        }
-    }
-
-    return true;
-}
-bool BASIC_DrawTable(const Table* table, const DrawFunc func) {
-    if (table == NULL || func == NULL) {
-        printf("%s: table == NULL || func == NULL.\n", __func__);
-        return false;
-    }
-
-    for (int i = 0; i < table->len; i++) {
-        if (func(table->kv[i].val) == false) {
-            printf("%s: func(table->kv[i].val) == false.\n", __func__);
-            return false;
-        }
-    }
-
-    return true;
-}
-void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
+void BASIC_DeleteTable(Table* table, void* func) {
+    void*(*deleteFunc)(void*) = func;
     if (table->kv != NULL) {
         for (int i = 0; i < table->len; i++) {
             if (table->kv[i].key != NULL) {
@@ -130,7 +102,7 @@ void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
             }
 
             if (table->kv[i].val != NULL) {
-                table->kv[i].val = func(table->kv[i].val);
+                table->kv[i].val = deleteFunc(table->kv[i].val);
             }
         }
         free(table->kv);
@@ -138,6 +110,26 @@ void BASIC_DeleteTable(Table* table, const DeleteFunc func) {
     }
 
     table->len = 0;
+}
+bool BASIC_RenewTable(const Table* table, void *func) {
+    REQ_CONDITION(table != NULL && func != NULL, return false);
+
+    bool (*renewFunc)(void*) = func;
+    for (int i = 0; i < table->len; i++) {
+        REQ_CONDITION(renewFunc(table->kv[i].val), return false);
+    }
+
+    return true;
+}
+bool BASIC_DrawTable(const Table* table, void *func) {
+    REQ_CONDITION(table != NULL && func != NULL, return false);
+
+    bool (*drawFunc)(const void*) = func;
+    for (int i = 0; i < table->len; i++) {
+        REQ_CONDITION(drawFunc(table->kv[i].val), return false);
+    }
+
+    return true;
 }
 void BASIC_PrintTable(const Table* table) {
     for (int i = 0; i < table->len; i++) {

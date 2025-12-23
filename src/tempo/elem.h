@@ -12,10 +12,10 @@ bool TEMPO_SetElemBckNow(const SDL_FRect* bck);
 bool TEMPO_SetElemTableNow(const Table *table);
 
 
-void *TEMPO_CreateElem(const cJSON *elem_json);
-void *TEMPO_DeleteElem(void *elem_void);
-bool TEMPO_RenewElem(void* elem_void);
-bool TEMPO_DrawElem(const void* elem_void);
+Elem *TEMPO_CreateElem(const cJSON *elem_json);
+Elem *TEMPO_DeleteElem(Elem *elem);
+bool TEMPO_RenewElem(Elem *elem);
+bool TEMPO_DrawElem(const Elem *elem);
 
 
 #endif //JASMIN_MENU_STRUCT_ELEM_H

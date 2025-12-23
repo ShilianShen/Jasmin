@@ -46,7 +46,7 @@ static bool TEMPO_InitMenu_RK(const cJSON* menu_json) {
     if (cJSON_ExistKey(menu_json, key = "pageTable")) {
         const cJSON* pageTable_json = cJSON_GetObjectItem(menu_json, key);
         REQ_CONDITION(pageTable_json != NULL, return false);
-        REQ_CONDITION(BASIC_CreateTable(&menu.pageTable, pageTable_json, TEMPO_CreatePage), return false);
+        REQ_CONDITION(BASIC_CreateTable(&menu.pageTable, TEMPO_CreatePage, pageTable_json), return false);
         menu.pageRoot = BASIC_GetTableValByKey(menu.pageTable, MENU_ROOT_NAME);
         menu.pageEdge = BASIC_GetTableValByKey(menu.pageTable, MENU_EDGE_NAME);
     }

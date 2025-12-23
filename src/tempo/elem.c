@@ -51,15 +51,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 
     return true;
 }
-void *TEMPO_CreateElem(const cJSON *elem_json) {
+Elem *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
     Elem* elem = calloc(1, sizeof(Elem));
     REQ_CONDITION(elem != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
     return elem;
 }
-void *TEMPO_DeleteElem(void *elem_void) {
-    Elem* elem = elem_void;
+Elem *TEMPO_DeleteElem(Elem *elem) {
     if (elem == NULL) return elem;
 
     if (elem->type != NULL) {
@@ -74,8 +73,7 @@ void *TEMPO_DeleteElem(void *elem_void) {
 
 
 // RENEW ===============================================================================================================
-bool TEMPO_RenewElem(void *elem_void) {
-    Elem* elem = elem_void;
+bool TEMPO_RenewElem(Elem *elem) {
     REQ_CONDITION(elem != NULL, return false);
 
     elem->texture = TEMPO_RenewTypeTexture(elem->type);
@@ -99,8 +97,7 @@ bool TEMPO_RenewElem(void *elem_void) {
 
 
 // DRAW ================================================================================================================
-bool TEMPO_DrawElem(const void *elem_void) {
-    const Elem *elem = elem_void;
+bool TEMPO_DrawElem(const Elem* elem) {
     REQ_CONDITION(elem != NULL, return false);
 
     if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect)) DEBUG_FillRect(elem->dst_rect);
