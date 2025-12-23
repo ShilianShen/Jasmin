@@ -72,7 +72,7 @@ bool BASIC_GetTableIdxByVal(const Table table, const void* val, int* idx) {
 // CREATE & DELETE =====================================================================================================
 bool BASIC_CreateTable(Table* table, void* func, const cJSON* table_json) {
     REQ_CONDITION(table_json != NULL, return false);
-
+    REQ_CONDITION(cJSON_IsArray(table_json) || cJSON_IsObject(table_json), return false);
     table->len = cJSON_GetArraySize(table_json);
     REQ_CONDITION(table->len > 0, return false);
 
