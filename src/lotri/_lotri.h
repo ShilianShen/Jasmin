@@ -5,7 +5,7 @@
 #include "../perph/perph.h"
 
 
-SDL_Texture* LOTRI_texture;
+extern SDL_Texture* LOTRI_texture;
 
 
 typedef struct {Vec3f xyz; Vec4f rgba; Vec2f uv;} LOTRI_Vertex;
