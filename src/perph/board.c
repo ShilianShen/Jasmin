@@ -47,7 +47,7 @@ static bool PERPH_RenewKeyboard_TrigArray() {
             }
         }
         else {
-            if (board.state1.pressed[i] == false && board.state2.pressed[i] == true) {
+            if (board.state1.pressed[i] == true && board.state2.pressed[i] == false) {
                 BASIC_PullTrig(trig);
             }
         }
