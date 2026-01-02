@@ -31,9 +31,9 @@ extern const Table TEMPO_PTR_TABLE;
  * Add it to TEMPO_PTR_TABLE, so it can be found by 'tempo.json'.
  */
 typedef struct {
-    void* info; /** It should point at the manually implemented structure. */
-    SDL_Texture* (*texture)(void*); /** A function to renew & return the texture, which will be drawn. */
-    bool (*trig)(void*, SDL_FRect); /** A function to set Trig, be called when needed, the dst_rect will be given. */
+    TrigPara info; /** It should point at the manually implemented structure. */
+    SDL_Texture* (*texture)(TrigPara); /** A function to renew & return the texture, which will be drawn. */
+    bool (*trig)(TrigPara, SDL_FRect); /** A function to set Trig, be called when needed, the dst_rect will be given. */
 } TEMPO_TypeManu;
 
 
