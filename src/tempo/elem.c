@@ -55,7 +55,10 @@ Elem *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
     Elem* elem = calloc(1, sizeof(Elem));
     REQ_CONDITION(elem != NULL, return NULL);
-    REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
+    REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), {
+        elem = TEMPO_DeleteElem(elem);
+        printf("%s\n", elem_json->string);
+    });
     return elem;
 }
 Elem *TEMPO_DeleteElem(Elem *elem) {

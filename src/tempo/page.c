@@ -60,7 +60,10 @@ Page *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
     Page* page = calloc(1, sizeof(Page));
     REQ_CONDITION(page != NULL, return NULL);
-    REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), page = TEMPO_DeletePage(page));
+    REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), {
+        page = TEMPO_DeletePage(page);
+        printf("%s\n", page_json->string);
+    });
     return page;
 }
 Page *TEMPO_DeletePage(Page *page) {
