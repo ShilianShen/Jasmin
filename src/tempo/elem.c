@@ -103,6 +103,8 @@ bool TEMPO_RenewElem(Elem *elem) {
 bool TEMPO_DrawElem(const Elem* elem) {
     REQ_CONDITION(elem != NULL, return false);
 
+    DEBUG_DrawRect(elem->dst_rect);
+
     if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, elem->dst_rect)) DEBUG_FillRect(elem->dst_rect);
 
     const SDL_FRect dst = SDL_RoundFRect(elem->dst_rect);
