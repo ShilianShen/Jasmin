@@ -2,6 +2,19 @@
 
 
 
+bool SDL_NegateSurface(SDL_Surface* surface) {
+    for (int x = 0; x < surface->w; x++) {
+        for (int y = 0; y < surface->h; y++) {
+            SDL_Color color;
+            REQ_CONDITION(SDL_GetSurfaceColor(surface, x, y, &color), return false);
+            color.r = 255 - color.r;
+            color.g = 255 - color.g;
+            color.b = 255 - color.b;
+            REQ_CONDITION(SDL_SetSurfaceColor(surface, x, y, color), return false);
+        }
+    }
+    return true;
+}
 SDL_FRect SDL_RoundFRect(const SDL_FRect rect) {
     const SDL_FRect result = {
         roundf(rect.x),
