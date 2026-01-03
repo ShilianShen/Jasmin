@@ -46,6 +46,11 @@ SDL_Texture* textureText(void *info) {
         string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
         REQ_CONDITION(string != NULL, return false);
     }
+    DEBUG_SendMessageR("%s\n", string);
+    if (text->texture != NULL) {
+        SDL_DestroyTexture(text->texture);
+        text->texture = NULL;
+    }
     if (text->texture == NULL) {
         text->texture = TXT_LoadTextureWithLines(
             renderer,
