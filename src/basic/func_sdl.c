@@ -2,6 +2,20 @@
 
 
 
+
+SDL_Surface* SDL_TransposeSurface(SDL_Surface* surface) {
+    if (surface == NULL) return NULL;
+    SDL_Surface* transpose = SDL_CreateSurface(surface->h, surface->w, surface->format);
+    REQ_CONDITION(transpose != NULL, return NULL);
+    for (int i = 0; i < surface->w; i++) {
+        for (int j = 0; j < surface->h; j++) {
+            SDL_Color color;
+            REQ_CONDITION(SDL_GetSurfaceColor(surface, i, j, &color), return NULL);
+            REQ_CONDITION(SDL_SetSurfaceColor(transpose, j, i, color), return NULL);
+        }
+    }
+    return transpose;
+}
 bool SDL_NegateSurface(SDL_Surface* surface) {
     for (int x = 0; x < surface->w; x++) {
         for (int y = 0; y < surface->h; y++) {

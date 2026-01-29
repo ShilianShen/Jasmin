@@ -18,6 +18,7 @@ void free2DArray(void** array, size_t w);
 // SDL =================================================================================================================
 bool SDL_GetPointInRect(SDL_FPoint point, SDL_FRect rect);
 bool SDL_NegateSurface(SDL_Surface* surface);
+SDL_Surface* SDL_TransposeSurface(SDL_Surface* surface);
 SDL_FRect SDL_RoundFRect(SDL_FRect rect);
 char*SDL_GetStrColor(SDL_Color color);
 char*SDL_GetStrFRect(SDL_FRect rect);
