@@ -39,7 +39,9 @@ TEMPO_Type* TEMPO_CreateType(const cJSON* type_json) {
     REQ_CONDITION(type_json != NULL, return NULL);
     TEMPO_Type* type = calloc(1, sizeof(TEMPO_Type));
     REQ_CONDITION(type != NULL, return NULL);
-    REQ_CONDITION(BASIC_GetTableIdxByKey(typeFuncTable, type_json->string, (int*)&type->id), return NULL);
+    char* type_name = NULL;
+    REQ_CONDITION(cJSON_LoadByKey(type_json, "type", JSM_STRING, &type_name), return NULL);
+    REQ_CONDITION(BASIC_GetTableIdxByKey(typeFuncTable, type_name, (int*)&type->id), return NULL);
     const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return NULL);
     REQ_CONDITION(typeFunc->create(&type->info, type_json), return NULL);

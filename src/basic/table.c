@@ -83,8 +83,10 @@ bool BASIC_CreateTable(Table* table, void* func, const cJSON* table_json) {
         const cJSON* kv_json = cJSON_GetArrayItem(table_json, i);
         REQ_CONDITION(kv_json != NULL, return false);
 
-        table->kv[i].key = strdup(kv_json->string);
-        REQ_CONDITION(table->kv[i].key != NULL, return false);
+        if (kv_json->string != NULL) {
+            table->kv[i].key = strdup(kv_json->string);
+            REQ_CONDITION(table->kv[i].key != NULL, return false);
+        }
 
         void*(*CreateFunc)(const cJSON*) = func;
         table->kv[i].val = CreateFunc(kv_json);

@@ -94,8 +94,10 @@ bool TEMPO_RenewPage(Page *page) {
     REQ_CONDITION(TEMPO_RenewPage_DstRect(page), return false);
 
     TEMPO_SetElemBckNow(&page->dst_rect);
+    TEMPO_SetElemTableNow(&page->elemTable);
     PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){0});
     BASIC_RenewTable(&page->elemTable, TEMPO_RenewElem);
+    TEMPO_SetElemTableNow(NULL);
     TEMPO_SetElemBckNow(NULL);
 
     if (trigAuthorize) {

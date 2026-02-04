@@ -9,6 +9,7 @@ static const Table* elemTableNow = NULL;
 
 // ELEM ================================================================================================================
 struct Elem {
+    char* name;
     TEMPO_Type* type;
     int anchor;
     SDL_FRect gid_rect, *gid;
@@ -31,7 +32,7 @@ bool TEMPO_SetElemTableNow(const Table* table) {
 
 // CREATE & DELETE =====================================================================================================
 static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
-    const cJSON* type_json = cJSON_GetArrayItem(elem_json, 0);
+    const cJSON* type_json = cJSON_GetObjectItem(elem_json, "type");
     REQ_CONDITION(type_json != NULL, return false);
 
     elem->type = TEMPO_CreateType(type_json);
@@ -39,14 +40,23 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
 
     cJSON_LoadByKey(elem_json, "anchor", JSM_INT, &elem->anchor);
 
+    const char* name_json = NULL;
+    if (cJSON_LoadByKey(elem_json, "name", JSM_STRING, &name_json)) {
+        elem->name = strdup(name_json);
+        REQ_CONDITION(elem->name != NULL, return false);
+    }
+
     const char* bck_json = NULL;
     if (cJSON_LoadByKey(elem_json, "gid", JSM_FRECT, &elem->gid_rect)) elem->gid = &elem->gid_rect;
     if (cJSON_LoadByKey(elem_json, "src", JSM_FRECT, &elem->src_rect)) elem->src = &elem->src_rect;
     if (cJSON_LoadByKey(elem_json, "bck", JSM_STRING, &bck_json)) {
         REQ_CONDITION(elemTableNow != NULL, return false);
-        Elem* another = BASIC_GetTableValByKey(*elemTableNow, bck_json);
-        REQ_CONDITION(another != NULL, return false);
-        elem->bck = &another->dst_rect;
+        for (int i = 0; i < elemTableNow->len; i++) {
+            Elem* another = elemTableNow->kv[i].val;
+            if (another == NULL || another->name == NULL) continue;
+            if (strcmp(another->name, bck_json) != 0) continue;
+            elem->bck = &another->dst_rect;
+        }
     }
 
     return true;
@@ -55,10 +65,7 @@ Elem *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
     Elem* elem = calloc(1, sizeof(Elem));
     REQ_CONDITION(elem != NULL, return NULL);
-    REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), {
-        elem = TEMPO_DeleteElem(elem);
-        printf("%s\n", elem_json->string);
-    });
+    REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
     return elem;
 }
 Elem *TEMPO_DeleteElem(Elem *elem) {

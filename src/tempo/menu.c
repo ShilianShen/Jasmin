@@ -72,6 +72,9 @@ bool TEMPO_InitMenu() {
         TEMPO_ExitMenu();
         return false;
     }
+    for (int i = 0; i < menu.pageTable.len; i++) {
+        printf("%s\n", menu.pageTable.kv[i].key);
+    }
     return true;
 }
 void TEMPO_ExitMenu() {
@@ -141,23 +144,21 @@ bool TEMPO_DrawMenu() {
 // TRIG ================================================================================================================
 static void TEMPO_TrigFuncPass(const char* para) {}
 static void TEMPO_TrigFuncForward(const char* para) {
-    if (para == NULL) {
-        printf("%s: para == NULL.\n", __func__);
-        return;
-    }
+    REQ_CONDITION(para != NULL, return);
     const char* pageName = para;
-    // getPageId
-    int pageId = 0;
+
+    // getPage
+    Page* page = NULL;
     for (int i = 0; i < menu.pageTable.len; i++) {
         if (menu.pageTable.kv[i].val == NULL) {continue;}
-        if (strcmp(menu.pageTable.kv[i].key, pageName) == 0) {pageId = i;}
+        if (strcmp(menu.pageTable.kv[i].key, pageName) == 0) {page = menu.pageTable.kv[i].val;}
     }
-    if (pageId == 0) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
+    if (page == NULL) {printf("%s: \"%s\" not exists.\n", __func__, (char*)pageName); return;}
 
     // forward
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {
         if (menu.path[i] == 0) {
-            menu.path[i] = menu.pageTable.kv[pageId].val;
+            menu.path[i] = page;
             break;
         }
     }
