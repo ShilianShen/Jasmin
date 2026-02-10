@@ -4,7 +4,7 @@
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_Color color = WHITE;
 static void TrigFunc_Slid(const TrigPara para) {
-    const TypeSlid* slid = (TypeSlid*)para;
+    const TEMPO_TypeSlid* slid = (TEMPO_TypeSlid*)para;
     if (slid->readonly) return;
 
     const float min = A + B;
@@ -28,7 +28,7 @@ static void TrigFunc_Slid(const TrigPara para) {
     }
 }
 bool createSlid(void* info, const cJSON* info_json) {
-    TypeSlid* slid = info;
+    TEMPO_TypeSlid* slid = info;
     REQ_CONDITION(cJSON_IsObject(info_json), return false);
     REQ_CONDITION(cJSON_LoadByKey(info_json, "discrete", JSM_BOOL, &slid->discrete), return false);
     REQ_CONDITION(cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &slid->readonly), return false);
@@ -54,11 +54,11 @@ bool createSlid(void* info, const cJSON* info_json) {
     return true;
 }
 void deleteSlid(void* info) {
-    const TypeSlid* slid = (TypeSlid*)info;
+    const TEMPO_TypeSlid* slid = (TEMPO_TypeSlid*)info;
     SDL_DestroyTexture(slid->texture);
 }
 SDL_Texture* textureSlid(void* info) {
-    TypeSlid* slid = info;
+    TEMPO_TypeSlid* slid = info;
     const float M = slid->max - slid->min;
     const float W = (float)slid->texture->w;
     const float H = (float)slid->texture->h;
@@ -106,7 +106,7 @@ SDL_Texture* textureSlid(void* info) {
     return slid->texture;
 }
 bool trigSlid(void* info, const SDL_FRect dst_rect) {
-    TypeSlid* slid = info;
+    TEMPO_TypeSlid* slid = info;
     if (PERPH_GetMouseKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         slid->point = SDL_ScaleByTexture(SDL_StdPointByRect(PERPH_GetMousePos(), dst_rect), slid->texture);
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TrigFunc_Slid, (TrigPara)slid, true});

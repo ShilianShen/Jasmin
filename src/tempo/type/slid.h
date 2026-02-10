@@ -10,7 +10,7 @@ typedef struct {
     float min, max, *now;
     SDL_Texture* texture;
     SDL_FPoint point;
-} TypeSlid;
+} TEMPO_TypeSlid;
 bool createSlid(void* info, const cJSON* info_json);
 SDL_Texture* textureSlid(void* info);
 bool trigSlid(void* info, SDL_FRect dst_rect);

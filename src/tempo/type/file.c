@@ -3,7 +3,7 @@
 
 
 bool createFile(void* info, const cJSON* info_json) {
-    TypeFile* file = info;
+    TEMPO_TypeFile* file = info;
 
     char* path_json = NULL;
     REQ_CONDITION(cJSON_LoadByKey(info_json, "path", JSM_STRING, &path_json), return false);
@@ -24,11 +24,11 @@ bool createFile(void* info, const cJSON* info_json) {
     return true;
 }
 SDL_Texture* textureFile(void *info) {
-    const TypeFile* file = info;
+    const TEMPO_TypeFile* file = info;
     return file->texture;
 }
 bool trigFile(void *info, const SDL_FRect dst_rect) {
-    const TypeFile* file = info;
+    const TEMPO_TypeFile* file = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         const Trig trig = file->func != NULL ? (Trig){file->func, (TrigPara)file->para_string, false} : BASIC_TrigPass;
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, trig);
@@ -36,6 +36,6 @@ bool trigFile(void *info, const SDL_FRect dst_rect) {
     return true;
 }
 void deleteFile(void* info) {
-    TypeFile* file = info;
+    TEMPO_TypeFile* file = info;
     SDL_DestroyTexture(file->texture);
 }

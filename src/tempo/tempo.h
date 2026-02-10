@@ -25,6 +25,9 @@ extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
  */
 extern const Table TEMPO_PTR_TABLE;
 
+typedef struct TEMPO_TypeFunc TEMPO_TypeFunc;
+extern const Table TEMPO_TYPE_FUNC_TABLE;
+
 
 /**
  * To-Implement interface type.

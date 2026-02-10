@@ -8,10 +8,10 @@
 
 struct TEMPO_Type {
     union {
-        TypeFile file;
-        TypeText text;
-        TypeSlid slid;
-        TypeBool bool_;
+        TEMPO_TypeFile file;
+        TEMPO_TypeText text;
+        TEMPO_TypeSlid slid;
+        TEMPO_TypeBool bool_;
         TEMPO_TypeManu* manu;
     } info;
     TypeId id;
@@ -19,18 +19,19 @@ struct TEMPO_Type {
 };
 
 
-typedef struct {
+struct TEMPO_TypeFunc {
     bool (*create)(void*, const cJSON*);
     SDL_Texture* (*texture)(void*);
     bool (*trig)(void*, SDL_FRect);
     void (*delete)(void*);
-} TypeFunc;
+};
+
 KeyVal typeKeyVal[TEMPO_NUM_TYPES] = {
-    [TEMPO_TYPE_FILE] = {"FILE", &(TypeFunc){createFile, textureFile, trigFile, deleteFile}},
-    [TEMPO_TYPE_TEXT] = {"TEXT", &(TypeFunc){createText, textureText, trigText, deleteText}},
-    [TEMPO_TYPE_SLID] = {"SLID", &(TypeFunc){createSlid, textureSlid, trigSlid, deleteSlid}},
-    [TEMPO_TYPE_BOOL] = {"BOOL", &(TypeFunc){createBool, textureBool, trigBool, deleteBool}},
-    [TEMPO_TYPE_MANU] = {"MANU", &(TypeFunc){createManu, textureManu, trigManu, deleteManu}}
+    [TEMPO_TYPE_FILE] = {"FILE", &(TEMPO_TypeFunc){createFile, textureFile, trigFile, deleteFile}},
+    [TEMPO_TYPE_TEXT] = {"TEXT", &(TEMPO_TypeFunc){createText, textureText, trigText, deleteText}},
+    [TEMPO_TYPE_SLID] = {"SLID", &(TEMPO_TypeFunc){createSlid, textureSlid, trigSlid, deleteSlid}},
+    [TEMPO_TYPE_BOOL] = {"BOOL", &(TEMPO_TypeFunc){createBool, textureBool, trigBool, deleteBool}},
+    [TEMPO_TYPE_MANU] = {"MANU", &(TEMPO_TypeFunc){createManu, textureManu, trigManu, deleteManu}}
 };
 Table typeFuncTable = {.kv = typeKeyVal, .len = len_of(typeKeyVal)};
 
@@ -43,14 +44,14 @@ TEMPO_Type* TEMPO_CreateType(const cJSON* type_json) {
     char* type_name = NULL;
     REQ_CONDITION(cJSON_LoadByKey(type_json, "type", JSM_STRING, &type_name), return NULL);
     REQ_CONDITION(BASIC_GetTableIdxByKey(typeFuncTable, type_name, (int*)&type->id), return NULL);
-    const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return NULL);
     REQ_CONDITION(typeFunc->create(&type->info, type_json), return NULL);
 
     return type;
 }
 TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
-    const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return NULL);
     if (typeFunc->delete != NULL) typeFunc->delete(&type->info);
 
@@ -63,7 +64,7 @@ TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
 SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type) {
     REQ_CONDITION(type != NULL, return false);
 
-    const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return false);
 
     REQ_CONDITION(typeFunc->texture != NULL, return false);
@@ -72,7 +73,7 @@ SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type) {
 bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FRect dst_rect) {
     REQ_CONDITION(type != NULL, return false);
 
-    const TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return false);
 
     REQ_CONDITION(typeFunc->trig != NULL, return false);

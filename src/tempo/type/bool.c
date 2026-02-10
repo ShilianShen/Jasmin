@@ -4,12 +4,12 @@
 static const float A = 4, B = 4, C = 6, D = 36;
 static const SDL_Color color = WHITE;
 static void TEMPO_TrigFuncBool(const TrigPara para) {
-    const TypeBool* bool_ = (TypeBool*)para;
+    const TEMPO_TypeBool* bool_ = (TEMPO_TypeBool*)para;
     bool* now = bool_->now;
     if (now != NULL && bool_->readonly == false) *now = !*now;
 }
 bool createBool(void* info, const cJSON* info_json) {
-    TypeBool* bool_ = info;
+    TEMPO_TypeBool* bool_ = info;
     REQ_CONDITION(cJSON_IsObject(info_json), return false);
 
     cJSON_LoadByKey(info_json, "readonly", JSM_BOOL, &bool_->readonly);
@@ -29,11 +29,11 @@ bool createBool(void* info, const cJSON* info_json) {
     return true;
 }
 void deleteBool(void *info) {
-    TypeBool* bool_ = info;
+    TEMPO_TypeBool* bool_ = info;
     SDL_DestroyTexture(bool_->texture);
 }
 SDL_Texture* textureBool(void* info) {
-    const TypeBool* bool_ = info;
+    const TEMPO_TypeBool* bool_ = info;
     const float M = 1;
     const float N = *bool_->now;
     const float W = 2 * A + (M + 1) * B + M * D;
@@ -55,7 +55,7 @@ SDL_Texture* textureBool(void* info) {
     return bool_->texture;
 }
 bool trigBool(void* info, const SDL_FRect dst_rect) {
-    const TypeBool* bool_ = info;
+    const TEMPO_TypeBool* bool_ = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, (Trig){TEMPO_TrigFuncBool, (TrigPara)bool_, false});
     }

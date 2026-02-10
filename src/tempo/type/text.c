@@ -2,7 +2,7 @@
 
 
 bool createText(void* info, const cJSON* info_json)   {
-    TypeText* text = info;
+    TEMPO_TypeText* text = info;
     if (cJSON_IsObject(info_json) == false) {
         return false;
     }
@@ -33,14 +33,14 @@ bool createText(void* info, const cJSON* info_json)   {
     return true;
 }
 void deleteText(void* info) {
-    TypeText* text = info;
+    TEMPO_TypeText* text = info;
     if (text->string != NULL) {
         free(text->string);
         text->string = NULL;
     }
 }
 SDL_Texture* textureText(void *info) {
-    TypeText* text = info;
+    TEMPO_TypeText* text = info;
     const char* string = text->string;
     if (text->key == true) {
         string = BASIC_GetTableValByKey(TEMPO_PTR_TABLE, text->string);
@@ -66,7 +66,7 @@ SDL_Texture* textureText(void *info) {
     return text->texture;
 }
 bool trigText(void *info, const SDL_FRect dst_rect) {
-    TypeText* text = info;
+    TEMPO_TypeText* text = info;
     if (PERPH_GetMouseAndKeyInRect(PERPH_MOUSE_KEY_LEFT, dst_rect)) {
         const Trig trig = text->func != NULL ? (Trig){text->func, (TrigPara)text->para_string, false} : BASIC_TrigPass;
         PERPH_SetMouseKeyTrig(PERPH_MOUSE_KEY_LEFT, trig);

@@ -5,14 +5,14 @@
 #include "model.h"
 
 
-typedef struct Camera Camera;
-struct Camera {
+typedef struct LOTRI_Camera LOTRI_Camera;
+struct LOTRI_Camera {
     Vec3f position;
     Vec3f rotation;
     Vec3f scale;
     Mat4f mat;
 };
-extern Camera camera;
+extern LOTRI_Camera camera;
 
 
 bool LOTRI_SetCamera(Vec3f rotation, Vec3f position);

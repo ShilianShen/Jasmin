@@ -9,7 +9,7 @@ typedef struct {
     bool readonly;
     bool* now;
     SDL_Texture* texture;
-} TypeBool;
+} TEMPO_TypeBool;
 
 
 bool createBool(void* info, const cJSON* info_json);

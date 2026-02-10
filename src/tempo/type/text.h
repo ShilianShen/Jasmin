@@ -13,7 +13,7 @@ typedef struct {
     SDL_Color backColor;
     TrigFunc func;
     char* para_string;
-} TypeText;
+} TEMPO_TypeText;
 bool createText(void* info, const cJSON* info_json);
 SDL_Texture* textureText(void *info);
 bool trigText(void *info, SDL_FRect dst_rect);

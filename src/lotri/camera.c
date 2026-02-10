@@ -4,7 +4,7 @@
 static Mat4f matProj;
 
 
-Camera camera = {
+LOTRI_Camera camera = {
     .position = {0, 0, 1.8f},
     .rotation = {0, 0, -(float)M_PI},
     .scale = {200, 200, 200},
