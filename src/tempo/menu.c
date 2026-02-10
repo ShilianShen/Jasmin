@@ -9,15 +9,15 @@ const char* MENU_ROOT_NAME = "Root";
 const char* MENU_EDGE_NAME = "Edge";
 bool trigAuthorize = false;
 #define MENU_PATH_VOLUME 6
-struct Menu {
+struct TEMPO_Menu {
     Table pageTable;
-    Page* pageRoot;
-    Page* pageEdge;
-    Page* path[MENU_PATH_VOLUME];
-    Page* pageNow;
+    TEMPO_Page* pageRoot;
+    TEMPO_Page* pageEdge;
+    TEMPO_Page* path[MENU_PATH_VOLUME];
+    TEMPO_Page* pageNow;
 };
-typedef struct Menu Menu;
-static Menu menu;
+typedef struct TEMPO_Menu TEMPO_Menu;
+static TEMPO_Menu menu;
 
 
 // MENU TRIG TYPE ======================================================================================================
@@ -63,7 +63,7 @@ static bool TEMPO_InitMenu_RK(const cJSON* menu_json) {
     return true;
 }
 bool TEMPO_InitMenu() {
-    memset(&menu, 0, sizeof(Menu));
+    memset(&menu, 0, sizeof(TEMPO_Menu));
     cJSON* menu_json = getJson(TEMPO_JSON);
     REQ_CONDITION(menu_json != NULL, return false);
     const bool rk = TEMPO_InitMenu_RK(menu_json);
@@ -145,7 +145,7 @@ static void TEMPO_TrigFuncForward(const char* para) {
     const char* pageName = para;
 
     // getPage
-    Page* page = NULL;
+    TEMPO_Page* page = NULL;
     for (int i = 0; i < menu.pageTable.len; i++) {
         if (menu.pageTable.kv[i].val == NULL) {continue;}
         if (strcmp(menu.pageTable.kv[i].key, pageName) == 0) {page = menu.pageTable.kv[i].val;}
@@ -172,7 +172,7 @@ static void TEMPO_TrigFuncClear(const char* para) {
     for (int i = 0; i < MENU_PATH_VOLUME; i++) {menu.path[i] = 0;}
 }
 static void TEMPO_TrigFuncSwap(const char* para) {
-    Page* page = BASIC_GetTableValByKey(menu.pageTable, para);
+    TEMPO_Page* page = BASIC_GetTableValByKey(menu.pageTable, para);
 
     if (page == NULL) return;
 

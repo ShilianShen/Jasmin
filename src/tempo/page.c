@@ -9,7 +9,7 @@ const SDL_FRect* elemBckNow = NULL;
 
 
 // PAGE ================================================================================================================
-struct Page {
+struct TEMPO_Page {
     Table elemTable;
     int anchor;
     SDL_FRect src_rect, *src;
@@ -21,8 +21,8 @@ struct Page {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
-    memset(page, 0, sizeof(Page));
+static bool TEMPO_CreatePage_RK(TEMPO_Page* page, const cJSON* page_json) {
+    memset(page, 0, sizeof(TEMPO_Page));
 
     const cJSON* table_json = cJSON_GetObjectItem(page_json, "elemTable");
     REQ_CONDITION(table_json != NULL, return false);
@@ -56,9 +56,9 @@ static bool TEMPO_CreatePage_RK(Page* page, const cJSON* page_json) {
     }
     return true;
 }
-Page *TEMPO_CreatePage(const cJSON *page_json) {
+TEMPO_Page *TEMPO_CreatePage(const cJSON *page_json) {
     REQ_CONDITION(page_json != NULL, return NULL);
-    Page* page = calloc(1, sizeof(Page));
+    TEMPO_Page* page = calloc(1, sizeof(TEMPO_Page));
     REQ_CONDITION(page != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreatePage_RK(page, page_json), {
         page = TEMPO_DeletePage(page);
@@ -66,7 +66,7 @@ Page *TEMPO_CreatePage(const cJSON *page_json) {
     });
     return page;
 }
-Page *TEMPO_DeletePage(Page *page) {
+TEMPO_Page *TEMPO_DeletePage(TEMPO_Page *page) {
     if (page != NULL) {
         if (page->elemTable.kv != NULL) {
             BASIC_DeleteTable(&page->elemTable, TEMPO_DeleteElem);
@@ -79,7 +79,7 @@ Page *TEMPO_DeletePage(Page *page) {
 
 
 // RENEW ===============================================================================================================
-static bool TEMPO_RenewPage_DstRect(Page* page) {
+static bool TEMPO_RenewPage_DstRect(TEMPO_Page* page) {
     return SDL_LoadDstRectAligned(
         &page->dst_rect,
         NULL,
@@ -89,7 +89,7 @@ static bool TEMPO_RenewPage_DstRect(Page* page) {
         page->anchor
     );
 }
-bool TEMPO_RenewPage(Page *page) {
+bool TEMPO_RenewPage(TEMPO_Page *page) {
     REQ_CONDITION(page != NULL, return false);
     REQ_CONDITION(TEMPO_RenewPage_DstRect(page), return false);
 
@@ -110,7 +110,7 @@ bool TEMPO_RenewPage(Page *page) {
 
 
 // DRAW ================================================================================================================
-bool TEMPO_DrawPage(const Page* page) {
+bool TEMPO_DrawPage(const TEMPO_Page* page) {
     REQ_CONDITION(page != NULL, return false);
     SDL_SetRenderColor(renderer, page->color);
     SDL_RenderFillRect(renderer, &page->dst_rect);

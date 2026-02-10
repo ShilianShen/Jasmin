@@ -8,7 +8,7 @@ static const Table* elemTableNow = NULL;
 
 
 // ELEM ================================================================================================================
-struct Elem {
+struct TEMPO_Elem {
     char* name;
     TEMPO_Type* type;
     int anchor;
@@ -31,7 +31,7 @@ bool TEMPO_SetElemTableNow(const Table* table) {
 
 
 // CREATE & DELETE =====================================================================================================
-static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
+static bool TEMPO_CreateElem_RK(TEMPO_Elem* elem, const cJSON *elem_json) {
     const cJSON* type_json = cJSON_GetObjectItem(elem_json, "type");
     REQ_CONDITION(type_json != NULL, return false);
 
@@ -52,7 +52,7 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     if (cJSON_LoadByKey(elem_json, "bck", JSM_STRING, &bck_json)) {
         REQ_CONDITION(elemTableNow != NULL, return false);
         for (int i = 0; i < elemTableNow->len; i++) {
-            Elem* another = elemTableNow->kv[i].val;
+            TEMPO_Elem* another = elemTableNow->kv[i].val;
             if (another == NULL || another->name == NULL) continue;
             if (strcmp(another->name, bck_json) != 0) continue;
             elem->bck = &another->dst_rect;
@@ -60,14 +60,14 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
     }
     return true;
 }
-Elem *TEMPO_CreateElem(const cJSON *elem_json) {
+TEMPO_Elem *TEMPO_CreateElem(const cJSON *elem_json) {
     REQ_CONDITION(elem_json != NULL, return NULL);
-    Elem* elem = calloc(1, sizeof(Elem));
+    TEMPO_Elem* elem = calloc(1, sizeof(TEMPO_Elem));
     REQ_CONDITION(elem != NULL, return NULL);
     REQ_CONDITION(TEMPO_CreateElem_RK(elem, elem_json), elem = TEMPO_DeleteElem(elem));
     return elem;
 }
-Elem *TEMPO_DeleteElem(Elem *elem) {
+TEMPO_Elem *TEMPO_DeleteElem(TEMPO_Elem *elem) {
     if (elem == NULL) return elem;
 
     if (elem->type != NULL) {
@@ -82,7 +82,7 @@ Elem *TEMPO_DeleteElem(Elem *elem) {
 
 
 // RENEW ===============================================================================================================
-bool TEMPO_RenewElem(Elem *elem) {
+bool TEMPO_RenewElem(TEMPO_Elem *elem) {
     REQ_CONDITION(elem != NULL, return false);
 
     elem->texture = TEMPO_RenewTypeTexture(elem->type);
@@ -106,7 +106,7 @@ bool TEMPO_RenewElem(Elem *elem) {
 
 
 // DRAW ================================================================================================================
-bool TEMPO_DrawElem(const Elem* elem) {
+bool TEMPO_DrawElem(const TEMPO_Elem* elem) {
     REQ_CONDITION(elem != NULL, return false);
 
     DEBUG_DrawRect(elem->dst_rect);

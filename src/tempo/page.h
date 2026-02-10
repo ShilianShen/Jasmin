@@ -5,13 +5,13 @@
 #include "elem.h"
 
 
-typedef struct Page Page;
+typedef struct TEMPO_Page TEMPO_Page;
 
 
-Page *TEMPO_CreatePage(const cJSON *page_json);
-Page *TEMPO_DeletePage(Page *page);
-bool TEMPO_RenewPage(Page *page);
-bool TEMPO_DrawPage(const Page *page);
+TEMPO_Page *TEMPO_CreatePage(const cJSON *page_json);
+TEMPO_Page *TEMPO_DeletePage(TEMPO_Page *page);
+bool TEMPO_RenewPage(TEMPO_Page *page);
+bool TEMPO_DrawPage(const TEMPO_Page *page);
 
 
 #endif //JASMIN_MENU_STRUCT_PAGE_H

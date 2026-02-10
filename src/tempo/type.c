@@ -78,3 +78,6 @@ bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FRect dst_rect) {
     REQ_CONDITION(typeFunc->trig != NULL, return false);
     return typeFunc->trig(&type->info, dst_rect);
 }
+
+
+
