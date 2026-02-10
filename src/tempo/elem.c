@@ -58,7 +58,6 @@ static bool TEMPO_CreateElem_RK(Elem* elem, const cJSON *elem_json) {
             elem->bck = &another->dst_rect;
         }
     }
-
     return true;
 }
 Elem *TEMPO_CreateElem(const cJSON *elem_json) {

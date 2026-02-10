@@ -72,9 +72,6 @@ bool TEMPO_InitMenu() {
         TEMPO_ExitMenu();
         return false;
     }
-    for (int i = 0; i < menu.pageTable.len; i++) {
-        printf("%s\n", menu.pageTable.kv[i].key);
-    }
     return true;
 }
 void TEMPO_ExitMenu() {

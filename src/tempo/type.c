@@ -15,6 +15,7 @@ struct TEMPO_Type {
         TEMPO_TypeManu* manu;
     } info;
     TypeId id;
+    int idx;
 };
 
 
