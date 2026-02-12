@@ -6,6 +6,14 @@
 #include "type/manu.h"
 
 
+typedef enum {
+    TEMPO_TYPE_FILE,
+    TEMPO_TYPE_TEXT,
+    TEMPO_TYPE_SLID,
+    TEMPO_TYPE_BOOL,
+    TEMPO_TYPE_MANU,
+    TEMPO_NUM_TYPES,
+} TypeId;
 struct TEMPO_Type {
     union {
         TEMPO_TypeFile file;
@@ -14,17 +22,14 @@ struct TEMPO_Type {
         TEMPO_TypeBool bool_;
         TEMPO_TypeManu* manu;
     } info;
+
     TypeId id;
+
+
     int idx;
+    void* data;
 };
 
-
-struct TEMPO_TypeFunc {
-    bool (*create)(void*, const cJSON*);
-    SDL_Texture* (*texture)(void*);
-    bool (*trig)(void*, SDL_FRect);
-    void (*delete)(void*);
-};
 
 KeyVal typeKeyVal[TEMPO_NUM_TYPES] = {
     [TEMPO_TYPE_FILE] = {"FILE", &(TEMPO_TypeFunc){createFile, textureFile, trigFile, deleteFile}},
@@ -47,6 +52,12 @@ TEMPO_Type* TEMPO_CreateType(const cJSON* type_json) {
     const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
     REQ_CONDITION(typeFunc != NULL, return NULL);
     REQ_CONDITION(typeFunc->create(&type->info, type_json), return NULL);
+    {
+        // REQ_CONDITION(BASIC_GetTableIdxByKey(TEMPO_TYPE_FUNC_TABLE, type_name, &type->idx), return NULL);
+        // const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
+        // REQ_CONDITION(typeFunc != NULL, return NULL);
+        // REQ_CONDITION(typeFunc->create(type->data, type_json), return NULL);
+    }
 
     return type;
 }
