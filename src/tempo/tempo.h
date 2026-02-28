@@ -24,13 +24,18 @@ extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
  * Will be used in 'tempo.json' to map 'para'/'key' to a void*.
  */
 extern const Table TEMPO_PTR_TABLE;
-struct TEMPO_TypeFunc {
-    bool (*create)(void*, const cJSON*);
-    SDL_Texture* (*texture)(void*);
-    bool (*trig)(void*, SDL_FRect);
+
+
+struct TEMPO_TypeFunc2 {
+    void*(*create)(const cJSON*);
     void (*delete)(void*);
+    SDL_Texture* (*texture)(void*);
+    void (*trig)(void*, SDL_FRect);
 };
-typedef struct TEMPO_TypeFunc TEMPO_TypeFunc;
+typedef struct TEMPO_TypeFunc2 TEMPO_TypeFunc2;
+
+
+
 extern const Table TEMPO_TYPE_FUNC_TABLE;
 
 

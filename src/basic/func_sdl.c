@@ -166,7 +166,7 @@ SDL_Texture* TXT_LoadTextureWithLines(
     const char aligned
     ) {
 
-    if (strlen(scr_text) == 0) return NULL; // Opt Condition
+    if (scr_text == NULL || strlen(scr_text) == 0) return NULL; // Opt Condition
     int size_text = (int)strlen(scr_text) + 1;
     char text[size_text];
     strcpy(text, scr_text);

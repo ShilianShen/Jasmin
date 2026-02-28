@@ -1,72 +1,42 @@
-// #include "type.h"
-#include "type/text.h"
-#include "type/file.h"
-#include "type/slid.h"
-#include "type/bool.h"
-#include "type/manu.h"
+#include "type.h"
 
 
-typedef enum {
-    TEMPO_TYPE_FILE,
-    TEMPO_TYPE_TEXT,
-    TEMPO_TYPE_SLID,
-    TEMPO_TYPE_BOOL,
-    TEMPO_TYPE_MANU,
-    TEMPO_NUM_TYPES,
-} TypeId;
 struct TEMPO_Type {
-    union {
-        TEMPO_TypeFile file;
-        TEMPO_TypeText text;
-        TEMPO_TypeSlid slid;
-        TEMPO_TypeBool bool_;
-        TEMPO_TypeManu* manu;
-    } info;
-
-    TypeId id;
-
-
     int idx;
     void* data;
 };
 
 
-KeyVal typeKeyVal[TEMPO_NUM_TYPES] = {
-    [TEMPO_TYPE_FILE] = {"FILE", &(TEMPO_TypeFunc){createFile, textureFile, trigFile, deleteFile}},
-    [TEMPO_TYPE_TEXT] = {"TEXT", &(TEMPO_TypeFunc){createText, textureText, trigText, deleteText}},
-    [TEMPO_TYPE_SLID] = {"SLID", &(TEMPO_TypeFunc){createSlid, textureSlid, trigSlid, deleteSlid}},
-    [TEMPO_TYPE_BOOL] = {"BOOL", &(TEMPO_TypeFunc){createBool, textureBool, trigBool, deleteBool}},
-    [TEMPO_TYPE_MANU] = {"MANU", &(TEMPO_TypeFunc){createManu, textureManu, trigManu, deleteManu}}
-};
-Table typeFuncTable = {.kv = typeKeyVal, .len = len_of(typeKeyVal)};
-
-
 // CREATE & DELETE =====================================================================================================
 TEMPO_Type* TEMPO_CreateType(const cJSON* type_json) {
     REQ_CONDITION(type_json != NULL, return NULL);
+
     TEMPO_Type* type = calloc(1, sizeof(TEMPO_Type));
     REQ_CONDITION(type != NULL, return NULL);
+
     char* type_name = NULL;
     REQ_CONDITION(cJSON_LoadByKey(type_json, "type", JSM_STRING, &type_name), return NULL);
-    REQ_CONDITION(BASIC_GetTableIdxByKey(typeFuncTable, type_name, (int*)&type->id), return NULL);
-    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+
+    REQ_CONDITION(BASIC_GetTableIdxByKey(TEMPO_TYPE_FUNC_TABLE, type_name, &type->idx), return NULL);
+
+    const TEMPO_TypeFunc2* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
     REQ_CONDITION(typeFunc != NULL, return NULL);
-    REQ_CONDITION(typeFunc->create(&type->info, type_json), return NULL);
-    {
-        // REQ_CONDITION(BASIC_GetTableIdxByKey(TEMPO_TYPE_FUNC_TABLE, type_name, &type->idx), return NULL);
-        // const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
-        // REQ_CONDITION(typeFunc != NULL, return NULL);
-        // REQ_CONDITION(typeFunc->create(type->data, type_json), return NULL);
-    }
+
+    type->data = typeFunc->create(type_json);
+    REQ_CONDITION(type->data != NULL, return NULL);
 
     return type;
 }
 TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
-    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
-    REQ_CONDITION(typeFunc != NULL, return NULL);
-    if (typeFunc->delete != NULL) typeFunc->delete(&type->info);
-
-    free(type);
+    if (type != NULL) {
+        if (type->data != NULL) {
+            const TEMPO_TypeFunc2* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
+            REQ_CONDITION(typeFunc != NULL, return NULL);
+            typeFunc->delete(type->data);
+        }
+        free(type);
+        type = NULL;
+    }
     return NULL;
 }
 
@@ -75,20 +45,21 @@ TEMPO_Type* TEMPO_DeleteType(TEMPO_Type* type) {
 SDL_Texture* TEMPO_RenewTypeTexture(TEMPO_Type* type) {
     REQ_CONDITION(type != NULL, return false);
 
-    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc2* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
     REQ_CONDITION(typeFunc != NULL, return false);
 
     REQ_CONDITION(typeFunc->texture != NULL, return false);
-    return typeFunc->texture(&type->info);
+    return typeFunc->texture(type->data);
 }
 bool TEMPO_RenewTypeTrig(TEMPO_Type* type, const SDL_FRect dst_rect) {
     REQ_CONDITION(type != NULL, return false);
 
-    const TEMPO_TypeFunc* typeFunc = BASIC_GetTableValByIdx(typeFuncTable, type->id);
+    const TEMPO_TypeFunc2* typeFunc = BASIC_GetTableValByIdx(TEMPO_TYPE_FUNC_TABLE, type->idx);
     REQ_CONDITION(typeFunc != NULL, return false);
 
     REQ_CONDITION(typeFunc->trig != NULL, return false);
-    return typeFunc->trig(&type->info, dst_rect);
+    typeFunc->trig(&type->data, dst_rect);
+    return true;
 }
 
 
