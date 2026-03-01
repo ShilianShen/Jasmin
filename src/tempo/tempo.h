@@ -26,13 +26,13 @@ extern const Table TEMPO_OUTER_TRIG_FUNC_TABLE;
 extern const Table TEMPO_PTR_TABLE;
 
 
-struct TEMPO_TypeFunc2 {
+struct TEMPO_TypeFunc {
     void*(*create)(const cJSON*);
     void (*delete)(void*);
     SDL_Texture* (*texture)(void*);
     void (*trig)(void*, SDL_FRect);
 };
-typedef struct TEMPO_TypeFunc2 TEMPO_TypeFunc2;
+typedef struct TEMPO_TypeFunc TEMPO_TypeFunc;
 
 
 
